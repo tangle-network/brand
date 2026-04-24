@@ -1,0 +1,65 @@
+{
+  "name": "@tangle-network/brand",
+  "version": "0.1.0",
+  "description": "Tangle brand system — design tokens, fonts, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tangle-network/brand"
+  },
+  "bugs": {
+    "url": "https://github.com/tangle-network/brand/issues"
+  },
+  "homepage": "https://github.com/tangle-network/brand",
+  "sideEffects": [
+    "./src/styles/*.css",
+    "./dist/styles/*.css"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles": {
+      "style": "./src/styles/index.css",
+      "default": "./src/styles/index.css"
+    },
+    "./styles/index.css": "./src/styles/index.css",
+    "./styles/tokens.css": "./src/styles/tokens.css",
+    "./styles/globals.css": "./src/styles/globals.css",
+    "./styles/fonts.css": "./src/styles/fonts.css",
+    "./styles/theme.css": "./src/styles/theme.css"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.0"
+  },
+  "keywords": [
+    "tangle",
+    "design-system",
+    "brand",
+    "tokens",
+    "tailwind"
+  ]
+}

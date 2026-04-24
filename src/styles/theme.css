@@ -1,0 +1,50 @@
+/* Tangle brand — Tailwind v4 @theme block.
+   Maps brand CSS custom properties into Tailwind's color/font/radius system
+   so utilities like `bg-brand-primary`, `text-text-muted`, `rounded-md`,
+   `font-display` work out of the box.
+
+   Consumers include this AFTER `@import "tailwindcss"` and
+   BEFORE their own project-local @theme overrides. */
+
+@theme {
+  /* Typography */
+  --font-sans: "Geist", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Geist", sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  /* Radii (dark theme default — light theme overrides in tokens.css) */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* Core brand accent (indigo) — use as `bg-brand`, `text-brand`, `ring-brand` */
+  --color-brand: #6366F1;
+  --color-brand-dim: #4F46E5;
+  --color-brand-cool: #818CF8;
+  --color-brand-glow: #A5AAFC;
+  --color-brand-emerald: #10B981;
+
+  /* Depth stack — use as `bg-depth-1` ... `bg-depth-4` */
+  --color-depth-1: #0C0B1D;
+  --color-depth-2: #141328;
+  --color-depth-3: #1D1B38;
+  --color-depth-4: #262448;
+
+  /* Semantic text — use as `text-fg`, `text-fg-muted`, `text-fg-dim` */
+  --color-fg: #fdfdfd;
+  --color-fg-muted: #8688B0;
+  --color-fg-dim: #606294;
+
+  /* Status — use as `text-status-running`, `bg-status-stopped` */
+  --color-status-running: #10B981;
+  --color-status-creating: #9B93F0;
+  --color-status-stopped: #FFB800;
+  --color-status-error: #FF4D6D;
+
+  /* Shadows — use as `shadow-card`, `shadow-glow` */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-glow: 0 0 32px rgba(99, 102, 241, 0.18);
+}

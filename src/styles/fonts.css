@@ -1,0 +1,5 @@
+/* Tangle brand typography — one import for every surface.
+   Geist (UI) + Geist Mono (code) + Outfit (display) + Manrope (vault headlines) + Inter (vault body).
+   Matches sandbox-ui. Do not add fonts here without updating the brand audit. */
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");

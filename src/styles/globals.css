@@ -1,0 +1,105 @@
+/* Tangle brand — base styles + utilities.
+   Mirrors sandbox-ui's globals.css with sandbox-only @source rules stripped.
+   Consumers should @import this AFTER @import "tailwindcss". */
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1,
+      "ss01" 1;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.28);
+    color: hsl(var(--hsl-foreground));
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border) / 0.7);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    background-image: var(--tangle-gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 48px -10px hsl(var(--primary) / 0.45);
+  }
+
+  .depth-1 { background-color: var(--depth-1); }
+  .depth-2 { background-color: var(--depth-2); }
+  .depth-3 { background-color: var(--depth-3); }
+  .depth-4 { background-color: var(--depth-4); }
+
+  .surface-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    transition: border-color var(--transition-default), box-shadow var(--transition-default);
+  }
+
+  .surface-card:hover {
+    border-color: hsl(var(--border));
+  }
+
+  .bg-mesh {
+    position: relative;
+  }
+
+  .bg-mesh::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 40%, var(--mesh-teal), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 20%, var(--mesh-violet), transparent),
+      radial-gradient(ellipse 50% 60% at 50% 80%, var(--mesh-blue), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .status-dot-running { background: var(--status-running); box-shadow: var(--shadow-status-running); }
+  .status-dot-stopped { background: var(--status-stopped); }
+  .status-dot-error { background: var(--status-error); box-shadow: var(--shadow-status-error); }
+}
