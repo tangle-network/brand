@@ -1,10 +1,10 @@
-/* One-line brand import — pulls fonts + tokens + globals + Tailwind v4 theme.
+/* One-line brand import — pulls tokens + globals + Tailwind v4 theme.
    Usage in a Tailwind v4 app:
      @import "@tangle-network/brand/styles";
      @import "tailwindcss";
-   For finer control, import the individual files. */
+   For finer control, import the individual files.
+   Fonts are NOT bundled — see README "Fonts" for consumer-loads-fonts strategy. */
 
-@import "./fonts.css";
 @import "./tokens.css";
 @import "./theme.css";
 @import "./globals.css";
