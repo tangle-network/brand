@@ -1,7 +1,7 @@
 {
   "name": "@tangle-network/brand",
-  "version": "0.1.0",
-  "description": "Tangle brand system — design tokens, fonts, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
+  "version": "0.2.0",
+  "description": "Tangle brand system — design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -35,7 +35,6 @@
     "./styles/index.css": "./src/styles/index.css",
     "./styles/tokens.css": "./src/styles/tokens.css",
     "./styles/globals.css": "./src/styles/globals.css",
-    "./styles/fonts.css": "./src/styles/fonts.css",
     "./styles/theme.css": "./src/styles/theme.css"
   },
   "scripts": {
