@@ -39,7 +39,7 @@
     "./tool-previews": { "types": "./dist/tool-previews.d.ts", "import": "./dist/tool-previews.js", "default": "./dist/tool-previews.js" }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node ../../scripts/validate-dist.mjs",
     "dev": "tsup --watch",
     "prepublishOnly": "pnpm build"
   },
