@@ -1,5 +1,5 @@
 import type { Preview } from "@storybook/react";
-import "@tangle-network/brand/styles";
+import "./storybook.css";
 
 const preview: Preview = {
   parameters: {
