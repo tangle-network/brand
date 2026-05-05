@@ -49,6 +49,7 @@
     "react": { "optional": true }
   },
   "devDependencies": {
+    "@storybook/react": "^8.6.18",
     "@types/react": "^19.0.0",
     "react": "^19.0.0",
     "tsup": "^8.3.5",

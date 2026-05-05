@@ -5,3 +5,5 @@ dist/
 .env
 .env.local
 thoughts/
+storybook-static/
+.vite/
