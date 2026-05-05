@@ -7,10 +7,10 @@
   "repository": { "type": "git", "url": "https://github.com/tangle-network/brand" },
   "type": "module",
   "scripts": {
-    "build": "pnpm -r --filter ./packages/* run build",
-    "dev": "pnpm -r --parallel --filter ./packages/* run dev",
+    "build": "pnpm -r run --if-present build",
+    "dev": "pnpm -r --parallel run --if-present dev",
     "test": "echo \"no tests yet (lands in Phase B)\" && exit 0",
-    "typecheck": "pnpm -r --filter ./packages/* exec tsc --noEmit",
+    "typecheck": "pnpm -r exec tsc --noEmit",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
