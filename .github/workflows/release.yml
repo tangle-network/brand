@@ -1,14 +1,14 @@
-name: Auto Release & Publish
+name: Release
 
 on:
   push:
     branches: [main]
-    paths: [package.json]
 
 permissions:
   contents: write
   id-token: write
   packages: write
+  pull-requests: write
 
 jobs:
   release:
@@ -19,58 +19,63 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 2
-
-      - name: Check for version change
-        id: version
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          NEW_VERSION=$(jq -r '.version' package.json)
-          OLD_VERSION=$(git show HEAD~1:package.json 2>/dev/null | jq -r '.version' || echo "")
-          if [ -n "$OLD_VERSION" ] && [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
-            if ! gh release view "v${NEW_VERSION}" &>/dev/null; then
-              echo "changed=true" >> "$GITHUB_OUTPUT"
-              echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-            fi
-          fi
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
-        if: steps.version.outputs.changed == 'true'
         with:
           version: 10
 
       - uses: actions/setup-node@v5
-        if: steps.version.outputs.changed == 'true'
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
-      - name: Install, build, and publish
-        if: steps.version.outputs.changed == 'true'
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run build
-          npm publish --provenance --access public
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -r run --if-present build
+
+      - name: Create release PR or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+          version: pnpm version-packages
+          commit: "chore: release"
+          title: "chore: release"
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
 
       - name: Publish to GitHub Packages
-        if: steps.version.outputs.changed == 'true'
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           cat > .npmrc <<EOF
           @tangle-network:registry=https://npm.pkg.github.com
           //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
           EOF
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo '${{ steps.changesets.outputs.publishedPackages }}' \
+            | jq -r '.[] | [.name, .version] | @tsv' \
+            | while IFS=$'\t' read -r name version; do
+                dir="packages/${name#@tangle-network/}"
+                echo "Publishing $name@$version from $dir to GitHub Packages"
+                (cd "$dir" && npm publish)
+              done
 
-      - name: Create GitHub Release
-        if: steps.version.outputs.changed == 'true'
+      - name: Create GitHub Releases
+        if: steps.changesets.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_VERSION: ${{ steps.version.outputs.version }}
-        run: gh release create "v${RELEASE_VERSION}" --generate-notes
+        run: |
+          echo '${{ steps.changesets.outputs.publishedPackages }}' \
+            | jq -r '.[] | "\(.name)@\(.version)"' \
+            | while read -r tag; do
+                version="${tag##*@}"
+                gh release create "v${version}" --generate-notes --title "${tag}" || true
+              done
