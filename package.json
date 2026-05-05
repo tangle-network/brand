@@ -1,64 +1,24 @@
 {
-  "name": "@tangle-network/brand",
-  "version": "0.2.0",
-  "description": "Tangle brand system — design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
-  "type": "module",
+  "name": "@tangle-network/design-system-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Tangle design-system foundation — brand tokens + generic UI components.",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tangle-network/brand"
-  },
-  "bugs": {
-    "url": "https://github.com/tangle-network/brand/issues"
-  },
-  "homepage": "https://github.com/tangle-network/brand",
-  "sideEffects": [
-    "./src/styles/*.css",
-    "./dist/styles/*.css"
-  ],
-  "files": [
-    "dist",
-    "src",
-    "README.md",
-    "CHANGELOG.md"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./styles": {
-      "style": "./src/styles/index.css",
-      "default": "./src/styles/index.css"
-    },
-    "./styles/index.css": "./src/styles/index.css",
-    "./styles/tokens.css": "./src/styles/tokens.css",
-    "./styles/globals.css": "./src/styles/globals.css",
-    "./styles/theme.css": "./src/styles/theme.css"
-  },
+  "repository": { "type": "git", "url": "https://github.com/tangle-network/brand" },
+  "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean",
-    "dev": "tsup src/index.ts --format esm --dts --watch",
-    "prepublishOnly": "pnpm build"
-  },
-  "peerDependencies": {
-    "react": ">=18"
-  },
-  "peerDependenciesMeta": {
-    "react": { "optional": true }
+    "build": "pnpm -r --filter ./packages/* run build",
+    "dev": "pnpm -r --parallel --filter ./packages/* run dev",
+    "test": "echo \"no tests yet (lands in Phase B)\" && exit 0",
+    "typecheck": "pnpm -r --filter ./packages/* exec tsc --noEmit",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "react": "^19.0.0",
-    "tsup": "^8.3.5",
+    "@changesets/cli": "^2.27.10",
     "typescript": "^5.6.0"
   },
-  "keywords": [
-    "tangle",
-    "design-system",
-    "brand",
-    "tokens",
-    "tailwind"
-  ]
+  "packageManager": "pnpm@10.33.3",
+  "engines": { "node": ">=22" }
 }
