@@ -113,3 +113,6 @@ export type { SidebarDropZoneProps } from "./sidebar-drop-zone";
 
 export { ArtifactPane } from "./artifact-pane";
 export type { ArtifactPaneProps } from "./artifact-pane";
+
+export { CodeBlock, CopyButton, InlineCode } from "./code-block";
+export type { CodeBlockProps, InlineCodeProps } from "./code-block";
