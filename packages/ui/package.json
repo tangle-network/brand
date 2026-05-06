@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/ui",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Generic React UI components for Tangle products — primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
@@ -22,21 +22,81 @@
     "LICENSE"
   ],
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "default": "./dist/index.js" },
-    "./primitives": { "types": "./dist/primitives.d.ts", "import": "./dist/primitives.js", "default": "./dist/primitives.js" },
-    "./chat": { "types": "./dist/chat.d.ts", "import": "./dist/chat.js", "default": "./dist/chat.js" },
-    "./run": { "types": "./dist/run.d.ts", "import": "./dist/run.js", "default": "./dist/run.js" },
-    "./openui": { "types": "./dist/openui.d.ts", "import": "./dist/openui.js", "default": "./dist/openui.js" },
-    "./files": { "types": "./dist/files.d.ts", "import": "./dist/files.js", "default": "./dist/files.js" },
-    "./editor": { "types": "./dist/editor.d.ts", "import": "./dist/editor.js", "default": "./dist/editor.js" },
-    "./markdown": { "types": "./dist/markdown.d.ts", "import": "./dist/markdown.js", "default": "./dist/markdown.js" },
-    "./auth": { "types": "./dist/auth.d.ts", "import": "./dist/auth.js", "default": "./dist/auth.js" },
-    "./hooks": { "types": "./dist/hooks.d.ts", "import": "./dist/hooks.js", "default": "./dist/hooks.js" },
-    "./sdk-hooks": { "types": "./dist/sdk-hooks.d.ts", "import": "./dist/sdk-hooks.js", "default": "./dist/sdk-hooks.js" },
-    "./stores": { "types": "./dist/stores.d.ts", "import": "./dist/stores.js", "default": "./dist/stores.js" },
-    "./types": { "types": "./dist/types.d.ts", "import": "./dist/types.js", "default": "./dist/types.js" },
-    "./utils": { "types": "./dist/utils.d.ts", "import": "./dist/utils.js", "default": "./dist/utils.js" },
-    "./tool-previews": { "types": "./dist/tool-previews.d.ts", "import": "./dist/tool-previews.js", "default": "./dist/tool-previews.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./primitives": {
+      "types": "./dist/primitives.d.ts",
+      "import": "./dist/primitives.js",
+      "default": "./dist/primitives.js"
+    },
+    "./chat": {
+      "types": "./dist/chat.d.ts",
+      "import": "./dist/chat.js",
+      "default": "./dist/chat.js"
+    },
+    "./run": {
+      "types": "./dist/run.d.ts",
+      "import": "./dist/run.js",
+      "default": "./dist/run.js"
+    },
+    "./openui": {
+      "types": "./dist/openui.d.ts",
+      "import": "./dist/openui.js",
+      "default": "./dist/openui.js"
+    },
+    "./files": {
+      "types": "./dist/files.d.ts",
+      "import": "./dist/files.js",
+      "default": "./dist/files.js"
+    },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js",
+      "default": "./dist/editor.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "import": "./dist/markdown.js",
+      "default": "./dist/markdown.js"
+    },
+    "./auth": {
+      "types": "./dist/auth.d.ts",
+      "import": "./dist/auth.js",
+      "default": "./dist/auth.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js",
+      "default": "./dist/hooks.js"
+    },
+    "./sdk-hooks": {
+      "types": "./dist/sdk-hooks.d.ts",
+      "import": "./dist/sdk-hooks.js",
+      "default": "./dist/sdk-hooks.js"
+    },
+    "./stores": {
+      "types": "./dist/stores.d.ts",
+      "import": "./dist/stores.js",
+      "default": "./dist/stores.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
+    },
+    "./tool-previews": {
+      "types": "./dist/tool-previews.d.ts",
+      "import": "./dist/tool-previews.js",
+      "default": "./dist/tool-previews.js"
+    }
   },
   "scripts": {
     "build": "tsup && node ../../scripts/validate-dist.mjs",
@@ -74,16 +134,36 @@
     "react-dom": "^18 || ^19"
   },
   "peerDependenciesMeta": {
-    "@nanostores/react": { "optional": true },
-    "nanostores": { "optional": true },
-    "@tanstack/react-query": { "optional": true },
-    "@hocuspocus/provider": { "optional": true },
-    "@tiptap/core": { "optional": true },
-    "@tiptap/react": { "optional": true },
-    "@tiptap/starter-kit": { "optional": true },
-    "@tiptap/extension-collaboration": { "optional": true },
-    "@tiptap/extension-collaboration-caret": { "optional": true },
-    "yjs": { "optional": true }
+    "@nanostores/react": {
+      "optional": true
+    },
+    "nanostores": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "@hocuspocus/provider": {
+      "optional": true
+    },
+    "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    },
+    "@tiptap/starter-kit": {
+      "optional": true
+    },
+    "@tiptap/extension-collaboration": {
+      "optional": true
+    },
+    "@tiptap/extension-collaboration-caret": {
+      "optional": true
+    },
+    "yjs": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@hocuspocus/provider": "^2.15.0",
