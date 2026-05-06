@@ -100,8 +100,7 @@
   },
   "scripts": {
     "build": "tsup && node ../../scripts/validate-dist.mjs",
-    "dev": "tsup --watch",
-    "prepublishOnly": "pnpm build"
+    "dev": "tsup --watch"
   },
   "dependencies": {
     "@pierre/trees": "1.0.0-beta.3",
