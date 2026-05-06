@@ -116,3 +116,5 @@ export type { ArtifactPaneProps } from "./artifact-pane";
 
 export { CodeBlock, CopyButton, InlineCode } from "./code-block";
 export type { CodeBlockProps, InlineCodeProps } from "./code-block";
+
+export { ThemeToggle, useTheme } from "./theme-toggle";
