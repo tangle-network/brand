@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 1.0.1
+
+### Patch Changes
+
+- 0db7afc: Expose `ThemeToggle` and `useTheme` from `@tangle-network/ui/primitives`. The component and hook were bulk-imported in `1.0.0` but never wired into `primitives/index.ts`, leaving them inaccessible to consumers.
+
 ## 1.0.0
 
 ### Minor Changes
