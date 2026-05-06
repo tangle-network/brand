@@ -39,8 +39,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
-    "dev": "tsup src/index.ts --format esm --dts --watch",
-    "prepublishOnly": "pnpm build"
+    "dev": "tsup src/index.ts --format esm --dts --watch"
   },
   "peerDependencies": {
     "react": ">=18"
