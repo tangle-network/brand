@@ -3,8 +3,6 @@ export * from "./chat";
 export * from "./run";
 export * from "./openui";
 export * from "./files";
-export { type ConnectionState } from "./editor";
-export * from "./editor";
 export * from "./markdown";
 export * from "./auth";
 export * from "./hooks";
