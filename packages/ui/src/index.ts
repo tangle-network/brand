@@ -12,3 +12,4 @@ export * from "./stores";
 export * from "./types";
 export * from "./utils";
 export * from "./tool-previews";
+export * from "./redaction";
