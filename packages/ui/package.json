@@ -96,6 +96,11 @@
       "types": "./dist/tool-previews.d.ts",
       "import": "./dist/tool-previews.js",
       "default": "./dist/tool-previews.js"
+    },
+    "./nav": {
+      "types": "./dist/nav.d.ts",
+      "import": "./dist/nav.js",
+      "default": "./dist/nav.js"
     }
   },
   "scripts": {
@@ -130,7 +135,8 @@
   "peerDependencies": {
     "@tangle-network/brand": "workspace:^",
     "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react-dom": "^18 || ^19",
+    "react-router": "^7"
   },
   "peerDependenciesMeta": {
     "@nanostores/react": {
@@ -162,6 +168,9 @@
     },
     "yjs": {
       "optional": true
+    },
+    "react-router": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -181,7 +190,8 @@
     "@storybook/react": "^8.6.18",
     "tsup": "^8.3.5",
     "typescript": "^5.6.0",
-    "yjs": "^13.6.0"
+    "yjs": "^13.6.0",
+    "react-router": "^7"
   },
   "keywords": [
     "tangle",
