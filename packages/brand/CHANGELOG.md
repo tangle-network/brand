@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 8152d92: Tangle Quiet reskin: flat neutral chrome with a single indigo accent. Reworks `theme.css` and `tokens.css` so surfaces read as quiet neutrals and color is reserved for the indigo accent only.
+
 ## 0.3.0
 
 ### Minor Changes
