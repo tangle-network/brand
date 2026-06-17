@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [8152d92]
+  - @tangle-network/brand@0.4.0
+
 ## 2.1.0
 
 ### Minor Changes
