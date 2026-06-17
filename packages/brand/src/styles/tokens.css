@@ -45,25 +45,25 @@
   --md3-inverse-on-surface: #000000;
   --md3-surface-tint: #818CF8;
 
-  /* Semantic HSL bridge */
-  --hsl-background: 244 28% 5%;
-  --hsl-foreground: 240 18% 94%;
-  --hsl-card: 246 30% 11%;
-  --hsl-card-foreground: 240 18% 94%;
-  --hsl-popover: 246 28% 14%;
-  --hsl-popover-foreground: 240 18% 94%;
+  /* Semantic HSL bridge — flat neutral spine (Tangle Quiet) */
+  --hsl-background: 240 8% 5%;     /* #0b0b0d */
+  --hsl-foreground: 240 6% 93%;    /* #ececee */
+  --hsl-card: 240 5% 8%;           /* #141416 surface */
+  --hsl-card-foreground: 240 6% 93%;
+  --hsl-popover: 240 4% 13%;       /* #202023 elevated */
+  --hsl-popover-foreground: 240 6% 93%;
   --hsl-primary: 239 84% 67%;
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 248 24% 18%;
-  --hsl-secondary-foreground: 240 16% 90%;
-  --hsl-muted: 246 22% 15%;
-  --hsl-muted-foreground: 240 14% 58%;
-  --hsl-accent: 248 26% 20%;
-  --hsl-accent-foreground: 240 16% 92%;
+  --hsl-secondary: 240 5% 11%;     /* #1a1a1d surface-2 */
+  --hsl-secondary-foreground: 240 6% 93%;
+  --hsl-muted: 240 5% 11%;         /* #1a1a1d — neutral hover well */
+  --hsl-muted-foreground: 240 4% 62%;  /* #9a9aa2 text-muted */
+  --hsl-accent: 240 5% 11%;        /* neutral hover (indigo lives in accent-surface-strong) */
+  --hsl-accent-foreground: 240 6% 93%;
   --hsl-destructive: 348 90% 60%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 244 14% 22%;
-  --hsl-input: 246 28% 14%;
+  --hsl-border: 240 3% 13%;        /* hairline ≈ rgba(255,255,255,0.07) */
+  --hsl-input: 240 5% 11%;
   --hsl-ring: 239 84% 67%;
   --hsl-success: 160 84% 39%;
   --hsl-warning: 40 94% 56%;
@@ -94,21 +94,21 @@
   --error: var(--hsl-destructive);
   --info: var(--hsl-info);
 
-  /* Sidebar tokens */
-  --sidebar-background: 244 28% 5%;
-  --sidebar-foreground: 240 18% 94%;
+  /* Sidebar tokens — flat surface + hairline */
+  --sidebar-background: 240 5% 8%;   /* #141416 surface */
+  --sidebar-foreground: 240 6% 93%;
   --sidebar-primary: 239 84% 67%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 248 26% 20%;
-  --sidebar-accent-foreground: 240 16% 92%;
-  --sidebar-border: 244 14% 17%;
+  --sidebar-accent: 240 5% 11%;      /* neutral hover */
+  --sidebar-accent-foreground: 240 6% 93%;
+  --sidebar-border: 240 3% 13%;      /* hairline */
   --sidebar-ring: 239 84% 67%;
 
-  /* Depth scale — Tangle deep purple surfaces */
-  --depth-1: #0C0B1D;
-  --depth-2: #141328;
-  --depth-3: #1D1B38;
-  --depth-4: #262448;
+  /* Depth scale — flat neutral spine (Tangle Quiet) */
+  --depth-1: #0b0b0d;
+  --depth-2: #141416;
+  --depth-3: #1a1a1d;
+  --depth-4: #202023;
 
   /* Status colors */
   --status-running: #10B981;
@@ -152,36 +152,35 @@
   --glass-border-hover: var(--border-default);
   --glass-blur: 0px;
 
-  /* Mesh gradient — Tangle brand glows */
-  --mesh-teal: rgba(16, 185, 129, 0.05);
-  --mesh-violet: rgba(99, 102, 241, 0.07);
-  --mesh-blue: rgba(129, 140, 248, 0.04);
+  /* Mesh glows — quieted to off; chrome is flat in Tangle Quiet */
+  --mesh-teal: transparent;
+  --mesh-violet: transparent;
+  --mesh-blue: transparent;
 
-  /* Brand gradients — Tangle */
+  /* Brand gradients — the indigo spark, kept ONLY for the logo mark + send button */
   --tangle-gradient: linear-gradient(135deg, #6366F1, #818CF8);
   --tangle-gradient-text: linear-gradient(135deg, #A5AAFC, #818CF8);
   --accent-gradient-strong: linear-gradient(135deg, #6366F1, #818CF8);
-  --accent-surface-soft: rgba(99, 102, 241, 0.12);
-  --accent-surface-strong: rgba(99, 102, 241, 0.20);
-  --accent-text: #A5AAFC;
+  /* Accent wells — soft = hover neutral, strong = active/selected row (indigo) */
+  --accent-surface-soft: rgba(255, 255, 255, 0.04);
+  --accent-surface-strong: rgba(129, 140, 248, 0.14);
+  --accent-text: #b9bffb;
 
-  /* Surfaces */
-  --bg-root: radial-gradient(ellipse 70% 50% at 20% 0%, rgba(99, 102, 241, 0.08), transparent),
-             radial-gradient(ellipse 50% 40% at 80% 10%, rgba(129, 140, 248, 0.06), transparent),
-             linear-gradient(180deg, var(--depth-1), #0D0C1E 100%);
+  /* Surfaces — flat single-neutral (no radial mesh) */
+  --bg-root: #0b0b0d;
   --bg-dark: var(--depth-1);
-  --bg-card: hsl(var(--hsl-card));
-  --bg-elevated: hsl(246 28% 17%);
-  --bg-section: hsl(246 28% 9%);
-  --bg-input: hsl(var(--hsl-input));
-  --bg-hover: rgba(99, 102, 241, 0.08);
-  --bg-selection: rgba(99, 102, 241, 0.18);
+  --bg-card: var(--depth-2);
+  --bg-elevated: var(--depth-4);
+  --bg-section: var(--depth-1);
+  --bg-input: var(--depth-3);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-selection: rgba(129, 140, 248, 0.14);
 
-  /* Text */
-  --text-primary: hsl(var(--hsl-foreground));
-  --text-secondary: hsl(240 16% 85%);
-  --text-muted: #8688B0;
-  --text-dim: #606294;
+  /* Text — neutral */
+  --text-primary: #ececee;
+  --text-secondary: #c8c8cd;
+  --text-muted: #9a9aa2;
+  --text-dim: #6b6b73;
 
   /* Brand accents — Tangle */
   --brand-primary: #6366F1;
@@ -195,12 +194,12 @@
   --brand-vibrant: #6366F1;
   --brand-emerald: #10B981;
 
-  /* Borders */
-  --border-subtle: rgba(100, 100, 148, 0.10);
-  --border-default: rgba(100, 100, 148, 0.18);
-  --border-hover: rgba(100, 100, 148, 0.28);
-  --border-accent: rgba(99, 102, 241, 0.18);
-  --border-accent-hover: rgba(99, 102, 241, 0.35);
+  /* Borders — neutral hairlines */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(129, 140, 248, 0.20);
+  --border-accent-hover: rgba(129, 140, 248, 0.35);
 
   /* Buttons */
   --btn-primary-bg: #6366F1;
@@ -218,11 +217,11 @@
   --code-comment: #606294;
   --code-error: #FF4D6D;
 
-  /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
-  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
-  --shadow-glow: 0 0 32px rgba(99, 102, 241, 0.18);
-  --shadow-accent: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.2);
+  /* Shadows — flat, no inner ring, no indigo glow */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-glow: none;
+  --shadow-accent: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-status-running: 0 0 6px rgba(16, 185, 129, 0.5);
   --shadow-status-creating: 0 0 6px rgba(99, 102, 241, 0.5);
   --shadow-status-error: 0 0 6px rgba(255, 77, 109, 0.5);
@@ -230,11 +229,12 @@
   /* Radii */
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;          /* chrome stays tight (was 16px) */
   --radius-pill: 999px;
   --radius-full: 999px;
-  --radius: 0.625rem;
+  --radius-composer: 26px;    /* centered composer pill */
+  --radius: 0.5rem;           /* 8px chrome default (was 10px) */
 
   /* Density */
   --control-height: 2.25rem;
@@ -249,8 +249,8 @@
   --font-size-lg: 1rem;           /* 16px — emphasized text */
   --font-size-xl: 1.25rem;        /* 20px — section headers */
   --line-height-tight: 1.3;
-  --line-height-base: 1.75;       /* matches leading-7 */
-  --line-height-relaxed: 1.8;
+  --line-height-base: 1.6;        /* tighter body rhythm (was 1.75) */
+  --line-height-relaxed: 1.75;
 
   /* Component spacing — override per-app for tighter/looser layouts */
   --avatar-size: 2rem;            /* 32px — chat avatars */
@@ -284,9 +284,9 @@
   --transition-default: 0.16s ease;
   --transition-medium: 0.24s ease;
 
-  /* Fonts */
-  --font-sans: "Geist", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", "Geist", sans-serif;
+  /* Fonts — unified on Inter (dark + light) */
+  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -336,34 +336,34 @@
   --md3-inverse-on-surface: #f0f1f4;
   --md3-surface-tint: #6366F1;
 
-  /* Semantic HSL bridge */
-  --hsl-background: 225 20% 97%;
-  --hsl-foreground: 228 20% 12%;
-  --hsl-card: 0 0% 100%;
-  --hsl-card-foreground: 228 20% 12%;
+  /* Semantic HSL bridge — flat neutral light (Tangle Quiet) */
+  --hsl-background: 0 0% 100%;      /* #ffffff */
+  --hsl-foreground: 0 0% 5%;        /* #0d0d0d */
+  --hsl-card: 240 7% 97%;           /* #f7f7f8 surface */
+  --hsl-card-foreground: 0 0% 5%;
   --hsl-popover: 0 0% 100%;
-  --hsl-popover-foreground: 228 20% 12%;
-  --hsl-primary: 239 84% 67%;
+  --hsl-popover-foreground: 0 0% 5%;
+  --hsl-primary: 245 62% 57%;       /* #5B4ED4 light accent */
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 242 22% 42%;
-  --hsl-secondary-foreground: 0 0% 100%;
-  --hsl-muted: 240 14% 89%;
-  --hsl-muted-foreground: 240 10% 36%;
-  --hsl-accent: 248 22% 86%;
-  --hsl-accent-foreground: 248 38% 30%;
+  --hsl-secondary: 240 6% 93%;      /* #ececee surface-2 */
+  --hsl-secondary-foreground: 0 0% 10%;
+  --hsl-muted: 240 6% 93%;          /* #ececee neutral hover */
+  --hsl-muted-foreground: 240 5% 38%;  /* #5d5d66 text-muted */
+  --hsl-accent: 240 6% 93%;         /* neutral hover */
+  --hsl-accent-foreground: 0 0% 10%;
   --hsl-destructive: 0 72% 41%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 244 14% 78%;
-  --hsl-input: 244 12% 80%;
-  --hsl-ring: 239 84% 67%;
+  --hsl-border: 240 6% 89%;         /* hairline ≈ rgba(0,0,0,0.08) */
+  --hsl-input: 240 6% 89%;
+  --hsl-ring: 245 62% 57%;
   --hsl-success: 160 84% 30%;
   --hsl-warning: 41 96% 50%;
   --hsl-info: 212 80% 50%;
 
-  --depth-1: #f4f4f9;
-  --depth-2: #edecf4;
-  --depth-3: #e5e4ee;
-  --depth-4: #dcdbe8;
+  --depth-1: #ffffff;
+  --depth-2: #f7f7f8;
+  --depth-3: #ececee;
+  --depth-4: #e3e3e6;
 
   --status-running: #059669;
   --status-creating: #3E349E;
@@ -404,33 +404,34 @@
   --surface-neutral-border: var(--border-subtle);
   --surface-neutral-text: var(--text-muted);
 
-  /* Sidebar — light */
-  --sidebar-background: 232 18% 96%;
-  --sidebar-foreground: 228 20% 12%;
-  --sidebar-primary: 239 84% 67%;
+  /* Sidebar — light, flat surface + hairline */
+  --sidebar-background: 240 7% 97%;   /* #f7f7f8 surface */
+  --sidebar-foreground: 0 0% 5%;
+  --sidebar-primary: 245 62% 57%;     /* #5B4ED4 */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 18% 90%;
-  --sidebar-accent-foreground: 240 38% 30%;
-  --sidebar-border: 244 14% 78%;
-  --sidebar-ring: 239 84% 67%;
+  --sidebar-accent: 240 6% 93%;       /* neutral hover */
+  --sidebar-accent-foreground: 0 0% 10%;
+  --sidebar-border: 240 6% 89%;       /* hairline */
+  --sidebar-ring: 245 62% 57%;
 
-  --mesh-teal: rgba(5, 150, 105, 0.04);
-  --mesh-violet: rgba(99, 102, 241, 0.03);
-  --mesh-blue: rgba(129, 140, 248, 0.03);
+  --mesh-teal: transparent;
+  --mesh-violet: transparent;
+  --mesh-blue: transparent;
 
-  --bg-root: #f4f4f9;
-  --bg-dark: #edecf4;
-  --bg-card: #ffffff;
-  --bg-elevated: #e5e4ee;
-  --bg-section: #edecf4;
-  --bg-input: #edecf4;
-  --bg-hover: rgba(99, 102, 241, 0.05);
-  --bg-selection: rgba(99, 102, 241, 0.10);
+  /* Surfaces — flat single-neutral light */
+  --bg-root: #ffffff;
+  --bg-dark: #f7f7f8;
+  --bg-card: #f7f7f8;
+  --bg-elevated: #ffffff;
+  --bg-section: #f7f7f8;
+  --bg-input: #ececee;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-selection: rgba(91, 78, 212, 0.10);
 
-  --text-primary: #191c24;
-  --text-secondary: #3a3a50;
-  --text-muted: #5E5E7A;
-  --text-dim: #A0A0B8;
+  --text-primary: #0d0d0d;
+  --text-secondary: #2a2a30;
+  --text-muted: #5d5d66;
+  --text-dim: #8e8e98;
 
   --brand-primary: #6366F1;
   --brand-strong: #2E2A5E;
@@ -443,16 +444,16 @@
   --brand-vibrant: #6366F1;
   --brand-emerald: #059669;
 
-  --border-subtle: rgba(110, 108, 148, 0.20);
-  --border-default: rgba(110, 108, 148, 0.35);
-  --border-hover: rgba(110, 108, 148, 0.50);
-  --border-accent: rgba(99, 102, 241, 0.15);
-  --border-accent-hover: rgba(99, 102, 241, 0.30);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.13);
+  --border-accent: rgba(91, 78, 212, 0.18);
+  --border-accent-hover: rgba(91, 78, 212, 0.35);
 
-  --btn-primary-bg: #6366F1;
+  --btn-primary-bg: #5B4ED4;
   --btn-primary-hover: #4F46E5;
   --btn-primary-text: #ffffff;
-  --btn-cta-bg: #6366F1;
+  --btn-cta-bg: #5B4ED4;
   --btn-cta-text: #ffffff;
 
   --code-keyword: #3E349E;
@@ -463,30 +464,33 @@
   --code-comment: #6B6E8A;
   --code-error: #ba1a1a;
 
-  --shadow-card: 0 1px 3px rgba(25, 28, 36, 0.05), 0 0 0 1px rgba(200, 198, 218, 0.22);
-  --shadow-dropdown: 0 8px 32px rgba(25, 28, 36, 0.10), 0 0 0 1px rgba(200, 198, 218, 0.28);
+  /* Shadows — flat, no inner ring, no glow */
+  --shadow-card: 0 1px 2px rgba(25, 28, 36, 0.06);
+  --shadow-dropdown: 0 8px 30px rgba(25, 28, 36, 0.10);
   --shadow-glow: none;
-  --shadow-accent: 0 1px 3px rgba(25, 28, 36, 0.05), 0 0 0 1px rgba(99, 102, 241, 0.15);
+  --shadow-accent: 0 1px 2px rgba(25, 28, 36, 0.06);
 
-  --tangle-gradient: linear-gradient(135deg, #6366F1, #818CF8);
-  --tangle-gradient-text: linear-gradient(135deg, #4F46E5, #6366F1);
-  --accent-gradient-strong: linear-gradient(135deg, #6366F1, #818CF8);
-  --accent-surface-soft: rgba(99, 102, 241, 0.06);
-  --accent-surface-strong: rgba(99, 102, 241, 0.12);
+  /* Indigo spark kept for logo + send; accent-fill is the active row well */
+  --tangle-gradient: linear-gradient(135deg, #4F46E5, #5B4ED4);
+  --tangle-gradient-text: linear-gradient(135deg, #4F46E5, #5B4ED4);
+  --accent-gradient-strong: linear-gradient(135deg, #4F46E5, #5B4ED4);
+  --accent-surface-soft: rgba(0, 0, 0, 0.04);
+  --accent-surface-strong: rgba(91, 78, 212, 0.10);
   --accent-text: #4F46E5;
 
-  /* Typography — Manrope (headlines) + Inter (body/labels) */
-  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Manrope", "Inter", sans-serif;
+  /* Typography — unified on Inter */
+  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 
-  /* Tighter border radius for enterprise precision */
-  --radius: 0.375rem;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
+  /* Radius — unified chrome scale (matches dark; 8px md) */
+  --radius: 0.5rem;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
   --radius-pill: 999px;
   --radius-full: 999px;
+  --radius-composer: 26px;
 }
 
