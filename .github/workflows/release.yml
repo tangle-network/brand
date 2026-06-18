@@ -42,14 +42,20 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Force OIDC auth (strip empty npm token line)
-        # setup-node's `registry-url` writes a
-        # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` line into
-        # ~/.npmrc. With no NODE_AUTH_TOKEN it expands to an empty token, so
-        # `changeset publish` attempts (failing) token auth and 404s on the
-        # @tangle-network scope instead of falling back to OIDC trusted
-        # publishing. Strip the line so npm authenticates via OIDC.
-        # Mirrors sandbox-ui's working release job.
-        run: if [ -f "$HOME/.npmrc" ]; then sed -i '/_authToken=/d' "$HOME/.npmrc" || true; fi
+        # setup-node writes a `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
+        # line into the npm userconfig it points NPM_CONFIG_USERCONFIG at
+        # (/home/runner/work/_temp/.npmrc) — NOT just ~/.npmrc. With no
+        # NODE_AUTH_TOKEN the token expands empty, so `changeset publish`
+        # attempts (failing) token auth and 404s on the @tangle-network scope
+        # instead of falling back to OIDC trusted publishing. Strip the line
+        # from every npmrc npm might read so it authenticates via OIDC.
+        run: |
+          for f in "$HOME/.npmrc" "${NPM_CONFIG_USERCONFIG:-}" "$RUNNER_TEMP/.npmrc" "$GITHUB_WORKSPACE/.npmrc"; do
+            if [ -n "$f" ] && [ -f "$f" ]; then
+              sed -i '/_authToken=/d' "$f" || true
+              echo "stripped _authToken from $f"
+            fi
+          done
 
       - name: Create release PR or publish
         id: changesets
