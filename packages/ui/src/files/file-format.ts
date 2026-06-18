@@ -23,25 +23,47 @@ const CODE_DOTFILES = ["profile", "bashrc", "bash_logout", "env", "gitignore"];
 
 /** Lowercased trailing extension, or the whole basename for dotfiles (".bashrc" → "bashrc"). */
 export function fileExtension(filename: string): string {
-  return filename.split(".").pop()?.toLowerCase() ?? "";
+  // Strip any directory first so dots in directory names don't leak in
+  // ("my.config/file" → "file", not "config/file").
+  const base = filename.slice(filename.lastIndexOf("/") + 1);
+  return base.split(".").pop()?.toLowerCase() ?? "";
 }
 
-/** Resolve a filename + optional MIME type to the renderer format. */
+/** Bare MIME essence, lowercased with any `; charset=…` parameters stripped. */
+function mimeEssence(mimeType?: string): string {
+  return mimeType?.split(";")[0]?.trim().toLowerCase() ?? "";
+}
+
+/**
+ * Resolve a filename + optional MIME type to the renderer format. A specific,
+ * authoritative MIME type wins over the extension; otherwise the extension
+ * decides; a generic text/plain payload is the final fallback.
+ */
 export function detectFileFormat(filename: string, mimeType?: string): FileFormat {
   const ext = fileExtension(filename);
+  const mime = mimeEssence(mimeType);
 
-  if (mimeType?.startsWith("application/pdf") || ext === "pdf") return "pdf";
-  if (mimeType?.startsWith("image/") || IMAGE_EXTENSIONS.includes(ext)) return "image";
+  // 1. Specific MIME types are authoritative — they outrank the extension.
+  if (mime === "application/pdf") return "pdf";
+  if (mime.startsWith("image/")) return "image";
+  if (mime === "text/markdown") return "markdown";
+  if (mime === "application/json") return "json";
+  if (mime === "text/csv" || mime === "application/csv") return "csv";
+  if (mime === "application/yaml" || mime === "application/x-yaml" || mime === "text/yaml") return "yaml";
+
+  // 2. Fall back to the file extension.
+  if (ext === "pdf") return "pdf";
+  if (IMAGE_EXTENSIONS.includes(ext)) return "image";
   if (ext === "csv") return "csv";
   if (ext === "xlsx" || ext === "xls") return "spreadsheet";
   if (CODE_EXTENSIONS.includes(ext) || CODE_DOTFILES.includes(ext)) return "code";
   if (ext === "json") return "json";
   if (ext === "yaml" || ext === "yml") return "yaml";
-  if (mimeType === "text/markdown" || ext === "md" || ext === "markdown") return "markdown";
+  if (ext === "md" || ext === "markdown") return "markdown";
   if (["txt", "log", "text"].includes(ext)) return "text";
 
-  // Unknown extension but a text/plain payload — show as text, not "unknown".
-  if (mimeType?.startsWith("text/plain")) return "text";
+  // 3. Unknown extension but a text/plain payload — show as text, not "unknown".
+  if (mime === "text/plain") return "text";
 
   return "unknown";
 }

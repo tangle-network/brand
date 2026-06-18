@@ -45,6 +45,25 @@ describe("detectFileFormat", () => {
     expect(detectFileFormat("config.json", "text/plain")).toBe("json");
     expect(detectFileFormat("main.py", "text/plain")).toBe("code");
   });
+
+  it("detects structured-data MIME types on generically-named files", () => {
+    expect(detectFileFormat("data", "application/json")).toBe("json");
+    expect(detectFileFormat("records", "text/csv")).toBe("csv");
+    expect(detectFileFormat("export", "application/csv")).toBe("csv");
+    expect(detectFileFormat("config", "application/yaml")).toBe("yaml");
+    expect(detectFileFormat("feed", "application/x-yaml")).toBe("yaml");
+    expect(detectFileFormat("feed", "text/yaml")).toBe("yaml");
+  });
+
+  it("ignores MIME charset parameters", () => {
+    expect(detectFileFormat("data", "application/json; charset=utf-8")).toBe("json");
+    expect(detectFileFormat("blob", "IMAGE/PNG")).toBe("image");
+  });
+
+  it("treats an authoritative MIME type as outranking a conflicting extension", () => {
+    expect(detectFileFormat("notes.json", "text/markdown")).toBe("markdown");
+    expect(detectFileFormat("page.txt", "application/json")).toBe("json");
+  });
 });
 
 describe("getFormatLabel", () => {
@@ -86,5 +105,11 @@ describe("fileExtension", () => {
 
   it("returns the dotfile name for files that are all extension", () => {
     expect(fileExtension(".gitignore")).toBe("gitignore");
+  });
+
+  it("ignores dots in directory components", () => {
+    expect(fileExtension("my.config.dir/file")).toBe("file");
+    expect(fileExtension("v1.2.0/Makefile")).toBe("makefile");
+    expect(fileExtension("a.b.c/server.ts")).toBe("ts");
   });
 });
