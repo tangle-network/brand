@@ -29,6 +29,35 @@ describe("detectFileFormat", () => {
     expect(detectFileFormat(".gitignore")).toBe("code");
   });
 
+  it("routes every highlightable extension to the code viewer", () => {
+    // detectFileFormat must stay in sync with getSyntaxLanguage — anything we
+    // can highlight (and that has no dedicated format) renders as code, not text.
+    for (const file of [
+      "main.rs",
+      "server.go",
+      "app.rb",
+      "styles.css",
+      "theme.scss",
+      "index.html",
+      "Cargo.toml",
+      "query.sql",
+      "Token.sol",
+      "schema.proto",
+      "module.mjs",
+      "legacy.cjs",
+      "deploy.zsh",
+    ]) {
+      expect(detectFileFormat(file)).toBe("code");
+      expect(getSyntaxLanguage(file)).toBeDefined();
+    }
+  });
+
+  it("keeps formats with a dedicated renderer out of the code viewer", () => {
+    expect(detectFileFormat("config.json")).toBe("json");
+    expect(detectFileFormat("compose.yml")).toBe("yaml");
+    expect(detectFileFormat("README.md")).toBe("markdown");
+  });
+
   it("prefers MIME type when it is more specific", () => {
     expect(detectFileFormat("file", "application/pdf")).toBe("pdf");
     expect(detectFileFormat("blob", "image/png")).toBe("image");

@@ -18,8 +18,52 @@ export type FileFormat =
   | "unknown";
 
 const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "svg", "webp"];
-const CODE_EXTENSIONS = ["py", "ts", "js", "tsx", "jsx", "sh", "bash"];
-const CODE_DOTFILES = ["profile", "bashrc", "bash_logout", "env", "gitignore"];
+
+const EXTENSION_TO_SYNTAX_LANGUAGE: Record<string, string> = {
+  ts: "typescript",
+  tsx: "tsx",
+  js: "javascript",
+  jsx: "jsx",
+  mjs: "javascript",
+  cjs: "javascript",
+  rs: "rust",
+  py: "python",
+  go: "go",
+  rb: "ruby",
+  json: "json",
+  yaml: "yaml",
+  yml: "yaml",
+  toml: "toml",
+  md: "markdown",
+  markdown: "markdown",
+  css: "css",
+  scss: "scss",
+  html: "html",
+  sh: "bash",
+  bash: "bash",
+  zsh: "bash",
+  bashrc: "bash",
+  bash_logout: "bash",
+  profile: "bash",
+  sql: "sql",
+  sol: "solidity",
+  proto: "protobuf",
+};
+
+// Syntax-mapped extensions that render through their own dedicated format
+// instead of the generic code viewer.
+const NON_CODE_SYNTAX_EXTENSIONS = new Set(["json", "yaml", "yml", "md", "markdown"]);
+
+// Code files with no highlight language — still shown as themed monospace.
+const PLAIN_CODE_EXTENSIONS = ["env", "gitignore"];
+
+// Derived from the syntax map so code detection and highlighting never drift:
+// every extension we can highlight (minus those with a dedicated format) routes
+// through the code viewer.
+const CODE_EXTENSIONS = new Set<string>([
+  ...Object.keys(EXTENSION_TO_SYNTAX_LANGUAGE).filter((ext) => !NON_CODE_SYNTAX_EXTENSIONS.has(ext)),
+  ...PLAIN_CODE_EXTENSIONS,
+]);
 
 /** Lowercased trailing extension, or the whole basename for dotfiles (".bashrc" → "bashrc"). */
 export function fileExtension(filename: string): string {
@@ -56,7 +100,7 @@ export function detectFileFormat(filename: string, mimeType?: string): FileForma
   if (IMAGE_EXTENSIONS.includes(ext)) return "image";
   if (ext === "csv") return "csv";
   if (ext === "xlsx" || ext === "xls") return "spreadsheet";
-  if (CODE_EXTENSIONS.includes(ext) || CODE_DOTFILES.includes(ext)) return "code";
+  if (CODE_EXTENSIONS.has(ext)) return "code";
   if (ext === "json") return "json";
   if (ext === "yaml" || ext === "yml") return "yaml";
   if (ext === "md" || ext === "markdown") return "markdown";
@@ -93,37 +137,6 @@ export function getFormatLabel(format: FileFormat): string {
       return "File";
   }
 }
-
-const EXTENSION_TO_SYNTAX_LANGUAGE: Record<string, string> = {
-  ts: "typescript",
-  tsx: "tsx",
-  js: "javascript",
-  jsx: "jsx",
-  mjs: "javascript",
-  cjs: "javascript",
-  rs: "rust",
-  py: "python",
-  go: "go",
-  rb: "ruby",
-  json: "json",
-  yaml: "yaml",
-  yml: "yaml",
-  toml: "toml",
-  md: "markdown",
-  markdown: "markdown",
-  css: "css",
-  scss: "scss",
-  html: "html",
-  sh: "bash",
-  bash: "bash",
-  zsh: "bash",
-  bashrc: "bash",
-  bash_logout: "bash",
-  profile: "bash",
-  sql: "sql",
-  sol: "solidity",
-  proto: "protobuf",
-};
 
 /**
  * Map a filename (or path) to a highlight.js language id for CodeBlock. Returns
