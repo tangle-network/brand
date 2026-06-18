@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { FileEdit } from "lucide-react";
 import type { ToolPart } from "../types/parts";
+import { getSyntaxLanguage } from "../files/file-format";
 import { CodeBlock, CopyButton } from "../markdown/code-block";
 import { PreviewCard, PreviewError, PreviewLoading } from "./preview-primitives";
 
@@ -18,35 +19,6 @@ function extractWriteContent(
   return { path, content };
 }
 
-function getLanguageFromPath(path: string): string | undefined {
-  const ext = path.split(".").pop()?.toLowerCase();
-  const map: Record<string, string> = {
-    ts: "typescript",
-    tsx: "tsx",
-    js: "javascript",
-    jsx: "jsx",
-    rs: "rust",
-    py: "python",
-    go: "go",
-    rb: "ruby",
-    json: "json",
-    yaml: "yaml",
-    yml: "yaml",
-    toml: "toml",
-    md: "markdown",
-    css: "css",
-    scss: "scss",
-    html: "html",
-    sh: "bash",
-    bash: "bash",
-    zsh: "bash",
-    sql: "sql",
-    sol: "solidity",
-    proto: "protobuf",
-  };
-  return ext ? map[ext] : undefined;
-}
-
 /**
  * Preview for file write/create operations.
  * Shows file path, line count, and the written content.
@@ -56,7 +28,7 @@ export const WriteFilePreview = memo(({ part }: WriteFilePreviewProps) => {
   if (!write) return null;
 
   const lineCount = write.content.split("\n").length;
-  const language = getLanguageFromPath(write.path);
+  const language = getSyntaxLanguage(write.path);
 
   return (
     <PreviewCard

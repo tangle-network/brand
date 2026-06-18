@@ -6,6 +6,7 @@ import {
   type DocumentEditorPaneCollaborationConfig,
 } from "../editor/document-editor-pane";
 import { ArtifactPane, type ArtifactPaneProps } from "../primitives/artifact-pane";
+import { detectFileFormat } from "./file-format";
 import { FilePreview, type FilePreviewProps } from "./file-preview";
 import { FileTabs, type FileTabData } from "./file-tabs";
 
@@ -79,9 +80,8 @@ export function FileArtifactPane({
     />
   ) : undefined;
   const isMarkdown =
-    mimeType === "text/markdown" ||
-    filename.toLowerCase().endsWith(".md") ||
-    path?.toLowerCase().endsWith(".md");
+    detectFileFormat(filename, mimeType) === "markdown" ||
+    (path ? detectFileFormat(path, mimeType) === "markdown" : false);
   const isEditableMarkdown = isMarkdown && editor?.enabled;
   const headerActions = (
     <>
