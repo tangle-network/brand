@@ -71,6 +71,14 @@ describe("detectFileFormat", () => {
     expect(detectFileFormat("noextension")).toBe("unknown");
   });
 
+  it("does not classify a dotless basename that happens to spell an extension", () => {
+    // A file literally named "pdf"/"json" has no extension — it must not be
+    // treated as that format (e.g. a pdf with no blobUrl renders empty).
+    expect(detectFileFormat("pdf")).toBe("unknown");
+    expect(detectFileFormat("json")).toBe("unknown");
+    expect(detectFileFormat("csv")).toBe("unknown");
+  });
+
   it("lets a concrete extension win over a generic text/plain MIME", () => {
     expect(detectFileFormat("config.json", "text/plain")).toBe("json");
     expect(detectFileFormat("main.py", "text/plain")).toBe("code");
@@ -154,8 +162,15 @@ describe("fileExtension", () => {
   });
 
   it("ignores dots in directory components", () => {
-    expect(fileExtension("my.config.dir/file")).toBe("file");
-    expect(fileExtension("v1.2.0/Makefile")).toBe("makefile");
+    expect(fileExtension("my.config.dir/file")).toBe("");
+    expect(fileExtension("v1.2.0/Makefile")).toBe("");
     expect(fileExtension("a.b.c/server.ts")).toBe("ts");
+  });
+
+  it("returns no extension for a dotless basename, even one that looks like an extension", () => {
+    expect(fileExtension("json")).toBe("");
+    expect(fileExtension("pdf")).toBe("");
+    expect(fileExtension("README")).toBe("");
+    expect(fileExtension("Makefile")).toBe("");
   });
 });

@@ -47,15 +47,18 @@ function CodePreview({
   format: FileFormat;
 }) {
   const lineCount = content.split("\n").length;
-  const ext = fileExtension(filename) || "txt";
+  const language = getCodeLanguage(filename, format);
+  // Prefer the extension; for an extensionless file (e.g. one detected from its
+  // MIME type) fall back to the highlight language so the label stays meaningful.
+  const labelToken = fileExtension(filename) || language || "txt";
 
   // Same theme-aware highlighter the chat markdown renderer uses, so code looks
   // identical in an artifact pane and inline in a message.
   return (
     <CodeBlock
       code={content}
-      language={getCodeLanguage(filename, format)}
-      label={`${ext} · ${lineCount} lines`}
+      language={language}
+      label={`${labelToken} · ${lineCount} lines`}
       showLineNumbers
       className="max-h-[70vh] overflow-auto"
     >

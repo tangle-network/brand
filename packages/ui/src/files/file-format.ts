@@ -65,12 +65,19 @@ const CODE_EXTENSIONS = new Set<string>([
   ...PLAIN_CODE_EXTENSIONS,
 ]);
 
-/** Lowercased trailing extension, or the whole basename for dotfiles (".bashrc" → "bashrc"). */
+/**
+ * Lowercased trailing extension. Returns "" for a name with no extension
+ * ("README", "json" → ""), and the post-dot name for a dotfile (".bashrc" →
+ * "bashrc"). Directory components are ignored so dots in a directory name don't
+ * leak in ("my.config/file" → "").
+ */
 export function fileExtension(filename: string): string {
-  // Strip any directory first so dots in directory names don't leak in
-  // ("my.config/file" → "file", not "config/file").
   const base = filename.slice(filename.lastIndexOf("/") + 1);
-  return base.split(".").pop()?.toLowerCase() ?? "";
+  const dot = base.lastIndexOf(".");
+  // No dot → no extension. A leading dot (dotfile) is the one case where the
+  // whole post-dot name is the extension key.
+  if (dot < 0) return "";
+  return base.slice(dot + 1).toLowerCase();
 }
 
 /** Bare MIME essence, lowercased with any `; charset=…` parameters stripped. */
