@@ -74,6 +74,12 @@ function getSyntaxTheme(): { [key: string]: React.CSSProperties } {
 export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   code: string;
   language?: string;
+  /**
+   * Header text. Defaults to `language`. Set this when the display name differs
+   * from the highlight.js language id — e.g. a file extension ("BASHRC") whose
+   * content highlights as a known language, or none.
+   */
+  label?: string;
   showLineNumbers?: boolean;
   /** Force light theme; defaults to dark */
   light?: boolean;
@@ -107,28 +113,29 @@ function useIsLightTheme(): boolean {
 }
 
 export const CodeBlock = memo(
-  ({ code, language, showLineNumbers = false, light: lightProp, className, children, ...props }: CodeBlockProps) => {
+  ({ code, language, label, showLineNumbers = false, light: lightProp, className, children, ...props }: CodeBlockProps) => {
     const isLight = useIsLightTheme();
     const light = lightProp ?? isLight;
     const theme = getSyntaxTheme();
     const bg = "bg-card border-border";
     const headerBg = light ? "bg-muted/50 border-border" : "bg-background border-border";
     const langColor = "text-muted-foreground";
+    const headerLabel = label ?? language;
 
     return (
       <div
         className={cn("group relative overflow-hidden rounded-lg border font-mono", bg, className)}
         {...props}
       >
-        {language && (
+        {headerLabel && (
           <div className={cn("flex items-center justify-between border-b px-3 py-1", headerBg)}>
             <span className={cn("text-[calc(var(--font-size-xs)-1px)] font-mono font-medium uppercase tracking-widest", langColor)}>
-              {language}
+              {headerLabel}
             </span>
             {children}
           </div>
         )}
-        {!language && children && (
+        {!headerLabel && children && (
           <div className="absolute right-2 top-2 z-10 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
             {children}
           </div>

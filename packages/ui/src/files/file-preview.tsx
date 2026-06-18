@@ -4,7 +4,7 @@
  * Renders any file type beautifully:
  * - PDF: embedded viewer
  * - CSV/XLSX: tabular preview
- * - Code (py/json/yaml/ts/js): line-numbered viewer
+ * - Code (py/json/yaml/ts/js): syntax-highlighted, line-numbered viewer
  * - Markdown: rendered prose
  * - Images: inline display
  * - Text: monospace preview
@@ -17,6 +17,14 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Markdown } from "../markdown/markdown";
+import { CodeBlock, CopyButton } from "../markdown/code-block";
+import {
+  detectFileFormat,
+  fileExtension,
+  getFormatLabel,
+  getSyntaxLanguage,
+  type FileFormat,
+} from "./file-format";
 
 export interface FilePreviewProps {
   filename: string;
@@ -29,87 +37,22 @@ export interface FilePreviewProps {
   className?: string;
 }
 
-function getPreviewType(filename: string, mimeType?: string): string {
-  const ext = filename.split(".").pop()?.toLowerCase() || "";
-  if (mimeType?.startsWith("application/pdf") || ext === "pdf") return "pdf";
-  if (mimeType?.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(ext)) return "image";
-  if (["csv"].includes(ext)) return "csv";
-  if (["xlsx", "xls"].includes(ext)) return "spreadsheet";
-  if (["py", "ts", "js", "tsx", "jsx", "sh", "bash"].includes(ext) || ["profile", "bashrc", "bash_logout", "env", "gitignore"].includes(ext)) return "code";
-  if (["json"].includes(ext)) return "json";
-  if (["yaml", "yml"].includes(ext)) return "yaml";
-  if (["md", "markdown"].includes(ext)) return "markdown";
-  if (["txt", "log", "text"].includes(ext)) return "text";
-  
-  // If we have no known extension but we do have a text plain content payload, fallback to text rather than "unknown"
-  if (mimeType?.startsWith("text/plain")) return "text";
-  
-  return "unknown";
-}
-
-function getPreviewLabel(previewType: string) {
-  switch (previewType) {
-    case "pdf":
-      return "PDF";
-    case "image":
-      return "Image";
-    case "csv":
-      return "CSV";
-    case "spreadsheet":
-      return "Spreadsheet";
-    case "code":
-      return "Code";
-    case "json":
-      return "JSON";
-    case "yaml":
-      return "YAML";
-    case "markdown":
-      return "Markdown";
-    case "text":
-      return "Text";
-    default:
-      return "File";
-  }
-}
-
 function CodePreview({ content, filename }: { content: string; filename: string }) {
-  const lines = content.split("\n");
-  const language = filename.split(".").pop()?.toUpperCase() || "TXT";
+  const lineCount = content.split("\n").length;
+  const ext = fileExtension(filename) || "txt";
 
+  // Same theme-aware highlighter the chat markdown renderer uses, so code looks
+  // identical in an artifact pane and inline in a message.
   return (
-    <div className="relative bg-background rounded-[var(--radius-md)] border border-border overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
-        <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-          <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#8E59FF]" />
-        </div>
-        <div className="ml-2 min-w-0 flex-1 truncate text-xs font-mono text-muted-foreground">
-          {filename}
-        </div>
-        <div className="inline-flex items-center gap-2 rounded-[var(--radius-full)] border border-border bg-card px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          <span>{language}</span>
-          <span className="h-1 w-1 rounded-full bg-[var(--border-hover)]" />
-          <span>{lines.length} lines</span>
-        </div>
-      </div>
-      <div className="overflow-auto max-h-[70vh]">
-        <table className="w-full">
-          <tbody>
-            {lines.map((line, i) => (
-              <tr key={i} className="hover:bg-accent">
-                <td className="text-right pr-4 pl-4 py-0 select-none text-muted-foreground text-xs font-mono w-10 align-top leading-[1.55]">
-                  {i + 1}
-                </td>
-                <td className="pr-4 py-0 font-mono text-[13px] text-foreground leading-[1.55] whitespace-pre">
-                  {line || " "}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <CodeBlock
+      code={content}
+      language={getSyntaxLanguage(filename)}
+      label={`${ext} · ${lineCount} lines`}
+      showLineNumbers
+      className="max-h-[70vh] overflow-auto"
+    >
+      <CopyButton text={content} />
+    </CodeBlock>
   );
 }
 
@@ -270,13 +213,13 @@ export function FilePreview({
   hideHeader = false,
   className,
 }: FilePreviewProps) {
-  const previewType = getPreviewType(filename, mimeType);
-  const previewLabel = getPreviewLabel(previewType);
+  const format: FileFormat = detectFileFormat(filename, mimeType);
+  const previewLabel = getFormatLabel(format);
   const hasRenderableSource =
     Boolean(content) ||
     Boolean(blobUrl) ||
-    previewType === "unknown" ||
-    previewType === "spreadsheet";
+    format === "unknown" ||
+    format === "spreadsheet";
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
@@ -312,23 +255,23 @@ export function FilePreview({
       )}
 
       <div className="flex-1 overflow-auto p-3">
-        {previewType === "pdf" && blobUrl && <PdfPreview blobUrl={blobUrl} filename={filename} />}
-        {previewType === "image" && blobUrl && <ImagePreview src={blobUrl} filename={filename} />}
-        {previewType === "csv" && typeof content === "string" && <CsvPreview content={content} />}
-        {(previewType === "code" || previewType === "json" || previewType === "yaml") && typeof content === "string" && (
+        {format === "pdf" && blobUrl && <PdfPreview blobUrl={blobUrl} filename={filename} />}
+        {format === "image" && blobUrl && <ImagePreview src={blobUrl} filename={filename} />}
+        {format === "csv" && typeof content === "string" && <CsvPreview content={content} />}
+        {(format === "code" || format === "json" || format === "yaml") && typeof content === "string" && (
           <CodePreview content={content} filename={filename} />
         )}
-        {previewType === "text" && typeof content === "string" && <TextPreview content={content} />}
-        {previewType === "markdown" && typeof content === "string" && <MarkdownPreview content={content} />}
-        {previewType === "spreadsheet" && (
+        {format === "text" && typeof content === "string" && <TextPreview content={content} />}
+        {format === "markdown" && typeof content === "string" && <MarkdownPreview content={content} />}
+        {format === "spreadsheet" && (
           <UnsupportedPreview
             filename={filename}
             title="Spreadsheet preview is not available in this surface"
             description="Download the workbook or convert it to CSV when you need an inline preview."
           />
         )}
-        {previewType === "unknown" && typeof content !== "string" && <EmptyPreview filename={filename} />}
-        {previewType === "unknown" && typeof content === "string" && <TextPreview content={content} />}
+        {format === "unknown" && typeof content !== "string" && <EmptyPreview filename={filename} />}
+        {format === "unknown" && typeof content === "string" && <TextPreview content={content} />}
         {!hasRenderableSource && typeof content !== "string" && (
           <UnsupportedPreview
             filename={filename}
