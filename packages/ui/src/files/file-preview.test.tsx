@@ -27,6 +27,14 @@ describe("FilePreview", () => {
     expect(container.querySelector("table")).toBeNull();
   });
 
+  it("routes MIME-detected json on an extensionless file to the code viewer", () => {
+    const { container } = render(
+      <FilePreview filename="config" mimeType="application/json" content={'{"a":1}'} />,
+    );
+    expect(container.querySelector("code")).not.toBeNull();
+    expect(container.querySelector("pre.bg-background")).toBeNull(); // not the plain TextPreview
+  });
+
   it("renders csv as a table", () => {
     const { container } = render(
       <FilePreview filename="data.csv" content={"a,b\n1,2"} />,

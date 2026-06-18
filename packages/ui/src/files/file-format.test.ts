@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   detectFileFormat,
   fileExtension,
+  getCodeLanguage,
   getFormatLabel,
   getSyntaxLanguage,
 } from "./file-format";
@@ -124,6 +125,22 @@ describe("getSyntaxLanguage", () => {
   it("returns undefined for unmapped extensions", () => {
     expect(getSyntaxLanguage("mystery.bin")).toBeUndefined();
     expect(getSyntaxLanguage("noextension")).toBeUndefined();
+  });
+});
+
+describe("getCodeLanguage", () => {
+  it("uses the detected format for json/yaml, covering extensionless MIME-only files", () => {
+    expect(getCodeLanguage("config", "json")).toBe("json");
+    expect(getCodeLanguage("config", "yaml")).toBe("yaml");
+    // A real extension resolves to the same answer.
+    expect(getCodeLanguage("config.json", "json")).toBe("json");
+    expect(getCodeLanguage("compose.yml", "yaml")).toBe("yaml");
+  });
+
+  it("keys off the extension for other code formats", () => {
+    expect(getCodeLanguage("main.rs", "code")).toBe("rust");
+    expect(getCodeLanguage("server.ts", "code")).toBe("typescript");
+    expect(getCodeLanguage("notes", "code")).toBeUndefined();
   });
 });
 

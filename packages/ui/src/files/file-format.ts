@@ -147,3 +147,14 @@ export function getFormatLabel(format: FileFormat): string {
 export function getSyntaxLanguage(filename: string): string | undefined {
   return EXTENSION_TO_SYNTAX_LANGUAGE[fileExtension(filename)];
 }
+
+/**
+ * Highlight language for a file already classified as a code-like format.
+ * `json`/`yaml` are their own highlight language even when detected purely from
+ * a MIME type on an extensionless file (where the extension can't reveal it);
+ * any other code format keys off the extension.
+ */
+export function getCodeLanguage(filename: string, format: FileFormat): string | undefined {
+  if (format === "json" || format === "yaml") return format;
+  return getSyntaxLanguage(filename);
+}

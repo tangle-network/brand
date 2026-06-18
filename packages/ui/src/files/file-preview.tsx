@@ -21,8 +21,8 @@ import { CodeBlock, CopyButton } from "../markdown/code-block";
 import {
   detectFileFormat,
   fileExtension,
+  getCodeLanguage,
   getFormatLabel,
-  getSyntaxLanguage,
   type FileFormat,
 } from "./file-format";
 
@@ -37,7 +37,15 @@ export interface FilePreviewProps {
   className?: string;
 }
 
-function CodePreview({ content, filename }: { content: string; filename: string }) {
+function CodePreview({
+  content,
+  filename,
+  format,
+}: {
+  content: string;
+  filename: string;
+  format: FileFormat;
+}) {
   const lineCount = content.split("\n").length;
   const ext = fileExtension(filename) || "txt";
 
@@ -46,7 +54,7 @@ function CodePreview({ content, filename }: { content: string; filename: string 
   return (
     <CodeBlock
       code={content}
-      language={getSyntaxLanguage(filename)}
+      language={getCodeLanguage(filename, format)}
       label={`${ext} · ${lineCount} lines`}
       showLineNumbers
       className="max-h-[70vh] overflow-auto"
@@ -259,7 +267,7 @@ export function FilePreview({
         {format === "image" && blobUrl && <ImagePreview src={blobUrl} filename={filename} />}
         {format === "csv" && typeof content === "string" && <CsvPreview content={content} />}
         {(format === "code" || format === "json" || format === "yaml") && typeof content === "string" && (
-          <CodePreview content={content} filename={filename} />
+          <CodePreview content={content} filename={filename} format={format} />
         )}
         {format === "text" && typeof content === "string" && <TextPreview content={content} />}
         {format === "markdown" && typeof content === "string" && <MarkdownPreview content={content} />}

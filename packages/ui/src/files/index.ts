@@ -18,6 +18,7 @@ export { FileArtifactPane, type FileArtifactPaneProps } from "./file-artifact-pa
 export {
   detectFileFormat,
   fileExtension,
+  getCodeLanguage,
   getFormatLabel,
   getSyntaxLanguage,
   type FileFormat,
