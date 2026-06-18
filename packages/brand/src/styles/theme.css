@@ -12,6 +12,32 @@
   --font-display: "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 
+  /* Canonical type roles — additive semantic sizes (do not shadow Tailwind's
+     numeric text-* scale). Pair size + leading + tracking + weight so a
+     `text-display` / `text-page` utility carries the whole role. Prefer the
+     Heading / PageHeader primitives in @tangle-network/sandbox-ui over raw
+     utilities so titles stay consistent across every app. */
+  --text-display: var(--font-size-display);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+  --text-hero: var(--font-size-hero);
+  --text-hero--line-height: 1.1;
+  --text-hero--letter-spacing: -0.02em;
+  --text-hero--font-weight: 700;
+  --text-page: var(--font-size-3xl);
+  --text-page--line-height: 1.15;
+  --text-page--letter-spacing: -0.02em;
+  --text-page--font-weight: 600;
+  --text-section: var(--font-size-xl);
+  --text-section--line-height: 1.3;
+  --text-section--letter-spacing: -0.01em;
+  --text-section--font-weight: 600;
+  --text-eyebrow: var(--font-size-sm);
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.08em;
+  --text-eyebrow--font-weight: 600;
+
   /* Radii — tight chrome scale */
   --radius-sm: 6px;
   --radius-md: 8px;
