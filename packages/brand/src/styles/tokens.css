@@ -2,8 +2,13 @@
 /* Brand: warm purple palette, #5B4ED4 primary */
 
 /* MD3 surface hierarchy */
+/* Dark is the default theme (`:root`/`[data-sandbox-ui]`). It also responds to
+ * the standard `[data-theme="dark"]` / `.dark` switch so any consumer can pin or
+ * toggle a theme without inventing an ad-hoc `data-sandbox-theme` name. */
 :root,
-[data-sandbox-ui] {
+[data-sandbox-ui],
+[data-theme="dark"],
+.dark {
   --md3-surface: #0a0a14;
   --md3-surface-dim: #07070d;
   --md3-surface-bright: #1b1a2c;
@@ -304,7 +309,13 @@
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
-[data-sandbox-theme="vault"] {
+/* Light theme — reachable via the named `vault` theme or the standard
+ * `[data-theme="light"]` / `.light` switch. Both blocks are single-attribute/
+ * class selectors, and this one is later in source order, so when an element
+ * carries both `data-sandbox-ui` (dark) and `data-theme="light"`, light wins. */
+[data-sandbox-theme="vault"],
+[data-theme="light"],
+.light {
   /* Light theme — clean professional, warm purple accents */
 
   /* MD3 surface hierarchy */
