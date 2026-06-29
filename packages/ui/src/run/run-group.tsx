@@ -58,9 +58,9 @@ function AssistantShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex gap-3">
-      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white">
-        <Bot className="h-4 w-4" />
+    <div className="flex gap-2.5">
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white">
+        <Bot className="h-3.5 w-3.5" />
       </div>
 
       <div className={ASSISTANT_SHELL}>
@@ -402,7 +402,7 @@ export const RunGroup = memo(
       <Collapsible.Root open={!collapsed} onOpenChange={() => onToggle()}>
         <div className="rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-card)] shadow-none">
         {/* Header */}
-        <div className="flex items-start gap-3 px-4 py-3.5">
+        <div className="flex items-start gap-3 px-3 py-2.5">
           <Collapsible.Trigger asChild>
             <button
               className={cn(
@@ -410,13 +410,13 @@ export const RunGroup = memo(
                 "bg-transparent hover:bg-transparent",
               )}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <div
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white",
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white",
                   )}
                 >
-                  <Bot className="h-4 w-4" />
+                  <Bot className="h-3.5 w-3.5" />
                 </div>
 
                 <span className={cn("text-sm font-semibold", branding.textClass)}>
@@ -473,9 +473,23 @@ export const RunGroup = memo(
 
         {/* Expanded content */}
         <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp">
-          <div className={cn("space-y-3 border-t border-[var(--border-subtle)] px-4 pb-4 pt-3")}>
+          <div className={cn("border-t border-[var(--border-subtle)] px-4 pb-4 pt-3")}>
             {allParts.map(({ part, msgId, index }, partIndex) => {
               const key = `${msgId}-${index}`;
+
+              // Consecutive (non-OpenUI) tool calls connect into one block —
+              // `getToolGroupPosition` already gives them joined radii, so they
+              // get no vertical gap; every other transition keeps a normal gap.
+              const prev = allParts[partIndex - 1]?.part;
+              const connectedTool =
+                part.type === "tool" &&
+                prev?.type === "tool" &&
+                !isOpenUITool(part as ToolPart) &&
+                !isOpenUITool(prev as ToolPart);
+              const gapClass =
+                partIndex === 0 ? "" : connectedTool ? "mt-px" : "mt-3";
+
+              let node: ReactNode = null;
 
               if (part.type === "tool") {
                 if (isOpenUITool(part as ToolPart)) {
@@ -484,11 +498,8 @@ export const RunGroup = memo(
                   const summary = getOpenUISummary(toolPart.state.output);
 
                   if (toolPart.state.status === "completed" && schema) {
-                    return (
-                      <div
-                        key={key}
-                        className="overflow-hidden rounded-[24px] border border-[var(--border-subtle)] bg-[var(--bg-card)]"
-                      >
+                    node = (
+                      <div className="overflow-hidden rounded-[24px] border border-[var(--border-subtle)] bg-[var(--bg-card)]">
                         {summary ? (
                           <div className="border-b border-[var(--border-subtle)] px-4 py-3">
                             <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -502,14 +513,9 @@ export const RunGroup = memo(
                         </div>
                       </div>
                     );
-                  }
-
-                  if (toolPart.state.status === "running") {
-                    return (
-                      <div
-                        key={key}
-                        className="flex items-center gap-3 rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-muted-foreground"
-                      >
+                  } else if (toolPart.state.status === "running") {
+                    node = (
+                      <div className="flex items-center gap-3 rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                         Building view…
                       </div>
@@ -517,47 +523,45 @@ export const RunGroup = memo(
                   }
                 }
 
-                return (
-                  <InlineToolItem
-                    key={key}
-                    part={part as ToolPart}
-                    renderToolDetail={renderToolDetail}
-                    groupPosition={getToolGroupPosition(partIndex, allParts)}
-                    actions={renderToolActions?.(part as ToolPart, {
-                      run,
-                      messageId: msgId,
-                      partIndex: index,
-                    })}
-                  />
-                );
-              }
-
-              if (part.type === "reasoning") {
-                return (
+                if (node === null) {
+                  node = (
+                    <InlineToolItem
+                      part={part as ToolPart}
+                      renderToolDetail={renderToolDetail}
+                      groupPosition={getToolGroupPosition(partIndex, allParts)}
+                      actions={renderToolActions?.(part as ToolPart, {
+                        run,
+                        messageId: msgId,
+                        partIndex: index,
+                      })}
+                    />
+                  );
+                }
+              } else if (part.type === "reasoning") {
+                node = (
                   <InlineThinkingItem
-                    key={key}
                     part={part as ReasoningPart}
                     defaultOpen={isStreaming}
                   />
                 );
-              }
-
-              if (
+              } else if (
                 part.type === "text" &&
                 !part.synthetic &&
                 part.text.trim()
               ) {
-                return (
-                  <div
-                    key={key}
-                    className="px-1 py-1"
-                  >
+                node = (
+                  <div className="px-1 py-1">
                     <Markdown className="tangle-prose text-[15px] leading-7">{part.text}</Markdown>
                   </div>
                 );
               }
 
-              return null;
+              if (!node) return null;
+              return (
+                <div key={key} className={gapClass}>
+                  {node}
+                </div>
+              );
             })}
           </div>
         </Collapsible.Content>
