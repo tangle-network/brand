@@ -12,6 +12,7 @@ import {
   FileCode,
   Search,
   CheckCircle,
+  AlertCircle,
   ChevronRight,
   Loader2,
   FolderOpen,
@@ -130,10 +131,9 @@ export function ToolCallStep({
   return (
     <div
       className={cn(
-        "group overflow-hidden rounded-[var(--radius-lg)] border bg-card transition-colors",
-        status === "running" && "border-border",
-        status === "success" && "border-border hover:border-primary/20",
-        status === "error" && "border-[var(--surface-danger-border)]",
+        "group overflow-hidden rounded-[var(--radius-lg)] border bg-card/40 transition-colors",
+        "border-[var(--border-subtle)] hover:border-border",
+        status === "error" && "border-[var(--surface-danger-border)]/60",
         className,
       )}
     >
@@ -147,10 +147,10 @@ export function ToolCallStep({
       >
         <div
           className={cn(
-            "flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border",
-            status === "running" && "border-[var(--border-accent)] bg-[var(--accent-surface-soft)] text-primary",
-            status === "success" && "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
-            status === "error" && "border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
+            "flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)]",
+            status === "running" && "bg-[var(--accent-surface-soft)] text-primary",
+            status === "success" && "bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
+            status === "error" && "bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
           )}
         >
           {status === "running" ? (
@@ -165,24 +165,20 @@ export function ToolCallStep({
           {label}
         </span>
 
-        <span
-          className={cn(
-            "rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
-            status === "running" &&
-              "border-border bg-[var(--accent-surface-soft)] text-primary",
-            status === "success" &&
-              "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
-            status === "error" && "border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
-          )}
-        >
-          {status}
-        </span>
-
-        {/* Duration */}
+        {/* Duration — quiet, before the status glyph */}
         {duration !== undefined && status !== "running" && (
-          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+          <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
             {duration < 1000 ? `${duration}ms` : `${(duration / 1000).toFixed(1)}s`}
           </span>
+        )}
+
+        {/* Quiet status glyph — the loud uppercase pill read as harsh; the colored
+            icon carries the same signal calmly (running spins in the left badge). */}
+        {status === "success" && (
+          <CheckCircle className="h-3.5 w-3.5 shrink-0 text-[var(--surface-success-text)]" />
+        )}
+        {status === "error" && (
+          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--surface-danger-text)]" />
         )}
 
         {/* Expand chevron */}
@@ -198,7 +194,7 @@ export function ToolCallStep({
 
       {/* Expandable content */}
       {expanded && (detail || output) && (
-        <div className="space-y-2 border-t border-border bg-muted px-3 py-2.5">
+        <div className="space-y-2 border-t border-[var(--border-subtle)] bg-muted/40 px-3 py-2.5">
           {detail && (
             isFilePath(detail)
               ? <FilePathChip path={detail} />
