@@ -53,6 +53,10 @@ export interface InlineToolItemProps {
   className?: string;
   contentClassName?: string;
   actions?: ReactNode;
+  /** Override the derived title (default: from `getToolDisplayMetadata`). */
+  title?: string;
+  /** Override the derived inline description. */
+  description?: string;
 }
 
 /**
@@ -68,9 +72,13 @@ export const InlineToolItem = memo(
     className,
     contentClassName,
     actions,
+    title: titleOverride,
+    description: descriptionOverride,
   }: InlineToolItemProps) => {
     const [open, setOpen] = useState(false);
     const meta = getToolDisplayMetadata(part);
+    const title = titleOverride ?? meta.title;
+    const description = descriptionOverride ?? meta.description;
     const { status } = part.state;
     const errorText = getToolErrorText(part);
 
@@ -127,11 +135,11 @@ export const InlineToolItem = memo(
                 </div>
 
                 <span className="truncate text-xs font-medium text-foreground">
-                  {meta.title}
+                  {title}
                 </span>
-                {meta.description ? (
+                {description ? (
                   <span className="hidden truncate text-xs font-mono text-muted-foreground sm:inline">
-                    {meta.description}
+                    {description}
                   </span>
                 ) : null}
 

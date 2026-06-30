@@ -1,27 +1,17 @@
 /**
- * ToolCallStep — renders a single agent tool invocation as a collapsible activity step.
+ * ToolCallStep — a single agent tool invocation as a collapsible activity step.
  *
- * Inspired by Conductor's workspace activity feed.
- * Each step shows: icon, label, optional output, expandable detail.
+ * Now a thin adapter over the canonical `InlineToolItem`: it maps the flat
+ * `ToolCallData`-style props (label / status / detail / output / duration) onto
+ * a `ToolPart` and delegates rendering, so the timeline feed (`AgentTimeline`,
+ * `ToolCallFeed`) and the run group share ONE row implementation and one look.
+ * The bespoke row markup is gone; only the prop adapter remains.
  */
 
-import { useState, type ReactNode } from "react";
-import {
-  Terminal,
-  FileText,
-  FileCode,
-  Search,
-  CheckCircle,
-  AlertCircle,
-  ChevronRight,
-  Loader2,
-  FolderOpen,
-  Download,
-  Pencil,
-  Eye,
-} from "lucide-react";
-import { cn } from "../lib/utils";
+import { type ReactNode } from "react";
 import { CodeBlock } from "../markdown/code-block";
+import type { ToolPart, ToolStatus } from "../types/parts";
+import { InlineToolItem } from "./inline-tool-item";
 
 export type ToolCallType =
   | "bash"
@@ -65,52 +55,19 @@ const EXT_LANGUAGE: Record<string, string> = {
   go: "go",
   sql: "sql",
   xml: "xml",
-}
-
-function inferLanguage(detail?: string, language?: string): string | undefined {
-  if (language) return language
-  if (!detail) return undefined
-  const ext = detail.split(".").pop()?.toLowerCase()
-  return ext ? EXT_LANGUAGE[ext] : undefined
-}
-
-function isFilePath(detail: string): boolean {
-  return /[/\\]/.test(detail) || /\.\w{1,6}$/.test(detail)
-}
-
-function FilePathChip({ path }: { path: string }) {
-  const parts = path.replace(/\\/g, "/").split("/")
-  const filename = parts.pop() ?? path
-  const dir = parts.length > 0 ? parts.join("/") + "/" : ""
-  return (
-    <div className="flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border bg-background px-2.5 py-1.5 font-mono text-xs min-w-0">
-      <FileCode className="h-3.5 w-3.5 shrink-0 text-primary" />
-      {dir && (
-        <span className="truncate text-muted-foreground">{dir}</span>
-      )}
-      <span className="shrink-0 font-semibold text-foreground">{filename}</span>
-    </div>
-  )
-}
-
-const ICONS: Record<ToolCallType, typeof Terminal> = {
-  bash: Terminal,
-  read: Eye,
-  write: FileText,
-  edit: Pencil,
-  glob: FolderOpen,
-  grep: Search,
-  list: FolderOpen,
-  download: Download,
-  inspect: Search,
-  audit: CheckCircle,
-  unknown: FileCode,
 };
 
-const STATUS_COLORS: Record<ToolCallStatus, string> = {
-  running: "text-primary",
-  success: "text-[var(--code-success)]",
-  error: "text-[var(--code-error)]",
+function inferLanguage(detail?: string, language?: string): string | undefined {
+  if (language) return language;
+  if (!detail) return undefined;
+  const ext = detail.split(".").pop()?.toLowerCase();
+  return ext ? EXT_LANGUAGE[ext] : undefined;
+}
+
+const STATUS_MAP: Record<ToolCallStatus, ToolStatus> = {
+  running: "running",
+  success: "completed",
+  error: "error",
 };
 
 export function ToolCallStep({
@@ -123,93 +80,38 @@ export function ToolCallStep({
   duration,
   className,
 }: ToolCallStepProps) {
-  const [expanded, setExpanded] = useState(false);
-  const Icon = ICONS[type] || ICONS.unknown;
-  const hasExpandable = !!(detail || output);
+  const part: ToolPart = {
+    type: "tool",
+    id: `${type}:${label}`,
+    tool: type,
+    state: {
+      status: STATUS_MAP[status],
+      input: detail ? { detail } : undefined,
+      output,
+      time: duration != null ? { start: 0, end: duration } : undefined,
+    },
+  };
+
   const lang = inferLanguage(detail, language);
 
   return (
-    <div
-      className={cn(
-        "group overflow-hidden rounded-[var(--radius-lg)] border bg-card/40 transition-colors",
-        "border-[var(--border-subtle)] hover:border-border",
-        status === "error" && "border-[var(--surface-danger-border)]/60",
-        className,
-      )}
-    >
-      <button
-        onClick={() => hasExpandable && setExpanded(!expanded)}
-        disabled={!hasExpandable}
-        className={cn(
-          "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm",
-          hasExpandable && "cursor-pointer",
-        )}
-      >
-        <div
-          className={cn(
-            "flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)]",
-            status === "running" && "bg-[var(--accent-surface-soft)] text-primary",
-            status === "success" && "bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
-            status === "error" && "bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
-          )}
-        >
-          {status === "running" ? (
-            <Loader2 className="h-3 w-3 animate-spin shrink-0" />
-          ) : (
-            <Icon className={cn("h-3 w-3 shrink-0", STATUS_COLORS[status])} />
-          )}
-        </div>
-
-        {/* Label */}
-        <span className="truncate flex-1 font-sans text-foreground">
-          {label}
-        </span>
-
-        {/* Duration — quiet, before the status glyph */}
-        {duration !== undefined && status !== "running" && (
-          <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
-            {duration < 1000 ? `${duration}ms` : `${(duration / 1000).toFixed(1)}s`}
-          </span>
-        )}
-
-        {/* Quiet status glyph — the loud uppercase pill read as harsh; the colored
-            icon carries the same signal calmly (running spins in the left badge). */}
-        {status === "success" && (
-          <CheckCircle className="h-3.5 w-3.5 shrink-0 text-[var(--surface-success-text)]" />
-        )}
-        {status === "error" && (
-          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--surface-danger-text)]" />
-        )}
-
-        {/* Expand chevron */}
-        {hasExpandable && (
-          <ChevronRight
-            className={cn(
-              "h-3 w-3 text-muted-foreground transition-transform shrink-0",
-              expanded && "rotate-90",
-            )}
-          />
-        )}
-      </button>
-
-      {/* Expandable content */}
-      {expanded && (detail || output) && (
-        <div className="space-y-2 border-t border-[var(--border-subtle)] bg-muted/40 px-3 py-2.5">
-          {detail && (
-            isFilePath(detail)
-              ? <FilePathChip path={detail} />
-              : <div className="text-xs font-mono text-muted-foreground">{detail}</div>
-          )}
-          {output && (
-            <CodeBlock
-              code={output}
-              language={lang}
-              className="max-h-72 overflow-auto text-xs"
-            />
-          )}
-        </div>
-      )}
-    </div>
+    <InlineToolItem
+      part={part}
+      title={label}
+      description={detail}
+      className={className}
+      renderToolDetail={
+        output
+          ? () => (
+              <CodeBlock
+                code={output}
+                language={lang}
+                className="max-h-72 overflow-auto text-xs"
+              />
+            )
+          : () => null
+      }
+    />
   );
 }
 
@@ -224,7 +126,7 @@ export interface ToolCallGroupProps {
 
 export function ToolCallGroup({ title, children, className }: ToolCallGroupProps) {
   return (
-    <div className={cn("my-2 space-y-2", className)}>
+    <div className={["my-2 space-y-2", className].filter(Boolean).join(" ")}>
       {title && (
         <div className="mb-1 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {title}
