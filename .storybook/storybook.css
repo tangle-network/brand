@@ -1,4 +1,4 @@
-@import "@tangle-network/brand/styles";
 @import "tailwindcss";
+@import "@tangle-network/brand/styles";
 
 @source "../packages/*/src";

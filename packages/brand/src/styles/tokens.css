@@ -9,15 +9,15 @@
 [data-sandbox-ui],
 [data-theme="dark"],
 .dark {
-  --md3-surface: #0a0a14;
-  --md3-surface-dim: #07070d;
-  --md3-surface-bright: #1b1a2c;
-  --md3-surface-container-lowest: #000001;
-  --md3-surface-container-low: #0d0c18;
-  --md3-surface-container: #11101e;
-  --md3-surface-container-high: #171624;
-  --md3-surface-container-highest: #1f1e30;
-  --md3-surface-variant: #1f1e30;
+  --md3-surface: #16161f;
+  --md3-surface-dim: #111119;
+  --md3-surface-bright: #2a2940;
+  --md3-surface-container-lowest: #101017;
+  --md3-surface-container-low: #16161f;
+  --md3-surface-container: #1c1b27;
+  --md3-surface-container-high: #232231;
+  --md3-surface-container-highest: #2c2b3d;
+  --md3-surface-variant: #2c2b3d;
   --md3-on-surface: #fdfdfd;
   --md3-on-surface-variant: #aaa8b8;
 
@@ -36,8 +36,8 @@
   --md3-on-secondary-container: #E8E5FF;
 
   --md3-tertiary: #10B981;
-  --md3-outline: #434260;
-  --md3-outline-variant: #2A293D;
+  --md3-outline: #4a4965;
+  --md3-outline-variant: #34324a;
 
   --md3-error: #ff5277;
   --md3-error-dim: #eb2855;
@@ -51,24 +51,24 @@
   --md3-surface-tint: #818CF8;
 
   /* Semantic HSL bridge — flat neutral spine (Tangle Quiet) */
-  --hsl-background: 240 8% 5%;     /* #0b0b0d */
+  --hsl-background: 240 7% 9%;     /* #15151a canvas — lifted off pure black */
   --hsl-foreground: 240 6% 93%;    /* #ececee */
-  --hsl-card: 240 5% 8%;           /* #141416 surface */
+  --hsl-card: 240 5% 13%;          /* #1f1f23 surface, clearly above canvas */
   --hsl-card-foreground: 240 6% 93%;
-  --hsl-popover: 240 4% 13%;       /* #202023 elevated */
+  --hsl-popover: 240 5% 17%;       /* #28282d elevated */
   --hsl-popover-foreground: 240 6% 93%;
   --hsl-primary: 239 84% 67%;
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 5% 11%;     /* #1a1a1d surface-2 */
+  --hsl-secondary: 240 5% 15%;     /* #242428 surface-2 */
   --hsl-secondary-foreground: 240 6% 93%;
-  --hsl-muted: 240 5% 11%;         /* #1a1a1d — neutral hover well */
-  --hsl-muted-foreground: 240 4% 62%;  /* #9a9aa2 text-muted */
-  --hsl-accent: 240 5% 11%;        /* neutral hover (indigo lives in accent-surface-strong) */
+  --hsl-muted: 240 5% 15%;         /* #242428 — neutral hover well */
+  --hsl-muted-foreground: 240 4% 64%;  /* #9c9ca6 text-muted */
+  --hsl-accent: 240 5% 15%;        /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 240 6% 93%;
   --hsl-destructive: 348 90% 60%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 240 3% 13%;        /* hairline ≈ rgba(255,255,255,0.07) */
-  --hsl-input: 240 5% 11%;
+  --hsl-border: 240 5% 16%;        /* soft edge — fill carries separation, not the line */
+  --hsl-input: 240 5% 15%;
   --hsl-ring: 239 84% 67%;
   --hsl-success: 160 84% 39%;
   --hsl-warning: 40 94% 56%;
@@ -100,20 +100,20 @@
   --info: var(--hsl-info);
 
   /* Sidebar tokens — flat surface + hairline */
-  --sidebar-background: 240 5% 8%;   /* #141416 surface */
+  --sidebar-background: 240 6% 11%;  /* #1a1a1f surface */
   --sidebar-foreground: 240 6% 93%;
   --sidebar-primary: 239 84% 67%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 11%;      /* neutral hover */
+  --sidebar-accent: 240 5% 15%;      /* neutral hover */
   --sidebar-accent-foreground: 240 6% 93%;
-  --sidebar-border: 240 3% 13%;      /* hairline */
+  --sidebar-border: 240 5% 16%;      /* soft edge */
   --sidebar-ring: 239 84% 67%;
 
   /* Depth scale — flat neutral spine (Tangle Quiet) */
-  --depth-1: #0b0b0d;
-  --depth-2: #141416;
-  --depth-3: #1a1a1d;
-  --depth-4: #202023;
+  --depth-1: #15151a;
+  --depth-2: #1f1f23;
+  --depth-3: #26262b;
+  --depth-4: #2e2e34;
 
   /* Status colors */
   --status-running: #10B981;
@@ -172,7 +172,7 @@
   --accent-text: #b9bffb;
 
   /* Surfaces — flat single-neutral (no radial mesh) */
-  --bg-root: #0b0b0d;
+  --bg-root: #15151a;
   --bg-dark: var(--depth-1);
   --bg-card: var(--depth-2);
   --bg-elevated: var(--depth-4);

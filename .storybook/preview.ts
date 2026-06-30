@@ -15,7 +15,7 @@ const preview: Preview = {
     (Story) => {
       if (typeof document !== "undefined") {
         document.documentElement.style.colorScheme = "dark";
-        document.body.style.background = "hsl(248 52% 5%)";
+        document.body.style.background = "hsl(240 7% 9%)";
       }
       return Story();
     },

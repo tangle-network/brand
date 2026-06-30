@@ -52,16 +52,47 @@
   --color-brand-glow: #A5AAFC;
   --color-brand-emerald: #10B981;
 
-  /* Depth stack — flat neutral spine (Tangle Quiet) */
-  --color-depth-1: #0b0b0d;
-  --color-depth-2: #141416;
-  --color-depth-3: #1a1a1d;
-  --color-depth-4: #202023;
+  /* Depth stack — REFERENCE the spine in tokens.css (single source; was a stale
+     hardcoded copy that drifted from --depth-* and broke theme retunes). */
+  --color-depth-1: var(--depth-1);
+  --color-depth-2: var(--depth-2);
+  --color-depth-3: var(--depth-3);
+  --color-depth-4: var(--depth-4);
+
+  /* Semantic surface + text roles — map the shadcn/MD3 utility names onto the
+     tokens.css spine so `bg-card` / `border-border` / `bg-muted` /
+     `bg-surface-container*` / `text-muted-foreground` resolve from ONE source
+     here, instead of every consuming app re-defining them (the drift you hit).
+     Apps may still override locally; absent an override these are the defaults. */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-surface-container-lowest: var(--md3-surface-container-lowest);
+  --color-surface-container-low: var(--md3-surface-container-low);
+  --color-surface-container: var(--md3-surface-container);
+  --color-surface-container-high: var(--md3-surface-container-high);
+  --color-surface-container-highest: var(--md3-surface-container-highest);
 
   /* Semantic text — use as `text-fg`, `text-fg-muted`, `text-fg-dim` */
-  --color-fg: #ececee;
-  --color-fg-muted: #9a9aa2;
-  --color-fg-dim: #6b6b73;
+  --color-fg: var(--text-primary);
+  --color-fg-muted: var(--text-muted);
+  --color-fg-dim: var(--text-dim);
 
   /* Status — use as `text-status-running`, `bg-status-stopped` */
   --color-status-running: #10B981;
