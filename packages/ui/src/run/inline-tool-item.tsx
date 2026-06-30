@@ -101,8 +101,8 @@ export const InlineToolItem = memo(
             <button
               className={cn(
                 "w-full border text-left transition-colors",
-                "border-border bg-card hover:border-[var(--border-accent-hover)] hover:bg-accent/35",
-                open && "border-border bg-accent/30",
+                "border-[var(--border-subtle)] bg-card/40 hover:border-border hover:bg-accent/25",
+                open && "border-border bg-accent/20",
                 shapeClass,
                 className,
               )}
@@ -179,7 +179,7 @@ export const InlineToolItem = memo(
         </div>
 
         <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp">
-          <div className={cn("mt-2 pl-4", contentClassName)}>
+          <div className={cn("mt-1.5 ml-2.5 border-l-2 border-primary/15 pl-3.5", contentClassName)}>
             {renderToolDetail?.(part) ?? <ExpandedToolDetail part={part} />}
           </div>
         </Collapsible.Content>
