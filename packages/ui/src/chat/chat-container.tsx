@@ -1,7 +1,6 @@
 import {
   memo,
   type ReactNode,
-  useCallback,
   useMemo,
   useRef,
 } from "react";
@@ -20,7 +19,6 @@ import {
   AgentTimeline,
   type AgentTimelineItem,
 } from "./agent-timeline";
-import { ChatInput, type PendingFile } from "./chat-input";
 import { InlineThinkingItem } from "../run/inline-thinking-item";
 import { getToolDisplayMetadata } from "../utils/tool-display";
 import {
@@ -29,27 +27,21 @@ import {
   type OpenUIComponentNode,
 } from "../openui/openui-artifact-renderer";
 
+/**
+ * Transcript-only container: message list + auto-scroll. Composers are
+ * composed BELOW this by the app (the canonical one is `AgentComposer` in
+ * `@tangle-network/sandbox-ui`) — this component never renders an input.
+ */
 export interface ChatContainerProps {
   messages: SessionMessage[];
   partMap: Record<string, SessionPart[]>;
   isStreaming: boolean;
-  onSend?: (text: string) => void;
-  onCancel?: () => void;
   branding?: AgentBranding;
-  placeholder?: string;
   className?: string;
-  /** Hide the input area (useful for read-only views). */
-  hideInput?: boolean;
   /** Custom renderer for tool details. Return ReactNode to override, null to use default. */
   renderToolDetail?: CustomToolRenderer;
   /** Presentation mode for the session view. */
   presentation?: "runs" | "timeline";
-  modelLabel?: string;
-  onModelClick?: () => void;
-  pendingFiles?: PendingFile[];
-  onRemoveFile?: (id: string) => void;
-  onAttach?: (files: FileList) => void;
-  disabled?: boolean;
   /** Callback when an OpenUI action button is pressed within inline OpenUI blocks. */
   onOpenUIAction?: (action: OpenUIAction) => void;
   /** Enable rendering OpenUI schemas inline in the chat timeline. Defaults to true. */
@@ -355,7 +347,7 @@ function buildTimelineItems(
 }
 
 /**
- * Full chat container: message list + auto-scroll + input area.
+ * Chat transcript container: message list + auto-scroll.
  * Orchestrates useRunGroups, useRunCollapseState, and useAutoScroll.
  */
 export const ChatContainer = memo(
@@ -363,20 +355,10 @@ export const ChatContainer = memo(
     messages,
     partMap,
     isStreaming,
-    onSend,
-    onCancel,
     branding,
-    placeholder = "Type a message...",
     className,
-    hideInput = false,
     renderToolDetail,
     presentation = "runs",
-    modelLabel,
-    onModelClick,
-    pendingFiles,
-    onRemoveFile,
-    onAttach,
-    disabled = false,
     onOpenUIAction,
     enableOpenUI = true,
     renderRunActions,
@@ -402,13 +384,6 @@ export const ChatContainer = memo(
     const timeline = useMemo(
       () => buildTimelineItems(messages, partMap, isStreaming, onOpenUIAction, enableOpenUI),
       [messages, partMap, isStreaming, onOpenUIAction, enableOpenUI],
-    );
-
-    const handleSend = useCallback(
-      (text: string) => {
-        onSend?.(text);
-      },
-      [onSend],
     );
 
     return (
@@ -461,23 +436,6 @@ export const ChatContainer = memo(
               Scroll to bottom
             </button>
           </div>
-        )}
-
-        {/* Input area */}
-        {!hideInput && onSend && (
-          <ChatInput
-            onSend={handleSend}
-            onCancel={onCancel}
-            isStreaming={isStreaming}
-            placeholder={placeholder}
-            modelLabel={modelLabel}
-            onModelClick={onModelClick}
-            pendingFiles={pendingFiles}
-            onRemoveFile={onRemoveFile}
-            onAttach={onAttach}
-            disabled={disabled}
-            className="shrink-0 border-t border-border bg-background"
-          />
         )}
       </div>
     );

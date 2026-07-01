@@ -4,7 +4,9 @@ This document tracks what in `@tangle-network/ui` is canonical, adapter-only, or
 
 ## Current Judgment
 
-`RunGroup` and `InlineToolItem` are the useful center of the run UI. They model real agent transcript states and are referenced by product work. `ToolCallStep` and `ToolCallFeed` should be treated as compatibility adapters until consumers move to the canonical row.
+`RunGroup` and `InlineToolItem` are the useful center of the run UI. They model real agent transcript states and are referenced by product work. `ToolCallStep` is an internal-only adapter (no longer exported); `ToolCallFeed` remains public while `tax-agent` imports it.
+
+`ChatInput` is deleted. `ChatContainer` is transcript-only — the canonical composer is `AgentComposer` in `@tangle-network/sandbox-ui`, composed below the transcript by the app (the pattern `AgentWorkspace` in sandbox-web already uses). The composer stack stays in sandbox-ui because it is agent-domain (depends on `@tangle-network/agent-interface`, harness/model pickers, provider logos); `@tangle-network/ui` stays the generic layer.
 
 ## Keep
 
@@ -29,14 +31,14 @@ This document tracks what in `@tangle-network/ui` is canonical, adapter-only, or
 
 `packages/ui/src/run/tool-call-step.tsx`
 
-- Currently maps the older flat `label/status/detail/output` props into `InlineToolItem`.
-- Keep only until external consumers are migrated.
+- Internal adapter mapping flat `label/status/detail/output` props into `InlineToolItem` for `AgentTimeline` and `ToolCallFeed`.
+- Not exported; only the `ToolCallType`/`ToolCallStatus` types are public (referenced by `ToolCallData`).
 - Do not expand it into another bespoke row.
 
 `packages/ui/src/run/tool-call-feed.tsx`
 
-- Keep only if a product still needs the feed parser.
-- If it is not imported by active apps, delete it with the stories.
+- Public while `tax-agent` imports it (`session-vault.tsx`).
+- When tax-agent migrates to `AgentTimeline`/`RunGroup`, delete the feed and fold `ToolCallType`/`ToolCallStatus` into it.
 
 ## Suspect Story Patterns
 
