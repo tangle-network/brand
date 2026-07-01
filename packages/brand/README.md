@@ -2,7 +2,9 @@
 
 Single source of truth for the Tangle design system. Design tokens, logo, and a Tailwind v4 theme preset, shared across every Tangle app (`tangle-website`, `sandbox-ui`, `evals`, `agent-builder`, product surfaces).
 
-**Scope:** tokens, not components. Components live in `@tangle-network/sandbox-ui`.
+**Scope:** tokens, not components. Shared components live in `@tangle-network/ui`; product-specific components stay in their product repos.
+
+For the broader visual, copy, graphic, and component standards, see the repo-level [brand guidelines](../../docs/brand-guidelines.md).
 
 ## Install
 

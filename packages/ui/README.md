@@ -2,6 +2,8 @@
 
 Generic React UI components for Tangle products. Imports tokens from `@tangle-network/brand` (peer dep). Tailwind v4-native.
 
+Component visual precedent is governed by the repo-level [brand guidelines](../../docs/brand-guidelines.md) and [component audit](../../docs/component-audit.md). Storybook examples are test surfaces; they are not automatically approved brand patterns.
+
 ## Install
 
 ```sh
