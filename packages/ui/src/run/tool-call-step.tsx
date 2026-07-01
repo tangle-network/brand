@@ -1,11 +1,9 @@
 /**
- * ToolCallStep — a single agent tool invocation as a collapsible activity step.
- *
- * Now a thin adapter over the canonical `InlineToolItem`: it maps the flat
- * `ToolCallData`-style props (label / status / detail / output / duration) onto
- * a `ToolPart` and delegates rendering, so the timeline feed (`AgentTimeline`,
- * `ToolCallFeed`) and the run group share ONE row implementation and one look.
- * The bespoke row markup is gone; only the prop adapter remains.
+ * ToolCallStep — internal adapter over the canonical `InlineToolItem` row.
+ * Maps flat `ToolCallData`-style props (label / status / detail / output /
+ * duration) onto a `ToolPart` so `AgentTimeline` and `ToolCallFeed` share the
+ * one row implementation. Not exported publicly; only the `ToolCallType` /
+ * `ToolCallStatus` vocabulary is (via `ToolCallData`).
  */
 
 import { type ReactNode } from "react";

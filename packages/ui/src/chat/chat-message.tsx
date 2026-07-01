@@ -27,10 +27,6 @@ export interface ChatMessageProps {
   assistantLabel?: string;
   /** Hide the role label row entirely */
   hideRoleLabel?: boolean;
-  /** @deprecated Avatars were removed from the bubble design; this prop is ignored. */
-  hideAvatar?: boolean;
-  /** @deprecated Avatars were removed from the bubble design; this prop is ignored. */
-  avatar?: ReactNode;
 }
 
 export function ChatMessage({

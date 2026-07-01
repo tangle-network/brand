@@ -9,5 +9,8 @@ export {
   type ExpandedToolDetailProps,
 } from "./expanded-tool-detail";
 export { LiveDuration } from "./run-item-primitives";
-export { ToolCallStep, ToolCallGroup, type ToolCallStepProps, type ToolCallGroupProps, type ToolCallType, type ToolCallStatus } from "./tool-call-step";
+// ToolCallStep/ToolCallGroup are internal adapters over InlineToolItem (used by
+// AgentTimeline + ToolCallFeed); only their status/type vocabulary is public
+// because ToolCallData references it.
+export { type ToolCallType, type ToolCallStatus } from "./tool-call-step";
 export { ToolCallFeed, parseToolEvent, type ToolCallFeedProps, type ToolCallData, type FeedSegment } from "./tool-call-feed";

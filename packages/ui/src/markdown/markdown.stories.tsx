@@ -39,7 +39,7 @@ pnpm add @tangle/sandbox-ui
 Import the components you need:
 
 \`\`\`tsx
-import { ChatInput, DropZone, UploadProgress } from '@tangle/sandbox-ui'
+import { AgentComposer, DropZone, UploadProgress } from '@tangle-network/sandbox-ui'
 \`\`\`
 
 > **Note:** Components assume a Tailwind CSS v4 setup with the design tokens
