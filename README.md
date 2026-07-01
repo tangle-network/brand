@@ -7,7 +7,12 @@ Tangle design-system foundation: brand tokens + generic UI components.
 | Package | Path | Description |
 |---|---|---|
 | [`@tangle-network/brand`](packages/brand/README.md) | `packages/brand/` | Tokens, fonts, Tailwind v4 `@theme`, Logo. Published API unchanged from 0.2.x. |
-| `@tangle-network/ui` | `packages/ui/` | Generic React components. Placeholder — content lands in Phase B. |
+| [`@tangle-network/ui`](packages/ui/README.md) | `packages/ui/` | Generic React components for product surfaces. |
+
+## Guidelines
+
+- [Brand guidelines](docs/brand-guidelines.md)
+- [Component audit](docs/component-audit.md)
 
 ## Versioning
 

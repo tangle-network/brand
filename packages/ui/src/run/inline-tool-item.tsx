@@ -115,7 +115,7 @@ export const InlineToolItem = memo(
                 className,
               )}
             >
-              <div className="flex items-center gap-2 px-2.5 py-1.5">
+              <div className="flex items-center gap-2.5 px-3 py-2.5">
                 <div className={cn(
                   "shrink-0",
                   isRunning && "text-primary",
@@ -151,13 +151,13 @@ export const InlineToolItem = memo(
                     </span>
                   ) : null}
                   {isError ? (
-                    <span className="rounded-full border border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)] px-1.5 py-px text-[10px] font-semibold uppercase text-[var(--surface-danger-text)]">
-                      Failed
+                    <span className="text-[10px] font-medium text-[var(--surface-danger-text)]">
+                      failed
                     </span>
                   ) : null}
                   {isRunning ? (
-                    <span className="rounded-full border border-[var(--border-accent)] bg-primary/10 px-1.5 py-px text-[10px] font-semibold uppercase text-primary">
-                      Running
+                    <span className="text-[10px] font-medium text-primary">
+                      running
                     </span>
                   ) : null}
                   {open ? (

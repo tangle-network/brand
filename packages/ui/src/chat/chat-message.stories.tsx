@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { ChatMessage } from './chat-message'
-import { ToolCallStep } from '../run/tool-call-step'
+import { InlineToolItem } from '../run/inline-tool-item'
+import type { ToolPart } from '../types/parts'
 
 const meta: Meta<typeof ChatMessage> = {
   title: 'Chat/ChatMessage',
@@ -25,6 +26,30 @@ type Story = StoryObj<typeof ChatMessage>
 
 const ts = (offsetMinutes = 0) =>
   new Date(Date.now() - offsetMinutes * 60 * 1000)
+
+const readToolPart: ToolPart = {
+  type: 'tool',
+  id: 'chat-read',
+  tool: 'read',
+  state: {
+    status: 'completed',
+    input: { file_path: 'src/hooks/useFetchData.ts' },
+    output: `export function useFetchData<T>(url: string) {\n  const [data, setData] = useState<T | null>(null)\n  const [loading, setLoading] = useState(true)\n  // ...`,
+    time: { start: Date.now() - 1200, end: Date.now() - 1152 },
+  },
+}
+
+const searchToolPart: ToolPart = {
+  type: 'tool',
+  id: 'chat-search',
+  tool: 'grep',
+  state: {
+    status: 'completed',
+    input: { pattern: 'cache', path: 'src/hooks/useFetchData.ts' },
+    output: 'No cache layer found. Data fetched on every mount.',
+    time: { start: Date.now() - 900, end: Date.now() - 888 },
+  },
+}
 
 export const UserMessage: Story = {
   args: {
@@ -117,20 +142,8 @@ export const AssistantWithToolCalls: Story = {
     content: 'Let me read the current implementation first.',
     toolCalls: (
       <div className="mt-3 space-y-2">
-        <ToolCallStep
-          type="read"
-          label="Read src/hooks/useFetchData.ts"
-          status="success"
-          output={`export function useFetchData<T>(url: string) {\n  const [data, setData] = useState<T | null>(null)\n  const [loading, setLoading] = useState(true)\n  // ...`}
-          duration={48}
-        />
-        <ToolCallStep
-          type="grep"
-          label="Search for cache references"
-          status="success"
-          output="No cache layer found. Data fetched on every mount."
-          duration={12}
-        />
+        <InlineToolItem part={readToolPart} groupPosition="first" />
+        <InlineToolItem part={searchToolPart} groupPosition="last" />
       </div>
     ),
     timestamp: ts(1),

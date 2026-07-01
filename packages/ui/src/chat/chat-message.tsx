@@ -6,7 +6,6 @@
  */
 
 import { type ReactNode } from "react";
-import { User, Bot } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Markdown } from "../markdown/markdown";
 
@@ -28,9 +27,9 @@ export interface ChatMessageProps {
   assistantLabel?: string;
   /** Hide the role label row entirely */
   hideRoleLabel?: boolean;
-  /** Hide the avatar icon */
+  /** @deprecated Avatars were removed from the bubble design; this prop is ignored. */
   hideAvatar?: boolean;
-  /** Custom avatar element (replaces default User/Bot icon) */
+  /** @deprecated Avatars were removed from the bubble design; this prop is ignored. */
   avatar?: ReactNode;
 }
 
@@ -44,36 +43,28 @@ export function ChatMessage({
   userLabel = "You",
   assistantLabel = "Agent",
   hideRoleLabel,
-  hideAvatar,
-  avatar,
 }: ChatMessageProps) {
   const isUser = role === "user";
 
   return (
     <div
       className={cn(
-        "flex gap-3",
-        isUser ? "flex-row-reverse" : "flex-row",
+        "flex flex-col gap-1",
+        isUser ? "items-end" : "items-start",
         className,
       )}
     >
-      {/* Avatar */}
-      {!hideAvatar && (
-        avatar ? (
-          <div className="mt-0.5 shrink-0">{avatar}</div>
-        ) : (
-          <div
-            className={cn(
-              "mt-0.5 flex shrink-0 items-center justify-center rounded-[calc(var(--radius-md)+2px)] border",
-              "h-[var(--avatar-size)] w-[var(--avatar-size)]",
-              isUser
-                ? "border-border bg-[var(--accent-surface-soft)] text-[var(--accent-text)]"
-                : "border-border bg-muted text-[var(--brand-cool)]",
-            )}
-          >
-            {isUser ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
-          </div>
-        )
+      {!hideRoleLabel && (
+        <div className={cn("flex items-center gap-2 px-1", isUser && "flex-row-reverse")}>
+          <span className="font-medium text-foreground text-xs">
+            {isUser ? userLabel : assistantLabel}
+          </span>
+          {timestamp && (
+            <span className="text-muted-foreground text-xs">
+              {formatTime(timestamp)}
+            </span>
+          )}
+        </div>
       )}
 
       {/* Bubble */}
@@ -86,20 +77,6 @@ export function ChatMessage({
             : "border-border bg-card",
         )}
       >
-        {/* Role label + timestamp */}
-        {!hideRoleLabel && (
-          <div className={cn("flex items-center gap-2", isUser && "flex-row-reverse")}>
-            <span className="text-[var(--font-size-xs)] font-[var(--chat-label-weight,600)] uppercase tracking-[var(--chat-label-tracking,0.14em)] text-foreground">
-              {isUser ? userLabel : assistantLabel}
-            </span>
-            {timestamp && (
-              <span className="text-[var(--font-size-xs)] text-muted-foreground">
-                {formatTime(timestamp)}
-              </span>
-            )}
-          </div>
-        )}
-
         {/* Message body */}
         {isUser ? (
           <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)] text-foreground">

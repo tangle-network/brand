@@ -1,0 +1,107 @@
+/* Named brand themes. Each scope overrides only the spine tokens in tokens.css;
+ * components re-skin automatically because they reference the semantic tokens
+ * (bg-card / border-border / surface-container, mapped in theme.css). Apply with
+ * data-theme="<name>" on a wrapper (or <html>). The default :root / .dark spine
+ * is the neutral "tangle" theme; "<name>-light" scopes are the light variants. */
+
+/* ───────────────────────── Aubergine (bazaar) — dark purple ──────────────── */
+[data-theme="aubergine"] {
+  --hsl-background: 258 43% 7%;   --hsl-foreground: 258 50% 97%;
+  --hsl-card: 258 39% 19%;        --hsl-card-foreground: 258 50% 97%;
+  --hsl-popover: 258 37% 25%;     --hsl-popover-foreground: 258 50% 97%;
+  --hsl-primary: 232 100% 75%;    --hsl-primary-foreground: 258 45% 8%;
+  --hsl-secondary: 257 42% 13%;   --hsl-muted: 257 42% 13%;
+  --hsl-muted-foreground: 258 22% 64%;
+  --hsl-accent: 258 39% 19%;      --hsl-border: 258 28% 27%;
+  --hsl-input: 257 42% 13%;       --hsl-ring: 232 100% 75%;
+  --depth-1: #0f0a1a; --depth-2: #1a1330; --depth-3: #271d42; --depth-4: #362858;
+  --bg-root: #0f0a1a; --bg-card: var(--depth-3); --bg-input: var(--depth-2);
+  --md3-surface-container-lowest: #140d24; --md3-surface-container-low: #1a1330;
+  --md3-surface-container: #221842; --md3-surface-container-high: #271d42;
+  --md3-surface-container-highest: #362858; --md3-outline-variant: #392d52;
+  --border-subtle: rgba(183,157,255,0.10); --border-default: rgba(183,157,255,0.18);
+  --border-hover: rgba(183,157,255,0.34); --accent-text: #b69dff;
+  --brand-primary: #8090ff; --brand-glow: #b69dff;
+  --text-primary: #f4f1fd; --text-secondary: #c6bcdf; --text-muted: #998fb6; --text-dim: #6c6289;
+}
+[data-theme="aubergine-light"] {
+  --hsl-background: 258 60% 96%;  --hsl-foreground: 258 45% 11%;
+  --hsl-card: 0 0% 100%;          --hsl-card-foreground: 258 45% 11%;
+  --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 258 45% 11%;
+  --hsl-primary: 258 70% 50%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-secondary: 258 45% 92%;   --hsl-muted: 258 45% 92%;
+  --hsl-muted-foreground: 258 18% 42%;
+  --hsl-accent: 258 45% 92%;      --hsl-border: 258 30% 88%;
+  --hsl-input: 258 30% 88%;       --hsl-ring: 258 70% 50%;
+  --depth-1: #f4f1fc; --depth-2: #ece6f8; --depth-3: #ffffff; --depth-4: #ffffff;
+  --bg-root: #f4f1fc; --bg-card: #ffffff; --bg-input: #ece6f8;
+  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #faf8fe;
+  --md3-surface-container: #f4f1fc; --md3-surface-container-high: #ece6f8;
+  --md3-surface-container-highest: #e4dcf4; --md3-outline-variant: #e0d8f0;
+  --border-subtle: rgba(60,32,110,0.10); --border-default: rgba(60,32,110,0.16);
+  --border-hover: rgba(60,32,110,0.30); --accent-text: #6d28d9;
+  --brand-primary: #6d28d9; --brand-glow: #8b5cf6;
+  --text-primary: #160f22; --text-secondary: #3f3460; --text-muted: #6c6289; --text-dim: #8a82a6;
+}
+
+/* ───────────────────────── Arena — emerald / green accent ────────────────── */
+[data-theme="arena"] {
+  --hsl-background: 160 16% 6%;   --hsl-foreground: 150 20% 96%;
+  --hsl-card: 158 14% 12%;        --hsl-card-foreground: 150 20% 96%;
+  --hsl-popover: 158 13% 16%;     --hsl-popover-foreground: 150 20% 96%;
+  --hsl-primary: 160 84% 39%;     --hsl-primary-foreground: 160 60% 8%;
+  --hsl-secondary: 158 12% 12%;   --hsl-muted: 158 12% 12%;
+  --hsl-muted-foreground: 152 12% 62%;
+  --hsl-accent: 158 14% 14%;      --hsl-border: 158 14% 18%;
+  --hsl-input: 158 12% 12%;       --hsl-ring: 160 84% 45%;
+  --depth-1: #0a0f0c; --depth-2: #131b16; --depth-3: #1b261f; --depth-4: #233328;
+  --bg-root: #0a0f0c; --bg-card: var(--depth-3); --bg-input: var(--depth-2);
+  --md3-surface-container-lowest: #070b08; --md3-surface-container-low: #131b16;
+  --md3-surface-container: #182019; --md3-surface-container-high: #1b261f;
+  --md3-surface-container-highest: #233328; --md3-outline-variant: #2a3a31;
+  --border-subtle: rgba(52,211,153,0.10); --border-default: rgba(52,211,153,0.18);
+  --border-hover: rgba(52,211,153,0.32); --accent-text: #34d399;
+  --brand-primary: #10b981; --brand-glow: #34d399;
+  --text-primary: #ecfdf5; --text-secondary: #c2e8d6; --text-muted: #8fb6a3; --text-dim: #5f8472;
+}
+[data-theme="arena-light"] {
+  --hsl-background: 150 30% 96%;  --hsl-foreground: 158 30% 10%;
+  --hsl-card: 0 0% 100%;          --hsl-card-foreground: 158 30% 10%;
+  --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 158 30% 10%;
+  --hsl-primary: 160 84% 30%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-secondary: 150 25% 92%;   --hsl-muted: 150 25% 92%;
+  --hsl-muted-foreground: 158 14% 40%;
+  --hsl-accent: 150 25% 92%;      --hsl-border: 150 20% 86%;
+  --hsl-input: 150 20% 86%;       --hsl-ring: 160 84% 30%;
+  --depth-1: #f0f6f2; --depth-2: #e6f0ea; --depth-3: #ffffff; --depth-4: #ffffff;
+  --bg-root: #f0f6f2; --bg-card: #ffffff; --bg-input: #e6f0ea;
+  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #f6fbf8;
+  --md3-surface-container: #f0f6f2; --md3-surface-container-high: #e6f0ea;
+  --md3-surface-container-highest: #dcebe2; --md3-outline-variant: #d7e8de;
+  --border-subtle: rgba(6,95,70,0.10); --border-default: rgba(6,95,70,0.16);
+  --border-hover: rgba(6,95,70,0.30); --accent-text: #047857;
+  --brand-primary: #059669; --brand-glow: #10b981;
+  --text-primary: #06231a; --text-secondary: #285048; --text-muted: #5f8472; --text-dim: #82a699;
+}
+
+/* ───────────────────────── Tangle (neutral) — light variant alias ─────────── */
+/* dark = default :root spine; this is its light mode for the showcase. */
+[data-theme="tangle-light"] {
+  --hsl-background: 240 33% 98%;  --hsl-foreground: 245 32% 14%;
+  --hsl-card: 0 0% 100%;          --hsl-card-foreground: 245 32% 14%;
+  --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 245 32% 14%;
+  --hsl-primary: 239 84% 60%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-secondary: 240 30% 95%;   --hsl-muted: 240 28% 95%;
+  --hsl-muted-foreground: 240 8% 42%;
+  --hsl-accent: 240 30% 95%;      --hsl-border: 240 20% 90%;
+  --hsl-input: 240 20% 90%;       --hsl-ring: 239 84% 60%;
+  --depth-1: #f4f4f9; --depth-2: #edecf4; --depth-3: #ffffff; --depth-4: #ffffff;
+  --bg-root: #f4f4f9; --bg-card: #ffffff; --bg-input: #edecf4;
+  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #f8f8fc;
+  --md3-surface-container: #f4f4f9; --md3-surface-container-high: #edecf4;
+  --md3-surface-container-highest: #e5e4ee; --md3-outline-variant: #e2e1ec;
+  --border-subtle: rgba(20,20,40,0.08); --border-default: rgba(20,20,40,0.14);
+  --border-hover: rgba(20,20,40,0.26); --accent-text: #4f46e5;
+  --brand-primary: #6366f1; --brand-glow: #818cf8;
+  --text-primary: #15131f; --text-secondary: #3f3a52; --text-muted: #6a6680; --text-dim: #9490a6;
+}
