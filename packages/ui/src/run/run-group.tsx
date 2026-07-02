@@ -1,10 +1,7 @@
 import { memo, useMemo, type ComponentType, type ReactNode } from "react";
-import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   Bot,
   Loader2,
-  ChevronDown,
-  ChevronRight,
   Terminal,
   FileEdit,
   FileSearch,
@@ -13,10 +10,8 @@ import {
   Globe,
   ClipboardList,
   Settings,
-  Sparkles,
   type LucideProps,
 } from "lucide-react";
-import { cn } from "../lib/utils";
 import { formatDuration } from "../utils/format";
 import type { Run, ToolCategory } from "../types/run";
 import type { SessionPart, ToolPart, ReasoningPart } from "../types/parts";
@@ -24,6 +19,7 @@ import type { AgentBranding } from "../types/branding";
 import type { CustomToolRenderer } from "../types/tool-display";
 import { InlineToolItem } from "./inline-tool-item";
 import { InlineThinkingItem } from "./inline-thinking-item";
+import { AssistantRunShell } from "./assistant-run-shell";
 import { Markdown } from "../markdown/markdown";
 import {
   OpenUIArtifactRenderer,
@@ -393,73 +389,16 @@ export const RunGroup = memo(
     }
 
     return (
-      <Collapsible.Root open={!collapsed} onOpenChange={() => onToggle()}>
-        <div className="rounded-[28px] border border-[var(--border-subtle)] bg-[var(--bg-card)] shadow-none">
-        {/* Header */}
-        <div className="flex items-start gap-3 px-3 py-2.5">
-          <Collapsible.Trigger asChild>
-            <button
-              className={cn(
-                "w-full rounded-[20px] px-0 py-0 text-left transition-colors",
-                "bg-transparent hover:bg-transparent",
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <span className={cn("font-semibold text-sm", branding.textClass)}>
-                  {branding.label}
-                </span>
-
-                {renderSummary(run) ? (
-                  <span className="text-[11px] text-muted-foreground">{renderSummary(run)}</span>
-                ) : null}
-                {collapsed && run.summaryText ? (
-                  <span className="min-w-0 truncate text-[11px] text-foreground/70">
-                    {run.summaryText}
-                  </span>
-                ) : null}
-
-                <div className="ml-auto flex shrink-0 items-center gap-1.5">
-                  <CategoryBadges categories={stats.toolCategories} />
-
-                  {isStreaming ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-accent)] bg-[var(--accent-surface-soft)] px-2 py-px text-[10px] font-semibold uppercase text-[var(--accent-text)]">
-                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                      Running
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-px text-[10px] font-semibold uppercase text-muted-foreground">
-                      <Sparkles className="h-2.5 w-2.5" />
-                      Done
-                    </span>
-                  )}
-
-                  {!collapsed ? (
-                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                  )}
-                </div>
-              </div>
-            </button>
-          </Collapsible.Trigger>
-
-          {headerActions ? (
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 pt-1">
-              {headerActions}
-            </div>
-          ) : null}
-        </div>
-
-        {/* Summary text when collapsed */}
-        {collapsed && run.summaryText && (
-          <div className="px-4 pb-4 text-sm leading-6 text-muted-foreground line-clamp-2">
-            {run.summaryText}
-          </div>
-        )}
-
-        {/* Expanded content */}
-        <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp">
-          <div className={cn("border-t border-[var(--border-subtle)] px-4 pb-4 pt-3")}>
+      <AssistantRunShell
+        label={branding.label}
+        summary={renderSummary(run) || undefined}
+        collapsedPreview={run.summaryText ?? undefined}
+        badges={<CategoryBadges categories={stats.toolCategories} />}
+        isStreaming={isStreaming}
+        collapsed={collapsed}
+        onToggle={onToggle}
+        headerActions={headerActions}
+      >
             {allParts.map(({ part, msgId, index }, partIndex) => {
               const key = `${msgId}-${index}`;
 
@@ -549,10 +488,7 @@ export const RunGroup = memo(
                 </div>
               );
             })}
-          </div>
-        </Collapsible.Content>
-        </div>
-      </Collapsible.Root>
+      </AssistantRunShell>
     );
   },
 );
