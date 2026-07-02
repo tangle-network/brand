@@ -4,25 +4,66 @@
  * data-theme="<name>" on a wrapper (or <html>). The default :root / .dark spine
  * is the neutral "tangle" theme; "<name>-light" scopes are the light variants. */
 
+/* Bridge — the actual re-skin mechanism. Tailwind utilities read the --color-*
+ * layer (theme.css @theme: `bg-card` → var(--color-card) = hsl(var(--card))).
+ * Both --color-* and its --card/--hsl-card source are declared only at :root, so
+ * a descendant [data-theme] that changes --hsl-card never re-substitutes the
+ * :root-computed --color-card the utility consumes — the value is frozen at the
+ * root color (double-indirection inheritance trap). Redeclaring the --color-*
+ * layer directly on any themed element forces each one to recompute from that
+ * element's own --hsl-*. Tokens a theme doesn't override fall back to the
+ * inherited neutral --hsl-* (all defined at :root), so this is always valid. */
+[data-theme] {
+  --color-background: hsl(var(--hsl-background));
+  --color-foreground: hsl(var(--hsl-foreground));
+  --color-card: hsl(var(--hsl-card));
+  --color-card-foreground: hsl(var(--hsl-card-foreground));
+  --color-popover: hsl(var(--hsl-popover));
+  --color-popover-foreground: hsl(var(--hsl-popover-foreground));
+  --color-primary: hsl(var(--hsl-primary));
+  --color-primary-foreground: hsl(var(--hsl-primary-foreground));
+  --color-secondary: hsl(var(--hsl-secondary));
+  --color-secondary-foreground: hsl(var(--hsl-secondary-foreground));
+  --color-muted: hsl(var(--hsl-muted));
+  --color-muted-foreground: hsl(var(--hsl-muted-foreground));
+  --color-accent: hsl(var(--hsl-accent));
+  --color-accent-foreground: hsl(var(--hsl-accent-foreground));
+  --color-destructive: hsl(var(--hsl-destructive));
+  --color-destructive-foreground: hsl(var(--hsl-destructive-foreground));
+  --color-border: hsl(var(--hsl-border));
+  --color-input: hsl(var(--hsl-input));
+  --color-ring: hsl(var(--hsl-ring));
+  --color-surface-container-lowest: var(--md3-surface-container-lowest);
+  --color-surface-container-low: var(--md3-surface-container-low);
+  --color-surface-container: var(--md3-surface-container);
+  --color-surface-container-high: var(--md3-surface-container-high);
+  --color-surface-container-highest: var(--md3-surface-container-highest);
+  --color-fg: var(--text-primary);
+  --color-fg-muted: var(--text-muted);
+  --color-fg-dim: var(--text-dim);
+}
+
 /* ───────────────────────── Aubergine (bazaar) — dark purple ──────────────── */
 [data-theme="aubergine"] {
-  --hsl-background: 258 43% 7%;   --hsl-foreground: 258 50% 97%;
-  --hsl-card: 258 39% 19%;        --hsl-card-foreground: 258 50% 97%;
-  --hsl-popover: 258 37% 25%;     --hsl-popover-foreground: 258 50% 97%;
-  --hsl-primary: 232 100% 75%;    --hsl-primary-foreground: 258 45% 8%;
-  --hsl-secondary: 257 42% 13%;   --hsl-muted: 257 42% 13%;
-  --hsl-muted-foreground: 258 22% 64%;
-  --hsl-accent: 258 39% 19%;      --hsl-border: 258 28% 27%;
-  --hsl-input: 257 42% 13%;       --hsl-ring: 232 100% 75%;
-  --depth-1: #0f0a1a; --depth-2: #1a1330; --depth-3: #271d42; --depth-4: #362858;
-  --bg-root: #0f0a1a; --bg-card: var(--depth-3); --bg-input: var(--depth-2);
-  --md3-surface-container-lowest: #140d24; --md3-surface-container-low: #1a1330;
-  --md3-surface-container: #221842; --md3-surface-container-high: #271d42;
-  --md3-surface-container-highest: #362858; --md3-outline-variant: #392d52;
-  --border-subtle: rgba(183,157,255,0.10); --border-default: rgba(183,157,255,0.18);
-  --border-hover: rgba(183,157,255,0.34); --accent-text: #b69dff;
-  --brand-primary: #8090ff; --brand-glow: #b69dff;
-  --text-primary: #f4f1fd; --text-secondary: #c6bcdf; --text-muted: #998fb6; --text-dim: #6c6289;
+  /* Base lifted off near-black: at ~7% L the 258 hue read black; ~13-20% L with
+   * higher saturation makes the surfaces read unmistakably aubergine-purple. */
+  --hsl-background: 258 44% 12%;  --hsl-foreground: 258 50% 97%;
+  --hsl-card: 258 40% 20%;        --hsl-card-foreground: 258 50% 97%;
+  --hsl-popover: 258 40% 24%;     --hsl-popover-foreground: 258 50% 97%;
+  --hsl-primary: 250 100% 76%;    --hsl-primary-foreground: 258 45% 10%;
+  --hsl-secondary: 258 38% 17%;   --hsl-muted: 258 38% 17%;
+  --hsl-muted-foreground: 258 26% 70%;
+  --hsl-accent: 258 40% 24%;      --hsl-border: 258 32% 30%;
+  --hsl-input: 258 38% 17%;       --hsl-ring: 250 100% 76%;
+  --depth-1: #1a1230; --depth-2: #241a42; --depth-3: #2f2253; --depth-4: #3d2d68;
+  --bg-root: #1a1230; --bg-card: var(--depth-3); --bg-input: var(--depth-2);
+  --md3-surface-container-lowest: #150e28; --md3-surface-container-low: #241a42;
+  --md3-surface-container: #2a1f4c; --md3-surface-container-high: #2f2253;
+  --md3-surface-container-highest: #3d2d68; --md3-outline-variant: #463571;
+  --border-subtle: rgba(183,157,255,0.12); --border-default: rgba(183,157,255,0.22);
+  --border-hover: rgba(183,157,255,0.40); --accent-text: #c4b0ff;
+  --brand-primary: #8f8bff; --brand-glow: #c4b0ff;
+  --text-primary: #f4f1fd; --text-secondary: #cec4e8; --text-muted: #a99fc8; --text-dim: #786d99;
 }
 [data-theme="aubergine-light"] {
   --hsl-background: 258 60% 96%;  --hsl-foreground: 258 45% 11%;
