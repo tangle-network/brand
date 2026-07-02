@@ -1,4 +1,5 @@
 export { RunGroup, type RunGroupProps } from "./run-group";
+export { AssistantRunShell, type AssistantRunShellProps } from "./assistant-run-shell";
 export { InlineToolItem, type InlineToolItemProps } from "./inline-tool-item";
 export {
   InlineThinkingItem,

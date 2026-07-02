@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type ReactNode } from "react";
+import { type KeyboardEvent, type ReactNode, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,6 +12,7 @@ import { Markdown } from "../markdown/markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
 import { ToolCallGroup, ToolCallStep } from "../run/tool-call-step";
+import { AssistantRunShell } from "../run/assistant-run-shell";
 
 export type AgentTimelineTone = "default" | "info" | "success" | "warning" | "error";
 
@@ -78,6 +79,71 @@ export interface AgentTimelineProps {
   isThinking?: boolean;
   emptyState?: ReactNode;
   className?: string;
+  /**
+   * Fold consecutive tool / tool-group items into one collapsible run shell
+   * (the same `AssistantRunShell` `RunGroup` uses), so a burst of tool activity
+   * reads as a single toggleable step instead of a long ladder of rows.
+   * Default true; pass false for the flat one-row-per-tool timeline.
+   */
+  collapsibleToolRuns?: boolean;
+  /** Start collapsed tool runs open (true) or collapsed (false). Default open. */
+  defaultToolRunsOpen?: boolean;
+}
+
+/** A run of consecutive tool / tool-group items folded into one shell. */
+interface ToolRunGroup {
+  id: string;
+  kind: "tool_run";
+  items: (AgentTimelineToolItem | AgentTimelineToolGroupItem)[];
+}
+
+type TimelineNode = AgentTimelineItem | ToolRunGroup;
+
+function foldToolRuns(items: AgentTimelineItem[]): TimelineNode[] {
+  const nodes: TimelineNode[] = [];
+  let run: (AgentTimelineToolItem | AgentTimelineToolGroupItem)[] = [];
+
+  const flush = () => {
+    if (run.length === 0) return;
+    // A single tool stays a plain row; two or more fold into a collapsible run.
+    if (run.length === 1) {
+      nodes.push(run[0]);
+    } else {
+      nodes.push({ id: `tool-run-${run[0].id}`, kind: "tool_run", items: run });
+    }
+    run = [];
+  };
+
+  for (const item of items) {
+    if (item.kind === "tool" || item.kind === "tool_group") {
+      run.push(item);
+    } else {
+      flush();
+      nodes.push(item);
+    }
+  }
+  flush();
+  return nodes;
+}
+
+function countTools(group: ToolRunGroup): number {
+  return group.items.reduce(
+    (n, item) => n + (item.kind === "tool_group" ? item.calls.length : 1),
+    0,
+  );
+}
+
+function ToolCallRow({ call }: { call: ToolCallData }) {
+  return (
+    <ToolCallStep
+      type={call.type}
+      label={call.label}
+      status={call.status}
+      detail={call.detail}
+      output={call.output}
+      duration={call.duration}
+    />
+  );
 }
 
 const TONE_STYLES: Record<AgentTimelineTone, { dot: string; card: string; text: string; icon: typeof Info }> = {
@@ -253,7 +319,17 @@ export function AgentTimeline({
   isThinking,
   emptyState,
   className,
+  collapsibleToolRuns = true,
+  defaultToolRunsOpen = true,
 }: AgentTimelineProps) {
+  // Collapse state for folded tool runs, keyed by run id. Absent → default.
+  const [collapsedRuns, setCollapsedRuns] = useState<Record<string, boolean>>({});
+  const toggleRun = (id: string) =>
+    setCollapsedRuns((prev) => ({
+      ...prev,
+      [id]: prev[id] === undefined ? defaultToolRunsOpen : !prev[id],
+    }));
+
   if (items.length === 0 && !isThinking) {
     return emptyState ? (
       <div className={cn("flex h-full items-center justify-center p-4", className)}>
@@ -266,92 +342,110 @@ export function AgentTimeline({
     ? [...items, { id: "__thinking__", kind: "custom", content: <ThinkingIndicator /> }]
     : items;
 
-  // Determine which items participate in the timeline connector (non-user-message items)
-  // User messages are rendered outside the timeline grid
-  const timelineItems = renderedItems.filter((item) => !(item.kind === "message" && item.role === "user"));
+  const nodes: TimelineNode[] = collapsibleToolRuns
+    ? foldToolRuns(renderedItems)
+    : renderedItems;
+
+  // Non-user rows participate in the connector spine.
+  const timelineNodes = nodes.filter(
+    (node) => !(node.kind === "message" && node.role === "user"),
+  );
 
   return (
     <div className={cn("mx-auto w-full max-w-5xl px-4 py-4", className)}>
-      {renderedItems.map((item, index) => {
+      {nodes.map((node) => {
         // User messages: right-aligned bubble, no connector
-        if (item.kind === "message" && item.role === "user") {
-          return <UserMessage key={item.id} item={item} />;
+        if (node.kind === "message" && node.role === "user") {
+          return <UserMessage key={node.id} item={node} />;
         }
 
-        const timelineIndex = timelineItems.indexOf(item);
-        const isLast = timelineIndex === timelineItems.length - 1;
+        const isLast = timelineNodes.indexOf(node) === timelineNodes.length - 1;
 
-        if (item.kind === "message") {
+        if (node.kind === "tool_run") {
+          const collapsed = collapsedRuns[node.id] ?? !defaultToolRunsOpen;
+          const total = countTools(node);
           return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--brand-glow)]">
-              <AssistantMessage item={item} />
+            <AgentTimelineRow key={node.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+              <AssistantRunShell
+                label="Tools"
+                summary={`${total} ${total === 1 ? "tool" : "tools"}`}
+                collapsed={collapsed}
+                onToggle={() => toggleRun(node.id)}
+              >
+                <div className="space-y-px">
+                  {node.items.map((item) =>
+                    item.kind === "tool_group" ? (
+                      <ToolCallGroup key={item.id} title={item.title}>
+                        {item.calls.map((call) => (
+                          <ToolCallRow key={call.id} call={call} />
+                        ))}
+                      </ToolCallGroup>
+                    ) : (
+                      <ToolCallRow key={item.id} call={item.call} />
+                    ),
+                  )}
+                </div>
+              </AssistantRunShell>
             </AgentTimelineRow>
           );
         }
 
-        if (item.kind === "tool") {
+        if (node.kind === "message") {
           return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
-              <ToolCallStep
-                type={item.call.type}
-                label={item.call.label}
-                status={item.call.status}
-                detail={item.call.detail}
-                output={item.call.output}
-                duration={item.call.duration}
-              />
+            <AgentTimelineRow key={node.id} isLast={isLast} accentClassName="bg-[var(--brand-glow)]">
+              <AssistantMessage item={node} />
             </AgentTimelineRow>
           );
         }
 
-        if (item.kind === "tool_group") {
+        if (node.kind === "tool") {
           return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
-              <ToolCallGroup title={item.title}>
-                {item.calls.map((call) => (
-                  <ToolCallStep
-                    key={call.id}
-                    type={call.type}
-                    label={call.label}
-                    status={call.status}
-                    detail={call.detail}
-                    output={call.output}
-                    duration={call.duration}
-                  />
+            <AgentTimelineRow key={node.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+              <ToolCallRow call={node.call} />
+            </AgentTimelineRow>
+          );
+        }
+
+        if (node.kind === "tool_group") {
+          return (
+            <AgentTimelineRow key={node.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+              <ToolCallGroup title={node.title}>
+                {node.calls.map((call) => (
+                  <ToolCallRow key={call.id} call={call} />
                 ))}
               </ToolCallGroup>
             </AgentTimelineRow>
           );
         }
 
-        if (item.kind === "status") {
+        if (node.kind === "status") {
           return (
             <AgentTimelineRow
-              key={item.id}
+              key={node.id}
               isLast={isLast}
-              accentClassName={TONE_STYLES[item.tone ?? "default"].dot}
+              accentClassName={TONE_STYLES[node.tone ?? "default"].dot}
             >
-              <StatusCard item={item} />
+              <StatusCard item={node} />
             </AgentTimelineRow>
           );
         }
 
-        if (item.kind === "artifact") {
+        if (node.kind === "artifact") {
           return (
             <AgentTimelineRow
-              key={item.id}
+              key={node.id}
               isLast={isLast}
-              accentClassName={TONE_STYLES[item.tone ?? "default"].dot}
+              accentClassName={TONE_STYLES[node.tone ?? "default"].dot}
             >
-              <ArtifactCard item={item} />
+              <ArtifactCard item={node} />
             </AgentTimelineRow>
           );
         }
 
         // custom
         return (
-          <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
-            {(item as AgentTimelineCustomItem).content}
+          <AgentTimelineRow key={node.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+            {(node as AgentTimelineCustomItem).content}
           </AgentTimelineRow>
         );
       })}
