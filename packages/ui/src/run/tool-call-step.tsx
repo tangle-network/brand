@@ -36,6 +36,11 @@ export interface ToolCallStepProps {
   language?: string;
   duration?: number;
   className?: string;
+  /** Actions rendered beside the row (e.g. "open in artifacts"). */
+  actions?: ReactNode;
+  /** Source tool part. When provided, the expanded detail renders from the real
+   *  input/output (via ExpandedToolDetail) rather than the flat summary props. */
+  part?: ToolPart;
 }
 
 const EXT_LANGUAGE: Record<string, string> = {
@@ -77,8 +82,12 @@ export function ToolCallStep({
   language,
   duration,
   className,
+  actions,
+  part,
 }: ToolCallStepProps) {
-  const part: ToolPart = {
+  // Fall back to a synthesized part for callers that only have flat props
+  // (e.g. ToolCallFeed); the real part, when supplied, drives the expanded view.
+  const resolvedPart: ToolPart = part ?? {
     type: "tool",
     id: `${type}:${label}`,
     tool: type,
@@ -94,20 +103,26 @@ export function ToolCallStep({
 
   return (
     <InlineToolItem
-      part={part}
+      part={resolvedPart}
       title={label}
       description={detail}
       className={className}
+      actions={actions}
+      // With a real part, InlineToolItem's default ExpandedToolDetail renders
+      // the full input + output. The synthesized-part path keeps the output-only
+      // fallback (it has no real input to show).
       renderToolDetail={
-        output
-          ? () => (
-              <CodeBlock
-                code={output}
-                language={lang}
-                className="max-h-72 overflow-auto text-xs"
-              />
-            )
-          : () => null
+        part
+          ? undefined
+          : output
+            ? () => (
+                <CodeBlock
+                  code={output}
+                  language={lang}
+                  className="max-h-72 overflow-auto text-xs"
+                />
+              )
+            : () => null
       }
     />
   );

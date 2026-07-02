@@ -50,7 +50,8 @@ export interface ChatContainerProps {
   renderRunActions?: (run: Run) => ReactNode;
   /** Optional actions rendered below each user message bubble. */
   renderUserMessageActions?: (message: SessionMessage, parts: SessionPart[]) => ReactNode;
-  /** Optional actions rendered beside individual tool items. */
+  /** Optional actions rendered beside individual tool items in the run-grouped
+   *  (`runs`) presentation. */
   renderToolActions?: (
     part: ToolPart,
     options: {
@@ -59,6 +60,9 @@ export interface ChatContainerProps {
       partIndex: number;
     },
   ) => ReactNode;
+  /** Optional actions rendered beside individual tool items in the `timeline`
+   *  presentation, which has no run/message grouping (hence part-only). */
+  renderTimelineToolActions?: (part: ToolPart) => ReactNode;
 }
 
 const OPENUI_NODE_TYPES = new Set([
@@ -181,14 +185,16 @@ function buildTimelineItems(
     return {
       id: part.id,
       type: mapToolPartToTimelineType(part),
-      label: meta.description ? `${meta.title}: ${meta.description}` : meta.title,
+      label: meta.title,
       status:
         part.state.status === "completed"
           ? "success"
           : part.state.status === "error"
             ? "error"
             : "running",
-      detail: formatUnknown(part.state.input),
+      // A human-readable summary (file path / command), not the raw input JSON —
+      // the full input still renders in the expanded ExpandedToolDetail.
+      detail: meta.commandSnippet ?? meta.targetPath ?? meta.description,
       output: formatUnknown(part.state.output),
       duration: start && end ? end - start : undefined,
     } as const;
@@ -225,12 +231,14 @@ function buildTimelineItems(
           id: `${message.id}-tool-${toolBuffer[0].id}`,
           kind: "tool",
           call: toToolCall(toolBuffer[0]),
+          part: toolBuffer[0],
         });
       } else {
         items.push({
           id: `${message.id}-tool-group-${index}`,
           kind: "tool_group",
           title: "Tool activity",
+          parts: [...toolBuffer],
           calls: toolBuffer.map((part) => toToolCall(part)),
         });
       }
@@ -364,6 +372,7 @@ export const ChatContainer = memo(
     renderRunActions,
     renderUserMessageActions,
     renderToolActions,
+    renderTimelineToolActions,
   }: ChatContainerProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -401,7 +410,11 @@ export const ChatContainer = memo(
             </div>
           ) : presentation === "timeline" ? (
             <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-end">
-              <AgentTimeline items={timeline.items} isThinking={timeline.showThinking} />
+              <AgentTimeline
+                items={timeline.items}
+                isThinking={timeline.showThinking}
+                renderToolActions={renderTimelineToolActions}
+              />
             </div>
           ) : (
             <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-end">
