@@ -36,6 +36,8 @@ export interface ToolCallStepProps {
   language?: string;
   duration?: number;
   className?: string;
+  /** Actions rendered beside the row (e.g. "open in artifacts"). */
+  actions?: ReactNode;
 }
 
 const EXT_LANGUAGE: Record<string, string> = {
@@ -77,6 +79,7 @@ export function ToolCallStep({
   language,
   duration,
   className,
+  actions,
 }: ToolCallStepProps) {
   const part: ToolPart = {
     type: "tool",
@@ -98,6 +101,7 @@ export function ToolCallStep({
       title={label}
       description={detail}
       className={className}
+      actions={actions}
       renderToolDetail={
         output
           ? () => (

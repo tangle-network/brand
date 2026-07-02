@@ -12,6 +12,7 @@ import { Markdown } from "../markdown/markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
 import { ToolCallGroup, ToolCallStep } from "../run/tool-call-step";
+import type { ToolPart } from "../types/parts";
 
 export type AgentTimelineTone = "default" | "info" | "success" | "warning" | "error";
 
@@ -30,6 +31,9 @@ export interface AgentTimelineToolItem {
   id: string;
   kind: "tool";
   call: ToolCallData;
+  /** Source tool part, so a consumer's `renderToolActions` gets the real
+   *  input/output (the flat `call` is display-only). */
+  part?: ToolPart;
 }
 
 export interface AgentTimelineToolGroupItem {
@@ -37,6 +41,8 @@ export interface AgentTimelineToolGroupItem {
   kind: "tool_group";
   title?: string;
   calls: ToolCallData[];
+  /** Source tool parts, parallel to `calls`. */
+  parts?: ToolPart[];
 }
 
 export interface AgentTimelineStatusItem {
@@ -78,6 +84,9 @@ export interface AgentTimelineProps {
   isThinking?: boolean;
   emptyState?: ReactNode;
   className?: string;
+  /** Optional actions rendered beside each tool item (e.g. "open in artifacts").
+   *  Receives the source tool part carried on the item. */
+  renderToolActions?: (part: ToolPart) => ReactNode;
 }
 
 const TONE_STYLES: Record<AgentTimelineTone, { dot: string; card: string; text: string; icon: typeof Info }> = {
@@ -253,6 +262,7 @@ export function AgentTimeline({
   isThinking,
   emptyState,
   className,
+  renderToolActions,
 }: AgentTimelineProps) {
   if (items.length === 0 && !isThinking) {
     return emptyState ? (
@@ -299,6 +309,7 @@ export function AgentTimeline({
                 detail={item.call.detail}
                 output={item.call.output}
                 duration={item.call.duration}
+                actions={item.part ? renderToolActions?.(item.part) : undefined}
               />
             </AgentTimelineRow>
           );
@@ -308,17 +319,21 @@ export function AgentTimeline({
           return (
             <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
               <ToolCallGroup title={item.title}>
-                {item.calls.map((call) => (
-                  <ToolCallStep
-                    key={call.id}
-                    type={call.type}
-                    label={call.label}
-                    status={call.status}
-                    detail={call.detail}
-                    output={call.output}
-                    duration={call.duration}
-                  />
-                ))}
+                {item.calls.map((call, callIndex) => {
+                  const part = item.parts?.[callIndex];
+                  return (
+                    <ToolCallStep
+                      key={call.id}
+                      type={call.type}
+                      label={call.label}
+                      status={call.status}
+                      detail={call.detail}
+                      output={call.output}
+                      duration={call.duration}
+                      actions={part ? renderToolActions?.(part) : undefined}
+                    />
+                  );
+                })}
               </ToolCallGroup>
             </AgentTimelineRow>
           );
