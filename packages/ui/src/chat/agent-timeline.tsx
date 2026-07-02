@@ -309,6 +309,7 @@ export function AgentTimeline({
                 detail={item.call.detail}
                 output={item.call.output}
                 duration={item.call.duration}
+                part={item.part}
                 actions={item.part ? renderToolActions?.(item.part) : undefined}
               />
             </AgentTimelineRow>
@@ -330,6 +331,7 @@ export function AgentTimeline({
                       detail={call.detail}
                       output={call.output}
                       duration={call.duration}
+                      part={part}
                       actions={part ? renderToolActions?.(part) : undefined}
                     />
                   );

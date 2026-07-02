@@ -50,16 +50,19 @@ export interface ChatContainerProps {
   renderRunActions?: (run: Run) => ReactNode;
   /** Optional actions rendered below each user message bubble. */
   renderUserMessageActions?: (message: SessionMessage, parts: SessionPart[]) => ReactNode;
-  /** Optional actions rendered beside individual tool items. `options` is
-   *  omitted in the timeline presentation, which has no run/message grouping. */
+  /** Optional actions rendered beside individual tool items in the run-grouped
+   *  (`runs`) presentation. */
   renderToolActions?: (
     part: ToolPart,
-    options?: {
+    options: {
       run: Run;
       messageId: string;
       partIndex: number;
     },
   ) => ReactNode;
+  /** Optional actions rendered beside individual tool items in the `timeline`
+   *  presentation, which has no run/message grouping (hence part-only). */
+  renderTimelineToolActions?: (part: ToolPart) => ReactNode;
 }
 
 const OPENUI_NODE_TYPES = new Set([
@@ -369,6 +372,7 @@ export const ChatContainer = memo(
     renderRunActions,
     renderUserMessageActions,
     renderToolActions,
+    renderTimelineToolActions,
   }: ChatContainerProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -409,7 +413,7 @@ export const ChatContainer = memo(
               <AgentTimeline
                 items={timeline.items}
                 isThinking={timeline.showThinking}
-                renderToolActions={renderToolActions}
+                renderToolActions={renderTimelineToolActions}
               />
             </div>
           ) : (

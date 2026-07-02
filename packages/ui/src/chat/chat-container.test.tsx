@@ -42,8 +42,8 @@ describe("ChatContainer timeline tool rendering", () => {
     expect(screen.queryByText(/"path"/)).not.toBeInTheDocument()
   })
 
-  it("threads renderToolActions to the timeline tool item with its source part", () => {
-    const renderToolActions = vi.fn((part: ToolPart) => (
+  it("threads renderTimelineToolActions to the timeline tool item with its source part", () => {
+    const renderTimelineToolActions = vi.fn((part: ToolPart) => (
       <button type="button">Open {part.id}</button>
     ))
 
@@ -53,12 +53,14 @@ describe("ChatContainer timeline tool rendering", () => {
         partMap={partMap}
         isStreaming={false}
         presentation="timeline"
-        renderToolActions={renderToolActions}
+        renderTimelineToolActions={renderTimelineToolActions}
       />,
     )
 
-    expect(renderToolActions).toHaveBeenCalled()
-    expect(renderToolActions.mock.calls[0][0]).toMatchObject({ id: "tool-1" })
+    expect(renderTimelineToolActions).toHaveBeenCalled()
+    expect(renderTimelineToolActions.mock.calls[0][0]).toMatchObject({
+      id: "tool-1",
+    })
     expect(
       screen.getByRole("button", { name: /open tool-1/i }),
     ).toBeInTheDocument()
