@@ -1,7 +1,10 @@
 import { memo, useMemo, type ComponentType, type ReactNode } from "react";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   Bot,
   Loader2,
+  ChevronDown,
+  ChevronRight,
   Terminal,
   FileEdit,
   FileSearch,
@@ -10,8 +13,10 @@ import {
   Globe,
   ClipboardList,
   Settings,
+  Sparkles,
   type LucideProps,
 } from "lucide-react";
+import { cn } from "../lib/utils";
 import { formatDuration } from "../utils/format";
 import type { Run, ToolCategory } from "../types/run";
 import type { SessionPart, ToolPart, ReasoningPart } from "../types/parts";
@@ -19,8 +24,39 @@ import type { AgentBranding } from "../types/branding";
 import type { CustomToolRenderer } from "../types/tool-display";
 import { InlineToolItem } from "./inline-tool-item";
 import { InlineThinkingItem } from "./inline-thinking-item";
-import { AssistantRunShell } from "./assistant-run-shell";
 import { Markdown } from "../markdown/markdown";
+
+/**
+ * One row on the run's timeline spine: a connector line + accent dot in a
+ * narrow gutter, content to the right. Mirrors AgentTimeline's row so a run
+ * reads as separated, distinct steps — not one filled box.
+ */
+function SpineRow({
+  accentClassName,
+  isLast,
+  children,
+}: {
+  accentClassName: string;
+  isLast: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3">
+      <div className="relative flex justify-center">
+        {!isLast && (
+          <span className="absolute top-3.5 bottom-[-0.75rem] left-1/2 w-px -translate-x-1/2 bg-[var(--border-subtle)]" />
+        )}
+        <span
+          className={cn(
+            "relative mt-1.5 h-[var(--timeline-dot-size,0.5rem)] w-[var(--timeline-dot-size,0.5rem)] rounded-full ring-4 ring-[var(--bg-root)]",
+            accentClassName,
+          )}
+        />
+      </div>
+      <div className="min-w-0 pb-3">{children}</div>
+    </div>
+  );
+}
 import {
   OpenUIArtifactRenderer,
   type OpenUIAction,
@@ -241,21 +277,6 @@ function renderSummary(run: Run) {
   return parts.join(", ");
 }
 
-function getToolGroupPosition(
-  currentIndex: number,
-  parts: Array<{ part: SessionPart; msgId: string; index: number }>,
-) {
-  const previous = parts[currentIndex - 1]?.part;
-  const next = parts[currentIndex + 1]?.part;
-  const previousIsTool = previous?.type === "tool";
-  const nextIsTool = next?.type === "tool";
-
-  if (previousIsTool && nextIsTool) return "middle" as const;
-  if (previousIsTool) return "last" as const;
-  if (nextIsTool) return "first" as const;
-  return "single" as const;
-}
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -388,107 +409,147 @@ export const RunGroup = memo(
       );
     }
 
+    // Renderable rows: skip empty/synthetic text so spine dots map to real steps.
+    const rows = allParts.filter(({ part }) => {
+      if (part.type === "tool" || part.type === "reasoning") return true;
+      return part.type === "text" && !part.synthetic && part.text.trim().length > 0;
+    });
+
+    const dotAccent = (part: SessionPart): string => {
+      if (part.type === "reasoning") return "bg-[var(--brand-glow)]";
+      if (part.type === "text") return "bg-primary";
+      return "bg-[var(--border-hover)]";
+    };
+
     return (
-      <AssistantRunShell
-        label={branding.label}
-        summary={renderSummary(run) || undefined}
-        collapsedPreview={run.summaryText ?? undefined}
-        badges={<CategoryBadges categories={stats.toolCategories} />}
-        isStreaming={isStreaming}
-        collapsed={collapsed}
-        onToggle={onToggle}
-        headerActions={headerActions}
-      >
-            {allParts.map(({ part, msgId, index }, partIndex) => {
-              const key = `${msgId}-${index}`;
+      <Collapsible.Root open={!collapsed} onOpenChange={() => onToggle()}>
+        <div className="flex flex-col gap-1">
+          {/* Header — a quiet row, not a filled box */}
+          <div className="flex items-start gap-2">
+            <Collapsible.Trigger asChild>
+              <button
+                type="button"
+                className="group flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-[var(--surface-container-high)]/40"
+              >
+                {collapsed ? (
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                )}
+                <span className={cn("font-semibold text-sm", branding.textClass)}>
+                  {branding.label}
+                </span>
+                {renderSummary(run) ? (
+                  <span className="text-[11px] text-muted-foreground">{renderSummary(run)}</span>
+                ) : null}
+                {collapsed && run.summaryText ? (
+                  <span className="min-w-0 truncate text-[11px] text-foreground/70">
+                    {run.summaryText}
+                  </span>
+                ) : null}
+                <span className="ml-auto flex shrink-0 items-center gap-1.5">
+                  <CategoryBadges categories={stats.toolCategories} />
+                  {isStreaming ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-accent)] bg-[var(--accent-surface-soft)] px-2 py-px text-[10px] font-semibold uppercase text-[var(--accent-text)]">
+                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                      Running
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-px text-[10px] font-semibold uppercase text-muted-foreground">
+                      <Sparkles className="h-2.5 w-2.5" />
+                      Done
+                    </span>
+                  )}
+                </span>
+              </button>
+            </Collapsible.Trigger>
+            {headerActions ? (
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 pt-1">
+                {headerActions}
+              </div>
+            ) : null}
+          </div>
 
-              // Consecutive (non-OpenUI) tool calls connect into one block —
-              // `getToolGroupPosition` already gives them joined radii, so they
-              // get no vertical gap; every other transition keeps a normal gap.
-              const prev = allParts[partIndex - 1]?.part;
-              const connectedTool =
-                part.type === "tool" &&
-                prev?.type === "tool" &&
-                !isOpenUITool(part as ToolPart) &&
-                !isOpenUITool(prev as ToolPart);
-              const gapClass =
-                partIndex === 0 ? "" : connectedTool ? "mt-px" : "mt-3";
+          {/* Collapsed preview */}
+          {collapsed && run.summaryText ? (
+            <div className="line-clamp-2 pl-6 text-sm leading-6 text-muted-foreground">
+              {run.summaryText}
+            </div>
+          ) : null}
 
-              let node: ReactNode = null;
+          {/* Expanded — separated steps on a timeline spine, no wrapping box */}
+          <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp">
+            <div className="pt-1.5">
+              {rows.map(({ part, msgId, index }, rowIndex) => {
+                const key = `${msgId}-${index}`;
+                const isLast = rowIndex === rows.length - 1;
+                let node: ReactNode = null;
 
-              if (part.type === "tool") {
-                if (isOpenUITool(part as ToolPart)) {
-                  const toolPart = part as ToolPart;
-                  const schema = extractOpenUISchema(toolPart.state.output);
-                  const summary = getOpenUISummary(toolPart.state.output);
+                if (part.type === "tool") {
+                  if (isOpenUITool(part as ToolPart)) {
+                    const toolPart = part as ToolPart;
+                    const schema = extractOpenUISchema(toolPart.state.output);
+                    const summary = getOpenUISummary(toolPart.state.output);
 
-                  if (toolPart.state.status === "completed" && schema) {
-                    node = (
-                      <div className="overflow-hidden rounded-[24px] border border-[var(--border-subtle)] bg-[var(--bg-card)]">
-                        {summary ? (
-                          <div className="border-b border-[var(--border-subtle)] px-4 py-3">
-                            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                              View
+                    if (toolPart.state.status === "completed" && schema) {
+                      node = (
+                        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)]">
+                          {summary ? (
+                            <div className="border-b border-[var(--border-subtle)] px-4 py-3 text-sm leading-6 text-foreground">
+                              {summary}
                             </div>
-                            <div className="mt-1 text-sm leading-6 text-foreground">{summary}</div>
+                          ) : null}
+                          <div className="p-4">
+                            <OpenUIArtifactRenderer schema={schema} />
                           </div>
-                        ) : null}
-                        <div className="p-4">
-                          <OpenUIArtifactRenderer schema={schema} />
                         </div>
-                      </div>
-                    );
-                  } else if (toolPart.state.status === "running") {
+                      );
+                    } else if (toolPart.state.status === "running") {
+                      node = (
+                        <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                          Building view…
+                        </div>
+                      );
+                    }
+                  }
+
+                  if (node === null) {
                     node = (
-                      <div className="flex items-center gap-3 rounded-[20px] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        Building view…
-                      </div>
+                      <InlineToolItem
+                        part={part as ToolPart}
+                        renderToolDetail={renderToolDetail}
+                        actions={renderToolActions?.(part as ToolPart, {
+                          run,
+                          messageId: msgId,
+                          partIndex: index,
+                        })}
+                      />
                     );
                   }
-                }
-
-                if (node === null) {
+                } else if (part.type === "reasoning") {
                   node = (
-                    <InlineToolItem
-                      part={part as ToolPart}
-                      renderToolDetail={renderToolDetail}
-                      groupPosition={getToolGroupPosition(partIndex, allParts)}
-                      actions={renderToolActions?.(part as ToolPart, {
-                        run,
-                        messageId: msgId,
-                        partIndex: index,
-                      })}
-                    />
+                    <InlineThinkingItem part={part as ReasoningPart} defaultOpen={isStreaming} />
+                  );
+                } else if (part.type === "text" && !part.synthetic && part.text.trim()) {
+                  node = (
+                    <div className="px-1 py-0.5">
+                      <Markdown className="tangle-prose text-[15px] leading-7">{part.text}</Markdown>
+                    </div>
                   );
                 }
-              } else if (part.type === "reasoning") {
-                node = (
-                  <InlineThinkingItem
-                    part={part as ReasoningPart}
-                    defaultOpen={isStreaming}
-                  />
-                );
-              } else if (
-                part.type === "text" &&
-                !part.synthetic &&
-                part.text.trim()
-              ) {
-                node = (
-                  <div className="px-1 py-1">
-                    <Markdown className="tangle-prose text-[15px] leading-7">{part.text}</Markdown>
-                  </div>
-                );
-              }
 
-              if (!node) return null;
-              return (
-                <div key={key} className={gapClass}>
-                  {node}
-                </div>
-              );
-            })}
-      </AssistantRunShell>
+                if (!node) return null;
+                return (
+                  <SpineRow key={key} accentClassName={dotAccent(part)} isLast={isLast}>
+                    {node}
+                  </SpineRow>
+                );
+              })}
+            </div>
+          </Collapsible.Content>
+        </div>
+      </Collapsible.Root>
     );
   },
 );
