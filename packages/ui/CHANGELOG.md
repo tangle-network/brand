@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 9.1.2
+
+### Patch Changes
+
+- d50f746: Give run/timeline tool rows a proper elevation ladder. Rows read as the same value as the canvas: `InlineToolItem` used `bg-card/40` (near-transparent) and RunGroup's OpenUI/running blocks used `bg-[var(--bg-root)]` (literally the page background). Both now use `--md3-surface-container` — one clear step above the `--bg-root` canvas — with hover/open stepping to `--md3-surface-container-high`. Rows now separate from the background instead of blending into it.
+- d50f746: One user-message bubble. There were two: the exported `UserMessage` (a loud filled purple bubble with an uppercase "You" label + shadow, used by the run/message list) and a separate cleaner inline bubble inside `AgentTimeline`. Unify on the clean one — `UserMessage` is now a quiet right-aligned bordered bubble on the muted surface (no fill, no uppercase label), and `AgentTimeline` renders through it instead of its own copy. `UserMessage` accepts either session-model `parts` or a direct `content`/`timestamp`, so both call sites share it.
+
 ## 9.1.1
 
 ### Patch Changes
