@@ -3,41 +3,56 @@ import type { SessionMessage } from "../types/message";
 import type { SessionPart } from "../types/parts";
 
 export interface UserMessageProps {
-  message: SessionMessage;
-  parts: SessionPart[];
+  /** Session-model input: text is derived from these parts. */
+  message?: SessionMessage;
+  parts?: SessionPart[];
+  /** Direct-content input (e.g. AgentTimeline): explicit text + timestamp. */
+  content?: string;
+  timestamp?: Date;
   actions?: ReactNode;
 }
 
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+
 /**
- * Simple user message bubble.
- * Renders text parts from the user's message.
+ * The single user message bubble — a quiet, right-aligned bordered bubble on the
+ * muted surface (no loud fill, no uppercase label). Used by both the run/message
+ * list (session-model `parts`) and AgentTimeline (direct `content`/`timestamp`).
  */
-export const UserMessage = memo(({ message, parts, actions }: UserMessageProps) => {
-  const textContent = parts
-    .filter((p) => p.type === "text")
-    .map((p) => (p as { text: string }).text)
-    .join("\n");
+export const UserMessage = memo(
+  ({ message: _message, parts, content, timestamp, actions }: UserMessageProps) => {
+    const text =
+      content ??
+      (parts ?? [])
+        .filter((p) => p.type === "text")
+        .map((p) => (p as { text: string }).text)
+        .join("\n");
 
-  if (!textContent.trim()) return null;
+    if (!text.trim()) return null;
 
-  return (
-    <div className="flex justify-end">
-      <div className="flex max-w-[78%] flex-col items-end gap-2">
-        <div className="w-full rounded-[26px] rounded-br-[12px] bg-[var(--brand-primary)] px-4 py-3 text-white shadow-[0_8px_20px_rgba(15,23,42,0.12)]">
-          <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/60">
-            You
+    return (
+      <div className="flex justify-end">
+        <div className="flex max-w-[78%] flex-col items-end gap-2">
+          <div className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3">
+            {timestamp ? (
+              <div className="mb-1.5 text-right text-[var(--font-size-xs)] text-muted-foreground">
+                {formatTime(timestamp)}
+              </div>
+            ) : null}
+            <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)] text-foreground">
+              {text}
+            </div>
           </div>
-          <div className="whitespace-pre-wrap text-[15px] leading-6.5 text-white">
-            {textContent}
-          </div>
+          {actions ? (
+            <div className="flex flex-wrap items-center justify-end gap-1.5 text-xs text-muted-foreground">
+              {actions}
+            </div>
+          ) : null}
         </div>
-        {actions ? (
-          <div className="flex flex-wrap items-center justify-end gap-1.5 text-xs text-muted-foreground">
-            {actions}
-          </div>
-        ) : null}
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 UserMessage.displayName = "UserMessage";
