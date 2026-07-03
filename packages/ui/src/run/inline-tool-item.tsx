@@ -118,7 +118,7 @@ export const InlineToolItem = memo(
               <div className="flex items-center gap-2.5 px-3 py-2.5">
                 <div className={cn(
                   "shrink-0",
-                  isRunning && "text-primary",
+                  isRunning && "text-[var(--accent-text)]",
                   isComplete && "text-[var(--surface-success-text)]",
                   isError && "text-[var(--surface-danger-text)]",
                   !isRunning && !isComplete && !isError && "text-muted-foreground",
@@ -156,7 +156,7 @@ export const InlineToolItem = memo(
                     </span>
                   ) : null}
                   {isRunning ? (
-                    <span className="text-[10px] font-medium text-primary">
+                    <span className="text-[10px] font-medium text-[var(--accent-text)]">
                       running
                     </span>
                   ) : null}

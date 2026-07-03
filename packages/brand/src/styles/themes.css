@@ -43,6 +43,19 @@
   --color-fg-dim: var(--text-dim);
 }
 
+/* Light-tuned status palette for the named light scopes. Without this they
+ * inherit the dark :root status colors (bright #f87171/#34D399/…), which fail
+ * WCAG on a light surface — status text + glyphs drop to ~2.5:1. These mirror
+ * tokens.css `[data-theme="light"]` (dark-on-light status text that passes AA). */
+[data-theme="aubergine-light"],
+[data-theme="arena-light"],
+[data-theme="tangle-light"] {
+  --surface-success-bg: #ecfdf5; --surface-success-border: #a7f3d0; --surface-success-text: #047857;
+  --surface-warning-bg: #fffbeb; --surface-warning-border: #fde68a; --surface-warning-text: #b45309;
+  --surface-danger-bg: #fff1f2; --surface-danger-border: #fecdd3; --surface-danger-text: #b91c1c;
+  --surface-info-bg: #f0f9ff; --surface-info-border: #bae6fd; --surface-info-text: #0369a1;
+}
+
 /* ───────────────────────── Aubergine (bazaar) — dark purple ──────────────── */
 [data-theme="aubergine"] {
   /* Base lifted off near-black: at ~7% L the 258 hue read black; ~13-20% L with
@@ -109,7 +122,7 @@
   --hsl-background: 150 30% 96%;  --hsl-foreground: 158 30% 10%;
   --hsl-card: 0 0% 100%;          --hsl-card-foreground: 158 30% 10%;
   --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 158 30% 10%;
-  --hsl-primary: 160 84% 30%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-primary: 160 84% 27%;     --hsl-primary-foreground: 0 0% 100%;
   --hsl-secondary: 150 25% 92%;   --hsl-muted: 150 25% 92%;
   --hsl-muted-foreground: 158 14% 40%;
   --hsl-accent: 150 25% 92%;      --hsl-border: 150 20% 86%;
