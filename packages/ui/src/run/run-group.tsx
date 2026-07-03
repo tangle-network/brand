@@ -366,7 +366,7 @@ export const RunGroup = memo(
                   return (
                     <div
                       key={key}
-                      className="overflow-hidden rounded-[22px] border border-[var(--border-subtle)] bg-[var(--bg-root)]"
+                      className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)]"
                     >
                       {summary ? (
                         <div className="border-b border-[var(--border-subtle)] px-4 py-3 text-sm leading-6 text-foreground">
@@ -384,7 +384,7 @@ export const RunGroup = memo(
                   return (
                     <div
                       key={key}
-                      className="flex items-center gap-2 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--bg-root)] px-4 py-3 text-sm text-muted-foreground"
+                      className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground"
                     >
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       Building view…
@@ -493,7 +493,7 @@ export const RunGroup = memo(
 
                     if (toolPart.state.status === "completed" && schema) {
                       node = (
-                        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)]">
+                        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)]">
                           {summary ? (
                             <div className="border-b border-[var(--border-subtle)] px-4 py-3 text-sm leading-6 text-foreground">
                               {summary}
@@ -506,7 +506,7 @@ export const RunGroup = memo(
                       );
                     } else if (toolPart.state.status === "running") {
                       node = (
-                        <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground">
                           <Loader2 className="h-4 w-4 animate-spin text-primary" />
                           Building view…
                         </div>

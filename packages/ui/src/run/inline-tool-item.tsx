@@ -109,8 +109,8 @@ export const InlineToolItem = memo(
             <button
               className={cn(
                 "w-full border text-left transition-colors",
-                "border-[var(--border-subtle)] bg-card/40 hover:border-border hover:bg-accent/25",
-                open && "border-border bg-accent/20",
+                "border-[var(--border-subtle)] bg-[var(--md3-surface-container)] hover:border-border hover:bg-[var(--md3-surface-container-high)]",
+                open && "border-border bg-[var(--md3-surface-container-high)]",
                 shapeClass,
                 className,
               )}
