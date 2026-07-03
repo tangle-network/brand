@@ -21,7 +21,7 @@ export function ThinkingIndicator({ className }: ThinkingIndicatorProps) {
         <span className="h-[var(--indicator-dot-size)] w-[var(--indicator-dot-size)] animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "300ms" }} />
       </div>
       {elapsed > 3 && (
-        <span className="text-[var(--font-size-xs)] tabular-nums text-[var(--text-dim)]">
+        <span className="text-[var(--font-size-xs)] tabular-nums text-muted-foreground">
           {elapsed}s
         </span>
       )}
