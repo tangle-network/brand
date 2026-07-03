@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { type MessageRole } from "./chat-message";
+import { UserMessage } from "./user-message";
 import { Markdown } from "../markdown/markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
@@ -146,25 +147,6 @@ function AgentTimelineRow({ isLast, accentClassName, children }: AgentTimelineRo
   );
 }
 
-function UserMessage({ item }: { item: AgentTimelineMessageItem }) {
-  return (
-    <div className="mb-3 flex justify-end">
-      <div className="max-w-[72%]">
-        <div className="rounded-2xl border border-border bg-muted/50 px-4 py-3">
-          {item.timestamp && (
-            <div className="mb-1.5 text-right text-[var(--font-size-xs)] text-muted-foreground">
-              {formatTime(item.timestamp)}
-            </div>
-          )}
-          <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)] text-foreground">
-            {item.content}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AssistantMessage({ item }: { item: AgentTimelineMessageItem }) {
   return (
     <div className="-mt-0.5">
@@ -285,7 +267,7 @@ export function AgentTimeline({
       {renderedItems.map((item, index) => {
         // User messages: right-aligned bubble, no connector
         if (item.kind === "message" && item.role === "user") {
-          return <UserMessage key={item.id} item={item} />;
+          return <UserMessage key={item.id} content={item.content} timestamp={item.timestamp} />;
         }
 
         const timelineIndex = timelineItems.indexOf(item);
