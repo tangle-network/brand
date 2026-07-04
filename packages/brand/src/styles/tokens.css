@@ -288,7 +288,7 @@
   --tool-icon-size: 1.75rem;
 
   /* Syntax highlighting — override per-theme in vault section */
-  --syntax-comment: #6B7094;
+  --syntax-comment: #8b8fbc;
   --syntax-keyword: #A78FFF;
   --syntax-string: #10b981;
   --syntax-function: #6D9FFF;
