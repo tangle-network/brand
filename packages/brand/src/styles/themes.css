@@ -56,6 +56,25 @@
   --surface-info-bg: #f0f9ff; --surface-info-border: #bae6fd; --surface-info-text: #0369a1;
 }
 
+/* Light-tuned syntax highlighting for ALL light scopes (incl. base light).
+ * --syntax-* is defined only in the dark :root (near-white foreground), so on a
+ * light code surface (bg-card ≈ white) code was ~1.2:1 — invisible. Dark-on-light
+ * palette, all ≥4.5:1 on white. */
+[data-theme="light"],
+[data-theme="aubergine-light"],
+[data-theme="arena-light"],
+[data-theme="tangle-light"] {
+  --syntax-foreground: #24292f;
+  --syntax-comment: #57606a;
+  --syntax-keyword: #6d28d9;
+  --syntax-string: #047857;
+  --syntax-function: #1d4ed8;
+  --syntax-number: #92400e;
+  --syntax-meta: #7c3aed;
+  --syntax-variable: #24292f;
+  --syntax-error: #b91c1c;
+}
+
 /* ───────────────────────── Aubergine (bazaar) — dark purple ──────────────── */
 [data-theme="aubergine"] {
   /* Base lifted off near-black: at ~7% L the 258 hue read black; ~13-20% L with
