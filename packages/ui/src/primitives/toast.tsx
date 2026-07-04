@@ -93,6 +93,11 @@ interface ToastContainerProps {
 export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
   return (
     <div
+      // A generic div can't carry aria-label (WCAG 4.1.2 / axe
+      // aria-prohibited-attr); role="region" makes it a valid, navigable
+      // landmark. Live announcement stays on each toast (role="alert"
+      // aria-live="polite"), so the region itself is not a live region.
+      role="region"
       className="fixed right-4 bottom-4 z-50 flex max-w-md flex-col gap-2"
       aria-label="Notifications"
     >
