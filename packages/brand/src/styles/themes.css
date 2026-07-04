@@ -31,7 +31,7 @@
   --color-destructive: hsl(var(--hsl-destructive));
   --color-destructive-foreground: hsl(var(--hsl-destructive-foreground));
   --color-border: hsl(var(--hsl-border));
-  --color-input: hsl(var(--hsl-input));
+  --color-input: hsl(var(--hsl-muted-foreground));
   --color-ring: hsl(var(--hsl-ring));
   --color-surface-container-lowest: var(--md3-surface-container-lowest);
   --color-surface-container-low: var(--md3-surface-container-low);
@@ -54,6 +54,15 @@
   --surface-warning-bg: #fffbeb; --surface-warning-border: #fde68a; --surface-warning-text: #b45309;
   --surface-danger-bg: #fff1f2; --surface-danger-border: #fecdd3; --surface-danger-text: #b91c1c;
   --surface-info-bg: #f0f9ff; --surface-info-border: #bae6fd; --surface-info-text: #0369a1;
+  /* Light-tuned interactive tokens — without these the named light scopes
+   * inherit the dark :root values on a light surface: destructive white-on-red
+   * fell to 3.67, and the secondary badge inherited near-white foreground (~1.05). */
+  --hsl-destructive: 0 72% 41%;
+  --hsl-destructive-foreground: 0 0% 100%;
+  --hsl-secondary-foreground: 0 0% 10%;
+  /* neutral status label inherited var(--text-muted) which was ~3.8:1 on the
+   * light row surface; pin a darker slate that clears AA on light surfaces. */
+  --surface-neutral-text: #4b5563;
 }
 
 /* Light-tuned syntax highlighting for ALL light scopes (incl. base light).

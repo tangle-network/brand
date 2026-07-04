@@ -265,9 +265,14 @@ export function AgentTimeline({
   return (
     <div className={cn("mx-auto w-full max-w-5xl px-4 py-4", className)}>
       {renderedItems.map((item, index) => {
-        // User messages: right-aligned bubble, no connector
+        // User messages: right-aligned bubble, off-spine — needs its own vertical
+        // rhythm so it doesn't sit flush against the status/tool/agent row below.
         if (item.kind === "message" && item.role === "user") {
-          return <UserMessage key={item.id} content={item.content} timestamp={item.timestamp} />;
+          return (
+            <div key={item.id} className="mt-6 mb-4 first:mt-0">
+              <UserMessage content={item.content} timestamp={item.timestamp} />
+            </div>
+          );
         }
 
         const timelineIndex = timelineItems.indexOf(item);

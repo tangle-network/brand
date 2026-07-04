@@ -65,7 +65,7 @@
   --hsl-muted-foreground: 240 4% 64%;  /* #9c9ca6 text-muted */
   --hsl-accent: 240 5% 15%;        /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 240 6% 93%;
-  --hsl-destructive: 348 90% 60%;
+  --hsl-destructive: 348 74% 48%;
   --hsl-destructive-foreground: 0 0% 100%;
   --hsl-border: 240 5% 16%;        /* soft edge — fill carries separation, not the line */
   --hsl-input: 240 5% 15%;
@@ -92,7 +92,7 @@
   --destructive: var(--hsl-destructive);
   --destructive-foreground: var(--hsl-destructive-foreground);
   --border: var(--hsl-border);
-  --input: var(--hsl-input);
+  --input: var(--hsl-muted-foreground);
   --ring: var(--hsl-ring);
   --success: var(--hsl-success);
   --warning: var(--hsl-warning);
@@ -207,10 +207,10 @@
   --border-accent-hover: rgba(129, 140, 248, 0.35);
 
   /* Buttons */
-  --btn-primary-bg: #6366F1;
-  --btn-primary-hover: #818CF8;
+  --btn-primary-bg: #5B4ED4;
+  --btn-primary-hover: #4F46E5;
   --btn-primary-text: #ffffff;
-  --btn-cta-bg: #818CF8;
+  --btn-cta-bg: #4F46E5;
   --btn-cta-text: #FFFFFF;
 
   /* Code / runtime syntax */
