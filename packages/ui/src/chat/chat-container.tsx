@@ -63,6 +63,9 @@ export interface ChatContainerProps {
   /** Optional actions rendered beside individual tool items in the `timeline`
    *  presentation, which has no run/message grouping (hence part-only). */
   renderTimelineToolActions?: (part: ToolPart) => ReactNode;
+  /** In the `timeline` presentation, collapse to the first N spine rows behind
+   *  a "Show N more steps" toggle. Omit to always show every row. */
+  collapseTimelineAfter?: number;
 }
 
 const OPENUI_NODE_TYPES = new Set([
@@ -373,6 +376,7 @@ export const ChatContainer = memo(
     renderUserMessageActions,
     renderToolActions,
     renderTimelineToolActions,
+    collapseTimelineAfter,
   }: ChatContainerProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -414,6 +418,7 @@ export const ChatContainer = memo(
                 items={timeline.items}
                 isThinking={timeline.showThinking}
                 renderToolActions={renderTimelineToolActions}
+                collapseAfter={collapseTimelineAfter}
               />
             </div>
           ) : (

@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type ReactNode } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -88,6 +88,9 @@ export interface AgentTimelineProps {
   /** Optional actions rendered beside each tool item (e.g. "open in artifacts").
    *  Receives the source tool part carried on the item. */
   renderToolActions?: (part: ToolPart) => ReactNode;
+  /** When set, collapse the timeline to the first N spine rows behind a
+   *  "Show N more steps" toggle. Omit to always show every row. */
+  collapseAfter?: number;
 }
 
 const TONE_STYLES: Record<AgentTimelineTone, { dot: string; card: string; text: string; icon: typeof Info }> = {
@@ -245,7 +248,10 @@ export function AgentTimeline({
   emptyState,
   className,
   renderToolActions,
+  collapseAfter,
 }: AgentTimelineProps) {
+  const [expanded, setExpanded] = useState(false);
+
   if (items.length === 0 && !isThinking) {
     return emptyState ? (
       <div className={cn("flex h-full items-center justify-center p-4", className)}>
@@ -258,13 +264,41 @@ export function AgentTimeline({
     ? [...items, { id: "__thinking__", kind: "custom", content: <ThinkingIndicator /> }]
     : items;
 
-  // Determine which items participate in the timeline connector (non-user-message items)
-  // User messages are rendered outside the timeline grid
-  const timelineItems = renderedItems.filter((item) => !(item.kind === "message" && item.role === "user"));
+  const isUserMessage = (item: AgentTimelineItem) =>
+    item.kind === "message" && item.role === "user";
+
+  // Items on the vertical connector (user messages render off-spine).
+  const timelineItems = renderedItems.filter((item) => !isUserMessage(item));
+
+  const limit = collapseAfter ?? Infinity;
+  const collapsible = timelineItems.length > limit;
+  const collapsed = collapsible && !expanded;
+
+  // While collapsed, keep only the first `limit` spine rows (and any user
+  // messages that precede them); the rest hides behind the toggle.
+  let renderList = renderedItems;
+  let hiddenCount = 0;
+  if (collapsed) {
+    const visible: AgentTimelineItem[] = [];
+    let spineCount = 0;
+    for (const item of renderedItems) {
+      if (spineCount >= limit) break;
+      visible.push(item);
+      if (!isUserMessage(item)) spineCount += 1;
+    }
+    renderList = visible;
+    hiddenCount = timelineItems.length - limit;
+  }
+
+  const visibleSpine = renderList.filter((item) => !isUserMessage(item));
+  // When a toggle row follows, no real row is last — the toggle owns the tail.
+  const lastSpineItem = collapsible
+    ? undefined
+    : visibleSpine[visibleSpine.length - 1];
 
   return (
     <div className={cn("mx-auto w-full max-w-5xl px-4 py-4", className)}>
-      {renderedItems.map((item, index) => {
+      {renderList.map((item) => {
         // User messages: right-aligned bubble, off-spine — needs its own vertical
         // rhythm so it doesn't sit flush against the status/tool/agent row below.
         if (item.kind === "message" && item.role === "user") {
@@ -275,8 +309,7 @@ export function AgentTimeline({
           );
         }
 
-        const timelineIndex = timelineItems.indexOf(item);
-        const isLast = timelineIndex === timelineItems.length - 1;
+        const isLast = item === lastSpineItem;
 
         if (item.kind === "message") {
           return (
@@ -359,6 +392,19 @@ export function AgentTimeline({
           </AgentTimelineRow>
         );
       })}
+      {collapsible ? (
+        <AgentTimelineRow isLast accentClassName="bg-[var(--border-hover)]">
+          <button
+            type="button"
+            onClick={() => setExpanded((value) => !value)}
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {collapsed
+              ? `Show ${hiddenCount} more step${hiddenCount === 1 ? "" : "s"}`
+              : "Show less"}
+          </button>
+        </AgentTimelineRow>
+      ) : null}
     </div>
   );
 }

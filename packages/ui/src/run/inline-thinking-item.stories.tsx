@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { InlineThinkingItem } from './inline-thinking-item'
-import type { ReasoningPart } from '../types/parts'
+import { InlineToolItem } from './inline-tool-item'
+import type { ReasoningPart, ToolPart } from '../types/parts'
 
 const NOW = Date.now()
 
@@ -118,6 +119,34 @@ export const EmptyText: Story = {
   render: (args) => (
     <div className="p-6 max-w-2xl">
       <InlineThinkingItem {...args} />
+    </div>
+  ),
+}
+
+const bashTool: ToolPart = {
+  type: 'tool',
+  id: 'tool-shell-demo',
+  tool: 'bash',
+  state: {
+    status: 'completed',
+    input: { command: 'npx tsc --noEmit' },
+    output: '✓ No type errors',
+    time: { start: NOW - 2040, end: NOW - 200 },
+  },
+}
+
+// Reasoning and tool rows adjacent — they must read as one family (shared
+// badge geometry, trailing status/duration, chevron), not two designs.
+export const UnifiedWithToolRow: Story = {
+  name: 'Unified shell (reasoning + tool)',
+  render: () => (
+    <div className="p-6 max-w-2xl space-y-2">
+      <InlineThinkingItem
+        part={thinkingComplete}
+        defaultOpen={false}
+        autoCollapse={false}
+      />
+      <InlineToolItem part={bashTool} />
     </div>
   ),
 }

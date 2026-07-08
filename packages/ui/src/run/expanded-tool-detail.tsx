@@ -17,6 +17,7 @@ import { WebSearchPreview } from "../tool-previews/web-search-preview";
 import { QuestionPreview } from "../tool-previews/question-preview";
 import { DiffPreview } from "../tool-previews/diff-preview";
 import { cn } from "../lib/utils";
+import { ExpandableContent } from "./expandable-content";
 
 export interface ExpandedToolDetailProps {
   part: ToolPart;
@@ -146,15 +147,17 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
               Output
             </span>
           </div>
-          <CodeBlock
-            code={
-              outputStr.length > 2000
-                ? outputStr.slice(0, 2000) + "\n...(truncated)"
-                : outputStr
-            }
-            language="json"
-            className="rounded-none border-0"
-          />
+          <ExpandableContent fadeClassName="from-card">
+            <CodeBlock
+              code={
+                outputStr.length > 2000
+                  ? outputStr.slice(0, 2000) + "\n...(truncated)"
+                  : outputStr
+              }
+              language="json"
+              className="rounded-none border-0"
+            />
+          </ExpandableContent>
         </div>
       )}
 
@@ -167,9 +170,11 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
               Error
             </span>
           </div>
-          <pre className="bg-[var(--surface-danger-bg)] p-3 text-xs font-mono whitespace-pre-wrap break-all text-[var(--surface-danger-text)]">
-            {error}
-          </pre>
+          <ExpandableContent fadeClassName="from-[var(--surface-danger-bg)]">
+            <pre className="bg-[var(--surface-danger-bg)] p-3 text-xs font-mono whitespace-pre-wrap break-all text-[var(--surface-danger-text)]">
+              {error}
+            </pre>
+          </ExpandableContent>
         </div>
       )}
 

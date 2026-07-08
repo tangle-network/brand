@@ -1,11 +1,5 @@
-import { memo, useState, type ComponentType, type ReactNode } from "react";
-import * as Collapsible from "@radix-ui/react-collapsible";
+import { memo, type ComponentType, type ReactNode } from "react";
 import {
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  ChevronDown,
-  ChevronRight,
   Terminal,
   FileEdit,
   FileSearch,
@@ -23,12 +17,11 @@ import {
   getToolErrorText,
   getToolCategory,
 } from "../utils/tool-display";
-import { formatDuration } from "../utils/format";
 import type { ToolPart } from "../types/parts";
 import type { ToolCategory } from "../types/run";
 import type { CustomToolRenderer } from "../types/tool-display";
 import { ExpandedToolDetail } from "./expanded-tool-detail";
-import { LiveDuration } from "./run-item-primitives";
+import { RunRowShell, type RunRowStatus } from "./run-row-shell";
 
 /** Map tool category to a lucide-react icon component. */
 const TOOL_CATEGORY_ICON_MAP: Record<
@@ -59,10 +52,18 @@ export interface InlineToolItemProps {
   description?: string;
 }
 
+/** Map the tool part status onto the shared row status vocabulary. */
+function toRowStatus(status: ToolPart["state"]["status"]): RunRowStatus {
+  if (status === "pending" || status === "running") return "running";
+  if (status === "error") return "error";
+  return "success";
+}
+
 /**
- * Compact single-line tool call display (32px height).
- * Shows icon, title, description, duration, and status indicator.
- * Expands on click to show ExpandedToolDetail.
+ * Compact single-line tool call display. Shows a category icon, title,
+ * description, duration and status, and expands on click to show
+ * ExpandedToolDetail. Rendered through the shared RunRowShell so it stays
+ * consistent with the reasoning row.
  */
 export const InlineToolItem = memo(
   ({
@@ -75,123 +76,37 @@ export const InlineToolItem = memo(
     title: titleOverride,
     description: descriptionOverride,
   }: InlineToolItemProps) => {
-    const [open, setOpen] = useState(false);
     const meta = getToolDisplayMetadata(part);
     const title = titleOverride ?? meta.title;
     const description = descriptionOverride ?? meta.description;
-    const { status } = part.state;
     const errorText = getToolErrorText(part);
 
-    const isRunning = status === "pending" || status === "running";
-    const isError = status === "error";
-    const isComplete = status === "completed";
-
-    // Duration
     const startTime = part.state.time?.start;
     const endTime = part.state.time?.end;
     const durationMs =
-      startTime && endTime ? endTime - startTime : undefined;
+      startTime != null && endTime != null ? endTime - startTime : undefined;
 
-    // Determine the default icon based on tool category
     const category = getToolCategory(part.tool);
     const DefaultIcon = TOOL_CATEGORY_ICON_MAP[category] ?? Settings;
-    const shapeClass = {
-      single: "rounded-[var(--radius-lg)]",
-      first: "rounded-t-[var(--radius-lg)] rounded-b-[var(--radius-sm)]",
-      middle: "rounded-[var(--radius-sm)]",
-      last: "rounded-t-[var(--radius-sm)] rounded-b-[var(--radius-lg)]",
-    }[groupPosition];
 
     return (
-      <Collapsible.Root open={open} onOpenChange={setOpen}>
-        <div className="flex items-start gap-2">
-          <Collapsible.Trigger asChild>
-            <button
-              className={cn(
-                "w-full border text-left transition-colors",
-                "border-[var(--border-subtle)] bg-[var(--md3-surface-container)] hover:border-border hover:bg-[var(--md3-surface-container-high)]",
-                open && "border-border bg-[var(--md3-surface-container-high)]",
-                shapeClass,
-                className,
-              )}
-            >
-              <div className="flex items-center gap-2.5 px-3 py-2.5">
-                <div className={cn(
-                  "shrink-0",
-                  isRunning && "text-[var(--accent-text)]",
-                  isComplete && "text-[var(--surface-success-text)]",
-                  isError && "text-[var(--surface-danger-text)]",
-                  !isRunning && !isComplete && !isError && "text-muted-foreground",
-                )}>
-                  {isRunning ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : isComplete ? (
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                  ) : isError ? (
-                    <AlertCircle className="h-3.5 w-3.5" />
-                  ) : (
-                    <DefaultIcon className="h-3.5 w-3.5" />
-                  )}
-                </div>
-
-                <span className="truncate text-xs font-medium text-foreground">
-                  {title}
-                </span>
-                {description ? (
-                  <span className="hidden truncate text-xs font-mono text-muted-foreground sm:inline">
-                    {description}
-                  </span>
-                ) : null}
-
-                <div className="ml-auto flex shrink-0 items-center gap-1.5">
-                  {isRunning && startTime ? <LiveDuration startTime={startTime} /> : null}
-                  {!isRunning && durationMs != null ? (
-                    <span className="text-[10px] font-mono tabular-nums text-muted-foreground">
-                      {formatDuration(durationMs)}
-                    </span>
-                  ) : null}
-                  {isError ? (
-                    <span className="text-[10px] font-medium text-[var(--surface-danger-text)]">
-                      failed
-                    </span>
-                  ) : null}
-                  {isRunning ? (
-                    <span className="text-[10px] font-medium text-[var(--accent-text)]">
-                      running
-                    </span>
-                  ) : null}
-                  {open ? (
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
-                  )}
-                </div>
-              </div>
-
-              {errorText && !open ? (
-                <div className="border-t border-border px-3 py-2 text-xs text-red-200">
-                  {errorText}
-                </div>
-              ) : null}
-            </button>
-          </Collapsible.Trigger>
-
-          {actions ? (
-            <div
-              className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 pt-1"
-              onClick={(event) => event.stopPropagation()}
-            >
-              {actions}
-            </div>
-          ) : null}
-        </div>
-
-        <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp">
-          <div className={cn("mt-1.5 ml-2.5 border-l-2 border-primary/15 pl-3.5", contentClassName)}>
-            {renderToolDetail?.(part) ?? <ExpandedToolDetail part={part} />}
-          </div>
-        </Collapsible.Content>
-      </Collapsible.Root>
+      <RunRowShell
+        icon={<DefaultIcon className="h-3.5 w-3.5" />}
+        accent="neutral"
+        title={title}
+        description={description}
+        descriptionMono
+        status={toRowStatus(part.state.status)}
+        startTime={startTime}
+        durationMs={durationMs}
+        groupPosition={groupPosition}
+        collapsedError={errorText ?? undefined}
+        actions={actions}
+        className={className}
+        contentClassName={cn("p-2", contentClassName)}
+      >
+        {renderToolDetail?.(part) ?? <ExpandedToolDetail part={part} />}
+      </RunRowShell>
     );
   },
 );

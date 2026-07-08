@@ -165,6 +165,17 @@ export const CodingSession: Story = {
 }
 
 // ---------------------------------------------------------------------------
+// Long session collapsed to the first N spine rows behind a toggle
+// ---------------------------------------------------------------------------
+
+export const Collapsed: Story = {
+  args: {
+    items: codingSession,
+    collapseAfter: 3,
+  },
+}
+
+// ---------------------------------------------------------------------------
 // Session with thinking indicator active
 // ---------------------------------------------------------------------------
 
