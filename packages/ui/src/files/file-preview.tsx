@@ -199,7 +199,7 @@ function UnsupportedPreview({
 function MarkdownPreview({ content }: { content: string }) {
   return (
     <div className="rounded-[var(--radius-md)] border border-border bg-background p-5">
-      <Markdown className="prose-sm max-w-none">{content}</Markdown>
+      <Markdown>{content}</Markdown>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export interface MarkdownProps {
 export const Markdown = memo(({ children, className }: MarkdownProps) => {
   return (
     <div
-      className={cn("prose prose-sm dark:prose-invert max-w-none", className)}
+      className={cn("tangle-prose max-w-none text-sm", className)}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}

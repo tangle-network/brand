@@ -10,7 +10,7 @@ const markdownMeta: Meta<typeof Markdown> = {
   parameters: { layout: 'centered', backgrounds: { default: 'dark' } },
   decorators: [
     (Story) => (
-      <div className="w-[680px] p-6 rounded-xl bg-card text-foreground">
+      <div className="w-[680px] rounded-xl bg-card p-6 text-foreground">
         <Story />
       </div>
     ),
@@ -19,6 +19,60 @@ const markdownMeta: Meta<typeof Markdown> = {
 
 export default markdownMeta
 type Story = StoryObj<typeof Markdown>
+
+const CONTRAST_MARKDOWN = `# GTM Agent Repository Overview
+
+Source: \`github.com/tangle-network/gtm-agent\` Live at: [gtm.tangle.tools](https://gtm.tangle.tools)
+
+---
+
+## What It Is
+
+GTM Agent is an AI-powered go-to-market workspace where founders get a sandboxed environment with an AI co-founder.
+
+## Architecture
+
+| Layer | Owns | Location |
+|------|------|----------|
+| Engine | Stream normalization, DB port, harness | \`@tangle-network/agent-app\` |
+| Shell | Auth, billing, RBAC, vault | \`src/routes/**\` |
+| Runtime | Customer motion | Live sandbox |
+
+## Tech Stack
+
+- **Frontend:** Remix + Tailwind v4
+- **Database:** SQLite + Drizzle ORM
+- **Sandbox:** \`@tangle-network/sandbox\`
+
+> Prime directive: ship the shell, never hardcode customer motion.
+
+\`inline code\` stays readable beside paragraphs.
+
+\`\`\`ts
+export function readable(theme: 'light' | 'dark') {
+  return theme
+}
+\`\`\`
+`
+
+export const LightThemeRegression: Story = {
+  name: 'Light theme regression',
+  parameters: { backgrounds: { default: 'light' } },
+  render: () => (
+    <div data-theme="tangle-light" className="rounded-xl bg-background p-6 text-foreground">
+      <Markdown>{CONTRAST_MARKDOWN}</Markdown>
+    </div>
+  ),
+}
+
+export const DarkThemeRegression: Story = {
+  name: 'Dark theme regression',
+  render: () => (
+    <div className="rounded-xl bg-background p-6 text-foreground">
+      <Markdown>{CONTRAST_MARKDOWN}</Markdown>
+    </div>
+  ),
+}
 
 export const Prose: Story = {
   name: 'Prose',
