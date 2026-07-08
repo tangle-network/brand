@@ -6,7 +6,6 @@ import { formatDuration } from "../utils/format";
 import { LiveDuration } from "./run-item-primitives";
 
 export type RunRowStatus = "running" | "success" | "error" | "idle";
-export type RunRowAccent = "neutral" | "violet";
 
 /**
  * Trailing status indicator shared by every run row: a spinner while running,
@@ -33,8 +32,6 @@ export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
 export interface RunRowShellProps {
   /** Semantic lead glyph — always visible; never replaced by status. */
   icon: ReactNode;
-  /** Badge tint. `violet` marks reasoning rows; tools stay `neutral`. */
-  accent?: RunRowAccent;
   title: string;
   /** Secondary inline text (tool path/command, or a reasoning preview). */
   description?: string;
@@ -78,7 +75,6 @@ const SHAPE_CLASS: Record<
  */
 export function RunRowShell({
   icon,
-  accent = "neutral",
   title,
   description,
   descriptionMono = false,
@@ -113,8 +109,8 @@ export function RunRowShell({
           className={cn(
             "min-w-0 flex-1 overflow-hidden border transition-colors",
             "border-[var(--border-subtle)] bg-[var(--md3-surface-container)]",
-            expandable && "hover:border-border hover:bg-[var(--md3-surface-container-high)]",
-            open && "border-border bg-[var(--md3-surface-container-high)]",
+            expandable && "hover:border-border",
+            open && "border-border",
             SHAPE_CLASS[groupPosition],
             className,
           )}
@@ -127,14 +123,7 @@ export function RunRowShell({
                 expandable ? "cursor-pointer" : "cursor-default",
               )}
             >
-              <span
-                className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border",
-                  accent === "violet"
-                    ? "border-[var(--border-accent)] bg-[var(--accent-surface-soft)] text-primary"
-                    : "border-border bg-muted text-muted-foreground",
-                )}
-              >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-muted text-muted-foreground">
                 {icon}
               </span>
 

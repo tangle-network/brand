@@ -92,7 +92,6 @@ export const InlineToolItem = memo(
     return (
       <RunRowShell
         icon={<DefaultIcon className="h-3.5 w-3.5" />}
-        accent="neutral"
         title={title}
         description={description}
         descriptionMono

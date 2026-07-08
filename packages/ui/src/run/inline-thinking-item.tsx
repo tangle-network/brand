@@ -52,7 +52,6 @@ export const InlineThinkingItem = memo(
     return (
       <RunRowShell
         icon={<Brain className="h-3.5 w-3.5" />}
-        accent="violet"
         title={isActive ? "Thinking…" : "Reasoning"}
         description={preview}
         status={isActive ? "running" : "idle"}
@@ -61,16 +60,15 @@ export const InlineThinkingItem = memo(
         open={open}
         onOpenChange={setOpen}
         className={className}
-        contentClassName="bg-muted"
       >
         {part.text ? (
           <ExpandableContent
-            fadeClassName="from-muted"
+            fadeClassName="from-[var(--md3-surface-container)]"
             className={
               contentClassName ? `px-3 py-3 ${contentClassName}` : "px-3 py-3"
             }
           >
-            <div className="text-sm leading-relaxed text-muted-foreground">
+            <div className="text-sm leading-relaxed text-foreground">
               <Markdown>{part.text}</Markdown>
             </div>
           </ExpandableContent>
