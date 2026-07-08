@@ -126,6 +126,40 @@ describe("AgentTimeline tool actions", () => {
     ).toBeInTheDocument()
   })
 
+  it("renders every row and no toggle when collapseAfter is unset", () => {
+    const items: AgentTimelineItem[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `s-${i}`,
+      kind: "status",
+      label: `Step ${i}`,
+    }))
+    render(<AgentTimeline items={items} />)
+    expect(screen.getByText("Step 4")).toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", { name: /more step/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it("collapses to the first N spine rows behind a toggle and reveals the rest", async () => {
+    const user = userEvent.setup()
+    const items: AgentTimelineItem[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `s-${i}`,
+      kind: "status",
+      label: `Step ${i}`,
+    }))
+    render(<AgentTimeline items={items} collapseAfter={2} />)
+
+    // First 2 visible, the other 3 hidden behind the toggle
+    expect(screen.getByText("Step 0")).toBeInTheDocument()
+    expect(screen.getByText("Step 1")).toBeInTheDocument()
+    expect(screen.queryByText("Step 4")).not.toBeInTheDocument()
+
+    const toggle = screen.getByRole("button", { name: /show 3 more steps/i })
+    await user.click(toggle)
+
+    expect(screen.getByText("Step 4")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /show less/i })).toBeInTheDocument()
+  })
+
   it("renders the source part's real input in the expanded detail", async () => {
     const user = userEvent.setup()
     const probePart: ToolPart = {
