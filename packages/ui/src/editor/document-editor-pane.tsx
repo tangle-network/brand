@@ -291,7 +291,7 @@ export function DocumentEditorPane({
         previewClassName,
       )}
     >
-      <Markdown className="prose-sm max-w-none">{draft}</Markdown>
+      <Markdown>{draft}</Markdown>
     </div>
   );
 

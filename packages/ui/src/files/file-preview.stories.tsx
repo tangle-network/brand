@@ -43,7 +43,15 @@ Markdown still renders as **prose**, not as a code block.
 
 - Themed headings
 - \`inline code\`
-- [links](https://tangle.tools)`
+- [links](https://tangle.tools)
+
+---
+
+| Element | Expected |
+| --- | --- |
+| Body | readable foreground |
+| Table | subtle borders |
+| Code | tokenized accent |`
 
 const meta: Meta<typeof FilePreview> = {
   title: 'Files/FilePreview',
@@ -83,5 +91,18 @@ export const Csv: Story = {
 
 export const MarkdownProse: Story = {
   name: 'Markdown (rendered prose)',
+  args: { filename: 'README.md', content: MARKDOWN_SOURCE },
+}
+
+export const MarkdownProseLight: Story = {
+  name: 'Markdown (light theme)',
+  parameters: { backgrounds: { default: 'light' } },
+  decorators: [
+    (Story) => (
+      <div data-theme="tangle-light" className="h-[560px] w-[760px] bg-background text-foreground">
+        <Story />
+      </div>
+    ),
+  ],
   args: { filename: 'README.md', content: MARKDOWN_SOURCE },
 }
