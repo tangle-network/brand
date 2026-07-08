@@ -133,17 +133,24 @@ function formatTime(date: Date): string {
 interface AgentTimelineRowProps {
   isLast: boolean;
   accentClassName: string;
+  /** Dot top-offset. Defaults to aligning with the first text line; card rows
+   * pass CARD_ROW_DOT to center the dot on the card header instead. */
+  dotClassName?: string;
   children: ReactNode;
 }
 
-function AgentTimelineRow({ isLast, accentClassName, children }: AgentTimelineRowProps) {
+// Centers the dot on a RunRowShell card header (2.5rem: h-6 badge + py-2),
+// so tool and reasoning rows read as dot-aligned rather than top-anchored.
+const CARD_ROW_DOT = "mt-[calc((2.5rem-var(--timeline-dot-size))/2)]";
+
+function AgentTimelineRow({ isLast, accentClassName, dotClassName = "mt-2", children }: AgentTimelineRowProps) {
   return (
     <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-4">
       <div className="relative flex justify-center">
         {!isLast && (
           <span className="absolute top-4 bottom-[-0.75rem] left-1/2 w-px -translate-x-1/2 bg-border" />
         )}
-        <span className={cn("relative mt-2 h-[var(--timeline-dot-size)] w-[var(--timeline-dot-size)] rounded-full ring-4 ring-[var(--bg-root)]", accentClassName)} />
+        <span className={cn("relative h-[var(--timeline-dot-size)] w-[var(--timeline-dot-size)] rounded-full ring-4 ring-[var(--bg-root)]", dotClassName, accentClassName)} />
       </div>
       <div className="min-w-0 pb-3">{children}</div>
     </div>
@@ -321,7 +328,7 @@ export function AgentTimeline({
 
         if (item.kind === "tool") {
           return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
               <ToolCallStep
                 type={item.call.type}
                 label={item.call.label}
@@ -338,7 +345,7 @@ export function AgentTimeline({
 
         if (item.kind === "tool_group") {
           return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
               <ToolCallGroup title={item.title}>
                 {item.calls.map((call, callIndex) => {
                   const part = item.parts?.[callIndex];
@@ -387,7 +394,7 @@ export function AgentTimeline({
 
         // custom
         return (
-          <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]">
+          <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
             {(item as AgentTimelineCustomItem).content}
           </AgentTimelineRow>
         );
