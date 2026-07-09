@@ -44,6 +44,8 @@ export interface FileArtifactPaneProps extends Omit<FilePreviewProps, "className
   toolbar?: ArtifactPaneProps["toolbar"];
   footer?: ArtifactPaneProps["footer"];
   className?: string;
+  headerClassName?: ArtifactPaneProps["headerClassName"];
+  hideTitleBlock?: ArtifactPaneProps["hideTitleBlock"];
   editor?: FileArtifactPaneEditorOptions;
 }
 
@@ -68,6 +70,8 @@ export function FileArtifactPane({
   toolbar,
   footer,
   className,
+  headerClassName,
+  hideTitleBlock,
   editor,
 }: FileArtifactPaneProps) {
   const showTabs = tabs.length > 0 && onTabSelect && onTabClose;
@@ -83,7 +87,9 @@ export function FileArtifactPane({
     detectFileFormat(filename, mimeType) === "markdown" ||
     (path ? detectFileFormat(path, mimeType) === "markdown" : false);
   const isEditableMarkdown = isMarkdown && editor?.enabled;
-  const headerActions = (
+  // Undefined (not an empty fragment) when there are no actions, so ArtifactPane
+  // can collapse the header row entirely under hideTitleBlock.
+  const headerActions = onDownload || onClose ? (
     <>
       {onDownload && (
         <button
@@ -106,7 +112,7 @@ export function FileArtifactPane({
         </button>
       )}
     </>
-  );
+  ) : undefined;
 
   if (isEditableMarkdown) {
     return (
@@ -122,6 +128,8 @@ export function FileArtifactPane({
             className={className}
             tabs={paneTabs}
             headerActions={headerActions}
+            headerClassName={headerClassName}
+            hideTitleBlock={hideTitleBlock}
           >
             <div className="flex min-h-[12rem] items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-border bg-muted text-sm text-muted-foreground">
               Loading editor…
@@ -139,6 +147,8 @@ export function FileArtifactPane({
           className={className}
           tabs={paneTabs}
           headerActions={headerActions}
+          headerClassName={headerClassName}
+          hideTitleBlock={hideTitleBlock}
           markdown={content ?? ""}
           mode={editor.mode}
           defaultMode={editor.defaultMode}
@@ -170,6 +180,8 @@ export function FileArtifactPane({
       className={className}
       tabs={paneTabs}
       headerActions={headerActions}
+      headerClassName={headerClassName}
+      hideTitleBlock={hideTitleBlock}
     >
       <FilePreview
         filename={filename}

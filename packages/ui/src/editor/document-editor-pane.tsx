@@ -182,6 +182,8 @@ export function DocumentEditorPane({
   footer,
   className,
   contentClassName,
+  headerClassName,
+  hideTitleBlock,
   tabs,
   toolbar,
   markdown = "",
@@ -287,7 +289,10 @@ export function DocumentEditorPane({
   const preview = (
     <div
       className={cn(
-        "rounded-[var(--radius-lg)] border border-border bg-background p-5",
+        // The outer margin is the card's gutter (rather than padding on the tab
+        // panel) so `previewClassName` can govern the whole box — gutter, border,
+        // surface, and inner padding — e.g. to render the document full-bleed.
+        "m-4 rounded-[var(--radius-lg)] border border-border bg-card p-5",
         previewClassName,
       )}
     >
@@ -337,9 +342,11 @@ export function DocumentEditorPane({
         tabs={tabs}
         className={className}
         contentClassName={contentClassName}
+        headerClassName={headerClassName}
         toolbar={editorToolbar}
+        hideTitleBlock={hideTitleBlock}
       >
-        <TabsContent value="preview" className="mt-0 h-full px-4 py-4">
+        <TabsContent value="preview" className="mt-0 h-full">
           {preview}
         </TabsContent>
         <TabsContent value="edit" className="mt-0 h-full px-4 py-4">

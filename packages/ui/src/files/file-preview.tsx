@@ -171,7 +171,7 @@ function PdfPreview({ blobUrl, filename }: { blobUrl: string; filename: string }
 
 function TextPreview({ content }: { content: string }) {
   return (
-    <pre className="bg-background rounded-[var(--radius-md)] border border-border p-4 overflow-auto max-h-[70vh] text-sm text-foreground font-mono leading-[1.55]">
+    <pre className="bg-card rounded-[var(--radius-md)] border border-border p-4 overflow-auto max-h-[70vh] text-sm text-foreground font-mono leading-[1.55]">
       {content}
     </pre>
   );
