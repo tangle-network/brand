@@ -1,5 +1,20 @@
 # @tangle-network/ui
 
+## 11.2.0
+
+### Minor Changes
+
+- ac4eaf4: feat(files): host-aligned artifact surface props
+
+  - `ArtifactPane`: `headerClassName` + `hideTitleBlock` (header row collapses when empty).
+  - `FileArtifactPane`: threads both through all render paths; `headerActions` is `undefined` (not an empty fragment) when there are no actions.
+  - `DocumentEditorPane`: `previewClassName` now governs the whole preview box (gutter/border/surface/padding), enabling a full-bleed document body.
+  - `FilePreview`: text previews sit on `bg-card` for a white surface in light theme.
+
+### Patch Changes
+
+- c5dfc7d: Use tokenized Tangle prose styling for markdown previews so light themes stay readable.
+
 ## 11.1.0
 
 ### Minor Changes
