@@ -58,6 +58,62 @@ export function hslIn(
   return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
 }
 
+type Rgb = [number, number, number];
+
+/** `H S% L%` → RGB 0-255. */
+export function hslToRgb({
+  h,
+  s,
+  l,
+}: {
+  h: number;
+  s: number;
+  l: number;
+}): Rgb {
+  const sat = s / 100;
+  const lit = l / 100;
+  const c = (1 - Math.abs(2 * lit - 1)) * sat;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = lit - c / 2;
+  const [r, g, b] =
+    h < 60
+      ? [c, x, 0]
+      : h < 120
+        ? [x, c, 0]
+        : h < 180
+          ? [0, c, x]
+          : h < 240
+            ? [0, x, c]
+            : h < 300
+              ? [x, 0, c]
+              : [c, 0, x];
+  return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+}
+
+function relativeLuminance([r, g, b]: Rgb): number {
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+/**
+ * What a translucent foreground actually becomes once the surface behind it shows
+ * through. A `/70` utility does not render the token's color — it renders this.
+ */
+export function compositeOver(fg: Rgb, bg: Rgb, alpha: number): Rgb {
+  return fg.map((c, i) => alpha * c + (1 - alpha) * bg[i]) as Rgb;
+}
+
+/** WCAG contrast ratio between two opaque colors. */
+export function contrastRatio(a: Rgb, b: Rgb): number {
+  const [hi, lo] = [relativeLuminance(a), relativeLuminance(b)].sort(
+    (x, y) => y - x,
+  );
+  return (hi + 0.05) / (lo + 0.05);
+}
+
 /**
  * Read a hex surface token as WCAG relative luminance (0-1).
  *

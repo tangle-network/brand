@@ -1,7 +1,14 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn, hexRelativeLuminanceIn, hslIn } from "./css-test-utils";
+import {
+  blockIn,
+  compositeOver,
+  contrastRatio,
+  hexRelativeLuminanceIn,
+  hslIn,
+  hslToRgb,
+} from "./css-test-utils";
 
 /**
  * The canonical spine's structural contract.
@@ -71,6 +78,27 @@ describe("canonical dark spine", () => {
       ).toBeGreaterThan(ladder[i - 1]);
     }
   });
+});
+
+describe("muted text stays legible at the opacities the UI actually uses", () => {
+  // The token is never rendered at full strength in the places that matter: the
+  // shared components fade captions with `/70` and `/60`, and a translucent
+  // foreground does not render the token's color — it renders the token composited
+  // over whatever is behind it. So the contrast that counts is the composited one,
+  // and asserting it here is the difference between a claim and a guarantee.
+  const CARD = hslToRgb(hslIn(DARK, "hsl-card"));
+  const MUTED = hslToRgb(hslIn(DARK, "hsl-muted-foreground"));
+
+  it("clears AA for normal text at full strength", () => {
+    expect(contrastRatio(MUTED, CARD)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  for (const alpha of [0.7, 0.6]) {
+    it(`clears the 3:1 large-text floor at /${alpha * 100}`, () => {
+      const faded = compositeOver(MUTED, CARD, alpha);
+      expect(contrastRatio(faded, CARD)).toBeGreaterThanOrEqual(3);
+    });
+  }
 });
 
 describe("input tokens carry two DIFFERENT roles and must not be conflated", () => {

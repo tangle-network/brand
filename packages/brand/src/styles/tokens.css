@@ -473,6 +473,11 @@
   --bg-root: #eceef3;
   --bg-dark: var(--depth-1);
   --bg-card: var(--depth-2);
+  /* Paper, exactly like --bg-card: in light you cannot raise a plane by making it
+   * lighter than white, so an overlay lifts by SHADOW. A consumer that fills with
+   * --bg-elevated and applies no shadow gets no separation from a card — that is
+   * the contract, not an oversight (--hsl-popover is white for the same reason).
+   * Pair it with --shadow-dropdown. */
   --bg-elevated: var(--depth-4);
   --bg-section: var(--depth-1);
   --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
