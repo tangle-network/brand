@@ -399,7 +399,7 @@
   --depth-1: #eceef3;
   --depth-2: #ffffff;
   --depth-3: #f1f2f7;
-  --depth-4: #dcdee6;
+  --depth-4: #ffffff;
 
   --status-running: #059669;
   --status-creating: #3E349E;
@@ -456,11 +456,11 @@
 
   /* Surfaces — flat single-neutral light */
   --bg-root: #eceef3;
-  --bg-dark: #f7f7f8;
-  --bg-card: #f7f7f8;
-  --bg-elevated: #ffffff;
-  --bg-section: #f7f7f8;
-  --bg-input: #f6f7fa;
+  --bg-dark: var(--depth-1);
+  --bg-card: var(--depth-2);
+  --bg-elevated: var(--depth-4);
+  --bg-section: var(--depth-1);
+  --bg-input: var(--md3-surface-container-low);
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-selection: rgba(91, 78, 212, 0.10);
 

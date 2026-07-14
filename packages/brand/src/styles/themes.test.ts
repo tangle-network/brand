@@ -17,8 +17,13 @@ const themes = readFileSync(
 );
 
 function block(selector: string): string {
-  const start = themes.indexOf(`${selector} {`);
-  if (start === -1) throw new Error(`missing theme block: ${selector}`);
+  // Tolerate any whitespace between selector and brace — a formatter that
+  // closes the gap must not turn a passing suite into a "missing block" error.
+  const open = new RegExp(
+    `${selector.replace(/[.[\]"=]/g, "\\$&")}\\s*\\{`,
+  ).exec(themes);
+  if (!open) throw new Error(`missing theme block: ${selector}`);
+  const start = open.index;
   return themes.slice(start, themes.indexOf("\n}", start));
 }
 
@@ -31,8 +36,8 @@ function hsl(css: string, token: string): { h: number; s: number; l: number } {
   return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
 }
 
-describe('named theme: [data-theme="intelligence"]', () => {
-  const css = block('[data-theme="intelligence"]');
+describe('named theme: .dark[data-theme="intelligence"]', () => {
+  const css = block('.dark[data-theme="intelligence"]');
 
   it("retints the surface canvas to violet", () => {
     for (const token of ["background", "card", "popover", "muted", "border"]) {
@@ -65,7 +70,13 @@ describe('named theme: [data-theme="intelligence"]', () => {
     }
   });
 
-  it("is dark-only — it must not ship a light variant that fights the base theme", () => {
+  it("is dark-only — the SELECTOR enforces it, not the caller", () => {
+    // An unscoped `[data-theme="intelligence"]` would repaint every surface with
+    // the violet dark ramp if a consumer left the attribute on while switching to
+    // light. The `.dark` requirement makes that impossible.
+    expect(themes).toContain('.dark[data-theme="intelligence"]');
+    expect(themes).not.toMatch(/(?<!\.dark)\[data-theme="intelligence"\]/);
+    // No light variant: light falls through to brand's canonical light spine.
     expect(themes).not.toContain('[data-theme="intelligence-light"]');
   });
 });

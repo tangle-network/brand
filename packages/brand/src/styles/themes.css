@@ -190,11 +190,17 @@
 
 /* ───────────────────── Intelligence — violet surface ramp ────────────────────
  * A violet retint of the surface ladder (hue ~260-265, saturation tapering as
- * lightness rises) — dark only. The brand indigo primary / ring / accent-text
- * are deliberately NOT overridden: the accent stays Tangle, only the surfaces
- * carry the product's identity. Apply with data-theme="intelligence" on <html>
- * alongside the `.dark` class (which drives the app's `dark:` utilities). */
-[data-theme="intelligence"] {
+ * lightness rises). The brand indigo primary / ring / accent-text are
+ * deliberately NOT overridden: the accent stays Tangle, only the surfaces carry
+ * the product's identity.
+ *
+ * Apply `data-theme="intelligence"` on <html> alongside the `.dark` class.
+ * The selector REQUIRES `.dark` rather than trusting the consumer to swap the
+ * attribute on every mode change: a violet dark ramp left standing over a light
+ * page would repaint every surface. Dark-only is the contract, so the selector —
+ * not the caller — enforces it. There is deliberately no `-light` variant;
+ * light falls through to brand's canonical light spine. */
+.dark[data-theme="intelligence"] {
   --md3-surface: #0d0a10;
   --md3-surface-dim: #0a080d;
   --md3-surface-bright: #2e2936;
