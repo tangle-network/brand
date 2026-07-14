@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn, hexLightnessIn, hslIn } from "./css-test-utils";
+import { blockIn, hexRelativeLuminanceIn, hslIn } from "./css-test-utils";
 
 /**
  * The canonical spine's structural contract.
@@ -63,7 +63,7 @@ describe("canonical dark spine", () => {
       "md3-surface-container",
       "md3-surface-container-high",
       "md3-surface-container-highest",
-    ].map((t) => hexLightnessIn(DARK, t));
+    ].map((t) => hexRelativeLuminanceIn(DARK, t));
     for (let i = 1; i < ladder.length; i++) {
       expect(
         ladder[i],
@@ -122,13 +122,13 @@ describe("canonical light spine", () => {
     // what produced the white-on-white flatness this palette replaced.
     const paper = ["md3-surface-container", "md3-surface-container-highest"];
     const wells = ["md3-surface-container-low", "md3-surface-container-high"];
-    const canvas = hexLightnessIn(LIGHT, "md3-surface");
+    const canvas = hexRelativeLuminanceIn(LIGHT, "md3-surface");
 
     for (const t of paper) {
-      expect(hexLightnessIn(LIGHT, t), `${t} is paper`).toBe(1);
+      expect(hexRelativeLuminanceIn(LIGHT, t), `${t} is paper`).toBe(1);
     }
     for (const t of wells) {
-      const l = hexLightnessIn(LIGHT, t);
+      const l = hexRelativeLuminanceIn(LIGHT, t);
       expect(l, `${t} is a well — below paper`).toBeLessThan(1);
       expect(l, `${t} still sits above the canvas`).toBeGreaterThan(canvas);
     }
@@ -138,8 +138,8 @@ describe("canonical light spine", () => {
     // `--bg-card` (depth-2) and `--bg-elevated` (depth-4) are both paper by design;
     // the semantic layer agrees (--hsl-card and --hsl-popover are both white). The
     // separation is the shadow, so a shadow token must exist to carry it.
-    expect(hexLightnessIn(LIGHT, "depth-2")).toBe(1);
-    expect(hexLightnessIn(LIGHT, "depth-4")).toBe(1);
+    expect(hexRelativeLuminanceIn(LIGHT, "depth-2")).toBe(1);
+    expect(hexRelativeLuminanceIn(LIGHT, "depth-4")).toBe(1);
     expect(LIGHT, "the overlay's separation depends on this").toMatch(
       /--shadow-dropdown:/,
     );

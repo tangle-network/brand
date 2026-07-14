@@ -115,7 +115,8 @@
   --error: var(--hsl-destructive);
   --info: var(--hsl-info);
 
-  /* Sidebar tokens — L1 chrome, seated just under the page canvas */
+  /* Sidebar tokens — L1 chrome: one step ABOVE the canvas in lightness, so the
+   * panel reads as its own plane rather than a hole in the page. */
   --sidebar-background: 244 29% 9%;  /* L1 chrome #12111f */
   --sidebar-foreground: 240 6% 93%;
   --sidebar-primary: 239 84% 67%;

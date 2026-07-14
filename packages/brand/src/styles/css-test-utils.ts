@@ -11,8 +11,17 @@ function escapeRegex(literal: string): string {
   return literal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** Strip CSS comments, so a selector named in prose is never mistaken for a rule. */
+function rulesOnly(css: string): string {
+  return css.replace(/\/\*[\s\S]*?\*\//g, "");
+}
+
 /** Extract a rule's body by selector, tolerant of formatting. */
-export function blockIn(css: string, selector: string): string {
+export function blockIn(source: string, selector: string): string {
+  // Comments first: a block's own doc-comment routinely spells its selector out,
+  // and anchoring on that prose would slice the wrong region — silently, since
+  // the result still looks like CSS.
+  const css = rulesOnly(source);
   // Tolerate any whitespace between selector and brace — a formatter that closes
   // the gap must not turn a passing suite into a "missing block" error.
   const open = new RegExp(`${escapeRegex(selector)}\\s*\\{`).exec(css);
@@ -49,7 +58,7 @@ export function hslIn(
  * still read as different brightnesses, so an "is each plane brighter than the one
  * below" assertion made on HSL L would be measuring the wrong thing.
  */
-export function hexLightnessIn(css: string, token: string): number {
+export function hexRelativeLuminanceIn(css: string, token: string): number {
   const m = css.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`));
   if (!m) throw new Error(`missing surface --${token}`);
   const hex = m[1];
