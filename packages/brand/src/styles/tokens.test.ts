@@ -50,6 +50,13 @@ describe("canonical dark spine", () => {
     ).toBeGreaterThanOrEqual(3);
   });
 
+  it("defines the accent-TEXT token a named theme is forbidden from recoloring", () => {
+    // named-themes.test.ts asserts no named theme overrides --accent-text. That
+    // assertion is only meaningful if the base spine actually defines it.
+    expect(DARK).toContain("--accent-text:");
+    expect(LIGHT).toContain("--accent-text:");
+  });
+
   it("steps canvas -> card -> nested -> overlay monotonically upward", () => {
     const ladder = [
       "md3-surface",
