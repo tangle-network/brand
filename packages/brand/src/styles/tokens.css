@@ -1,5 +1,14 @@
-/* Tangle Sandbox UI design tokens */
-/* Brand: warm purple palette, #5B4ED4 primary */
+/* Tangle design tokens — the single palette every Tangle surface renders from.
+ *
+ * The surface ladder carries an indigo cast and steps in even ~4-5% lightness
+ * increments, so a card, a nested panel and an overlay each read as a distinct
+ * plane by their own fill. A flat, desaturated ladder forces separation onto
+ * borders instead, which is what makes an app read as grey and washed out.
+ * Light mirrors it: white paper on a tinted canvas, never white-on-white.
+ *
+ * Apps consume this spine as-is. If a product needs its own accent identity,
+ * add a named theme in named-themes.css (`data-theme="<name>"`) — do NOT re-declare
+ * these tokens in the app, or its surfaces silently stop tracking the brand. */
 
 /* MD3 surface hierarchy */
 /* Dark is the default theme (`:root`/`[data-sandbox-ui]`). It also responds to
@@ -9,15 +18,15 @@
 [data-sandbox-ui],
 [data-theme="dark"],
 .dark {
-  --md3-surface: #16161f;
-  --md3-surface-dim: #111119;
-  --md3-surface-bright: #2a2940;
-  --md3-surface-container-lowest: #101017;
-  --md3-surface-container-low: #16161f;
-  --md3-surface-container: #1c1b27;
-  --md3-surface-container-high: #232231;
-  --md3-surface-container-highest: #2c2b3d;
-  --md3-surface-variant: #2c2b3d;
+  --md3-surface: #0a0a14;                   /* L0 page canvas */
+  --md3-surface-dim: #060610;               /* recessed page */
+  --md3-surface-bright: #232238;
+  --md3-surface-container-lowest: #050509;  /* L-1 terminal/code well */
+  --md3-surface-container-low: #12111f;     /* L1 chrome, field wells */
+  --md3-surface-container: #191826;         /* L2 resting card */
+  --md3-surface-container-high: #221f33;    /* L3 nested / hover */
+  --md3-surface-container-highest: #2c2942; /* L4 overlay */
+  --md3-surface-variant: #2c2942;
   --md3-on-surface: #fdfdfd;
   --md3-on-surface-variant: #aaa8b8;
 
@@ -37,7 +46,7 @@
 
   --md3-tertiary: #10B981;
   --md3-outline: #4a4965;
-  --md3-outline-variant: #34324a;
+  --md3-outline-variant: #2a293d;
 
   --md3-error: #ff5277;
   --md3-error-dim: #eb2855;
@@ -50,25 +59,27 @@
   --md3-inverse-on-surface: #000000;
   --md3-surface-tint: #818CF8;
 
-  /* Semantic HSL bridge — flat neutral spine (Tangle Quiet) */
-  --hsl-background: 240 7% 9%;     /* #15151a canvas — lifted off pure black */
+  /* Semantic HSL bridge — the indigo-cast surface ladder */
+  --hsl-background: 240 33% 6%;     /* L0 canvas #0a0a14 */
   --hsl-foreground: 240 6% 93%;    /* #ececee */
-  --hsl-card: 240 5% 13%;          /* #1f1f23 surface, clearly above canvas */
+  --hsl-card: 244 23% 12%;          /* L2 card #191826 */
   --hsl-card-foreground: 240 6% 93%;
-  --hsl-popover: 240 5% 17%;       /* #28282d elevated */
+  --hsl-popover: 247 23% 21%;       /* L4 overlay #2c2942 */
   --hsl-popover-foreground: 240 6% 93%;
   --hsl-primary: 239 84% 62%;
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 5% 15%;     /* #242428 surface-2 */
+  --hsl-secondary: 249 24% 16%;     /* L3 #221f33 */
   --hsl-secondary-foreground: 240 6% 93%;
-  --hsl-muted: 240 5% 15%;         /* #242428 — neutral hover well */
-  --hsl-muted-foreground: 240 4% 64%;  /* #9c9ca6 text-muted */
-  --hsl-accent: 240 5% 15%;        /* neutral hover (indigo lives in accent-surface-strong) */
+  --hsl-muted: 249 24% 16%;         /* L3 hover well */
+  --hsl-muted-foreground: 240 5% 68%;  /* #a9a9b1 — high enough that the
+     reduced-opacity caption derivatives (/70, /60) still clear the large-text
+     contrast floor against the L2 card. */
+  --hsl-accent: 249 24% 16%;        /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 240 6% 93%;
   --hsl-destructive: 348 74% 48%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 240 5% 16%;        /* soft edge — fill carries separation, not the line */
-  --hsl-input: 240 5% 15%;
+  --hsl-border: 243 19.6% 20%;      /* #2a293d = --md3-outline-variant */
+  --hsl-input: 244 29% 9%;          /* recessed field well #12111f */
   --hsl-ring: 239 84% 67%;
   --hsl-success: 160 84% 39%;
   --hsl-warning: 40 94% 56%;
@@ -92,6 +103,11 @@
   --destructive: var(--hsl-destructive);
   --destructive-foreground: var(--hsl-destructive-foreground);
   --border: var(--hsl-border);
+  /* shadcn's `--input` is the input BORDER and the Switch's off-track — a
+   * mid-tone that has to stay visible AGAINST a surface. It is deliberately NOT
+   * the field fill: pointing it at the recessed well would tint a border and a
+   * track the same color as the plane behind them, and both would vanish. The
+   * field fill is --hsl-input / --bg-input below. */
   --input: var(--hsl-muted-foreground);
   --ring: var(--hsl-ring);
   --success: var(--hsl-success);
@@ -99,21 +115,22 @@
   --error: var(--hsl-destructive);
   --info: var(--hsl-info);
 
-  /* Sidebar tokens — flat surface + hairline */
-  --sidebar-background: 240 6% 11%;  /* #1a1a1f surface */
+  /* Sidebar tokens — L1 chrome: one step ABOVE the canvas in lightness, so the
+   * panel reads as its own plane rather than a hole in the page. */
+  --sidebar-background: 244 29% 9%;  /* L1 chrome #12111f */
   --sidebar-foreground: 240 6% 93%;
   --sidebar-primary: 239 84% 67%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 15%;      /* neutral hover */
+  --sidebar-accent: 249 24% 16%;     /* L3 hover well */
   --sidebar-accent-foreground: 240 6% 93%;
-  --sidebar-border: 240 5% 16%;      /* soft edge */
+  --sidebar-border: 243 19.6% 20%;   /* = --md3-outline-variant */
   --sidebar-ring: 239 84% 67%;
 
-  /* Depth scale — flat neutral spine (Tangle Quiet) */
-  --depth-1: #15151a;
-  --depth-2: #1f1f23;
-  --depth-3: #26262b;
-  --depth-4: #2e2e34;
+  /* Depth scale — tracks the MD3 ladder (canvas / card / nested / overlay) */
+  --depth-1: #0a0a14;
+  --depth-2: #191826;
+  --depth-3: #221f33;
+  --depth-4: #2c2942;
 
   /* Status colors */
   --status-running: #10B981;
@@ -157,7 +174,7 @@
   --glass-border-hover: var(--border-default);
   --glass-blur: 0px;
 
-  /* Mesh glows — quieted to off; chrome is flat in Tangle Quiet */
+  /* Mesh glows — off; depth comes from the ladder, not from glow */
   --mesh-teal: transparent;
   --mesh-violet: transparent;
   --mesh-blue: transparent;
@@ -171,13 +188,13 @@
   --accent-surface-strong: rgba(129, 140, 248, 0.14);
   --accent-text: #b9bffb;
 
-  /* Surfaces — flat single-neutral (no radial mesh) */
-  --bg-root: #15151a;
+  /* Surfaces — solid fills off the ladder (no radial mesh) */
+  --bg-root: #0a0a14;
   --bg-dark: var(--depth-1);
   --bg-card: var(--depth-2);
   --bg-elevated: var(--depth-4);
   --bg-section: var(--depth-1);
-  --bg-input: var(--depth-3);
+  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
   --bg-hover: rgba(255, 255, 255, 0.04);
   --bg-selection: rgba(129, 140, 248, 0.14);
 
@@ -319,15 +336,21 @@
   /* Light theme — clean professional, warm purple accents */
 
   /* MD3 surface hierarchy */
-  --md3-surface: #f8f9fb;
-  --md3-surface-dim: #d9dae0;
-  --md3-surface-bright: #f8f9fb;
-  --md3-surface-container-lowest: #ffffff;
-  --md3-surface-container-low: #f3f4f7;
-  --md3-surface-container: #edeef2;
-  --md3-surface-container-high: #e7e8ed;
-  --md3-surface-container-highest: #e1e2e8;
-  --md3-surface-variant: #e1e2e8;
+  /* The light ladder ALTERNATES; it is not monotonic, and that is deliberate.
+   * On a tinted canvas, a raised plane is PAPER (white) and a recessed one is a
+   * tinted WELL. So card and overlay are both white and separate from each other
+   * by shadow and ring, not by fill — which is how light-mode elevation actually
+   * reads. Forcing a strictly-darkening ladder here is what produced the
+   * white-on-white flatness this palette replaced. Pinned in tokens.test.ts. */
+  --md3-surface: #eceef3;                   /* L0 page canvas — tinted */
+  --md3-surface-dim: #dcdee6;
+  --md3-surface-bright: #ffffff;
+  --md3-surface-container-lowest: #ffffff;  /* insets read as paper */
+  --md3-surface-container-low: #f6f7fa;     /* L1 chrome, field wells — well */
+  --md3-surface-container: #ffffff;         /* L2 resting card — paper */
+  --md3-surface-container-high: #f1f2f7;    /* L3 nested / hover — well */
+  --md3-surface-container-highest: #ffffff; /* L4 overlay — paper + shadow */
+  --md3-surface-variant: #f1f2f7;
   --md3-on-surface: #191c24;
   --md3-on-surface-variant: #464858;
 
@@ -361,34 +384,37 @@
   --md3-inverse-on-surface: #f0f1f4;
   --md3-surface-tint: #6366F1;
 
-  /* Semantic HSL bridge — flat neutral light (Tangle Quiet) */
-  --hsl-background: 0 0% 100%;      /* #ffffff */
+  /* Semantic HSL bridge — white paper on a tinted canvas */
+  --hsl-background: 223 23% 94%;    /* L0 canvas #eceef3 */
   --hsl-foreground: 0 0% 5%;        /* #0d0d0d */
-  --hsl-card: 240 7% 97%;           /* #f7f7f8 surface */
+  --hsl-card: 0 0% 100%;            /* L2 card = white paper */
   --hsl-card-foreground: 0 0% 5%;
   --hsl-popover: 0 0% 100%;
   --hsl-popover-foreground: 0 0% 5%;
   --hsl-primary: 245 62% 57%;       /* #5B4ED4 light accent */
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 6% 93%;      /* #ececee surface-2 */
+  --hsl-secondary: 230 27% 96%;     /* L3 #f1f2f7 */
   --hsl-secondary-foreground: 0 0% 10%;
-  --hsl-muted: 240 6% 93%;          /* #ececee neutral hover */
+  --hsl-muted: 230 27% 96%;         /* L3 hover well */
   --hsl-muted-foreground: 240 5% 38%;  /* #5d5d66 text-muted */
-  --hsl-accent: 240 6% 93%;         /* neutral hover */
+  --hsl-accent: 230 27% 96%;        /* neutral hover */
   --hsl-accent-foreground: 0 0% 10%;
   --hsl-destructive: 0 72% 41%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 240 6% 89%;         /* hairline ≈ rgba(0,0,0,0.08) */
-  --hsl-input: 240 6% 89%;
+  --hsl-border: 244 16.3% 80.8%;    /* #c7c6d6 = --md3-outline-variant */
+  --hsl-input: 225 29% 97%;         /* field well #f6f7fa */
   --hsl-ring: 245 62% 57%;
   --hsl-success: 160 84% 30%;
   --hsl-warning: 41 96% 50%;
   --hsl-info: 212 80% 50%;
 
-  --depth-1: #ffffff;
-  --depth-2: #f7f7f8;
-  --depth-3: #ececee;
-  --depth-4: #e3e3e6;
+  /* depth-2 (card) and depth-4 (elevated) are BOTH paper, on purpose: in light,
+   * a popover does not out-lighten a white card — it lifts by shadow. See the
+   * ladder note above. */
+  --depth-1: #eceef3;  /* canvas */
+  --depth-2: #ffffff;  /* card — paper */
+  --depth-3: #f1f2f7;  /* nested well */
+  --depth-4: #ffffff;  /* elevated — paper, separated by shadow */
 
   --status-running: #059669;
   --status-creating: #3E349E;
@@ -430,13 +456,13 @@
   --surface-neutral-text: var(--text-muted);
 
   /* Sidebar — light, flat surface + hairline */
-  --sidebar-background: 240 7% 97%;   /* #f7f7f8 surface */
+  --sidebar-background: 0 0% 100%;     /* white paper */
   --sidebar-foreground: 0 0% 5%;
   --sidebar-primary: 245 62% 57%;     /* #5B4ED4 */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 6% 93%;       /* neutral hover */
+  --sidebar-accent: 230 27% 96%;       /* L3 hover well */
   --sidebar-accent-foreground: 0 0% 10%;
-  --sidebar-border: 240 6% 89%;       /* hairline */
+  --sidebar-border: 244 16.3% 80.8%;   /* = --md3-outline-variant */
   --sidebar-ring: 245 62% 57%;
 
   --mesh-teal: transparent;
@@ -444,12 +470,17 @@
   --mesh-blue: transparent;
 
   /* Surfaces — flat single-neutral light */
-  --bg-root: #ffffff;
-  --bg-dark: #f7f7f8;
-  --bg-card: #f7f7f8;
-  --bg-elevated: #ffffff;
-  --bg-section: #f7f7f8;
-  --bg-input: #ececee;
+  --bg-root: #eceef3;
+  --bg-dark: var(--depth-1);
+  --bg-card: var(--depth-2);
+  /* Paper, exactly like --bg-card: in light you cannot raise a plane by making it
+   * lighter than white, so an overlay lifts by SHADOW. A consumer that fills with
+   * --bg-elevated and applies no shadow gets no separation from a card — that is
+   * the contract, not an oversight (--hsl-popover is white for the same reason).
+   * Pair it with --shadow-dropdown. */
+  --bg-elevated: var(--depth-4);
+  --bg-section: var(--depth-1);
+  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-selection: rgba(91, 78, 212, 0.10);
 

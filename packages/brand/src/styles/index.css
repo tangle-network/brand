@@ -7,5 +7,5 @@
 
 @import "./tokens.css";
 @import "./theme.css";
-@import "./themes.css";
+@import "./named-themes.css";
 @import "./globals.css";
