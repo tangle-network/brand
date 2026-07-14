@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn } from "./themes.test";
+import { blockIn, hexLightnessIn, hslIn } from "./css-test-utils";
 
 /**
  * The canonical spine's structural contract.
@@ -9,9 +9,9 @@ import { blockIn } from "./themes.test";
  * The whole point of this palette is that a surface separates from the one below
  * it by its own FILL. A flat, desaturated ladder pushes that job onto borders,
  * and the app reads grey and washed out — which is the state this replaced. The
- * numbers are therefore not decoration; they are the contract, and these
- * assertions pin the properties rather than the exact values, so a retune is
- * free but a collapse back to flat is not.
+ * numbers are therefore not decoration; they are the contract. These assertions
+ * pin the PROPERTIES rather than the exact values, so a retune stays free but a
+ * collapse back to flat does not.
  */
 const tokens = readFileSync(
   path.resolve(import.meta.dirname, "tokens.css"),
@@ -24,42 +24,23 @@ const tokens = readFileSync(
 const DARK = blockIn(tokens, ".dark");
 const LIGHT = blockIn(tokens, ".light");
 
-function hsl(css: string, token: string): { h: number; s: number; l: number } {
-  const m = css.match(
-    new RegExp(
-      `--${token}:\\s*(\\d+(?:\\.\\d+)?)\\s+(\\d+(?:\\.\\d+)?)%\\s+(\\d+(?:\\.\\d+)?)%`,
-    ),
-  );
-  if (!m) throw new Error(`missing HSL slot --${token}`);
-  return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
-}
-
-function hexLightness(css: string, token: string): number {
-  const m = css.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`));
-  if (!m) throw new Error(`missing surface --${token}`);
-  const hex = m[1];
-  const [r, g, b] = [1, 3, 5].map(
-    (i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255,
-  );
-  return (Math.max(r, g, b) + Math.min(r, g, b)) / 2;
-}
-
 describe("canonical dark spine", () => {
   it("is indigo-cast, not grey — the canvas carries real saturation", () => {
-    const bg = hsl(DARK, "hsl-background");
+    const bg = hslIn(DARK, "hsl-background");
     expect(bg.h, "canvas hue sits in the indigo band").toBeGreaterThanOrEqual(
       235,
     );
     expect(bg.h).toBeLessThanOrEqual(250);
     // The flat spine this replaced sat at 7%. Anything near that reads grey.
-    expect(bg.s, "a desaturated canvas is the bug, not the design").toBeGreaterThan(
-      20,
-    );
+    expect(
+      bg.s,
+      "a desaturated canvas is the bug, not the design",
+    ).toBeGreaterThan(20);
   });
 
   it("lifts the card off the canvas by fill, not by border", () => {
-    const canvas = hsl(DARK, "hsl-background");
-    const card = hsl(DARK, "hsl-card");
+    const canvas = hslIn(DARK, "hsl-background");
+    const card = hslIn(DARK, "hsl-card");
     expect(card.l, "the card must be lighter than the canvas").toBeGreaterThan(
       canvas.l,
     );
@@ -75,7 +56,7 @@ describe("canonical dark spine", () => {
       "md3-surface-container",
       "md3-surface-container-high",
       "md3-surface-container-highest",
-    ].map((t) => hexLightness(DARK, t));
+    ].map((t) => hexLightnessIn(DARK, t));
     for (let i = 1; i < ladder.length; i++) {
       expect(
         ladder[i],
@@ -87,15 +68,46 @@ describe("canonical dark spine", () => {
 
 describe("canonical light spine", () => {
   it("is white paper on a TINTED canvas, never white-on-white", () => {
-    const canvas = hsl(LIGHT, "hsl-background");
-    const card = hsl(LIGHT, "hsl-card");
+    const canvas = hslIn(LIGHT, "hsl-background");
+    const card = hslIn(LIGHT, "hsl-card");
     expect(card.l, "the card is paper").toBe(100);
     expect(
       canvas.l,
       "a pure-white canvas gives a white card nothing to lift off",
     ).toBeLessThan(97);
-    expect(canvas.s, "the canvas carries a tint, not flat grey").toBeGreaterThan(
-      10,
+    expect(
+      canvas.s,
+      "the canvas carries a tint, not flat grey",
+    ).toBeGreaterThan(10);
+  });
+
+  it("ALTERNATES paper and well — light elevation is not a darkening ramp", () => {
+    // Deliberately not monotonic. On a tinted canvas a raised plane is paper and
+    // a recessed one is a tinted well, so the ladder alternates. Pinning it stops
+    // a well-meaning "fix" from forcing a strictly-ordered ramp, which is exactly
+    // what produced the white-on-white flatness this palette replaced.
+    const paper = ["md3-surface-container", "md3-surface-container-highest"];
+    const wells = ["md3-surface-container-low", "md3-surface-container-high"];
+    const canvas = hexLightnessIn(LIGHT, "md3-surface");
+
+    for (const t of paper) {
+      expect(hexLightnessIn(LIGHT, t), `${t} is paper`).toBe(1);
+    }
+    for (const t of wells) {
+      const l = hexLightnessIn(LIGHT, t);
+      expect(l, `${t} is a well — below paper`).toBeLessThan(1);
+      expect(l, `${t} still sits above the canvas`).toBeGreaterThan(canvas);
+    }
+  });
+
+  it("lets the overlay share the card's fill — it lifts by shadow, not lightness", () => {
+    // `--bg-card` (depth-2) and `--bg-elevated` (depth-4) are both paper by design;
+    // the semantic layer agrees (--hsl-card and --hsl-popover are both white). The
+    // separation is the shadow, so a shadow token must exist to carry it.
+    expect(hexLightnessIn(LIGHT, "depth-2")).toBe(1);
+    expect(hexLightnessIn(LIGHT, "depth-4")).toBe(1);
+    expect(LIGHT, "the overlay's separation depends on this").toMatch(
+      /--shadow-dropdown:/,
     );
   });
 

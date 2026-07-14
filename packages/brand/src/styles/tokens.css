@@ -330,13 +330,19 @@
   /* Light theme — clean professional, warm purple accents */
 
   /* MD3 surface hierarchy */
-  --md3-surface: #eceef3;                   /* L0 page canvas */
+  /* The light ladder ALTERNATES; it is not monotonic, and that is deliberate.
+   * On a tinted canvas, a raised plane is PAPER (white) and a recessed one is a
+   * tinted WELL. So card and overlay are both white and separate from each other
+   * by shadow and ring, not by fill — which is how light-mode elevation actually
+   * reads. Forcing a strictly-darkening ladder here is what produced the
+   * white-on-white flatness this palette replaced. Pinned in tokens.test.ts. */
+  --md3-surface: #eceef3;                   /* L0 page canvas — tinted */
   --md3-surface-dim: #dcdee6;
   --md3-surface-bright: #ffffff;
   --md3-surface-container-lowest: #ffffff;  /* insets read as paper */
-  --md3-surface-container-low: #f6f7fa;     /* L1 chrome, field wells */
+  --md3-surface-container-low: #f6f7fa;     /* L1 chrome, field wells — well */
   --md3-surface-container: #ffffff;         /* L2 resting card — paper */
-  --md3-surface-container-high: #f1f2f7;    /* L3 nested / hover */
+  --md3-surface-container-high: #f1f2f7;    /* L3 nested / hover — well */
   --md3-surface-container-highest: #ffffff; /* L4 overlay — paper + shadow */
   --md3-surface-variant: #f1f2f7;
   --md3-on-surface: #191c24;
@@ -396,10 +402,13 @@
   --hsl-warning: 41 96% 50%;
   --hsl-info: 212 80% 50%;
 
-  --depth-1: #eceef3;
-  --depth-2: #ffffff;
-  --depth-3: #f1f2f7;
-  --depth-4: #ffffff;
+  /* depth-2 (card) and depth-4 (elevated) are BOTH paper, on purpose: in light,
+   * a popover does not out-lighten a white card — it lifts by shadow. See the
+   * ladder note above. */
+  --depth-1: #eceef3;  /* canvas */
+  --depth-2: #ffffff;  /* card — paper */
+  --depth-3: #f1f2f7;  /* nested well */
+  --depth-4: #ffffff;  /* elevated — paper, separated by shadow */
 
   --status-running: #059669;
   --status-creating: #3E349E;

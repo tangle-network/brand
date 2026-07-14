@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { blockIn } from "./css-test-utils";
 
 /**
  * The named-theme contract.
@@ -15,23 +16,6 @@ const themes = readFileSync(
   path.resolve(import.meta.dirname, "themes.css"),
   "utf8",
 );
-
-export function blockIn(css: string, selector: string): string {
-  // Tolerate any whitespace between selector and brace — a formatter that
-  // closes the gap must not turn a passing suite into a "missing block" error.
-  const open = new RegExp(`${selector.replace(/[.[\]"=]/g, "\\$&")}\\s*\\{`).exec(
-    css,
-  );
-  if (!open) throw new Error(`missing theme block: ${selector}`);
-  const start = open.index;
-  // Find the block's real end. A bare `indexOf("\n}")` returns -1 when the brace
-  // is indented, and `slice(start, -1)` would then hand back nearly the whole
-  // stylesheet — assertions would pass or fail against the wrong text instead of
-  // failing loudly. Match the closing brace at any indent, and throw if absent.
-  const close = /\n[ \t]*\}/.exec(css.slice(start));
-  if (!close) throw new Error(`unterminated theme block: ${selector}`);
-  return css.slice(start, start + close.index);
-}
 
 function block(selector: string): string {
   return blockIn(themes, selector);
