@@ -103,6 +103,11 @@
   --destructive: var(--hsl-destructive);
   --destructive-foreground: var(--hsl-destructive-foreground);
   --border: var(--hsl-border);
+  /* shadcn's `--input` is the input BORDER and the Switch's off-track — a
+   * mid-tone that has to stay visible AGAINST a surface. It is deliberately NOT
+   * the field fill: pointing it at the recessed well would tint a border and a
+   * track the same color as the plane behind them, and both would vanish. The
+   * field fill is --hsl-input / --bg-input below. */
   --input: var(--hsl-muted-foreground);
   --ring: var(--hsl-ring);
   --success: var(--hsl-success);
@@ -188,7 +193,7 @@
   --bg-card: var(--depth-2);
   --bg-elevated: var(--depth-4);
   --bg-section: var(--depth-1);
-  --bg-input: var(--md3-surface-container-low);
+  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
   --bg-hover: rgba(255, 255, 255, 0.04);
   --bg-selection: rgba(129, 140, 248, 0.14);
 
@@ -469,7 +474,7 @@
   --bg-card: var(--depth-2);
   --bg-elevated: var(--depth-4);
   --bg-section: var(--depth-1);
-  --bg-input: var(--md3-surface-container-low);
+  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-selection: rgba(91, 78, 212, 0.10);
 

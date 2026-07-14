@@ -66,6 +66,33 @@ describe("canonical dark spine", () => {
   });
 });
 
+describe("input tokens carry two DIFFERENT roles and must not be conflated", () => {
+  // `--input` is shadcn's input BORDER and the Switch off-track: a mid-tone that
+  // must stay visible AGAINST a surface. `--hsl-input` / `--bg-input` are the
+  // recessed field FILL. Pointing `--input` at the fill is a tempting-looking
+  // "fix" that makes every input border and every off-state switch track vanish
+  // into the plane behind it — a legibility bug with no error and no visual clue
+  // beyond "the toggle disappeared". Pinned so it can't happen quietly.
+  it("--input is the border/track token, not the field fill", () => {
+    // The shadcn alias layer is declared ONCE and re-resolves per theme through
+    // the --hsl-* spine, so this is asserted on the file rather than per scope.
+    expect(tokens).toMatch(/--input:\s*var\(--hsl-muted-foreground\)/);
+    expect(
+      tokens,
+      "--input must not resolve to the field well — input borders and off-state switch tracks would disappear into the plane behind them",
+    ).not.toMatch(/--input:\s*var\(--hsl-input\)/);
+  });
+
+  for (const [name, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    it(`${name}: the field fill is single-sourced from --hsl-input`, () => {
+      expect(spine).toMatch(/--bg-input:\s*hsl\(var\(--hsl-input\)\)/);
+    });
+  }
+});
+
 describe("canonical light spine", () => {
   it("is white paper on a TINTED canvas, never white-on-white", () => {
     const canvas = hslIn(LIGHT, "hsl-background");
@@ -109,6 +136,14 @@ describe("canonical light spine", () => {
     expect(LIGHT, "the overlay's separation depends on this").toMatch(
       /--shadow-dropdown:/,
     );
+  });
+
+  it("keeps the light canvas single-sourced — --depth-1 and --md3-surface agree", () => {
+    // Both are the L0 page canvas. Two hex literals for one plane is a divergence
+    // waiting to happen the next time one of them is retuned.
+    const canvasHex = (token: string) =>
+      LIGHT.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
+    expect(canvasHex("depth-1")).toBe(canvasHex("md3-surface"));
   });
 
   it("keeps the derived --bg-* surfaces on the ladder", () => {
