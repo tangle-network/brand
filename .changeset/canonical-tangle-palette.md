@@ -9,3 +9,5 @@ The `:root` spine was a flat, desaturated neutral. Every product app overrode it
 Both themes now ship the ladder the products actually converged on: an indigo-cast dark scale stepped in even ~4-5% lightness increments, and a light scale of white paper on a tinted canvas rather than white-on-white. Surfaces, depth scale, sidebar and `--bg-root` all move together so the ladder stays coherent.
 
 Visual change for every consumer. Apps that were overriding the spine should delete those overrides; apps that were inheriting it get the branded look with no code change.
+
+Also adds `[data-theme="intelligence"]` to `themes.css` — the violet surface ramp that app previously hand-wrote — and exports `./styles/themes.css` so named themes can actually be imported (they were shipped but unreachable). A named theme re-skins surfaces only; the Tangle accent stays put.

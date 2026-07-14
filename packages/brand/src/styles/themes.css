@@ -187,3 +187,52 @@
   --brand-primary: #6366f1; --brand-glow: #818cf8;
   --text-primary: #15131f; --text-secondary: #3f3a52; --text-muted: #6a6680; --text-dim: #9490a6;
 }
+
+/* ───────────────────── Intelligence — violet surface ramp ────────────────────
+ * A violet retint of the surface ladder (hue ~260-265, saturation tapering as
+ * lightness rises) — dark only. The brand indigo primary / ring / accent-text
+ * are deliberately NOT overridden: the accent stays Tangle, only the surfaces
+ * carry the product's identity. Apply with data-theme="intelligence" on <html>
+ * alongside the `.dark` class (which drives the app's `dark:` utilities). */
+[data-theme="intelligence"] {
+  --md3-surface: #0d0a10;
+  --md3-surface-dim: #0a080d;
+  --md3-surface-bright: #2e2936;
+  --md3-surface-container-lowest: #070509;
+  --md3-surface-container-low: #100d15;
+  --md3-surface-container: #14111a;
+  --md3-surface-container-high: #1b1821;
+  --md3-surface-container-highest: #24202b;
+  --md3-surface-variant: #24202b;
+  --md3-on-surface-variant: #aaa6bb;
+
+  --hsl-background: 262 24% 5%;
+  --hsl-card: 262 19% 11%;
+  --hsl-popover: 260 16% 13%;
+  --hsl-secondary: 262 15% 18%;
+  --hsl-muted: 262 17% 15%;
+  --hsl-muted-foreground: 255 12% 62%;
+  --hsl-accent: 262 15% 20%;
+  --hsl-border: 262 12% 28%;
+  --hsl-input: 260 14% 16%;
+
+  /* seated a touch deeper than the canvas so the panel reads as a base plane */
+  --sidebar-background: 264 26% 4%;
+  --sidebar-accent: 262 16% 16%;
+  --sidebar-border: 262 12% 13%;
+
+  --depth-1: #0e0b13;
+  --depth-2: #16131c;
+  --depth-3: #201c28;
+  --depth-4: #2a2533;
+  --bg-elevated: hsl(262 17% 15%);
+  --bg-section: hsl(262 22% 7%);
+  --bg-root:
+    radial-gradient(ellipse 70% 50% at 20% 0%, rgba(129, 99, 241, 0.08), transparent),
+    radial-gradient(ellipse 50% 40% at 80% 10%, rgba(129, 140, 248, 0.06), transparent),
+    linear-gradient(180deg, var(--depth-1), #0d0a12 100%);
+
+  --border-subtle: rgba(120, 108, 158, 0.1);
+  --border-default: rgba(120, 108, 158, 0.18);
+  --border-hover: rgba(120, 108, 158, 0.28);
+}
