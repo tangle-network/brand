@@ -13,7 +13,7 @@ import { blockIn, hslIn } from "./css-test-utils";
  * is only to opt in.
  */
 const themes = readFileSync(
-  path.resolve(import.meta.dirname, "themes.css"),
+  path.resolve(import.meta.dirname, "named-themes.css"),
   "utf8",
 );
 

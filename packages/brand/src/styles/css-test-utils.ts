@@ -6,13 +6,16 @@
  * importing file's context.
  */
 
+/** Escape every regex metacharacter, so a selector is matched literally. */
+function escapeRegex(literal: string): string {
+  return literal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Extract a rule's body by selector, tolerant of formatting. */
 export function blockIn(css: string, selector: string): string {
   // Tolerate any whitespace between selector and brace — a formatter that closes
   // the gap must not turn a passing suite into a "missing block" error.
-  const open = new RegExp(`${selector.replace(/[.[\]"=]/g, "\\$&")}\\s*\\{`).exec(
-    css,
-  );
+  const open = new RegExp(`${escapeRegex(selector)}\\s*\\{`).exec(css);
   if (!open) throw new Error(`missing theme block: ${selector}`);
   const start = open.index;
   // Find the block's real end. A bare `indexOf("\n}")` returns -1 when the brace
@@ -38,7 +41,14 @@ export function hslIn(
   return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
 }
 
-/** Read a `#rrggbb` surface token as a 0-1 lightness. */
+/**
+ * Read a `#rrggbb` surface token as WCAG relative luminance (0-1).
+ *
+ * Relative luminance, not HSL lightness: the ladder varies hue and saturation as
+ * it rises, and HSL L is not perceptually uniform — two steps can share an L and
+ * still read as different brightnesses, so an "is each plane brighter than the one
+ * below" assertion made on HSL L would be measuring the wrong thing.
+ */
 export function hexLightnessIn(css: string, token: string): number {
   const m = css.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`));
   if (!m) throw new Error(`missing surface --${token}`);
@@ -46,5 +56,7 @@ export function hexLightnessIn(css: string, token: string): number {
   const [r, g, b] = [1, 3, 5].map(
     (i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255,
   );
-  return (Math.max(r, g, b) + Math.min(r, g, b)) / 2;
+  const lin = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }

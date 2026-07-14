@@ -7,7 +7,7 @@
  * Light mirrors it: white paper on a tinted canvas, never white-on-white.
  *
  * Apps consume this spine as-is. If a product needs its own accent identity,
- * add a named theme in themes.css (`data-theme="<name>"`) — do NOT re-declare
+ * add a named theme in named-themes.css (`data-theme="<name>"`) — do NOT re-declare
  * these tokens in the app, or its surfaces silently stop tracking the brand. */
 
 /* MD3 surface hierarchy */
