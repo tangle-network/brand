@@ -16,15 +16,25 @@ const themes = readFileSync(
   "utf8",
 );
 
-function block(selector: string): string {
+export function blockIn(css: string, selector: string): string {
   // Tolerate any whitespace between selector and brace — a formatter that
   // closes the gap must not turn a passing suite into a "missing block" error.
-  const open = new RegExp(
-    `${selector.replace(/[.[\]"=]/g, "\\$&")}\\s*\\{`,
-  ).exec(themes);
+  const open = new RegExp(`${selector.replace(/[.[\]"=]/g, "\\$&")}\\s*\\{`).exec(
+    css,
+  );
   if (!open) throw new Error(`missing theme block: ${selector}`);
   const start = open.index;
-  return themes.slice(start, themes.indexOf("\n}", start));
+  // Find the block's real end. A bare `indexOf("\n}")` returns -1 when the brace
+  // is indented, and `slice(start, -1)` would then hand back nearly the whole
+  // stylesheet — assertions would pass or fail against the wrong text instead of
+  // failing loudly. Match the closing brace at any indent, and throw if absent.
+  const close = /\n[ \t]*\}/.exec(css.slice(start));
+  if (!close) throw new Error(`unterminated theme block: ${selector}`);
+  return css.slice(start, start + close.index);
+}
+
+function block(selector: string): string {
+  return blockIn(themes, selector);
 }
 
 /** brand HSL slots are stored as "<H> <S>% <L>%". */
