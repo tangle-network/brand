@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn } from "./css-test-utils";
+import { blockIn, hslIn } from "./css-test-utils";
 
 /**
  * The named-theme contract.
@@ -21,21 +21,12 @@ function block(selector: string): string {
   return blockIn(themes, selector);
 }
 
-/** brand HSL slots are stored as "<H> <S>% <L>%". */
-function hsl(css: string, token: string): { h: number; s: number; l: number } {
-  const m = css.match(
-    new RegExp(`--${token}:\\s*(\\d+(?:\\.\\d+)?)\\s+(\\d+(?:\\.\\d+)?)%\\s+(\\d+(?:\\.\\d+)?)%`),
-  );
-  if (!m) throw new Error(`missing HSL slot --${token}`);
-  return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
-}
-
 describe('named theme: .dark[data-theme="intelligence"]', () => {
   const css = block('.dark[data-theme="intelligence"]');
 
   it("retints the surface canvas to violet", () => {
     for (const token of ["background", "card", "popover", "muted", "border"]) {
-      const { h } = hsl(css, `hsl-${token}`);
+      const { h } = hslIn(css, `hsl-${token}`);
       expect(h, `--hsl-${token} hue`).toBeGreaterThanOrEqual(255);
       expect(h, `--hsl-${token} hue`).toBeLessThanOrEqual(268);
     }
@@ -43,7 +34,7 @@ describe('named theme: .dark[data-theme="intelligence"]', () => {
 
   it("reads as graded depth, not mud: lightness rises, saturation tapers, hue locked", () => {
     const ladder = ["hsl-background", "hsl-card", "hsl-secondary"].map((t) =>
-      hsl(css, t),
+      hslIn(css, t),
     );
     for (let i = 1; i < ladder.length; i++) {
       expect(ladder[i].l, `step ${i} lightness must rise`).toBeGreaterThan(
@@ -68,9 +59,13 @@ describe('named theme: .dark[data-theme="intelligence"]', () => {
     // An unscoped `[data-theme="intelligence"]` would repaint every surface with
     // the violet dark ramp if a consumer left the attribute on while switching to
     // light. The `.dark` requirement makes that impossible.
-    expect(themes).toContain('.dark[data-theme="intelligence"]');
-    expect(themes).not.toMatch(/(?<!\.dark)\[data-theme="intelligence"\]/);
+    //
+    // Checked against the RULES, not the raw file: prose in a comment may well
+    // spell the selector out, and a doc edit must not be able to fail this.
+    const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(rules).toContain('.dark[data-theme="intelligence"]');
+    expect(rules).not.toMatch(/(?<!\.dark)\[data-theme="intelligence"\]/);
     // No light variant: light falls through to brand's canonical light spine.
-    expect(themes).not.toContain('[data-theme="intelligence-light"]');
+    expect(rules).not.toContain('[data-theme="intelligence-light"]');
   });
 });
