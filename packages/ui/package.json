@@ -134,18 +134,24 @@
   },
   "peerDependencies": {
     "@tangle-network/brand": "workspace:^",
+    "@hocuspocus/provider": ">=2.15.0 <5.0.0",
+    "@nanostores/react": ">=0.8.4 <2.0.0",
+    "@tiptap/core": ">=3.20.4 <4.0.0",
+    "@tiptap/extension-collaboration": ">=3.20.4 <4.0.0",
+    "@tiptap/extension-collaboration-caret": ">=3.7.0 <4.0.0",
+    "@tiptap/react": ">=3.20.4 <4.0.0",
+    "@tiptap/starter-kit": ">=3.20.4 <4.0.0",
+    "nanostores": ">=0.11.3 <2.0.0",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19",
-    "react-router": "^7"
+    "react-router": "^7",
+    "yjs": "^13.6.0"
   },
   "peerDependenciesMeta": {
     "@nanostores/react": {
       "optional": true
     },
     "nanostores": {
-      "optional": true
-    },
-    "@tanstack/react-query": {
       "optional": true
     },
     "@hocuspocus/provider": {
@@ -174,23 +180,24 @@
     }
   },
   "devDependencies": {
-    "@hocuspocus/provider": "^2.15.0",
-    "@nanostores/react": "^0.8.4",
-    "@tiptap/core": "^3.20.4",
-    "@tiptap/extension-collaboration": "^3.20.4",
-    "@tiptap/extension-collaboration-caret": "^3.7.0",
-    "@tiptap/react": "^3.20.4",
-    "@tiptap/starter-kit": "^3.20.4",
+    "@hocuspocus/provider": "^4.4.0",
+    "@nanostores/react": "^1.1.0",
+    "@tiptap/core": "^3.28.0",
+    "@tiptap/extension-collaboration": "^3.28.0",
+    "@tiptap/extension-collaboration-caret": "^3.28.0",
+    "@tiptap/react": "^3.28.0",
+    "@tiptap/starter-kit": "^3.28.0",
+    "@tiptap/y-tiptap": "^3.0.7",
     "@types/react": "^19.0.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/turndown": "^5.0.5",
-    "nanostores": "^0.11.3",
+    "nanostores": "^1.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "@storybook/react": "^8.6.18",
     "tsup": "^8.3.5",
     "typescript": "^5.6.0",
-    "yjs": "^13.6.0",
+    "yjs": "^13.6.31",
     "react-router": "^7"
   },
   "keywords": [
