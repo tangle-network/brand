@@ -26,23 +26,4 @@ export default defineConfig({
   esbuildOptions(options) {
     options.jsx = "automatic";
   },
-  external: [
-    "react",
-    "react-dom",
-    "@tanstack/react-query",
-    "nanostores",
-    "@nanostores/react",
-    "@hocuspocus/provider",
-    "@tiptap/core",
-    "@tiptap/react",
-    "@tiptap/starter-kit",
-    "@tiptap/extension-collaboration",
-    "@tiptap/extension-collaboration-caret",
-    "yjs",
-    "@tiptap/pm",
-    "@tiptap/y-tiptap",
-    "marked",
-    "turndown",
-    "@tangle-network/brand",
-  ],
 });

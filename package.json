@@ -14,9 +14,10 @@
     "dev": "pnpm -r --parallel run --if-present dev",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "typecheck": "pnpm -r exec tsc --noEmit",
+    "typecheck": "pnpm --filter @tangle-network/brand build && pnpm -r exec tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "test:package": "node scripts/package-smoke.mjs packages/ui",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"

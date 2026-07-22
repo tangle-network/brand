@@ -13,36 +13,40 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     concurrency:
       group: release-publish
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 22
+          node-version: 22.23.1
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm -r run --if-present build
+      - name: Validate and build
+        run: |
+          pnpm typecheck
+          pnpm build
+          pnpm test
+          pnpm test:package
+          pnpm build-storybook
 
       - name: Upgrade npm for OIDC trusted publishing
         # OIDC trusted publishing needs npm >= 11.5.1; Node 22 ships npm 10.x.
         # Without this, `changeset publish` uses the old npm + a token that
         # 404s on the @tangle-network scope. Mirrors sandbox-ui's working job.
-        # Pinned (not @latest): npm 12.0.0 (2026-07-08) broke `--provenance` with
-        # "MODULE_NOT_FOUND: Cannot find module 'sigstore'". 11.18.0 is the last
-        # known-good release. Revisit once a fixed npm 12.x ships.
-        run: npm install -g npm@11.18.0
+        # npm 12.0.1 fixes the 12.0.0 sigstore/provenance regression.
+        run: npm install -g npm@12.0.1
 
       - name: Force OIDC auth (strip empty npm token line)
         # setup-node writes a `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
@@ -62,7 +66,7 @@ jobs:
 
       - name: Create release PR or publish
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
         with:
           publish: pnpm release
           version: pnpm version-packages
@@ -78,9 +82,9 @@ jobs:
 
       - name: Configure npm for GitHub Packages
         if: steps.changesets.outputs.published == 'true'
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 22
+          node-version: 22.23.1
           registry-url: https://npm.pkg.github.com
           scope: "@tangle-network"
 

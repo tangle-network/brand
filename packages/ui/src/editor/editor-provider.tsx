@@ -281,7 +281,6 @@ export function EditorProvider({
       name: documentName,
       document: doc,
       token: async () => tokenRef.current,
-      connect: true,
 
       onConnect: () => {
         reconnectAttemptsRef.current = 0;
