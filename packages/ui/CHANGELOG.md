@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.2.1
+
+### Patch Changes
+
+- 8dd0d68: Declare the editor and session-store optional peers in the published manifest and prove every packed public export in a clean consumer before release.
+
 ## 11.2.0
 
 ### Minor Changes
