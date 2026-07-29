@@ -17,7 +17,7 @@
     "typecheck": "pnpm --filter @tangle-network/brand build && pnpm -r exec tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:package": "node scripts/package-smoke.mjs packages/ui",
+    "test:package": "node scripts/package-smoke.mjs packages/ui && PACKAGE_PEER_OVERRIDES='{\"react-router\":\"^7\"}' node scripts/package-smoke.mjs packages/ui",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"

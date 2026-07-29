@@ -67,6 +67,19 @@ try {
     throw new Error(`unexpected packed manifest in ${basename(tarballPath)}`);
   }
 
+  const peerOverrides = JSON.parse(process.env.PACKAGE_PEER_OVERRIDES ?? "{}");
+  if (!peerOverrides || typeof peerOverrides !== "object" || Array.isArray(peerOverrides)) {
+    throw new Error("PACKAGE_PEER_OVERRIDES must be a JSON object");
+  }
+  const invalidPeerOverrides = Object.entries(peerOverrides).filter(
+    ([name, version]) => !manifest.peerDependencies?.[name] || typeof version !== "string",
+  );
+  if (invalidPeerOverrides.length > 0) {
+    throw new Error(
+      `invalid peer overrides: ${invalidPeerOverrides.map(([name]) => name).join(", ")}`,
+    );
+  }
+
   const invalidOptionalPeers = Object.keys(manifest.peerDependenciesMeta ?? {}).filter(
     (name) => !manifest.peerDependencies?.[name],
   );
@@ -79,7 +92,10 @@ try {
   const optionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
     .filter(([, metadata]) => metadata?.optional === true)
     .map(([name]) => {
-      const version = manifest.devDependencies?.[name] ?? manifest.peerDependencies[name];
+      const version =
+        peerOverrides[name] ??
+        manifest.devDependencies?.[name] ??
+        manifest.peerDependencies[name];
       return `${name}@${version}`;
     });
 
