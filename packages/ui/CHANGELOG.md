@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.2.2
+
+### Patch Changes
+
+- 172d68a: Accept React Router 8 as a supported peer dependency.
+
 ## 11.2.1
 
 ### Patch Changes
