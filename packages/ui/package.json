@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/ui",
-  "version": "11.2.2",
+  "version": "11.2.3",
   "description": "Generic React UI components for Tangle products — primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
