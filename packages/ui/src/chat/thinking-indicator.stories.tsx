@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { ChatContainer } from './chat-container'
 import { ThinkingIndicator } from './thinking-indicator'
 
 const meta: Meta<typeof ThinkingIndicator> = {
@@ -38,6 +39,25 @@ export const InContext: Story = {
         Let me analyze the rate limiter implementation and check the Redis pipeline for atomicity issues.
       </div>
       <ThinkingIndicator />
+    </div>
+  ),
+}
+
+/**
+ * The production handoff state: the user's message is already visible while
+ * the first assistant event has not arrived yet.
+ */
+export const PendingChatResponse: Story = {
+  render: () => (
+    <div className="h-80 rounded-xl border border-border bg-[var(--bg-root)]">
+      <ChatContainer
+        messages={[{ id: 'user-1', role: 'user' }]}
+        partMap={{
+          'user-1': [{ type: 'text', text: 'Hello — can you inspect this sandbox?' }],
+        }}
+        isStreaming
+        presentation="timeline"
+      />
     </div>
   ),
 }

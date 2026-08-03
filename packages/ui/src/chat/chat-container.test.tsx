@@ -27,6 +27,68 @@ const editPart: ToolPart = {
 const partMap: Record<string, SessionPart[]> = { m1: [editPart] }
 
 describe("ChatContainer timeline tool rendering", () => {
+  it("shows thinking as soon as a submitted user message is streaming", () => {
+    render(
+      <ChatContainer
+        messages={[{ id: "user-1", role: "user" }]}
+        partMap={{
+          "user-1": [{ type: "text", text: "hello" }],
+        }}
+        isStreaming
+        presentation="timeline"
+      />,
+    )
+
+    expect(
+      screen.getByRole("status", { name: "Agent is thinking" }),
+    ).toBeInTheDocument()
+  })
+
+  it("does not let an earlier assistant reply hide the next turn's thinking state", () => {
+    render(
+      <ChatContainer
+        messages={[
+          { id: "user-1", role: "user" },
+          { id: "assistant-1", role: "assistant" },
+          { id: "user-2", role: "user" },
+        ]}
+        partMap={{
+          "user-1": [{ type: "text", text: "first" }],
+          "assistant-1": [{ type: "text", text: "done" }],
+          "user-2": [{ type: "text", text: "second" }],
+        }}
+        isStreaming
+        presentation="timeline"
+      />,
+    )
+
+    expect(
+      screen.getByRole("status", { name: "Agent is thinking" }),
+    ).toBeInTheDocument()
+  })
+
+  it("replaces the generic thinking row when the current reply has text", () => {
+    render(
+      <ChatContainer
+        messages={[
+          { id: "user-1", role: "user" },
+          { id: "assistant-1", role: "assistant" },
+        ]}
+        partMap={{
+          "user-1": [{ type: "text", text: "hello" }],
+          "assistant-1": [{ type: "text", text: "working on it" }],
+        }}
+        isStreaming
+        presentation="timeline"
+      />,
+    )
+
+    expect(
+      screen.queryByRole("status", { name: "Agent is thinking" }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("working on it")).toBeInTheDocument()
+  })
+
   it("shows a clean tool detail (the file path), not the raw input JSON", () => {
     render(
       <ChatContainer
