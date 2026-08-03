@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.2.3
+
+### Patch Changes
+
+- 7eeed23: Show the animated thinking row immediately after a user submits a message, before the first assistant event arrives.
+
 ## 11.2.2
 
 ### Patch Changes
