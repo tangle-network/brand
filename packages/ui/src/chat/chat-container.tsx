@@ -179,7 +179,18 @@ function buildTimelineItems(
   enableOpenUI = true,
 ): { items: AgentTimelineItem[]; showThinking: boolean } {
   const items: AgentTimelineItem[] = [];
-  const lastAssistantMessage = [...messages].reverse().find((message) => message.role === "assistant");
+  let latestUserIndex = -1;
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index].role === "user") {
+      latestUserIndex = index;
+      break;
+    }
+  }
+  const responseMessages =
+    latestUserIndex >= 0 ? messages.slice(latestUserIndex + 1) : messages;
+  const lastAssistantMessage = [...responseMessages]
+    .reverse()
+    .find((message) => message.role === "assistant");
   const toToolCall = (part: ToolPart) => {
     const meta = getToolDisplayMetadata(part as ToolPart);
     const start = part.state.time?.start;
@@ -346,13 +357,14 @@ function buildTimelineItems(
 
   const showThinking =
     isStreaming &&
-    lastAssistantMessage != null &&
-    !items.some(
-      (item) =>
-        item.kind === "message" &&
-        item.role === "assistant" &&
-        item.id.startsWith(lastAssistantMessage.id),
-    );
+    latestUserIndex >= 0 &&
+    (lastAssistantMessage == null ||
+      !items.some(
+        (item) =>
+          item.kind === "message" &&
+          item.role === "assistant" &&
+          item.id.startsWith(lastAssistantMessage.id),
+      ));
 
   return { items, showThinking };
 }
