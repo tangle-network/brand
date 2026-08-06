@@ -3,7 +3,7 @@
  * The surface ladder is NEUTRAL GREY and the indigo is trim — accent, never
  * field. It steps in even lightness increments so a card, a nested panel and an
  * overlay each read as a distinct plane by their own fill, and carries a crisp
- * hairline (2:1 against the card in dark) because shadow does no work on a dark
+ * hairline (1.6:1 against the card in dark) because shadow does no work on a dark
  * canvas. Light mirrors it: white paper on a grey canvas, never white-on-white.
  *
  * Apps consume this spine as-is. If a product needs its own accent identity,
@@ -28,7 +28,8 @@
  *
  * Elevation is carried by surface lightness plus a hairline that can actually be
  * seen — a black shadow on a dark canvas renders as nothing, so shadow does no
- * work here. The hairline is 2:1 against the resting card, deliberately crisp.
+ * work here. The hairline is 1.6:1 against the resting card — quiet by design,
+ * enough to state an edge without drawing a box around every panel.
  */
 :root,
 [data-sandbox-ui],
@@ -37,6 +38,11 @@
   --md3-surface: #151523;                   /* L0 page canvas */
   --md3-surface-dim: #0f0f1a;               /* recessed page */
   --md3-surface-bright: #434365;
+  /* Same value as --md3-surface-dim by design, not by drift: both name the floor
+   * of the ladder, and dark has no plane below it to give them. They stay two
+   * tokens because the roles diverge in light, where the well is paper (#ffffff)
+   * and the recessed page is grey (#d9d9e6) — a consumer binding to the wrong one
+   * there gets the wrong surface. */
   --md3-surface-container-lowest: #0f0f1a;  /* L-1 terminal/code well */
   --md3-surface-container-low: #222235;     /* L1 chrome, field wells */
   --md3-surface-container: #2d2e43;         /* L2 resting card */
@@ -78,31 +84,31 @@
   /* Semantic HSL bridge — the neutral-grey surface ladder */
   --hsl-background: 240 24% 11%;     /* L0 canvas #151523 */
   /* 92% L, not pure white: near-white ink on the canvas is the glare end of the
-   * range, and the tiers below it need room to separate. 92% holds 13.5:1 on the
+   * range, and the tiers below it need room to separate. 91% holds 10.6:1 on the
    * card — AAA with headroom — and leaves four ink steps the eye can tell apart. */
-  --hsl-foreground: 225 22% 91%;     /* #eaeaec */
-  --hsl-card: 238 20% 22%;           /* L2 card #202024 */
+  --hsl-foreground: 225 22% 91%;     /* #e3e6ed */
+  --hsl-card: 238 20% 22%;           /* L2 card #2d2e43 */
   --hsl-card-foreground: 225 22% 91%;
   --hsl-popover: 240 22% 27%;        /* L4 overlay */
   --hsl-popover-foreground: 225 22% 91%;
   /* The fill indigo, NOT the bright one: `.btn-primary` puts white on this, and
-   * #6366F1 carries white at only 4.47:1. This clears the floor at 6.0:1. The
+   * #6366F1 carries white at only 4.47:1. This clears the floor at 7.4:1. The
    * bright indigo stays available for accent TEXT via --accent-text. */
-  --hsl-primary: 246 54% 51%;       /* #5B4ED4 */
+  --hsl-primary: 246 54% 51%;       /* #4c3fc6 */
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 22% 27%;      /* L3 #2a2a2f */
+  --hsl-secondary: 240 22% 27%;      /* L3 #363654 */
   --hsl-secondary-foreground: 225 22% 91%;
   --hsl-muted: 240 22% 27%;          /* L3 hover well */
-  --hsl-muted-foreground: 223 14% 69%;  /* #9e9ea0 — high enough that the
+  --hsl-muted-foreground: 223 14% 69%;  /* #a5abbb — high enough that the
      reduced-opacity caption derivatives (/70, /60) still clear the large-text
      contrast floor against the L2 card. */
   --hsl-accent: 240 22% 27%;         /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 225 22% 91%;
   --hsl-destructive: 348 74% 48%;
   --hsl-destructive-foreground: 0 0% 100%;
-  /* Crisp on purpose: 2.0:1 against the resting card. Shadow does no work on a
+  /* Quiet on purpose: 1.6:1 against the resting card. Shadow does no work on a
    * dark canvas, so the hairline is what states where a plane ends. */
-  --hsl-border: 236 20% 35%;         /* #4f4f56 = --md3-outline-variant */
+  --hsl-border: 236 20% 35%;         /* #474a6b = --md3-outline-variant */
   --hsl-input: 240 24% 15%;          /* recessed field well */
   /* Brighter than --primary on purpose: the ring is NON-TEXT and has to clear
    * 3:1 against BOTH canvas and card. The fill indigo is tuned to carry white
@@ -144,7 +150,7 @@
 
   /* Sidebar tokens — L1 chrome: one step BELOW the canvas here, so the nav reads
    * as chrome the content sits in front of rather than as another card. */
-  --sidebar-background: 242 26% 8%;   /* L1 chrome #141417 */
+  --sidebar-background: 242 26% 8%;   /* L1 chrome #0f0f1a */
   --sidebar-foreground: 225 22% 91%;
   --sidebar-primary: 246 54% 51%;
   --sidebar-primary-foreground: 0 0% 100%;
@@ -214,7 +220,7 @@
   --accent-surface-soft: rgba(165, 180, 252, 0.07);
   --accent-surface-strong: rgba(76, 63, 197, 0.30);
   /* The BRIGHT indigo, and only ever as text: --primary is the fill (it carries
-   * white), and at 4.8:1 on the card this is the one that stays legible as ink. */
+   * white), and at 6.7:1 on the card this is the one that stays legible as ink. */
   --accent-text: #A5B4FC;
 
   /* Surfaces — solid fills off the ladder (no radial mesh) */
@@ -419,33 +425,33 @@
   --md3-surface-tint: #6366F1;
 
   /* Semantic HSL bridge — white paper on a neutral-grey canvas */
-  --hsl-background: 240 24% 93%;     /* L0 canvas #ebebed */
+  --hsl-background: 240 24% 93%;     /* L0 canvas #e9e9f1 */
   /* Ink, not black. Pure #0d0d0d on white paper measures 19.5:1 — a hair off the
    * 21:1 ceiling — and that maximum is what reads as glare rather than as
-   * legibility. 16% L lands 14.9:1 on the card and 13.6:1 on the canvas: AAA with
+   * legibility. 20.5% L lands 13.7:1 on the card and 11.4:1 on the canvas: AAA with
    * headroom in both places, and a step the eye reads as text instead of as a
    * hole. */
-  --hsl-foreground: 235 18% 20.5%;     /* #27272a */
+  --hsl-foreground: 235 18% 20.5%;     /* #2b2c3e */
   --hsl-card: 0 0% 100%;            /* L2 card = white paper */
   --hsl-card-foreground: 235 18% 20.5%;
   --hsl-popover: 0 0% 100%;
   --hsl-popover-foreground: 235 18% 20.5%;
-  --hsl-primary: 246 54% 51%;       /* #5B4ED4 — carries white at 6.0:1 */
+  --hsl-primary: 246 54% 51%;       /* #4c3fc6 — carries white at 7.4:1 */
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 26% 96%;      /* L3 #ececee */
+  --hsl-secondary: 240 26% 96%;      /* L3 #f2f2f7 */
   --hsl-secondary-foreground: 235 18% 20.5%;
   --hsl-muted: 240 26% 96%;          /* L3 hover well */
   /* 34% L: the shared components fade captions with /70 and /60, and a
    * translucent foreground renders as the token COMPOSITED over the plane behind
    * it. Against white paper that compositing is brutal — a lighter value puts the
-   * /60 caption under the 3:1 large-text floor. This holds 3.1:1 there and 7.7:1
-   * at full strength, still a clear step below the 14.9:1 body ink. */
-  --hsl-muted-foreground: 235 12% 32.5%;  /* #52525b text-muted */
+   * /60 caption under the 3:1 large-text floor. This holds 3.0:1 there and 8.6:1
+   * at full strength, still a clear step below the 13.7:1 body ink. */
+  --hsl-muted-foreground: 235 12% 32.5%;  /* #494b5d text-muted */
   --hsl-accent: 240 26% 96%;         /* neutral hover */
   --hsl-accent-foreground: 235 18% 20.5%;
   --hsl-destructive: 0 72% 41%;
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 238 20% 84%;         /* #cfcfd3 = --md3-outline-variant */
+  --hsl-border: 238 20% 84%;         /* #cecfde = --md3-outline-variant */
   --hsl-input: 240 30% 97%;          /* field well */
   --hsl-ring: 246 54% 51%;
   --hsl-success: 160 84% 30%;
@@ -502,7 +508,7 @@
   /* Sidebar — light, flat surface + hairline */
   --sidebar-background: 0 0% 100%;     /* white paper */
   --sidebar-foreground: 235 18% 20.5%;
-  --sidebar-primary: 246 54% 51%;     /* #5B4ED4 */
+  --sidebar-primary: 246 54% 51%;     /* #4c3fc6 */
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 240 26% 96%;       /* L3 hover well */
   --sidebar-accent-foreground: 235 18% 20.5%;

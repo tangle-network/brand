@@ -120,6 +120,44 @@ describe("muted text stays legible at the opacities the UI actually uses", () =>
   }
 });
 
+describe("a hex quoted beside an HSL token is the value that token resolves to", () => {
+  // The spine is authored in HSL, but it is READ in hex — every comment here
+  // annotates a triple with the colour it produces, because `238 20% 22%` tells
+  // a reader nothing. That makes the annotations load-bearing documentation, and
+  // load-bearing documentation that nothing checks is documentation that lies:
+  // retuning a triple leaves the old hex sitting beside it, and the next person
+  // to trust it picks a neighbouring value against a surface that moved.
+  //
+  // Every declaration of the form `--token: H S% L%; /* … #rrggbb … */`, in every
+  // block, not just the two spines.
+  const ANNOTATED =
+    /^[^\S\n]*(--[a-z0-9-]+):\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%;[^\S\n]*\/\*([^*]*)\*\//gm;
+
+  const annotated = [...tokens.matchAll(ANNOTATED)].flatMap(
+    ([, token, h, s, l, comment]) =>
+      (comment.match(/#[0-9a-fA-F]{6}/g) ?? []).map((quoted) => ({
+        token,
+        quoted,
+        hsl: { h: Number(h), s: Number(s), l: Number(l) },
+      })),
+  );
+
+  it("finds the annotations to check", () => {
+    // Without this, rewriting a comment into a shape the pattern misses would
+    // empty the suite below and read as a pass.
+    expect(annotated.length).toBeGreaterThanOrEqual(15);
+  });
+
+  for (const { token, quoted, hsl } of annotated) {
+    it(`${token} resolves to ${quoted}`, () => {
+      const actual = `#${hslToRgb(hsl)
+        .map((c) => Math.round(c).toString(16).padStart(2, "0"))
+        .join("")}`;
+      expect(actual).toBe(quoted.toLowerCase());
+    });
+  }
+});
+
 describe("the faint ink tiers are still TEXT, on every plane they land on", () => {
   // These two tiers are the ones that break. They are solved against a specific
   // surface, so any move in the ladder — lifting the card, softening the canvas,
