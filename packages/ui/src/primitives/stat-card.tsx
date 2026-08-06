@@ -58,8 +58,12 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm">{title}</p>
             <p className="font-bold text-3xl tracking-tight">{value}</p>
+            {/* A token, never `opacity-70` over the muted tone: a translucent
+                foreground renders as the token COMPOSITED over whatever plane sits
+                behind it, so the same class lands a different colour — and a
+                different contrast ratio — on a card than on the canvas. */}
             {subtitle && (
-              <p className="text-muted-foreground opacity-70 text-xs">{subtitle}</p>
+              <p className="text-[var(--text-dim)] text-xs">{subtitle}</p>
             )}
             {trend && trendStatus && (
               <div
