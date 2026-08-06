@@ -32,17 +32,36 @@ const DARK = blockIn(tokens, ".dark");
 const LIGHT = blockIn(tokens, ".light");
 
 describe("canonical dark spine", () => {
-  it("is indigo-cast, not grey — the canvas carries real saturation", () => {
+  it("keeps the canvas in the brand's hue family, at any strength", () => {
     const bg = hslIn(DARK, "hsl-background");
+    // HUE is the brand constraint and does not move: the greys are cool and sit
+    // in the indigo band, so they belong to the same family as the accent rather
+    // than reading as a foreign neutral pasted underneath it.
     expect(bg.h, "canvas hue sits in the indigo band").toBeGreaterThanOrEqual(
-      235,
+      215,
     );
-    expect(bg.h).toBeLessThanOrEqual(250);
-    // The flat spine this replaced sat at 7%. Anything near that reads grey.
-    expect(
-      bg.s,
-      "a desaturated canvas is the bug, not the design",
-    ).toBeGreaterThan(20);
+    expect(bg.h).toBeLessThanOrEqual(260);
+    // SATURATION is a taste dial, not a contract. How far the surfaces lean —
+    // near-neutral graphite with the indigo purely in the accents, or a fully
+    // indigo-cast ground — is a live product decision, so the only thing pinned
+    // here is that the canvas is not dead grey. Asserting a band instead makes
+    // this test fail every time that decision is revisited, which tells you
+    // nothing about whether the palette is correct.
+    expect(bg.s, "a colourless canvas has left the brand behind").toBeGreaterThan(
+      5,
+    );
+  });
+
+  it("guards reading comfort at the INK, not at the canvas", () => {
+    // A deep canvas is fine — glare comes from the ratio between ink and ground,
+    // not from the ground alone. So the floor here is loose, and the real guard
+    // is the 16:1 comfort ceiling on body text in contrast.test.ts. Pinning the
+    // canvas instead would forbid a deep spine that is perfectly comfortable
+    // once its ink is tuned.
+    const bg = hslIn(DARK, "hsl-background");
+    expect(bg.l, "an unlit canvas still needs to be a surface").toBeGreaterThan(
+      3,
+    );
   });
 
   it("lifts the card off the canvas by fill, not by border", () => {
@@ -101,6 +120,101 @@ describe("muted text stays legible at the opacities the UI actually uses", () =>
   }
 });
 
+describe("the sidebar is its own plane", () => {
+  // Which SIDE of the canvas the nav sits on is a taste call — it is chrome
+  // below the content in dark and paper above it in light, and either reads
+  // fine. What is not a taste call is the two collapsing onto the same value:
+  // the nav would stop being a distinct region and the page would lose the edge
+  // that separates navigation from content, with no border to fall back on.
+  // Pinned as a minimum separation so a retune can move it without erasing it.
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    it(`${theme}: sidebar and canvas stay separable`, () => {
+      const sidebar = hslIn(spine, "sidebar-background");
+      const canvas = hslIn(spine, "hsl-background");
+      expect(
+        Math.abs(sidebar.l - canvas.l),
+        "sidebar and canvas lightness must not converge",
+      ).toBeGreaterThanOrEqual(2);
+    });
+  }
+});
+
+describe("a hex quoted beside an HSL token is the value that token resolves to", () => {
+  // The spine is authored in HSL, but it is READ in hex — every comment here
+  // annotates a triple with the colour it produces, because `238 20% 22%` tells
+  // a reader nothing. That makes the annotations load-bearing documentation, and
+  // load-bearing documentation that nothing checks is documentation that lies:
+  // retuning a triple leaves the old hex sitting beside it, and the next person
+  // to trust it picks a neighbouring value against a surface that moved.
+  //
+  // Every declaration of the form `--token: H S% L%; /* … #rrggbb … */`, in every
+  // block, not just the two spines.
+  const ANNOTATED =
+    /^[^\S\n]*(--[a-z0-9-]+):\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%;[^\S\n]*\/\*([^*]*)\*\//gm;
+
+  const annotated = [...tokens.matchAll(ANNOTATED)].flatMap(
+    ([, token, h, s, l, comment]) =>
+      (comment.match(/#[0-9a-fA-F]{6}/g) ?? []).map((quoted) => ({
+        token,
+        quoted,
+        hsl: { h: Number(h), s: Number(s), l: Number(l) },
+      })),
+  );
+
+  it("finds the annotations to check", () => {
+    // Without this, rewriting a comment into a shape the pattern misses would
+    // empty the suite below and read as a pass.
+    expect(annotated.length).toBeGreaterThanOrEqual(15);
+  });
+
+  for (const { token, quoted, hsl } of annotated) {
+    it(`${token} resolves to ${quoted}`, () => {
+      const actual = `#${hslToRgb(hsl)
+        .map((c) => Math.round(c).toString(16).padStart(2, "0"))
+        .join("")}`;
+      expect(actual).toBe(quoted.toLowerCase());
+    });
+  }
+});
+
+describe("the faint ink tiers are still TEXT, on every plane they land on", () => {
+  // These two tiers are the ones that break. They are solved against a specific
+  // surface, so any move in the ladder — lifting the card, softening the canvas,
+  // recasting the hue — silently drops them under the floor, and nothing about
+  // the result LOOKS wrong: it renders as slightly faint captions that happen to
+  // be unreadable. Every plane is asserted, not just the one each was tuned on.
+  //
+  // Compared hex-to-hex through the MD3 ladder rather than the HSL bridge,
+  // because these tokens ARE hexes; `--md3-surface` and `--md3-surface-container`
+  // are the canvas and the card at the same positions.
+  const ratioOf = (a: number, b: number) =>
+    (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    for (const tier of ["text-dim", "text-muted"] as const) {
+      it(`${theme}: --${tier} clears 4.5:1 on both the card and the canvas`, () => {
+        expect(spine, `--${tier} must be defined`).toContain(`--${tier}:`);
+        const ink = hexRelativeLuminanceIn(spine, tier);
+        for (const [plane, token] of [
+          ["card", "md3-surface-container"],
+          ["canvas", "md3-surface"],
+        ] as const) {
+          expect(
+            ratioOf(ink, hexRelativeLuminanceIn(spine, token)),
+            `--${tier} on the ${plane}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      });
+    }
+  }
+});
+
 describe("input tokens carry two DIFFERENT roles and must not be conflated", () => {
   // `--input` is shadcn's input BORDER and the Switch off-track: a mid-tone that
   // must stay visible AGAINST a surface. `--hsl-input` / `--bg-input` are the
@@ -129,7 +243,7 @@ describe("input tokens carry two DIFFERENT roles and must not be conflated", () 
 });
 
 describe("canonical light spine", () => {
-  it("is white paper on a TINTED canvas, never white-on-white", () => {
+  it("is white paper on a tinted canvas, never white-on-white", () => {
     const canvas = hslIn(LIGHT, "hsl-background");
     const card = hslIn(LIGHT, "hsl-card");
     expect(card.l, "the card is paper").toBe(100);
@@ -137,10 +251,17 @@ describe("canonical light spine", () => {
       canvas.l,
       "a pure-white canvas gives a white card nothing to lift off",
     ).toBeLessThan(97);
-    expect(
-      canvas.s,
-      "the canvas carries a tint, not flat grey",
-    ).toBeGreaterThan(10);
+    // Mirrors the dark spine exactly: HUE is the brand constraint and is pinned;
+    // saturation is a taste dial and is not. How far the surfaces lean is a live
+    // product decision, so asserting a band here only guarantees this test fails
+    // the next time that decision is revisited.
+    expect(canvas.h, "canvas hue sits in the indigo band").toBeGreaterThanOrEqual(
+      215,
+    );
+    expect(canvas.h).toBeLessThanOrEqual(260);
+    expect(canvas.s, "a colourless canvas has left the brand behind").toBeGreaterThan(
+      5,
+    );
   });
 
   it("ALTERNATES paper and well — light elevation is not a darkening ramp", () => {

@@ -65,7 +65,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {input}
         {error && <p className="text-[var(--surface-danger-text)] text-sm font-medium">{error}</p>}
         {hint && !error && (
-          <p className="text-muted-foreground/70 text-sm">{hint}</p>
+          <p className="text-[var(--text-dim)] text-sm">{hint}</p>
         )}
       </div>
     );
@@ -125,7 +125,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {textarea}
         {error && <p className="text-[var(--surface-danger-text)] text-sm">{error}</p>}
         {hint && !error && (
-          <p className="text-muted-foreground/70 text-sm">{hint}</p>
+          <p className="text-[var(--text-dim)] text-sm">{hint}</p>
         )}
       </div>
     );
