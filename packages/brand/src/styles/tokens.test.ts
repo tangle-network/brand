@@ -120,6 +120,28 @@ describe("muted text stays legible at the opacities the UI actually uses", () =>
   }
 });
 
+describe("the sidebar is its own plane", () => {
+  // Which SIDE of the canvas the nav sits on is a taste call — it is chrome
+  // below the content in dark and paper above it in light, and either reads
+  // fine. What is not a taste call is the two collapsing onto the same value:
+  // the nav would stop being a distinct region and the page would lose the edge
+  // that separates navigation from content, with no border to fall back on.
+  // Pinned as a minimum separation so a retune can move it without erasing it.
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    it(`${theme}: sidebar and canvas stay separable`, () => {
+      const sidebar = hslIn(spine, "sidebar-background");
+      const canvas = hslIn(spine, "hsl-background");
+      expect(
+        Math.abs(sidebar.l - canvas.l),
+        "sidebar and canvas lightness must not converge",
+      ).toBeGreaterThanOrEqual(2);
+    });
+  }
+});
+
 describe("a hex quoted beside an HSL token is the value that token resolves to", () => {
   // The spine is authored in HSL, but it is READ in hex — every comment here
   // annotates a triple with the colour it produces, because `238 20% 22%` tells
