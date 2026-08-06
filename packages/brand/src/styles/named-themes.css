@@ -2,7 +2,8 @@
  * components re-skin automatically because they reference the semantic tokens
  * (bg-card / border-border / surface-container, mapped in theme.css). Apply with
  * data-theme="<name>" on a wrapper (or <html>). The default :root / .dark spine
- * is the neutral "tangle" theme; "<name>-light" scopes are the light variants. */
+ * is the neutral "tangle" theme — also selectable by name as "tangle-dark";
+ * "<name>-light" scopes are the light variants. */
 
 /* Bridge — the actual re-skin mechanism. Tailwind utilities read the --color-*
  * layer (theme.css @theme: `bg-card` → var(--color-card) = hsl(var(--card))).
@@ -166,8 +167,42 @@
   --text-primary: #06231a; --text-secondary: #285048; --text-muted: #5f8472; --text-dim: #82a699;
 }
 
-/* ───────────────────────── Tangle (neutral) — light variant alias ─────────── */
-/* dark = default :root spine; this is its light mode for the showcase. */
+/* ───────────────────────── Tangle (neutral) — the canonical pair ──────────── */
+/* tangle-dark names the default :root/.dark spine explicitly — the values mirror
+ * tokens.css exactly (pinned in named-themes.test.ts). The named scope matters the
+ * moment the attribute would NOT resolve to :root: a dark island inside a
+ * light-named wrapper inherits the light --hsl-* without it, and a theme picker
+ * switching between named themes needs a `tangle-dark` that actually selects. Same
+ * indigo hue family as tangle-light (~239-246), held to the dark discipline —
+ * graphite-indigo neutrals, elevation by lightening, the fill indigo that carries
+ * white (7.4:1) with the bright indigo reserved for accent text. The foreground
+ * and destructive redeclares equal :root standalone, but the block must be
+ * self-sufficient: in the island nesting an omitted token inherits the WRAPPER's
+ * light value (near-black secondary text on the dark secondary measured ~1.5:1).
+ * Status tokens are deliberately not redeclared: the :root dark status palette is
+ * already dark-tuned, same as aubergine/arena. */
+[data-theme="tangle-dark"] {
+  --hsl-background: 240 24% 11%;  --hsl-foreground: 225 22% 91%;
+  --hsl-card: 238 20% 22%;        --hsl-card-foreground: 225 22% 91%;
+  --hsl-popover: 240 22% 27%;     --hsl-popover-foreground: 225 22% 91%;
+  --hsl-primary: 246 54% 51%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-secondary: 240 22% 27%;   --hsl-secondary-foreground: 225 22% 91%;
+  --hsl-muted: 240 22% 27%;       --hsl-muted-foreground: 223 14% 69%;
+  --hsl-accent: 240 22% 27%;      --hsl-accent-foreground: 225 22% 91%;
+  --hsl-destructive: 348 74% 48%; --hsl-destructive-foreground: 0 0% 100%;
+  --hsl-border: 236 20% 35%;      --hsl-input: 240 24% 15%;
+  --hsl-ring: 233 100% 87%;
+  --depth-1: #151523; --depth-2: #2d2e43; --depth-3: #363654; --depth-4: #434365;
+  --bg-root: #151523; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
+  --md3-surface-container-lowest: #0f0f1a; --md3-surface-container-low: #222235;
+  --md3-surface-container: #2d2e43; --md3-surface-container-high: #363654;
+  --md3-surface-container-highest: #434365; --md3-outline-variant: #474a6b;
+  --border-subtle: rgba(165, 180, 252, 0.10); --border-default: rgba(165, 180, 252, 0.16);
+  --border-hover: rgba(165, 180, 252, 0.28); --accent-text: #A5B4FC;
+  --brand-primary: #7C6CF6; --brand-glow: #A5AAFC;
+  --text-primary: #e3e6ed; --text-secondary: #bec3d0; --text-muted: #a5abbb; --text-dim: #9299ab;
+}
+/* Its light mode. */
 [data-theme="tangle-light"] {
   --hsl-background: 240 33% 98%;  --hsl-foreground: 245 32% 14%;
   --hsl-card: 0 0% 100%;          --hsl-card-foreground: 245 32% 14%;

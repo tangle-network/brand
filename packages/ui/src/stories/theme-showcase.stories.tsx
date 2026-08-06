@@ -11,6 +11,7 @@ type Story = StoryObj;
 
 const THEMES: { name: string; theme?: string }[] = [
   { name: "Tangle (neutral)", theme: undefined }, // default :root dark
+  { name: "Tangle · dark", theme: "tangle-dark" }, // the same spine, named
   { name: "Tangle · light", theme: "tangle-light" },
   { name: "Aubergine (bazaar)", theme: "aubergine" },
   { name: "Aubergine · light", theme: "aubergine-light" },
