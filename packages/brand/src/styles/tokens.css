@@ -228,9 +228,11 @@
   --bg-selection: rgba(124, 108, 246, 0.28);
 
   /* Text — neutral */
-  /* Four steps the eye can actually separate: 13.5 / 9.6 / 6.1 / 4.8 against the
+  /* Four steps the eye can actually separate: 10.6 / 7.5 / 5.8 / 4.7 against the
    * L2 card. --text-dim is the faintest tier but it is still TEXT, so it clears
-   * the 4.5:1 body floor rather than only the 3:1 large-text one. */
+   * the 4.5:1 body floor rather than only the 3:1 large-text one — asserted in
+   * tokens.test.ts against both the card and the canvas, since the tier is
+   * solved against one surface and rendered on both. */
   --text-primary: #e3e6ed;
   --text-secondary: #bec3d0;
   --text-muted: #a5abbb;
@@ -526,13 +528,15 @@
   --bg-hover: rgba(76, 63, 198, 0.06);
   --bg-selection: rgba(76, 63, 198, 0.16);
 
-  /* Mirrors the dark ramp's spacing: 14.5 / 11.0 / 9.0 / 5.3 against white paper.
+  /* Mirrors the dark ramp's spacing: 13.7 / 10.5 / 8.6 / 5.6 against white paper.
    * Every step carries the 240 cast so the ink belongs to the palette.
    *
    * --text-dim is pinned from the CANVAS (#e9e9f1), not the white card: it is
    * the faintest tier, so the tinted L0 is the surface that binds it, and a
    * value chosen against paper alone sits under the 4.5:1 body floor there.
-   * 4.5 on the canvas, 5.3 on the card. */
+   * 4.6 on the canvas, 5.6 on the card — both floors are asserted in
+   * tokens.test.ts, because a ratio quoted in a comment drifts the moment a
+   * surface moves and nothing catches it. */
   --text-primary: #2b2c3e;
   --text-secondary: #3d3e52;
   --text-muted: #494b5d;

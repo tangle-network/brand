@@ -120,6 +120,41 @@ describe("muted text stays legible at the opacities the UI actually uses", () =>
   }
 });
 
+describe("the faint ink tiers are still TEXT, on every plane they land on", () => {
+  // These two tiers are the ones that break. They are solved against a specific
+  // surface, so any move in the ladder — lifting the card, softening the canvas,
+  // recasting the hue — silently drops them under the floor, and nothing about
+  // the result LOOKS wrong: it renders as slightly faint captions that happen to
+  // be unreadable. Every plane is asserted, not just the one each was tuned on.
+  //
+  // Compared hex-to-hex through the MD3 ladder rather than the HSL bridge,
+  // because these tokens ARE hexes; `--md3-surface` and `--md3-surface-container`
+  // are the canvas and the card at the same positions.
+  const ratioOf = (a: number, b: number) =>
+    (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    for (const tier of ["text-dim", "text-muted"] as const) {
+      it(`${theme}: --${tier} clears 4.5:1 on both the card and the canvas`, () => {
+        expect(spine, `--${tier} must be defined`).toContain(`--${tier}:`);
+        const ink = hexRelativeLuminanceIn(spine, tier);
+        for (const [plane, token] of [
+          ["card", "md3-surface-container"],
+          ["canvas", "md3-surface"],
+        ] as const) {
+          expect(
+            ratioOf(ink, hexRelativeLuminanceIn(spine, token)),
+            `--${tier} on the ${plane}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      });
+    }
+  }
+});
+
 describe("input tokens carry two DIFFERENT roles and must not be conflated", () => {
   // `--input` is shadcn's input BORDER and the Switch off-track: a mid-tone that
   // must stay visible AGAINST a surface. `--hsl-input` / `--bg-input` are the
