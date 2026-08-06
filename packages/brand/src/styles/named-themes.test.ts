@@ -88,7 +88,6 @@ describe('named theme: .dark[data-theme="intelligence"]', () => {
   });
 });
 
-
 describe('named theme: [data-theme="tangle-dark"]', () => {
   const css = block('[data-theme="tangle-dark"]');
   // `[data-theme="tangle-light"]` heads two rules — the shared light-status
@@ -113,9 +112,13 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
       "hsl-primary",
       "hsl-primary-foreground",
       "hsl-secondary",
+      "hsl-secondary-foreground",
       "hsl-muted",
       "hsl-muted-foreground",
       "hsl-accent",
+      "hsl-accent-foreground",
+      "hsl-destructive",
+      "hsl-destructive-foreground",
       "hsl-border",
       "hsl-input",
       "hsl-ring",
@@ -247,6 +250,41 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
     expect(contrastRatio(dim, canvas), "text-dim on canvas").toBeGreaterThanOrEqual(
       4.5,
     );
+  });
+
+  it("is self-sufficient inside a light-named wrapper — the island it exists for", () => {
+    // The feature's stated scenario: tangle-dark nested in a tangle-light
+    // wrapper. The browser composes the two scopes, so a token the island omits
+    // inherits the WRAPPER's light value, not :root's — the light group's
+    // near-black secondary-foreground on the dark secondary measured ~1.5:1
+    // before the block redeclared its foregrounds. Model that cascade: every
+    // tangle-light rule (the shared light group AND the theme block), with the
+    // island's declarations overriding.
+    const wrapper = blocksIn(themes, '[data-theme="tangle-light"]').join("\n");
+    const effective = (token: string) => {
+      const read = (source: string) => {
+        try {
+          return hslIn(source, token);
+        } catch {
+          return null;
+        }
+      };
+      const value = read(css) ?? read(wrapper);
+      if (!value) {
+        throw new Error(`--${token} resolves to nothing inside the island`);
+      }
+      return value;
+    };
+    for (const [fgToken, bgToken] of [
+      ["hsl-secondary-foreground", "hsl-secondary"],
+      ["hsl-accent-foreground", "hsl-accent"],
+      ["hsl-destructive-foreground", "hsl-destructive"],
+    ] as const) {
+      expect(
+        contrastRatio(hslToRgb(effective(fgToken)), hslToRgb(effective(bgToken))),
+        `effective ${fgToken} on ${bgToken}, island inside tangle-light`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it("keeps the dark-tuned :root status palette instead of redeclaring it", () => {

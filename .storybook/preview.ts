@@ -8,6 +8,7 @@ const THEMES = [
   { value: "aubergine-light", title: "Aubergine · light" },
   { value: "arena", title: "Arena (green)" },
   { value: "arena-light", title: "Arena · light" },
+  { value: "tangle-dark", title: "Tangle · dark" },
   { value: "tangle-light", title: "Tangle · light" },
 ] as const;
 

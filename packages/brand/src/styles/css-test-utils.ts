@@ -24,9 +24,11 @@ export function blockIn(source: string, selector: string): string {
 }
 
 /**
- * Every rule body whose selector mentions `selector`, in source order.
+ * Every rule body whose selector list ENDS in `selector`, in source order — the
+ * match requires the selector immediately before the `{`, so a selector earlier
+ * in a comma-separated group (`selector, .other {`) is not returned.
  *
- * A selector can head MORE than one rule — `[data-theme="tangle-light"]` names
+ * One selector can head MORE than one rule — `[data-theme="tangle-light"]` names
  * both the shared light-status override group and the theme's own block — so a
  * first-match read can silently slice the wrong region. Return them all and let
  * the caller pick (e.g. the one that declares `--hsl-background`).
@@ -104,9 +106,7 @@ export function hexIn(css: string, token: string): Rgb {
   const value = declaration[1].trim();
   const hex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/.exec(value);
   if (!hex) {
-    throw new Error(
-      `--${token} is not a hex color (found "${value}") — use hslIn or compositeOver for it`,
-    );
+    throw new Error(`--${token} is not a hex color (found "${value}")`);
   }
 
   const digits = hex[1];
@@ -178,15 +178,9 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
  * Relative luminance, not HSL lightness: the ladder varies hue and saturation as
  * it rises, and HSL L is not perceptually uniform — two steps can share an L and
  * still read as different brightnesses, so an "is each plane brighter than the one
- * below" assertion made on HSL L would be measuring the wrong thing.
- *
- * Accepts `#rgb`, `#rrggbb` and `#rrggbbaa` (alpha is ignored — luminance is a
- * property of the color, not of how much of it you can see through). A token that
- * exists but is not hex reports exactly that, rather than claiming it is missing.
+ * below" assertion made on HSL L would be measuring the wrong thing. Hex parsing
+ * (and its error reporting) is `hexIn`'s.
  */
 export function hexRelativeLuminanceIn(css: string, token: string): number {
-  const [r, g, b] = hexIn(css, token).map((c) => c / 255);
-  const lin = (c: number) =>
-    c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return relativeLuminance(hexIn(css, token));
 }
