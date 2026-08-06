@@ -22,7 +22,7 @@
  * an indigo page, and the eye stops finding them. Neutral planes give the brand
  * a field to sit on, so a single accent does all the signalling.
  *
- * The canvas sits OFF pure black (#17171a). A near-black page under near-white
+ * The canvas sits OFF pure black (#151523). A near-black page under near-white
  * ink is the glare end of the range, and it is the reading surface for long
  * sessions.
  *
@@ -76,7 +76,7 @@
   --md3-surface-tint: #A5B4FC;
 
   /* Semantic HSL bridge — the neutral-grey surface ladder */
-  --hsl-background: 240 24% 11%;     /* L0 canvas #17171a */
+  --hsl-background: 240 24% 11%;     /* L0 canvas #151523 */
   /* 92% L, not pure white: near-white ink on the canvas is the glare end of the
    * range, and the tiers below it need room to separate. 92% holds 13.5:1 on the
    * card — AAA with headroom — and leaves four ink steps the eye can tell apart. */
@@ -529,7 +529,7 @@
   /* Mirrors the dark ramp's spacing: 14.5 / 11.0 / 9.0 / 5.3 against white paper.
    * Every step carries the 240 cast so the ink belongs to the palette.
    *
-   * --text-dim is pinned from the CANVAS (#eceef3), not the white card: it is
+   * --text-dim is pinned from the CANVAS (#e9e9f1), not the white card: it is
    * the faintest tier, so the tinted L0 is the surface that binds it, and a
    * value chosen against paper alone sits under the 4.5:1 body floor there.
    * 4.5 on the canvas, 5.3 on the card. */
