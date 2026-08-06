@@ -113,7 +113,7 @@ const TerminalLine = React.forwardRef<HTMLDivElement, TerminalLineProps>(
           <span className="shrink-0 select-none">...</span>
         )}
         {timestamp && (
-          <span className="shrink-0 select-none text-muted-foreground opacity-50">
+          <span className="shrink-0 select-none text-[var(--text-dim)]">
             [{timestamp}]
           </span>
         )}
