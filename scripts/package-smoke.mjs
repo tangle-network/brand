@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -43,6 +44,61 @@ function exportTarget(value) {
 
 function packageSpecifier(packageName, subpath) {
   return subpath === "." ? packageName : `${packageName}/${subpath.slice(2)}`;
+}
+
+// Map every package in this pnpm workspace (name → directory) by scanning the
+// packages globs in pnpm-workspace.yaml. Only "<dir>/*" style globs are
+// understood, which covers this repo's layout.
+function workspacePackageDirectories() {
+  const directories = new Map();
+  const workspaceFile = join(root, "pnpm-workspace.yaml");
+  if (!existsSync(workspaceFile)) return directories;
+  const parents = [];
+  let inPackages = false;
+  for (const line of readFileSync(workspaceFile, "utf8").split("\n")) {
+    if (/^packages:/.test(line)) {
+      inPackages = true;
+      continue;
+    }
+    if (!inPackages) continue;
+    const entry = line.match(/^\s+-\s*["']?([^"'\s]+)["']?\s*$/);
+    if (entry) {
+      parents.push(entry[1].replace(/\/\*.*$/, ""));
+    } else if (line.trim() !== "") {
+      break;
+    }
+  }
+  for (const parent of parents) {
+    const parentDirectory = resolve(root, parent);
+    if (!existsSync(parentDirectory)) continue;
+    for (const child of readdirSync(parentDirectory, { withFileTypes: true })) {
+      if (!child.isDirectory()) continue;
+      const manifestPath = join(parentDirectory, child.name, "package.json");
+      if (!existsSync(manifestPath)) continue;
+      const name = JSON.parse(readFileSync(manifestPath, "utf8")).name;
+      if (typeof name === "string") {
+        directories.set(name, join(parentDirectory, child.name));
+      }
+    }
+  }
+  return directories;
+}
+
+function packWorkspacePackage(workspacePackageDirectory) {
+  const path = execFileSync(
+    "pnpm",
+    ["pack", "--pack-destination", packDirectory],
+    { cwd: workspacePackageDirectory, encoding: "utf8" },
+  )
+    .trim()
+    .split("\n")
+    .at(-1);
+  if (!path || !existsSync(path) || !path.endsWith(".tgz")) {
+    throw new Error(
+      `workspace peer tarball is missing: ${path ?? "no path returned"}`,
+    );
+  }
+  return path;
 }
 
 try {
@@ -89,15 +145,52 @@ try {
     );
   }
 
+  const workspacePackages = workspacePackageDirectories();
+  const workspacePeerTarballs = new Map();
+  // A peer that is another package in this workspace must be installed from a
+  // local tarball, never from the registry. The release PR bumps versions
+  // before publish, so the repo version does not exist on npm yet — asking
+  // npm for it fails with ETARGET, which fails this validation, which blocks
+  // the publish that would put the version on npm: a chicken-and-egg deadlock
+  // on every release. Packing the workspace package and installing the
+  // tarball breaks the cycle. Requires `pnpm build` to have run first (the
+  // release workflow builds before test:package) so the tarball contains
+  // dist/. Prefer the tarball even when npm already carries the repo version,
+  // so the smoke test always exercises the exact code being released.
+  function workspacePeerTarball(name) {
+    if (!workspacePeerTarballs.has(name)) {
+      workspacePeerTarballs.set(
+        name,
+        packWorkspacePackage(workspacePackages.get(name)),
+      );
+    }
+    return workspacePeerTarballs.get(name);
+  }
+
   const optionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
     .filter(([, metadata]) => metadata?.optional === true)
     .map(([name]) => {
+      // An explicit override always wins over the workspace tarball.
+      if (peerOverrides[name] !== undefined) {
+        return `${name}@${peerOverrides[name]}`;
+      }
+      if (workspacePackages.has(name)) return workspacePeerTarball(name);
       const version =
-        peerOverrides[name] ??
-        manifest.devDependencies?.[name] ??
-        manifest.peerDependencies[name];
+        manifest.devDependencies?.[name] ?? manifest.peerDependencies[name];
       return `${name}@${version}`;
     });
+
+  // Required peers are not in the list above — npm auto-installs them from
+  // the registry using the packed manifest's range, which hits the same
+  // ETARGET deadlock for workspace packages. Install their tarballs
+  // explicitly so npm satisfies the peer from disk instead.
+  const requiredWorkspacePeerTarballs = Object.keys(manifest.peerDependencies ?? {})
+    .filter(
+      (name) =>
+        manifest.peerDependenciesMeta?.[name]?.optional !== true &&
+        workspacePackages.has(name),
+    )
+    .map((name) => workspacePeerTarball(name));
 
   writeFileSync(
     join(consumerDirectory, "package.json"),
@@ -118,6 +211,7 @@ try {
       tarballPath,
       "react@19",
       "react-dom@19",
+      ...requiredWorkspacePeerTarballs,
       ...optionalPeers,
     ],
     { cwd: consumerDirectory, stdio: "inherit" },
