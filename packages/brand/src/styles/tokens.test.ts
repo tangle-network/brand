@@ -157,7 +157,7 @@ describe("a hex quoted beside an HSL token is the value that token resolves to",
 
   const annotated = [...tokens.matchAll(ANNOTATED)].flatMap(
     ([, token, h, s, l, comment]) =>
-      (comment.match(/#[0-9a-fA-F]{6}/g) ?? []).map((quoted) => ({
+      (comment.match(/#[0-9a-fA-F]{6}/g) ?? []).map((quoted: string) => ({
         token,
         quoted,
         hsl: { h: Number(h), s: Number(s), l: Number(l) },
