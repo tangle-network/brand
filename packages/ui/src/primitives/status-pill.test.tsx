@@ -67,6 +67,22 @@ describe("StatusPill", () => {
     expect(glyphWrapper.className).toMatch(/text-\[var\(--surface-[a-z]+-text\)\]/);
   });
 
+  // `px-2` from the size and `px-0` from bare are the same utility group, so
+  // which one lands is decided by the class merge rather than by reading order.
+  // Asserting the resolved class list keeps that a guarantee: a bare pill has to
+  // sit flush against the text beside it, and silently keeping the size padding
+  // would space it like a chip that lost only its background.
+  it.each(["sm", "md"] as const)("drops the %s size padding in bare mode", (size) => {
+    const { container } = render(
+      <StatusPill bare size={size} tone="info">
+        Queued
+      </StatusPill>,
+    );
+    const cls = (container.firstElementChild as HTMLElement).className;
+    expect(cls).toContain("px-0");
+    expect(cls).not.toMatch(/(^| )px-2(\.5)?( |$)/);
+  });
+
   it("gives no two tones the same silhouette", () => {
     const shapes = TONES.map((tone) => {
       const { container } = render(<StatusPill tone={tone}>S</StatusPill>);

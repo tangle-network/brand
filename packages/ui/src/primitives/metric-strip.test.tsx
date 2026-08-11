@@ -102,8 +102,53 @@ describe("MetricStrip", () => {
     const item = (container.querySelector("dl") as HTMLElement)
       .children[0] as HTMLElement;
     expect(item.className).not.toContain("border-l-0");
-    expect(item.className).toContain("max-sm:[&:not(:nth-child(2n+1))]:border-l");
-    expect(item.className).toContain("sm:[&:not(:nth-child(4n+1))]:border-l");
+  });
+
+  // The row-start test has to name the same column count the grid does, at each
+  // breakpoint. Nothing in the type system ties them together, so changing the
+  // grid to three columns without moving the divider puts a rule mid-row. Read
+  // both out of the rendered classes and require them to agree, so the coupling
+  // is enforced rather than only described.
+  it("keeps the divider's row-start test matching the grid's column count", () => {
+    const { container } = render(
+      <MetricStrip>
+        <Metric label="Balance" value="$0.00" />
+      </MetricStrip>,
+    );
+    const dl = container.querySelector("dl") as HTMLElement;
+    const item = dl.children[0] as HTMLElement;
+
+    // `grid-cols-N` unprefixed is the base breakpoint; `<bp>:grid-cols-N` is that
+    // breakpoint. The divider spells the same breakpoints as `max-<bp>:` / `<bp>:`.
+    const columnsAt = (prefix: string) => {
+      const re = prefix
+        ? new RegExp(`(?:^| )${prefix}:grid-cols-(\\d+)(?: |$)`)
+        : /(?:^| )grid-cols-(\d+)(?: |$)/;
+      const m = dl.className.match(re);
+      return m ? Number(m[1]) : null;
+    };
+    const modulusAt = (prefix: string) => {
+      const m = item.className.match(
+        new RegExp(`(?:^| )${prefix}:\\[&:not\\(:nth-child\\((\\d+)n\\+1\\)\\)\\]:border-l(?: |$)`),
+      );
+      return m ? Number(m[1]) : null;
+    };
+
+    // base grid (below sm) is guarded by the `max-sm:` divider rule
+    expect(modulusAt("max-sm")).toBe(columnsAt(""));
+    // the `sm:` grid is guarded by the `sm:` divider rule
+    expect(modulusAt("sm")).toBe(columnsAt("sm"));
+
+    // Every grid-cols breakpoint the strip declares must have a divider rule.
+    const declared = [...dl.className.matchAll(/(?:^| )(?:([a-z]+):)?grid-cols-\d+(?= |$)/g)]
+      .map((m) => m[1] ?? "");
+    for (const bp of declared) {
+      const guard = bp === "" ? "max-sm" : bp;
+      expect(
+        modulusAt(guard),
+        `grid-cols at "${bp || "base"}" has no matching ${guard}: divider rule`,
+      ).not.toBeNull();
+    }
   });
 
   it("titles the hint too, so a truncated qualifier stays recoverable", () => {
