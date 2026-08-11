@@ -118,3 +118,15 @@ export { CodeBlock, CopyButton, InlineCode } from "./code-block";
 export type { CodeBlockProps, InlineCodeProps } from "./code-block";
 
 export { ThemeToggle, useTheme } from "./theme-toggle";
+
+export { PageHeader } from "./page-header";
+export type { PageHeaderProps } from "./page-header";
+
+export { StatusPill } from "./status-pill";
+export type { StatusPillProps, StatusTone } from "./status-pill";
+
+export { MetricStrip, Metric } from "./metric-strip";
+export type { MetricStripProps, MetricProps } from "./metric-strip";
+
+export { Toolbar, FilterField } from "./toolbar";
+export type { ToolbarProps, FilterFieldProps } from "./toolbar";
