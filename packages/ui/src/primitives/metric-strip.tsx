@@ -64,9 +64,16 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
     <div
       ref={ref}
       className={cn(
-        // Leading hairline, suppressed at the start of each wrapped row.
-        "border-border border-l p-4 first:border-l-0 sm:p-5 [&:nth-child(odd)]:border-l-0 sm:[&:nth-child(odd)]:border-l",
-        "sm:first:border-l-0",
+        // Leading hairline, DRAWN only where a divider belongs — never drawn
+        // and then suppressed. Stating it as `border-l` plus `border-l-0`
+        // variants puts both in one conflict group, where the winner is decided
+        // by emitted-rule order rather than by intent; that resolved the wrong
+        // way at every breakpoint and left a rule down the start of each row.
+        // `:not(:nth-child(Nn+1))` is the row-start test for the column count
+        // at that breakpoint, so no rule ever contradicts another.
+        "border-border p-4 sm:p-5",
+        "max-sm:[&:not(:nth-child(2n+1))]:border-l",
+        "sm:[&:not(:nth-child(4n+1))]:border-l",
         className,
       )}
       {...props}

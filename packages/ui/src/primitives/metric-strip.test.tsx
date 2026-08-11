@@ -88,6 +88,24 @@ describe("MetricStrip", () => {
     expect(container.querySelectorAll("dd")).toHaveLength(1);
   });
 
+  // The divider is drawn only where it belongs, never drawn and then
+  // suppressed: `border-l` alongside `border-l-0` variants puts both in one
+  // conflict group whose winner is decided by emitted-rule order, and that
+  // resolved the wrong way at every breakpoint — every item kept a left border,
+  // including the first in each row.
+  it("draws the divider without a suppressing counterpart", () => {
+    const { container } = render(
+      <MetricStrip>
+        <Metric label="Balance" value="$0.00" />
+      </MetricStrip>,
+    );
+    const item = (container.querySelector("dl") as HTMLElement)
+      .children[0] as HTMLElement;
+    expect(item.className).not.toContain("border-l-0");
+    expect(item.className).toContain("max-sm:[&:not(:nth-child(2n+1))]:border-l");
+    expect(item.className).toContain("sm:[&:not(:nth-child(4n+1))]:border-l");
+  });
+
   it("titles a string value so a truncated figure stays readable", () => {
     render(
       <MetricStrip>
