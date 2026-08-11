@@ -57,6 +57,12 @@ const TONE_SURFACE: Record<StatusTone, string> = {
   danger:
     "bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)] border-[var(--surface-danger-border)]",
   info: "bg-[var(--surface-info-bg)] text-[var(--surface-info-text)] border-[var(--surface-info-border)]",
+  // `running` shares the info triple on purpose. `--status-running` exists but
+  // is the green dot on a sandbox — a machine's power state, not a run's
+  // outcome — and it ships as one colour with no paired background or text
+  // tier, which is the pairing this component is built to guarantee. Green also
+  // already means SUCCEEDED here, so a green "running" pill would say a run had
+  // finished well while it was still going.
   running:
     "bg-[var(--surface-info-bg)] text-[var(--surface-info-text)] border-[var(--surface-info-border)]",
   neutral:
