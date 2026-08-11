@@ -15,11 +15,10 @@ import { cn } from "../lib/utils";
  * disc as "stopped". Two states never share one silhouette.
  *
  * Each tone draws its fill, border and text from ONE matched token triple.
- * That pairing is the whole point: `--surface-warning-text` is tuned against
- * `--surface-warning-bg` and measures 4.16:1 on the light page canvas, so the
- * same colour used as bare text on a page fails AA while the pill passes. A
- * component that always brings its own background cannot be placed onto a plane
- * that breaks it.
+ * That pairing is the whole point: a status colour is solved against its own
+ * background, and nothing guarantees it against an arbitrary one. A component
+ * that always brings its own background cannot be placed onto a plane that
+ * breaks it.
  */
 export type StatusTone =
   | "success"
@@ -37,13 +36,12 @@ export interface StatusPillProps
    * Drops the fill and border, leaving a toned GLYPH beside a label in the
    * inherited body colour.
    *
-   * The label deliberately does not keep the tone. A status colour is solved
-   * against its own background, so lifting it onto whatever plane the caller
-   * happens to be on is the failure this component exists to prevent — the
-   * warning tone as bare text on the light page canvas measures 4.16:1, under
-   * the 4.5:1 body floor. The glyph keeps it because a glyph is non-text
-   * content and clears its own 3:1 floor comfortably, so the tone still reads
-   * without the label going quiet.
+   * The label deliberately does not keep the tone. Every status text token
+   * clears the 4.5:1 body floor on the page canvas — a gate holds them there —
+   * but in light the margin is thin (4.51:1 for warning, 4.54:1 for success),
+   * and the canvas is only one of the planes a caller can put a pill on. The
+   * glyph keeps the tone instead because a glyph is non-text content against a
+   * 3:1 floor, so the tone still reads with room to spare on any plane.
    *
    * For a control that supplies its own surface (a chip, a selected row).
    */

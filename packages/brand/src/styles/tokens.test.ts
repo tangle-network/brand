@@ -339,9 +339,10 @@ describe("the faint ink tiers are still TEXT, on every plane they land on", () =
     // Each status text token is solved against its own paired background, and
     // that pairing is what `StatusPill` guarantees. But the tokens also get used
     // as bare text — a "required" hint, a warning headline — where the plane
-    // behind them is the page itself. The warning tone measured 4.16:1 there
-    // while its three siblings cleared it, so the set was inconsistent rather
-    // than deliberately scoped. All four are held to the canvas now.
+    // behind them is the page itself, and nothing about that use announces it
+    // has left the pairing. So every tone is held to the body floor on the
+    // canvas as well, and the set stands or falls together rather than one tone
+    // being quietly scoped tighter than its siblings.
     const ratioOf = (a: number, b: number) =>
       (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
     for (const [theme, spine] of [

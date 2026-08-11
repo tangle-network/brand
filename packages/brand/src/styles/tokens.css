@@ -206,9 +206,11 @@
    * Separate from the `--surface-*-text` tones because a 6px bar is read
    * differently from a chip: it is told by hue alone, at a size too small to
    * carry a glyph or a label, so its slices must ALSO separate from each other
-   * in greyscale. These five are spaced 1.3:1 apart in relative luminance and
-   * each clears 3:1 against the track, so the mix stays countable with any form
-   * of colour blindness and in a monochrome screenshot.
+   * in greyscale. These five are spaced at least 1.18:1 apart in relative
+   * luminance — 1.30 in dark, 1.20 in light, where the ramp has less room
+   * before it runs into the paper — and each clears 3:1 against the track, so
+   * the mix stays countable with any form of colour blindness and in a
+   * monochrome screenshot. 1.18 is the floor the gate holds them to.
    *
    * Ranked by how much the reader needs to tell them apart: succeeded is
    * brightest and cancelled quietest, so the two that matter — succeeded and
@@ -541,9 +543,11 @@
    * Separate from the `--surface-*-text` tones because a 6px bar is read
    * differently from a chip: it is told by hue alone, at a size too small to
    * carry a glyph or a label, so its slices must ALSO separate from each other
-   * in greyscale. These five are spaced 1.3:1 apart in relative luminance and
-   * each clears 3:1 against the track, so the mix stays countable with any form
-   * of colour blindness and in a monochrome screenshot.
+   * in greyscale. These five are spaced at least 1.18:1 apart in relative
+   * luminance — 1.30 in dark, 1.20 in light, where the ramp has less room
+   * before it runs into the paper — and each clears 3:1 against the track, so
+   * the mix stays countable with any form of colour blindness and in a
+   * monochrome screenshot. 1.18 is the floor the gate holds them to.
    *
    * Ranked by how much the reader needs to tell them apart: succeeded is
    * brightest and cancelled quietest, so the two that matter — succeeded and
