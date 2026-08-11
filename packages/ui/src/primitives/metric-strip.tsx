@@ -71,6 +71,11 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
         // way at every breakpoint and left a rule down the start of each row.
         // `:not(:nth-child(Nn+1))` is the row-start test for the column count
         // at that breakpoint, so no rule ever contradicts another.
+        //
+        // N is COUPLED to the grid template on `MetricStrip`: 2 columns below
+        // `sm`, 4 from `sm`. A new breakpoint there — `md:grid-cols-3`, say —
+        // needs its `md:[&:not(:nth-child(3n+1))]:border-l` here in the same
+        // change, or the dividers land mid-row at that width.
         "border-border p-4 sm:p-5",
         "max-sm:[&:not(:nth-child(2n+1))]:border-l",
         "sm:[&:not(:nth-child(4n+1))]:border-l",
