@@ -24,21 +24,28 @@ describe("Toolbar", () => {
     expect(row.children).toHaveLength(1);
   });
 
-  // The search slot is the only one that grows; everything else stays at its
-  // content width, and the filter row scrolls as a group rather than wrapping.
-  it("lets search grow and holds actions at content width", () => {
+  // Search and filters both flex, on purpose: giving the filter row its content
+  // width starves search — a 537px filter row in an 832px toolbar collapses the
+  // search field to 89px. Sharing bounds the filter row so it scrolls within its
+  // half and search stays usable. Only `actions` sits at content width.
+  it("lets search and filters share the row, holding actions at content width", () => {
     const { container } = render(
       <Toolbar
         actions={<button type="button">Export</button>}
+        filters={<span>Product</span>}
         search={<input aria-label="Search" type="search" />}
       />,
     );
-    const [searchSlot, actionsSlot] = Array.from(
+    const [searchSlot, filterSlot, actionsSlot] = Array.from(
       (container.firstElementChild as HTMLElement).children,
     ) as HTMLElement[];
     expect(searchSlot.className).toContain("lg:flex-1");
     expect(searchSlot.className).toContain("min-w-0");
+    // Both flex, so neither can starve the other.
+    expect(filterSlot.className).toContain("lg:flex-1");
+    expect(filterSlot.className).toContain("min-w-0");
     expect(actionsSlot.className).toContain("shrink-0");
+    expect(actionsSlot.className).not.toContain("flex-1");
   });
 
   it("scrolls the filter row instead of wrapping it", () => {

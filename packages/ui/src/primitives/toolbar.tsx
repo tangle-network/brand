@@ -11,9 +11,16 @@ import { cn } from "../lib/utils";
  * own visual language, so one row carried a native `<select>`, a custom input
  * and a segmented control side by side.
  *
- * So the search slot GROWS and every other slot stays at its content width, and
- * the row is the one place those controls are composed, which is what keeps
- * them looking like one set.
+ * So search and filters SHARE the free space and `actions` stays at its content
+ * width, and the row is the one place those controls are composed, which is what
+ * keeps them looking like one set.
+ *
+ * Sharing is deliberate, and the alternative is worse. Giving the filter row its
+ * content width starves search: measured with a 537px filter row in an 832px
+ * toolbar, the search field collapses to 89px. Letting both flex bounds the
+ * filter row instead, so it scrolls within its half — 313px each in that same
+ * case — and search stays usable however many filters a page adds. `max-w-sm`
+ * then stops search claiming more than it can use when there are few filters.
  *
  * On a narrow viewport the row becomes a column and the filters scroll
  * horizontally as a group rather than wrapping into a tall stack that pushes
