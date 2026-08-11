@@ -66,6 +66,22 @@ const TONE_SURFACE: Record<StatusTone, string> = {
 };
 
 /**
+ * The text tier alone, for `bare`. Declared rather than recovered from
+ * `TONE_SURFACE` by string search: picking the `text-` class out of that string
+ * silently yields `undefined` the moment the triple gains a second `text-`
+ * utility, and an undefined class removes the tone from the one channel `bare`
+ * has left — the glyph — with nothing to signal that it happened.
+ */
+const TONE_TEXT: Record<StatusTone, string> = {
+  success: "text-[var(--surface-success-text)]",
+  warning: "text-[var(--surface-warning-text)]",
+  danger: "text-[var(--surface-danger-text)]",
+  info: "text-[var(--surface-info-text)]",
+  running: "text-[var(--surface-info-text)]",
+  neutral: "text-[var(--surface-neutral-text)]",
+};
+
+/**
  * One glyph per silhouette. `currentColor` throughout so the mark inherits the
  * tone's text colour and can never drift from the label beside it.
  */
@@ -161,13 +177,7 @@ const StatusPill = React.forwardRef<HTMLSpanElement, StatusPillProps>(
     >
       {/* In `bare` mode the tone rides on the glyph alone, so it is scoped to
           the wrapper the glyph sits in rather than applied to the whole pill. */}
-      <span
-        className={cn(
-          "inline-flex",
-          bare &&
-            TONE_SURFACE[tone].split(" ").find((c) => c.startsWith("text-")),
-        )}
-      >
+      <span className={cn("inline-flex", bare && TONE_TEXT[tone])}>
         <ToneGlyph tone={tone} />
       </span>
       {children}
