@@ -89,11 +89,10 @@
   --hsl-foreground: 225 22% 91%;     /* #e3e6ed */
   --hsl-card: 238 20% 22%;           /* L2 card #2d2e43 */
   --hsl-card-foreground: 225 22% 91%;
-  --hsl-popover: 239 22% 25%;        /* L3 #32324e. Named "popover", but the
-     value has always been the NESTED plane, not the overlay one — the overlay is
-     --md3-surface-container-highest. Kept on L3 rather than raised: a popover
+  --hsl-popover: 239 22% 25%;        /* L3 #32324e — the NESTED plane despite
+     the name; the overlay plane is --md3-surface-container-highest. A popover
      carries body text, and the ladder above L3 is reserved for planes that lift
-     by shadow. */
+     by shadow, so it sits on L3 and the ink ramp reaches it. */
   --hsl-popover-foreground: 225 22% 91%;
   /* The fill indigo, NOT the bright one: `.btn-primary` puts white on this, and
    * #6366F1 carries white at only 4.47:1. This clears the floor at 7.4:1. The
@@ -267,14 +266,14 @@
    * L2 card. --text-dim is the faintest tier but it is still TEXT, so it clears
    * the 4.5:1 body floor rather than only the 3:1 large-text one.
    *
-   * Solved against the WHOLE ladder, not against one plane. The two faint tiers
-   * used to be tuned on the card and asserted only there, which left them below
-   * the floor on the two planes above it — 4.06:1 and 3.30:1 on the nested and
-   * overlay planes, which carry a modal, a drawer and every dropdown menu. The
-   * fix moved both ends toward each other: these two tiers lifted, and the two
-   * planes above the card came down to meet them. The card, the chrome and the
-   * canvas did not move. tokens.test.ts now asserts every tier on every plane,
-   * so the next retune cannot re-open the same gap. */
+   * Solved against the WHOLE ladder, not against one plane. A faint tier tuned
+   * on the card alone still has to clear the floor on the nested and overlay
+   * planes above it, which carry the modals, the drawers and every dropdown
+   * menu — so both ends meet in the middle: the faint tiers sit high enough for
+   * the overlay, and the planes above the card sit low enough for them. The
+   * card, the chrome and the canvas are fixed points. tokens.test.ts asserts
+   * every tier on every plane, so a retune cannot open a gap on one plane while
+   * looking correct on another. */
   --text-primary: #e3e6ed;
   --text-secondary: #c2c7d4;
   --text-muted: #b2b4c7;

@@ -187,12 +187,12 @@ describe("the faint ink tiers are still TEXT, on every plane they land on", () =
   // the result LOOKS wrong: it renders as slightly faint captions that happen to
   // be unreadable.
   //
-  // EVERY plane, not just the two each tier was tuned on. This used to assert
-  // the canvas and the card only, while claiming the whole ladder in its name,
-  // and the gap was not hypothetical: the overlay plane sat two steps above the
-  // card, which put `--text-dim` at 3.30:1 and `--text-muted` at 4.10:1 there —
-  // both under the floor, on a plane that carries a modal, a drawer, a w-80
-  // dashboard panel and four dropdown menus.
+  // EVERY plane, not just the two a tier is easiest to tune on. Asserting the
+  // canvas and the card alone would leave the nested and overlay planes
+  // unguarded while this test's name still claimed the whole ladder — and those
+  // are the planes that carry a modal, a drawer, a w-80 dashboard panel and four
+  // dropdown menus, so a tier that fails only there fails where the reading
+  // actually happens.
   //
   // Compared hex-to-hex through the MD3 ladder rather than the HSL bridge,
   // because these tokens ARE hexes, and the ladder names each plane at the same
