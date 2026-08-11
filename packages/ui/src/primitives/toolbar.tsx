@@ -19,7 +19,14 @@ import { cn } from "../lib/utils";
  * horizontally as a group rather than wrapping into a tall stack that pushes
  * the table itself below the fold.
  */
-export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
+/**
+ * Slots only — `children` is omitted deliberately. A free child would render as
+ * a bare flex item with none of the `min-w-0` / `shrink-0` guards the named
+ * slots carry, so it would size itself off its content and push the row into
+ * the overflow this layout exists to prevent.
+ */
+export interface ToolbarProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   /** The one control that expands to fill the row. */
   search?: React.ReactNode;
   /** Filters, in reading order. Kept on one scrollable line when space runs out. */
@@ -29,7 +36,7 @@ export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
-  ({ className, search, filters, actions, children, ...props }, ref) => (
+  ({ className, search, filters, actions, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -53,7 +60,6 @@ const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
           {actions}
         </div>
       )}
-      {children}
     </div>
   ),
 );
