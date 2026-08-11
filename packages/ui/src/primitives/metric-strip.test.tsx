@@ -106,6 +106,22 @@ describe("MetricStrip", () => {
     expect(item.className).toContain("sm:[&:not(:nth-child(4n+1))]:border-l");
   });
 
+  it("titles the hint too, so a truncated qualifier stays recoverable", () => {
+    render(
+      <MetricStrip>
+        <Metric
+          hint="Personal wallet (0x1234abcd5678efgh)"
+          label="Balance"
+          value="$248.55"
+        />
+      </MetricStrip>,
+    );
+    expect(screen.getByText("Personal wallet (0x1234abcd5678efgh)")).toHaveAttribute(
+      "title",
+      "Personal wallet (0x1234abcd5678efgh)",
+    );
+  });
+
   it("titles a string value so a truncated figure stays readable", () => {
     render(
       <MetricStrip>

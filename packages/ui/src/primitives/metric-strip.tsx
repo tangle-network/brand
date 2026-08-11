@@ -104,7 +104,13 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
         {value}
       </dd>
       {hint && (
-        <dd className="mt-0.5 truncate text-[var(--text-dim)] text-xs">
+        // Titled for the same reason the value is: the line truncates, and a
+        // hint is where the qualifying detail lives — which wallet, which
+        // window — so a clipped one is the case most worth recovering.
+        <dd
+          className="mt-0.5 truncate text-[var(--text-dim)] text-xs"
+          title={typeof hint === "string" ? hint : undefined}
+        >
           {hint}
         </dd>
       )}
