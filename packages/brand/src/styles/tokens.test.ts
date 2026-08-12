@@ -185,34 +185,179 @@ describe("the faint ink tiers are still TEXT, on every plane they land on", () =
   // surface, so any move in the ladder — lifting the card, softening the canvas,
   // recasting the hue — silently drops them under the floor, and nothing about
   // the result LOOKS wrong: it renders as slightly faint captions that happen to
-  // be unreadable. Every plane is asserted, not just the one each was tuned on.
+  // be unreadable.
+  //
+  // EVERY plane, not just the two a tier is easiest to tune on. Asserting the
+  // canvas and the card alone would leave the nested and overlay planes
+  // unguarded while this test's name still claimed the whole ladder — and those
+  // are the planes that carry a modal, a drawer, a w-80 dashboard panel and four
+  // dropdown menus, so a tier that fails only there fails where the reading
+  // actually happens.
   //
   // Compared hex-to-hex through the MD3 ladder rather than the HSL bridge,
-  // because these tokens ARE hexes; `--md3-surface` and `--md3-surface-container`
-  // are the canvas and the card at the same positions.
+  // because these tokens ARE hexes, and the ladder names each plane at the same
+  // position in both themes.
   const ratioOf = (a: number, b: number) =>
     (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
+  /** Every plane the spine paints resting content on, floor to overlay. */
+  const PLANES = [
+    ["canvas", "md3-surface"],
+    ["chrome / field well", "md3-surface-container-low"],
+    ["card", "md3-surface-container"],
+    ["nested / hover", "md3-surface-container-high"],
+    ["overlay", "md3-surface-container-highest"],
+  ] as const;
 
   for (const [theme, spine] of [
     ["dark", DARK],
     ["light", LIGHT],
   ] as const) {
     for (const tier of ["text-dim", "text-muted"] as const) {
-      it(`${theme}: --${tier} clears 4.5:1 on both the card and the canvas`, () => {
+      it(`${theme}: --${tier} clears 4.5:1 on every plane in the ladder`, () => {
         expect(spine, `--${tier} must be defined`).toContain(`--${tier}:`);
         const ink = hexRelativeLuminanceIn(spine, tier);
-        for (const [plane, token] of [
-          ["card", "md3-surface-container"],
-          ["canvas", "md3-surface"],
-        ] as const) {
+        for (const [plane, token] of PLANES) {
           expect(
             ratioOf(ink, hexRelativeLuminanceIn(spine, token)),
-            `--${tier} on the ${plane}`,
+            `--${tier} on the ${plane} (--${token})`,
           ).toBeGreaterThanOrEqual(4.5);
         }
       });
     }
   }
+
+  it("keeps a real STEP between the ink tiers, not merely an order", () => {
+    // A tier that has to clear AA on a lighter plane can always be brightened
+    // until it does — but once it sits within a hair of the tier above it, the
+    // rung has been deleted rather than repaired, and both an ordering check
+    // and a pure contrast check call that a pass.
+    //
+    // 1.2:1 is the floor because that is roughly where two greys on the same
+    // surface stop being separable side by side. The ramp is solved to it, so a
+    // retune that compresses one end reds here instead of quietly flattening.
+    const MIN_TIER_STEP = 1.2;
+    const ratioOf = (a: number, b: number) =>
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    for (const [theme, spine] of [
+      ["dark", DARK],
+      ["light", LIGHT],
+    ] as const) {
+      const tiers = ["text-dim", "text-muted", "text-secondary", "text-primary"];
+      const lums = tiers.map((t) => hexRelativeLuminanceIn(spine, t));
+      for (let i = 1; i < tiers.length; i++) {
+        expect(
+          ratioOf(lums[i], lums[i - 1]),
+          `${theme}: --${tiers[i - 1]} and --${tiers[i]} are too close to read as different tiers`,
+        ).toBeGreaterThanOrEqual(MIN_TIER_STEP);
+      }
+      // Monotonic in the direction the theme recedes: dark quiets by darkening,
+      // light by lightening.
+      const rising = lums.every((l, i) => i === 0 || l > lums[i - 1]);
+      const falling = lums.every((l, i) => i === 0 || l < lums[i - 1]);
+      expect(
+        theme === "dark" ? rising : falling,
+        `${theme}: the ink ramp must move in one direction from dim to primary`,
+      ).toBe(true);
+    }
+  });
+
+  it("keeps a status chip a TINT in light and a RAISED FILL in dark", () => {
+    // The two themes want opposite things from a chip's fill, and treating them
+    // the same is how this got broken once already: a dark-mode rule — "the fill
+    // must separate from the card so the chip reads as a plane" — was applied to
+    // light, where the card is white, so 1.5:1 from it IS a dark grey. Every
+    // contrast floor still passed and every chip turned to mud.
+    //
+    // Light: the fill stays a WASH near paper and the border does the
+    // separating. Dark: the fill is a raised tint that has to lift off the card,
+    // because a dark chip with a near-card fill is just coloured text.
+    const ratioOf = (a: number, b: number) =>
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    const TONES = ["success", "warning", "danger", "info"] as const;
+
+    for (const tone of TONES) {
+      const lightFill = ratioOf(
+        hexRelativeLuminanceIn(LIGHT, `surface-${tone}-bg`),
+        hexRelativeLuminanceIn(LIGHT, "md3-surface-container"),
+      );
+      expect(
+        lightFill,
+        `light --surface-${tone}-bg must stay a tint near paper — the border separates the chip, not the fill`,
+      ).toBeLessThanOrEqual(1.25);
+
+      const darkFill = ratioOf(
+        hexRelativeLuminanceIn(DARK, `surface-${tone}-bg`),
+        hexRelativeLuminanceIn(DARK, "md3-surface-container"),
+      );
+      expect(
+        darkFill,
+        `dark --surface-${tone}-bg must lift off the card, or the chip is only coloured text`,
+      ).toBeGreaterThanOrEqual(1.3);
+    }
+  });
+
+  it("keeps the run-mix ramp countable without colour", () => {
+    // The bar is 6px tall and told by hue alone, so its slices must separate in
+    // GREYSCALE too. Spacing them evenly by OKLCH lightness does not do it —
+    // that is perceptual, while the ratio is computed from relative luminance —
+    // so the ramp is solved in luminance space and pinned here.
+    const RAMP = [
+      "run-mix-succeeded",
+      "run-mix-waiting",
+      "run-mix-failed",
+      "run-mix-in-flight",
+      "run-mix-cancelled",
+    ] as const;
+    const ratioOf = (a: number, b: number) =>
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    // The bar's track is `bg-background-tertiary` -> `--muted`, which is an HSL
+    // bridge token. `--md3-surface-container-high` is the same plane expressed
+    // as a hex, which is what this helper can read.
+    for (const [theme, spine, track] of [
+      ["dark", DARK, "md3-surface-container-high"],
+      ["light", LIGHT, "md3-surface-container-high"],
+    ] as const) {
+      const lums = RAMP.map((t) => hexRelativeLuminanceIn(spine, t));
+      const trackLum = hexRelativeLuminanceIn(spine, track);
+      for (const [i, l] of lums.entries()) {
+        expect(
+          ratioOf(l, trackLum),
+          `${theme}: --${RAMP[i]} against the bar's track`,
+        ).toBeGreaterThanOrEqual(2.9);
+      }
+      for (let i = 1; i < lums.length; i++) {
+        expect(
+          ratioOf(lums[i], lums[i - 1]),
+          `${theme}: --${RAMP[i - 1]} and --${RAMP[i]} are indistinguishable in greyscale`,
+        ).toBeGreaterThanOrEqual(1.18);
+      }
+    }
+  });
+
+  it("keeps every status TEXT legible on the bare page canvas", () => {
+    // Each status text token is solved against its own paired background, and
+    // that pairing is what `StatusPill` guarantees. But the tokens also get used
+    // as bare text — a "required" hint, a warning headline — where the plane
+    // behind them is the page itself, and nothing about that use announces it
+    // has left the pairing. So every tone is held to the body floor on the
+    // canvas as well, and the set stands or falls together rather than one tone
+    // being quietly scoped tighter than its siblings.
+    const ratioOf = (a: number, b: number) =>
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    for (const [theme, spine] of [
+      ["dark", DARK],
+      ["light", LIGHT],
+    ] as const) {
+      const canvas = hexRelativeLuminanceIn(spine, "md3-surface");
+      for (const tone of ["success", "warning", "danger", "info"] as const) {
+        expect(
+          ratioOf(hexRelativeLuminanceIn(spine, `surface-${tone}-text`), canvas),
+          `${theme}: --surface-${tone}-text on the page canvas`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
 });
 
 describe("input tokens carry two DIFFERENT roles and must not be conflated", () => {

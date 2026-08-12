@@ -37,7 +37,7 @@
 .dark {
   --md3-surface: #151523;                   /* L0 page canvas */
   --md3-surface-dim: #0f0f1a;               /* recessed page */
-  --md3-surface-bright: #434365;
+  --md3-surface-bright: #393957;
   /* Same value as --md3-surface-dim by design, not by drift: both name the floor
    * of the ladder, and dark has no plane below it to give them. They stay two
    * tokens because the roles diverge in light, where the well is paper (#ffffff)
@@ -46,11 +46,11 @@
   --md3-surface-container-lowest: #0f0f1a;  /* L-1 terminal/code well */
   --md3-surface-container-low: #222235;     /* L1 chrome, field wells */
   --md3-surface-container: #2d2e43;         /* L2 resting card */
-  --md3-surface-container-high: #363654;    /* L3 nested / hover */
-  --md3-surface-container-highest: #434365; /* L4 overlay */
-  --md3-surface-variant: #363654;
+  --md3-surface-container-high: #32324e;    /* L3 nested / hover */
+  --md3-surface-container-highest: #393957; /* L4 overlay */
+  --md3-surface-variant: #32324e;
   --md3-on-surface: #e3e6ed;
-  --md3-on-surface-variant: #a5abbb;
+  --md3-on-surface-variant: #b2b4c7;
 
   --md3-primary: #A5B4FC;
   --md3-primary-dim: #7C6CF6;
@@ -89,20 +89,23 @@
   --hsl-foreground: 225 22% 91%;     /* #e3e6ed */
   --hsl-card: 238 20% 22%;           /* L2 card #2d2e43 */
   --hsl-card-foreground: 225 22% 91%;
-  --hsl-popover: 240 22% 27%;        /* L4 overlay */
+  --hsl-popover: 239 22% 25%;        /* L3 #32324e — the NESTED plane despite
+     the name; the overlay plane is --md3-surface-container-highest. A popover
+     carries body text, and the ladder above L3 is reserved for planes that lift
+     by shadow, so it sits on L3 and the ink ramp reaches it. */
   --hsl-popover-foreground: 225 22% 91%;
   /* The fill indigo, NOT the bright one: `.btn-primary` puts white on this, and
    * #6366F1 carries white at only 4.47:1. This clears the floor at 7.4:1. The
    * bright indigo stays available for accent TEXT via --accent-text. */
   --hsl-primary: 246 54% 51%;       /* #4c3fc6 */
   --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 22% 27%;      /* L3 #363654 */
+  --hsl-secondary: 239 22% 25%;      /* L3 #32324e */
   --hsl-secondary-foreground: 225 22% 91%;
-  --hsl-muted: 240 22% 27%;          /* L3 hover well */
-  --hsl-muted-foreground: 223 14% 69%;  /* #a5abbb — high enough that the
+  --hsl-muted: 239 22% 25%;          /* L3 hover well */
+  --hsl-muted-foreground: 234 16% 74%;  /* #b2b4c7 — high enough that the
      reduced-opacity caption derivatives (/70, /60) still clear the large-text
      contrast floor against the L2 card. */
-  --hsl-accent: 240 22% 27%;         /* neutral hover (indigo lives in accent-surface-strong) */
+  --hsl-accent: 239 22% 25%;         /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 225 22% 91%;
   --hsl-destructive: 348 74% 48%;
   --hsl-destructive-foreground: 0 0% 100%;
@@ -154,7 +157,7 @@
   --sidebar-foreground: 225 22% 91%;
   --sidebar-primary: 246 54% 51%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 22% 27%;      /* L3 hover well */
+  --sidebar-accent: 239 22% 25%;      /* L3 hover well */
   --sidebar-accent-foreground: 225 22% 91%;
   --sidebar-border: 236 20% 35%;
   --sidebar-ring: 233 100% 87%;
@@ -162,8 +165,8 @@
   /* Depth scale — tracks the MD3 ladder (canvas / card / nested / overlay) */
   --depth-1: #151523;
   --depth-2: #2d2e43;
-  --depth-3: #363654;
-  --depth-4: #434365;
+  --depth-3: #32324e;
+  --depth-4: #393957;
 
   /* Status colors */
   --status-running: #10B981;
@@ -175,18 +178,18 @@
   --status-deleted: #6B7094;
 
   /* Status surface tokens — bg / border / text for each semantic color */
-  --surface-success-bg: #022c22;
-  --surface-success-border: #14532d;
-  --surface-success-text: #34D399;
-  --surface-warning-bg: #451a03;
-  --surface-warning-border: #78350f;
-  --surface-warning-text: #fbbf24;
-  --surface-danger-bg: #450a0a;
-  --surface-danger-border: #7f1d1d;
-  --surface-danger-text: #f87171;
-  --surface-info-bg: #082f49;
-  --surface-info-border: #0c4a6e;
-  --surface-info-text: #38bdf8;
+  --surface-success-bg: #2f5146;
+  --surface-success-border: #3c7760;
+  --surface-success-text: #5ed7a4;
+  --surface-warning-bg: #6a402c;
+  --surface-warning-border: #916436;
+  --surface-warning-text: #f4c14f;
+  --surface-danger-bg: #733b36;
+  --surface-danger-border: #9a5b56;
+  --surface-danger-text: #ffada9;
+  --surface-info-bg: #2d4e67;
+  --surface-info-border: #3d7292;
+  --surface-info-text: #67cdff;
   --surface-teal-bg: #042f2e;
   --surface-teal-border: #134e4a;
   --surface-teal-text: #2dd4bf;
@@ -196,6 +199,31 @@
   --surface-orange-bg: #431407;
   --surface-orange-border: #7c2d12;
   --surface-orange-text: #fb923c;
+
+  /* Run-mix ramp — the fills of a proportional status bar.
+   *
+   * Separate from the `--surface-*-text` tones because a 6px bar is read
+   * differently from a chip: it is told by hue alone, at a size too small to
+   * carry a glyph or a label, so its slices must ALSO separate from each other
+   * in greyscale. These five are spaced at least 1.18:1 apart in relative
+   * luminance — 1.30 in dark, 1.20 in light, where the ramp has less room
+   * before it runs into the paper — and each clears 3:1 against the track, so
+   * the mix stays countable with any form of colour blindness and in a
+   * monochrome screenshot. 1.18 is the floor the gate holds them to.
+   *
+   * Ranked by how much the reader needs to tell them apart: succeeded is
+   * brightest and cancelled quietest, so the two that matter — succeeded and
+   * failed — sit at opposite ends and can never be confused.
+   *
+   * Spacing them by OKLCH lightness does NOT work: that is perceptual, and the
+   * contrast ratio is computed from relative luminance, so an even perceptual
+   * ramp left every pair at 1.1:1. Solved in luminance space instead. */
+  --run-mix-succeeded: #76edb9;
+  --run-mix-waiting: #e9b642;
+  --run-mix-failed: #e1918e;
+  --run-mix-in-flight: #2d9bca;
+  --run-mix-cancelled: #767d90;
+
   --surface-neutral-bg: var(--depth-3);
   --surface-neutral-border: var(--border-subtle);
   --surface-neutral-text: var(--text-muted);
@@ -234,15 +262,22 @@
   --bg-selection: rgba(124, 108, 246, 0.28);
 
   /* Text — neutral */
-  /* Four steps the eye can actually separate: 10.6 / 7.5 / 5.8 / 4.7 against the
+  /* Four steps the eye can actually separate: 10.6 / 7.8 / 6.5 / 5.4 against the
    * L2 card. --text-dim is the faintest tier but it is still TEXT, so it clears
-   * the 4.5:1 body floor rather than only the 3:1 large-text one — asserted in
-   * tokens.test.ts against both the card and the canvas, since the tier is
-   * solved against one surface and rendered on both. */
+   * the 4.5:1 body floor rather than only the 3:1 large-text one.
+   *
+   * Solved against the WHOLE ladder, not against one plane. A faint tier tuned
+   * on the card alone still has to clear the floor on the nested and overlay
+   * planes above it, which carry the modals, the drawers and every dropdown
+   * menu — so both ends meet in the middle: the faint tiers sit high enough for
+   * the overlay, and the planes above the card sit low enough for them. The
+   * card, the chrome and the canvas are fixed points. tokens.test.ts asserts
+   * every tier on every plane, so a retune cannot open a gap on one plane while
+   * looking correct on another. */
   --text-primary: #e3e6ed;
-  --text-secondary: #bec3d0;
-  --text-muted: #a5abbb;
-  --text-dim: #9299ab;
+  --text-secondary: #c2c7d4;
+  --text-muted: #b2b4c7;
+  --text-dim: #9ea5b9;
 
   /* Brand accents — Tangle */
   --brand-primary: #7C6CF6;
@@ -485,7 +520,7 @@
   --surface-success-text: #047857;
   --surface-warning-bg: #fffbeb;
   --surface-warning-border: #fde68a;
-  --surface-warning-text: #b45309;
+  --surface-warning-text: #ab4f09;
   --surface-danger-bg: #fff1f2;
   --surface-danger-border: #fecdd3;
   --surface-danger-text: #b91c1c;
@@ -501,6 +536,31 @@
   --surface-orange-bg: #fff7ed;
   --surface-orange-border: #fed7aa;
   --surface-orange-text: #c2410c;
+
+  /* Run-mix ramp — the fills of a proportional status bar.
+   *
+   * Separate from the `--surface-*-text` tones because a 6px bar is read
+   * differently from a chip: it is told by hue alone, at a size too small to
+   * carry a glyph or a label, so its slices must ALSO separate from each other
+   * in greyscale. These five are spaced at least 1.18:1 apart in relative
+   * luminance — 1.30 in dark, 1.20 in light, where the ramp has less room
+   * before it runs into the paper — and each clears 3:1 against the track, so
+   * the mix stays countable with any form of colour blindness and in a
+   * monochrome screenshot. 1.18 is the floor the gate holds them to.
+   *
+   * Ranked by how much the reader needs to tell them apart: succeeded is
+   * brightest and cancelled quietest, so the two that matter — succeeded and
+   * failed — sit at opposite ends and can never be confused.
+   *
+   * Spacing them by OKLCH lightness does NOT work: that is perceptual, and the
+   * contrast ratio is computed from relative luminance, so an even perceptual
+   * ramp left every pair at 1.1:1. Solved in luminance space instead. */
+  --run-mix-succeeded: #3c9b78;
+  --run-mix-waiting: #c16227;
+  --run-mix-failed: #cd342f;
+  --run-mix-in-flight: #00679e;
+  --run-mix-cancelled: #515367;
+
   --surface-neutral-bg: var(--depth-3);
   --surface-neutral-border: var(--border-subtle);
   --surface-neutral-text: var(--text-muted);

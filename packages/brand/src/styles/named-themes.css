@@ -52,7 +52,7 @@
 [data-theme="arena-light"],
 [data-theme="tangle-light"] {
   --surface-success-bg: #ecfdf5; --surface-success-border: #a7f3d0; --surface-success-text: #047857;
-  --surface-warning-bg: #fffbeb; --surface-warning-border: #fde68a; --surface-warning-text: #b45309;
+  --surface-warning-bg: #fffbeb; --surface-warning-border: #fde68a; --surface-warning-text: #ab4f09;
   --surface-danger-bg: #fff1f2; --surface-danger-border: #fecdd3; --surface-danger-text: #b91c1c;
   --surface-info-bg: #f0f9ff; --surface-info-border: #bae6fd; --surface-info-text: #0369a1;
   /* Light-tuned interactive tokens — without these the named light scopes
@@ -184,23 +184,23 @@
 [data-theme="tangle-dark"] {
   --hsl-background: 240 24% 11%;  --hsl-foreground: 225 22% 91%;
   --hsl-card: 238 20% 22%;        --hsl-card-foreground: 225 22% 91%;
-  --hsl-popover: 240 22% 27%;     --hsl-popover-foreground: 225 22% 91%;
+  --hsl-popover: 239 22% 25%;     --hsl-popover-foreground: 225 22% 91%;
   --hsl-primary: 246 54% 51%;     --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 240 22% 27%;   --hsl-secondary-foreground: 225 22% 91%;
-  --hsl-muted: 240 22% 27%;       --hsl-muted-foreground: 223 14% 69%;
-  --hsl-accent: 240 22% 27%;      --hsl-accent-foreground: 225 22% 91%;
+  --hsl-secondary: 239 22% 25%;   --hsl-secondary-foreground: 225 22% 91%;
+  --hsl-muted: 239 22% 25%;       --hsl-muted-foreground: 234 16% 74%;
+  --hsl-accent: 239 22% 25%;      --hsl-accent-foreground: 225 22% 91%;
   --hsl-destructive: 348 74% 48%; --hsl-destructive-foreground: 0 0% 100%;
   --hsl-border: 236 20% 35%;      --hsl-input: 240 24% 15%;
   --hsl-ring: 233 100% 87%;
-  --depth-1: #151523; --depth-2: #2d2e43; --depth-3: #363654; --depth-4: #434365;
+  --depth-1: #151523; --depth-2: #2d2e43; --depth-3: #32324e; --depth-4: #393957;
   --bg-root: #151523; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: #0f0f1a; --md3-surface-container-low: #222235;
-  --md3-surface-container: #2d2e43; --md3-surface-container-high: #363654;
-  --md3-surface-container-highest: #434365; --md3-outline-variant: #474a6b;
+  --md3-surface-container: #2d2e43; --md3-surface-container-high: #32324e;
+  --md3-surface-container-highest: #393957; --md3-outline-variant: #474a6b;
   --border-subtle: rgba(165, 180, 252, 0.10); --border-default: rgba(165, 180, 252, 0.16);
   --border-hover: rgba(165, 180, 252, 0.28); --accent-text: #A5B4FC;
   --brand-primary: #7C6CF6; --brand-glow: #A5AAFC;
-  --text-primary: #e3e6ed; --text-secondary: #bec3d0; --text-muted: #a5abbb; --text-dim: #9299ab;
+  --text-primary: #e3e6ed; --text-secondary: #c2c7d4; --text-muted: #b2b4c7; --text-dim: #9ea5b9;
 }
 /* Its light mode. */
 [data-theme="tangle-light"] {
