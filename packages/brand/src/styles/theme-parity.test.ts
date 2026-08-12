@@ -33,7 +33,9 @@ function declarationsIn(css: string): Map<string, string> {
 
 // The default spine, which is the one `@theme` mirrors. Anchor on the last
 // selector of the multi-selector header, as the other suites here do.
-const runtime = declarationsIn(blockIn(read("tokens.css"), ".dark"));
+const tokensCss = read("tokens.css");
+const runtime = declarationsIn(blockIn(tokensCss, ".dark"));
+const light = declarationsIn(blockIn(tokensCss, ".light"));
 const theme = declarationsIn(blockIn(read("theme.css"), "@theme"));
 
 const shared = [...theme.keys()].filter((t) => runtime.has(t)).sort();
@@ -48,6 +50,32 @@ describe("tokens.css and theme.css agree on every token they both declare", () =
   for (const token of shared) {
     it(`${token} carries one value`, () => {
       expect(theme.get(token)).toBe(runtime.get(token));
+    });
+  }
+});
+
+/**
+ * A token written in terms of `--hsl-foreground` already inverts, because that
+ * ramp is what each spine redefines. Restating it on the light spine would pin
+ * it to one theme's ink and defeat the derivation — the failure would be silent,
+ * since both declarations are individually valid CSS.
+ *
+ * So the omission is the contract, and this asserts it rather than trusting the
+ * comment that states it.
+ */
+const selfInverting = [...runtime.entries()]
+  .filter(([, value]) => value.includes("var(--hsl-foreground)"))
+  .map(([token]) => token)
+  .sort();
+
+describe("a self-inverting token is declared once, not per spine", () => {
+  it("finds the self-inverting tokens to check", () => {
+    expect(selfInverting.length).toBeGreaterThan(0);
+  });
+
+  for (const token of selfInverting) {
+    it(`${token} is not restated on the light spine`, () => {
+      expect(light.has(token)).toBe(false);
     });
   }
 });
