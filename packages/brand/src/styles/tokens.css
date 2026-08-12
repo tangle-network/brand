@@ -319,6 +319,18 @@
   --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.45);
   --shadow-glow: none;
   --shadow-accent: 0 1px 2px rgba(0, 0, 0, 0.3);
+  /* The lift above --shadow-dropdown, for a surface that covers the page
+     rather than sitting beside it: a drawer, a modal, a floating dock.
+     Two layers — a tight contact shadow plus a wide ambient one.
+     Alone among the shadows this is derived from --hsl-foreground instead of
+     a fixed rgba, so it INVERTS with the theme. That is what makes it work in
+     dark: a black shadow on a dark canvas renders as nothing (see the ladder
+     note at the top of this file), while the foreground is near-white there,
+     so the same declaration reads as a soft halo. One definition therefore
+     serves both themes and the light block does not restate it. */
+  --shadow-overlay:
+    0 2px 6px hsl(var(--hsl-foreground) / 0.1),
+    0 16px 40px hsl(var(--hsl-foreground) / 0.16);
   --shadow-status-running: none;
   --shadow-status-creating: none;
   --shadow-status-error: none;
