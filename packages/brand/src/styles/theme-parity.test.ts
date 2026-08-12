@@ -71,6 +71,11 @@ const selfInverting = [...runtime.entries()]
 describe("a self-inverting token is declared once, not per spine", () => {
   it("finds the self-inverting tokens to check", () => {
     expect(selfInverting.length).toBeGreaterThan(0);
+    // The assertions below are absence checks, so they hold trivially against
+    // an empty map. A selector rename that stopped matching the light spine
+    // would otherwise read as "nothing is restated" — the strongest possible
+    // pass from the weakest possible parse.
+    expect(light.size).toBeGreaterThan(5);
   });
 
   for (const token of selfInverting) {
