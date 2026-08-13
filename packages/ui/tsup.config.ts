@@ -18,6 +18,7 @@ export default defineConfig({
     types: "src/types/index.ts",
     utils: "src/utils/index.ts",
     "tool-previews": "src/tool-previews/index.ts",
+    redaction: "src/redaction/index.ts",
   },
   format: ["esm"],
   dts: true,

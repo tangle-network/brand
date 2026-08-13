@@ -101,6 +101,11 @@
       "types": "./dist/nav.d.ts",
       "import": "./dist/nav.js",
       "default": "./dist/nav.js"
+    },
+    "./redaction": {
+      "types": "./dist/redaction.d.ts",
+      "import": "./dist/redaction.js",
+      "default": "./dist/redaction.js"
     }
   },
   "scripts": {
