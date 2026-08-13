@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.5.0
+
+### Minor Changes
+
+- 8dbe359: Export `RunRowShell` (+ `RunRowStatusDot`, `RunRowStatus`) from the `/run` entry. The shell is the shared run-row grammar beneath `InlineToolItem`/`InlineThinkingItem`; consumers whose row carries behaviors the fixed items don't model (a treated title, a streaming plain-text body) can now compose the grammar directly instead of re-forking it.
+
 ## 11.4.0
 
 ### Minor Changes
