@@ -32,7 +32,10 @@ export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
 export interface RunRowShellProps {
   /** Semantic lead glyph — always visible; never replaced by status. */
   icon: ReactNode;
-  title: string;
+  /** Row title. A string in the common case; a node when the title carries its
+   *  own treatment (e.g. an active-state shimmer sweep) — it renders inline in
+   *  the shell's title slot either way. */
+  title: ReactNode;
   /** Secondary inline text (tool path/command, or a reasoning preview). */
   description?: string;
   /** Render the description in mono (tools) vs prose (reasoning). */
