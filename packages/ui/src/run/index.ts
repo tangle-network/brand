@@ -1,4 +1,10 @@
 export { RunGroup, type RunGroupProps } from "./run-group";
+export {
+  RunRowShell,
+  RunRowStatusDot,
+  type RunRowShellProps,
+  type RunRowStatus,
+} from "./run-row-shell";
 export { InlineToolItem, type InlineToolItemProps } from "./inline-tool-item";
 export {
   InlineThinkingItem,
