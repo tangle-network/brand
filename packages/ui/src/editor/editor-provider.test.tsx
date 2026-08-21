@@ -185,10 +185,17 @@ describe("EditorProvider", () => {
   });
 
   it("holds children back until the peers load, then renders them", async () => {
+    let releasePeers: (() => void) | null = null;
+    const gate = new Promise<void>((resolve) => {
+      releasePeers = resolve;
+    });
     vi.resetModules();
     vi.doMock("./editor-peers", async () => ({
       ...(await vi.importActual<typeof EditorPeers>("./editor-peers")),
-      loadCollaborationPeers: async () => stubPeers(),
+      loadEditorProviderPeers: async () => {
+        await gate;
+        return stubPeers();
+      },
     }));
     const { EditorProvider } = await import("./editor-provider");
 
@@ -204,10 +211,16 @@ describe("EditorProvider", () => {
     );
 
     // A child that rendered before the provider would throw out of
-    // `useEditorContext`, so the wrapper must render nothing until then.
+    // `useEditorContext`, so the wrapper must render nothing while the gate
+    // holds the loader.
     expect(screen.queryByTestId("child")).toBeNull();
+    expect(StubHocuspocusProvider.instances).toHaveLength(0);
+
+    releasePeers?.();
+
     await waitFor(() => {
       expect(screen.getByTestId("child")).toBeInTheDocument();
     });
+    expect(StubHocuspocusProvider.instances).toHaveLength(1);
   });
 });

@@ -313,6 +313,13 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
   // behaviour, and it also means a green build no longer proves that an
   // INSTALLED peer resolved. Read the emitted chunks and say which peers the
   // bundle stubbed.
+  //
+  // The text below is Vite's own wording for that stub. A Vite upgrade that
+  // rewords it must update this marker: the `stubbedPeers.size === 0` guard
+  // further down turns a stale marker into a failing run rather than a silent
+  // pass, and the omit-every-peer run in `test:package` reaches that guard on
+  // every CI run.
+  const stubMarker = (name) => `Could not resolve "${name}"`;
   const stubbedPeers = new Set();
   for (const entry of readdirSync(consumerDistDirectory, {
     recursive: true,
@@ -321,7 +328,7 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
     if (!entry.isFile() || !entry.name.endsWith(".js")) continue;
     const code = readFileSync(join(entry.parentPath, entry.name), "utf8");
     for (const name of declaredOptionalPeers) {
-      if (code.includes(`Could not resolve "${name}"`)) stubbedPeers.add(name);
+      if (code.includes(stubMarker(name))) stubbedPeers.add(name);
     }
   }
 
@@ -340,7 +347,8 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
   // string that the check above reads.
   if (omittedOptionalPeers.length > 0 && stubbedPeers.size === 0) {
     throw new Error(
-      `no omitted optional peer was stubbed; the build never reached ${omittedOptionalPeers.join(", ")}`,
+      `no omitted optional peer was stubbed; either the build never reached ` +
+        `${omittedOptionalPeers.join(", ")}, or Vite reworded the stub this script reads`,
     );
   }
 

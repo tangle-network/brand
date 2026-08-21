@@ -164,10 +164,24 @@ describe("editor optional peer loaders", () => {
     );
   });
 
-  it("leaves the install list alone when the failure names no single package", async () => {
-    const vague = new Error("Module not found");
-    const mapped = asMissingEditorPeersError(vague, "install the peers");
+  it("leaves a resolution failure that names no peer alone, so it stays retryable", async () => {
+    // An application chunk, or a dependency of a peer that did load, can fail
+    // to resolve too. Installing the editor peers would not fix that, and
+    // marking it permanent would stop a remount from trying again.
+    const unrelated = new Error("Cannot find module './app-chunk-a91f.js'");
+    const mapped = asMissingEditorPeersError(unrelated, "install the peers");
 
+    expect(mapped).toBe(unrelated);
+    expect(isMissingEditorPeersError(mapped)).toBe(false);
+  });
+
+  it("keeps the install list alone when the failure names several peers", async () => {
+    const both = new Error(
+      'Could not resolve "@tiptap/react" or "@hocuspocus/provider"',
+    );
+    const mapped = asMissingEditorPeersError(both, "install the peers");
+
+    expect(isMissingEditorPeersError(mapped)).toBe(true);
     expect((mapped as Error).message).toBe("install the peers");
   });
 

@@ -124,35 +124,35 @@ const DEFERRED_PEERS = [
   "yjs",
 ];
 
-/**
- * The one package a resolution failure names, or null when the message names
- * none or more than one. An install list holds every peer a surface needs, so
- * this tells a consumer which of them is actually absent.
- */
-function unresolvedPeerFrom(error: unknown): string | null {
-  if (!(error instanceof Error)) return null;
+/** Every deferred peer a resolution failure names. */
+function unresolvedPeersFrom(error: unknown): string[] {
+  if (!(error instanceof Error)) return [];
   const named = DEFERRED_PEERS.filter((name) => error.message.includes(name));
   // "@tiptap/extension-collaboration" is a prefix of the caret package, so a
-  // message about the caret names both. Keep only the longest.
-  const longest = named.filter(
+  // message about the caret names both. Drop a name another match contains.
+  return named.filter(
     (name) => !named.some((other) => other !== name && other.includes(name)),
   );
-  return longest.length === 1 ? longest[0] : null;
 }
 
 /**
- * Turns a rejection that names an unresolved package into the install-list
- * error, and keeps the original as its cause. Any other rejection passes
- * through, so a transient chunk fetch keeps its own message and stays
- * retryable.
+ * Turns a rejection that names an unresolved peer into the install-list error,
+ * and keeps the original as its cause. Any other rejection passes through, so
+ * a transient chunk fetch keeps its own message and stays retryable.
  */
 export function asMissingEditorPeersError(
   error: unknown,
   missingMessage: string,
 ): unknown {
   if (!isMissingPeerError(error)) return error;
-  const unresolved = unresolvedPeerFrom(error);
-  const detail = unresolved === null ? "" : ` ${unresolved} did not resolve.`;
+  const unresolved = unresolvedPeersFrom(error);
+  // A resolution failure that names none of the peers comes from somewhere
+  // else: an application chunk, or a dependency of a peer that did load.
+  // Installing the list would not fix it, and a later attempt can still
+  // succeed, so it keeps its own error and stays retryable.
+  if (unresolved.length === 0) return error;
+  const detail =
+    unresolved.length === 1 ? ` ${unresolved[0]} did not resolve.` : "";
   return new MissingEditorPeersError(missingMessage + detail, { cause: error });
 }
 
