@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -89,19 +89,46 @@ if (unclassifiedPeers.length > 0 || staleClassifications.length > 0) {
   process.exit(1);
 }
 
+function specifierPattern(peer) {
+  return `${peer.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:/[^"']*)?`;
+}
+
 // `from "x"` also matches a re-export and an import statement that spans
 // lines; `import("x")` is the dynamic form and is the point of the rule.
 function staticImportPattern(peer) {
-  const specifier = `${peer.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:/[^"']*)?`;
-  return new RegExp(`(?:^|[^\\w$.])(?:from|import)\\s*["']${specifier}["']`);
+  return new RegExp(`(?:^|[^\\w$.])(?:from|import)\\s*["']${specifierPattern(peer)}["']`);
 }
 
+// esbuild reports an unresolvable literal `import()` as a build error and
+// leaves it to run time only when the call carries a `.catch()`. A dynamic
+// import that loses its handler still builds here and under Vite, and breaks
+// an esbuild consumer that installs no peers, so match the shape directly.
+function uncaughtDynamicImportPattern(peer) {
+  return new RegExp(
+    `import\\s*\\(\\s*["']${specifierPattern(peer)}["']\\s*\\)(?!\\s*\\.catch\\b)`,
+  );
+}
+
+// Code-split chunks and nested directories carry imports too, so read every
+// emitted file rather than the top level alone.
+const emittedFiles = readdirSync(distDirectory, {
+  recursive: true,
+  withFileTypes: true,
+})
+  .filter((entry) => entry.isFile() && entry.name.endsWith(".js"))
+  .map((entry) => join(entry.parentPath, entry.name));
+
 const staticPeerImports = [];
-for (const file of readdirSync(distDirectory).filter((name) => name.endsWith(".js"))) {
-  const code = readFileSync(join(distDirectory, file), "utf8");
+const uncaughtPeerImports = [];
+for (const file of emittedFiles) {
+  const code = readFileSync(file, "utf8");
+  const label = relative(distDirectory, file);
   for (const peer of deferredOptionalPeers) {
     if (staticImportPattern(peer).test(code)) {
-      staticPeerImports.push(`${file}: ${peer}`);
+      staticPeerImports.push(`${label}: ${peer}`);
+    }
+    if (uncaughtDynamicImportPattern(peer).test(code)) {
+      uncaughtPeerImports.push(`${label}: ${peer}`);
     }
   }
 }
@@ -110,6 +137,14 @@ if (staticPeerImports.length > 0) {
     "validate-dist: deferred optional peers must be reached through a dynamic import():",
   );
   for (const entry of staticPeerImports) console.error(`  ${entry}`);
+  process.exit(1);
+}
+if (uncaughtPeerImports.length > 0) {
+  console.error(
+    "validate-dist: every dynamic import of a deferred optional peer must carry a .catch(), " +
+      "or an esbuild consumer without the peer fails to build:",
+  );
+  for (const entry of uncaughtPeerImports) console.error(`  ${entry}`);
   process.exit(1);
 }
 
@@ -125,5 +160,5 @@ if (forbiddenCss.length > 0) {
 console.log(
   `validate-dist: ok (${Object.keys(manifest.exports).length} exports, ${targetCount} files, ` +
     `${declaredOptionalPeers.length} optional peers, ${deferredOptionalPeers.length} of them ` +
-    `dynamic-only, no CSS leak)`,
+    `dynamic-only and caught, no CSS leak, ${emittedFiles.length} files scanned)`,
 );

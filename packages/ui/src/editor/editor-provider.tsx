@@ -4,7 +4,6 @@ import type { HocuspocusProvider } from "@hocuspocus/provider";
 import {
   type ComponentType,
   createContext,
-  lazy,
   type ReactNode,
   Suspense,
   useCallback,
@@ -15,6 +14,7 @@ import {
   useState,
 } from "react";
 import type * as Y from "yjs";
+import { retryableLazyEditor } from "./editor-lazy";
 import { type CollaborationPeers, loadCollaborationPeers } from "./editor-peers";
 
 /**
@@ -429,9 +429,9 @@ export function createEditorProvider(
   };
 }
 
-const LazyEditorProvider = lazy(async () => ({
-  default: createEditorProvider(await loadCollaborationPeers()),
-}));
+const lazyEditorProvider = retryableLazyEditor(async () =>
+  createEditorProvider(await loadCollaborationPeers()),
+);
 
 /**
  * EditorProvider wraps children with Hocuspocus collaboration context.
@@ -440,6 +440,7 @@ const LazyEditorProvider = lazy(async () => ({
  * hook reads a context that only the loaded provider can supply.
  */
 export function EditorProvider(props: EditorProviderProps) {
+  const LazyEditorProvider = lazyEditorProvider();
   return (
     <Suspense fallback={null}>
       <LazyEditorProvider {...props} />

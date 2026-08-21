@@ -1,15 +1,9 @@
 "use client";
 
 import type { Editor } from "@tiptap/react";
-import {
-  type ComponentType,
-  lazy,
-  Suspense,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { type ComponentType, Suspense, useEffect, useMemo, useRef } from "react";
 import { cn } from "../lib/utils";
+import { retryableLazyEditor } from "./editor-lazy";
 import { EditorLoadingPlaceholder } from "./editor-loading";
 import { type DocumentEditorPeers, loadDocumentEditorPeers } from "./editor-peers";
 import { EditorToolbar } from "./editor-toolbar";
@@ -156,12 +150,13 @@ export function createMarkdownDocumentEditor(
   };
 }
 
-const LazyMarkdownDocumentEditor = lazy(async () => ({
-  default: createMarkdownDocumentEditor(await loadDocumentEditorPeers()),
-}));
+const lazyMarkdownDocumentEditor = retryableLazyEditor(async () =>
+  createMarkdownDocumentEditor(await loadDocumentEditorPeers()),
+);
 
 /** Local markdown editor. Loads its tiptap peers on first render. */
 export function MarkdownDocumentEditor(props: MarkdownDocumentEditorProps) {
+  const LazyMarkdownDocumentEditor = lazyMarkdownDocumentEditor();
   return (
     <Suspense
       fallback={

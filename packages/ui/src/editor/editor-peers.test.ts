@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { isMissingPeerError } from "./editor-peers";
+import {
+  asMissingEditorPeersError,
+  isMissingEditorPeersError,
+  isMissingPeerError,
+} from "./editor-peers";
 
 /** The namespace shape each peer has when it is installed. */
 const installedPeers: Record<string, Record<string, unknown>> = {
@@ -92,6 +96,64 @@ describe("editor optional peer loaders", () => {
     );
   });
 
+  it("names the install list when an extension stub carries a default it cannot configure", async () => {
+    // The commonest stub shape is a default export that is present but empty.
+    // It passes a plain "is the default defined" test, and then the factory
+    // calls .configure() on it and throws an opaque TypeError mid-render.
+    const { loadDocumentEditorPeers } = await loadPeerLoaders({
+      "@tiptap/starter-kit": { default: {} },
+    });
+
+    await expect(loadDocumentEditorPeers()).rejects.toThrow(
+      /Install @tiptap\/react and @tiptap\/starter-kit/,
+    );
+  });
+
+  it.each([
+    "@tiptap/extension-collaboration",
+    "@tiptap/extension-collaboration-caret",
+  ])("names the collaboration install list when %s is an empty default", async (specifier) => {
+    const { loadCollaborationPeers } = await loadPeerLoaders({
+      [specifier]: { default: {} },
+    });
+
+    await expect(loadCollaborationPeers()).rejects.toThrow(
+      /@hocuspocus\/provider and yjs/,
+    );
+  });
+
+  it("marks a missing peer permanent and leaves any other failure retryable", async () => {
+    // editor-lazy.ts reads this distinction to decide whether a remount may
+    // try the import again.
+    const { loadDocumentEditorPeers } = await loadPeerLoaders({
+      "@tiptap/starter-kit": { default: {} },
+    });
+
+    await expect(loadDocumentEditorPeers()).rejects.toSatisfy(isMissingEditorPeersError);
+    expect(isMissingEditorPeersError(new Error("Failed to fetch dynamically imported module"))).toBe(
+      false,
+    );
+  });
+
+  it("reports an unresolved import as a permanent missing peer and keeps the cause", async () => {
+    // The rejection a throwing stub gives must become the install list, so a
+    // consumer reads which packages to add, and must count as permanent so a
+    // remount does not retry an import that cannot start to succeed.
+    const resolutionFailure = new Error('Could not resolve "@tiptap/starter-kit"');
+    const mapped = asMissingEditorPeersError(resolutionFailure, "install the peers");
+
+    expect(isMissingEditorPeersError(mapped)).toBe(true);
+    expect(mapped).toHaveProperty("cause", resolutionFailure);
+    expect((mapped as Error).message).toBe("install the peers");
+  });
+
+  it("leaves a transient chunk failure unchanged, so a remount can retry it", async () => {
+    const transient = new Error("Failed to fetch dynamically imported module");
+
+    expect(asMissingEditorPeersError(transient, "install the peers")).toBe(transient);
+    expect(isMissingEditorPeersError(transient)).toBe(false);
+  });
+
   it("names the install list when a peer carries the wrong member type", async () => {
     const { loadDocumentEditorPeers } = await loadPeerLoaders({
       "@tiptap/react": { useEditor: undefined, EditorContent: undefined },
@@ -100,6 +162,26 @@ describe("editor optional peer loaders", () => {
     await expect(loadDocumentEditorPeers()).rejects.toThrow(
       /Install @tiptap\/react and @tiptap\/starter-kit/,
     );
+  });
+
+  it("accepts the shapes the installed peers really have", async () => {
+    // The other cases in this file describe the peers, so nothing here would
+    // notice a tiptap release that moves `configure` off the default export.
+    // Loading the real packages is what turns that into a failure here rather
+    // than in a consumer's editor.
+    vi.resetModules();
+    for (const specifier of Object.keys(installedPeers)) {
+      vi.doUnmock(specifier);
+    }
+    const { loadCollaborationPeers } = await import("./editor-peers");
+
+    const peers = await loadCollaborationPeers();
+    // Prove the substitutions are gone; against the stubs this case would
+    // pass without reading a real package at all.
+    expect(peers.starterKit.default).not.toBe(installedPeers["@tiptap/starter-kit"].default);
+    expect(typeof peers.starterKit.default.configure).toBe("function");
+    expect(typeof peers.collaboration.default.configure).toBe("function");
+    expect(typeof peers.collaborationCaret.default.configure).toBe("function");
   });
 
   it("keeps the local editor usable when only a collaboration peer is missing", async () => {

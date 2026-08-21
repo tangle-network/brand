@@ -2,9 +2,10 @@
 
 import type { AnyExtension } from "@tiptap/core";
 import type { Editor } from "@tiptap/react";
-import { type ComponentType, lazy, Suspense, useEffect, useMemo } from "react";
+import { type ComponentType, Suspense, useEffect, useMemo } from "react";
 import { cn } from "../lib/utils";
 import { type Collaborator, useEditorContext } from "./editor-provider";
+import { retryableLazyEditor } from "./editor-lazy";
 import { EditorLoadingPlaceholder } from "./editor-loading";
 import { type CollaborationPeers, loadCollaborationPeers } from "./editor-peers";
 
@@ -266,9 +267,9 @@ export function createTiptapEditor(
   };
 }
 
-const LazyTiptapEditor = lazy(async () => ({
-  default: createTiptapEditor(await loadCollaborationPeers()),
-}));
+const lazyTiptapEditor = retryableLazyEditor(async () =>
+  createTiptapEditor(await loadCollaborationPeers()),
+);
 
 /**
  * TiptapEditor - Collaborative markdown editor with Y.js sync.
@@ -276,6 +277,7 @@ const LazyTiptapEditor = lazy(async () => ({
  * yjs peers on first render.
  */
 export function TiptapEditor(props: TiptapEditorProps) {
+  const LazyTiptapEditor = lazyTiptapEditor();
   return (
     <Suspense
       fallback={

@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Doc } from "yjs";
 import { createEditorProvider, useEditorContext } from "./editor-provider";
+import type * as EditorPeers from "./editor-peers";
 import type { CollaborationPeers } from "./editor-peers";
 import { useEditorConnection } from "./use-editor";
 
@@ -141,7 +142,8 @@ describe("createEditorProvider", () => {
 describe("EditorProvider", () => {
   it("holds children back until the peers load, then renders them", async () => {
     vi.resetModules();
-    vi.doMock("./editor-peers", () => ({
+    vi.doMock("./editor-peers", async () => ({
+      ...(await vi.importActual<typeof EditorPeers>("./editor-peers")),
       loadCollaborationPeers: async () => stubPeers(),
     }));
     const { EditorProvider } = await import("./editor-provider");

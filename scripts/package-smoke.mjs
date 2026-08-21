@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
+import { build as esbuildBuild } from "esbuild";
 import { build } from "vite";
 
 const root = resolve(import.meta.dirname, "..");
@@ -343,12 +344,28 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
     );
   }
 
+  // Vite and Rollup leave an unresolved literal `import()` to run time on
+  // their own. esbuild does so only when the call carries a `.catch()`, and
+  // reports a build error otherwise, so a consumer that installs no peers
+  // needs its own bundle to prove the promise the README makes. Building the
+  // same entry a second time is what catches a dropped handler end to end.
+  await esbuildBuild({
+    entryPoints: [join(consumerDirectory, "src/main.js")],
+    bundle: true,
+    format: "esm",
+    platform: "browser",
+    outfile: join(consumerDirectory, "dist-esbuild/out.js"),
+    logLevel: "error",
+    absWorkingDir: consumerDirectory,
+  });
+
   const omissionNote =
     omittedOptionalPeers.length > 0
       ? ` without ${omittedOptionalPeers.join(", ")}`
       : "";
   console.log(
-    `Packed ${manifest.name}@${manifest.version} passed a clean consumer build across ${specifiers.length} JS exports${omissionNote}`,
+    `Packed ${manifest.name}@${manifest.version} passed a clean Vite and esbuild consumer build ` +
+      `across ${specifiers.length} JS exports${omissionNote}`,
   );
 } finally {
   rmSync(workDirectory, { force: true, recursive: true });

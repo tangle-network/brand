@@ -9,13 +9,20 @@
  * dynamic `import()` calls in this module, and each component is built from
  * the loaded namespaces. Type-only imports are erased, so they stay allowed.
  *
+ * A bundler still reads the literal specifier in a dynamic `import()`. Vite
+ * and Rollup leave an unresolved one to run time on their own; esbuild does so
+ * only when the call carries a `.catch()`. Every import below therefore
+ * attaches `rethrow`. Webpack has no such rule and needs consumer
+ * configuration, which `packages/ui/README.md` gives.
+ *
  * The two loaders keep the local editor independent of the collaboration
  * stack: a consumer that installs only tiptap can edit markdown locally, and
  * pays for yjs and Hocuspocus only when it renders the collaborative editor.
  *
- * Each component wraps one loader in a module-scope `React.lazy`. A missing
- * peer is a permanent condition, so the rejection that `lazy` caches stays
- * true, and it reaches the consumer's error boundary with the install list.
+ * A missing peer and a transient chunk fetch fail differently, so they carry
+ * different types: a missing peer throws `MissingEditorPeersError`, which
+ * `editor-lazy.ts` treats as permanent, and any other rejection keeps its own
+ * error and stays retryable.
  */
 
 import type * as Hocuspocus from "@hocuspocus/provider";
@@ -48,6 +55,26 @@ const COLLABORATION_PEERS_MISSING =
   "Install @tiptap/react, @tiptap/starter-kit, @tiptap/extension-collaboration, " +
   "@tiptap/extension-collaboration-caret, @hocuspocus/provider and yjs.";
 
+/**
+ * A peer the editor needs is absent, or resolved to a stub that carries none
+ * of the members the editor calls. The condition holds for the rest of the
+ * session, because a package does not install itself mid-run.
+ */
+export class MissingEditorPeersError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "MissingEditorPeersError";
+  }
+}
+
+/**
+ * True for the error above. The name carries the answer, so a duplicated copy
+ * of this module in a consumer's bundle still reports its own error correctly.
+ */
+export function isMissingEditorPeersError(error: unknown): boolean {
+  return error instanceof Error && error.name === "MissingEditorPeersError";
+}
+
 /** The messages a bundler or a runtime gives for a module it cannot resolve. */
 const RESOLUTION_FAILURE =
   /could not resolve|cannot find (?:module|package)|can't resolve|failed to resolve|module not found/i;
@@ -63,6 +90,31 @@ export function isMissingPeerError(error: unknown): boolean {
   return error instanceof Error && RESOLUTION_FAILURE.test(error.message);
 }
 
+/**
+ * Hands an `import()` rejection on unchanged. esbuild reports an unresolvable
+ * literal `import()` as a build error and defers it to run time only when the
+ * call carries a `.catch()`, so every peer import attaches this handler. It
+ * changes nothing at run time.
+ */
+function rethrow(error: unknown): never {
+  throw error;
+}
+
+/**
+ * Turns a rejection that names an unresolved package into the install-list
+ * error, and keeps the original as its cause. Any other rejection passes
+ * through, so a transient chunk fetch keeps its own message and stays
+ * retryable.
+ */
+export function asMissingEditorPeersError(
+  error: unknown,
+  missingMessage: string,
+): unknown {
+  return isMissingPeerError(error)
+    ? new MissingEditorPeersError(missingMessage, { cause: error })
+    : error;
+}
+
 async function loadPeers<T>(
   load: () => Promise<T>,
   missingMessage: string,
@@ -70,18 +122,24 @@ async function loadPeers<T>(
   try {
     return await load();
   } catch (error) {
-    if (isMissingPeerError(error)) {
-      throw new Error(missingMessage, { cause: error });
-    }
-    throw error;
+    throw asMissingEditorPeersError(error, missingMessage);
   }
 }
 
 /**
- * A bundler can also stub a missing optional peer as a silent empty namespace
- * instead of a throwing module. Read the members the editor calls, so that
- * shape also fails with the install list, and not as an undefined-property
- * crash in the middle of a render.
+ * True for a tiptap extension the editor can configure. A bundler can stub a
+ * missing optional peer as a silent namespace whose default export is an empty
+ * object, which is defined but carries no `configure`. Reading the member the
+ * factories call separates that shape from a real extension.
+ */
+function isConfigurableExtension(value: unknown): boolean {
+  return typeof (value as { configure?: unknown } | undefined)?.configure === "function";
+}
+
+/**
+ * Reads the members the editor calls, so a stub namespace fails with the
+ * install list, and not as an undefined-property crash in the middle of a
+ * render.
  */
 function assertDocumentEditorPeers(
   peers: DocumentEditorPeers,
@@ -90,28 +148,28 @@ function assertDocumentEditorPeers(
   if (
     typeof peers.react.useEditor !== "function" ||
     peers.react.EditorContent === undefined ||
-    peers.starterKit.default === undefined
+    !isConfigurableExtension(peers.starterKit.default)
   ) {
-    throw new Error(missingMessage);
+    throw new MissingEditorPeersError(missingMessage);
   }
 }
 
 function assertCollaborationPeers(peers: CollaborationPeers): void {
   assertDocumentEditorPeers(peers, COLLABORATION_PEERS_MISSING);
   if (
-    peers.collaboration.default === undefined ||
-    peers.collaborationCaret.default === undefined ||
+    !isConfigurableExtension(peers.collaboration.default) ||
+    !isConfigurableExtension(peers.collaborationCaret.default) ||
     typeof peers.hocuspocus.HocuspocusProvider !== "function" ||
     typeof peers.yjs.Doc !== "function"
   ) {
-    throw new Error(COLLABORATION_PEERS_MISSING);
+    throw new MissingEditorPeersError(COLLABORATION_PEERS_MISSING);
   }
 }
 
 async function importDocumentEditorPeers(): Promise<DocumentEditorPeers> {
   const [react, starterKit] = await Promise.all([
-    import("@tiptap/react"),
-    import("@tiptap/starter-kit"),
+    import("@tiptap/react").catch(rethrow),
+    import("@tiptap/starter-kit").catch(rethrow),
   ]);
   return { react, starterKit };
 }
@@ -129,10 +187,10 @@ export async function loadCollaborationPeers(): Promise<CollaborationPeers> {
     const [documentPeers, collaboration, collaborationCaret, hocuspocus, yjs] =
       await Promise.all([
         importDocumentEditorPeers(),
-        import("@tiptap/extension-collaboration"),
-        import("@tiptap/extension-collaboration-caret"),
-        import("@hocuspocus/provider"),
-        import("yjs"),
+        import("@tiptap/extension-collaboration").catch(rethrow),
+        import("@tiptap/extension-collaboration-caret").catch(rethrow),
+        import("@hocuspocus/provider").catch(rethrow),
+        import("yjs").catch(rethrow),
       ]);
     return { ...documentPeers, collaboration, collaborationCaret, hocuspocus, yjs };
   }, COLLABORATION_PEERS_MISSING);
