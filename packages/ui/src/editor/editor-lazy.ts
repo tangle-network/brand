@@ -9,11 +9,15 @@ import { isMissingEditorPeersError } from "./editor-peers";
  * a transient chunk fetch: one failed network request would otherwise hold the
  * editor broken until a full page reload.
  *
- * The returned function gives the component to render. A `MissingEditorPeersError`
- * keeps the cached rejection, so the install list reaches the consumer's error
- * boundary once and the loader does not run again. Any other rejection
- * replaces the component, so the next mount — an error boundary that resets,
- * or a remount by the parent — starts a fresh attempt.
+ * The returned function gives the component to render, and a caller must call
+ * it on every render: a transient failure replaces the component, and a caller
+ * that holds the one it got earlier keeps replaying the cached rejection.
+ *
+ * A `MissingEditorPeersError` keeps the cached rejection, so the install list
+ * reaches the consumer's error boundary once and the loader does not run
+ * again. Any other rejection replaces the component, so the next mount — an
+ * error boundary that resets, or a remount by the parent — starts a fresh
+ * attempt.
  */
 export function retryableLazyEditor<P extends object>(
   loadComponent: () => Promise<ComponentType<P>>,

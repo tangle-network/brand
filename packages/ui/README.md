@@ -51,7 +51,9 @@ A bundler still reads the literal specifier in a dynamic `import()`, so what a c
 | esbuild | Builds. Each import carries a `.catch()`, which moves the unresolved path from build time to run time. |
 | webpack | Needs configuration. Give `resolve.fallback` the value `false` for each peer you do not install, for example `resolve: { fallback: { "@tiptap/react": false } }`. |
 
-`pnpm test:package` builds a packed consumer that installs none of the peers, under both Vite and esbuild. `scripts/validate-dist.mjs` rejects a static import of any of them, and rejects a dynamic import that lost its `.catch()`.
+A TypeScript consumer resolves these entries through the emitted declarations, and those declarations name the optional peers in their own import statements. Keep `skipLibCheck: true` — the common default — and a consumer without the peers type-checks: its own imports resolve, and TypeScript skips the declaration files that name the packages it does not have. With `skipLibCheck: false`, TypeScript reads those files and reports `TS2307` for each absent peer; install the peers, or add a module declaration for each one you omit.
+
+`pnpm test:package` builds a packed consumer that installs none of the peers, under both Vite and esbuild, and type-checks it. `scripts/validate-dist.mjs` rejects a static import of any of them, and rejects a dynamic import that lost its `.catch()`.
 
 Because the peers now resolve at first render rather than at build time, a missing one surfaces as a thrown error while React renders. Wrap the editors in an error boundary, so the install list reaches a surface you control instead of unmounting the tree.
 

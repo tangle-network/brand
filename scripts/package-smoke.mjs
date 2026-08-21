@@ -348,7 +348,9 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
   if (omittedOptionalPeers.length > 0 && stubbedPeers.size === 0) {
     throw new Error(
       `no omitted optional peer was stubbed; either the build never reached ` +
-        `${omittedOptionalPeers.join(", ")}, or Vite reworded the stub this script reads`,
+        `${omittedOptionalPeers.join(", ")}, or Vite reworded the stub this script reads. ` +
+        `The marker was read from Vite 8.1.5 — compare it against the Vite now installed ` +
+        `and update stubMarker() in this file.`,
     );
   }
 
@@ -357,6 +359,44 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
   // reports a build error otherwise, so a consumer that installs no peers
   // needs its own bundle to prove the promise the README makes. Building the
   // same entry a second time is what catches a dropped handler end to end.
+  // A TypeScript consumer resolves the entries through the emitted
+  // declarations, which name the optional peers in their own import
+  // statements. `skipLibCheck` — on in the common consumer setup — skips those
+  // files, so the consumer's own imports still resolve with no peer installed.
+  // This is what fails if a peer type ever reaches a position outside a
+  // declaration file, where no `skipLibCheck` can skip it.
+  const typeEntry = specifiers
+    .map((specifier, index) => `import * as tsEntry${index} from ${JSON.stringify(specifier)};`)
+    .join("\n");
+  writeFileSync(
+    join(consumerDirectory, "src/main.ts"),
+    `${typeEntry}
+export const entries = [${specifiers.map((_, index) => `tsEntry${index}`).join(", ")}];
+`,
+  );
+  writeFileSync(
+    join(consumerDirectory, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        target: "ES2022",
+        module: "ESNext",
+        moduleResolution: "bundler",
+        jsx: "react-jsx",
+        strict: true,
+        noEmit: true,
+        skipLibCheck: true,
+      },
+      include: ["src/main.ts"],
+    }),
+  );
+  execFileSync(join(root, "node_modules", ".bin", "tsc"), ["--noEmit"], {
+    cwd: consumerDirectory,
+    stdio: "inherit",
+  });
+
+  // No loader is configured beyond the default set, because the consumer entry
+  // written above imports JavaScript only. A fixture that grows a stylesheet
+  // import fails here with esbuild's own "No loader is configured" error.
   await esbuildBuild({
     entryPoints: [join(consumerDirectory, "src/main.js")],
     bundle: true,
@@ -373,7 +413,7 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
       : "";
   console.log(
     `Packed ${manifest.name}@${manifest.version} passed a clean Vite and esbuild consumer build ` +
-      `across ${specifiers.length} JS exports${omissionNote}`,
+      `and a TypeScript type-check across ${specifiers.length} exports${omissionNote}`,
   );
 } finally {
   rmSync(workDirectory, { force: true, recursive: true });

@@ -177,11 +177,14 @@ function chainReachesCatch(code, start) {
     skipSpace();
     const nameStart = index;
     while (index < code.length && /[\w$]/.test(code[index])) index += 1;
-    if (code.slice(nameStart, index) === "catch") return true;
+    const member = code.slice(nameStart, index);
     skipSpace();
+    // A bare `.catch` that nothing calls installs no handler, so read the
+    // argument list before the link counts.
     if (code[index] !== "(") return false;
     index = skipArgumentList(code, index);
     if (index === -1) return false;
+    if (member === "catch") return true;
   }
 }
 
