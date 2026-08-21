@@ -28,8 +28,10 @@ export function App() {
 
 ## Subpaths
 
-Fourteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`.
+Sixteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`, `nav`, `redaction`.
 
 ## Optional peers
 
-`@nanostores/react`, `nanostores`, `@tanstack/react-query`, `@hocuspocus/provider`, `@tiptap/*`, `yjs` — install only the peers you actually use. The package will type-check and tree-shake without them.
+`@tiptap/core`, `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-collaboration`, `@tiptap/extension-collaboration-caret`, `@hocuspocus/provider` and `yjs` back the `./editor` entry. The entry reaches every one of them through a dynamic `import()`, so a consumer that installs none of them still builds `./editor` — and every other entry — and gets a loud error that names the missing packages only when it renders an editor. `./editor` splits the cost in two: the local markdown editor needs `@tiptap/react` and `@tiptap/starter-kit`; the collaborative editor adds the rest. `scripts/validate-dist.mjs` rejects a static import of any of them, and `pnpm test:package` builds a packed consumer that installs none of them.
+
+`nanostores` and `@nanostores/react` back `./stores`, and `react-router` backs `./nav`. Those two entries create their values at module scope, so they hold a static import and a consumer that imports them must install the peer. Every other entry stays free of all of these.
