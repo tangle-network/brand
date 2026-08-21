@@ -65,7 +65,8 @@ describe("MarkdownDocumentEditor", () => {
 
     const { container } = render(<HeldEditor value="# Title" />);
 
-    expect(screen.getByText("Loading editor…")).toBeInTheDocument();
+    // A live region, so a screen reader hears that the editor is still coming.
+    expect(screen.getByRole("status")).toHaveTextContent("Loading editor…");
     expect(container.querySelector(".ProseMirror")).toBeNull();
 
     releasePeers?.();

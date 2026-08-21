@@ -314,11 +314,11 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
   // INSTALLED peer resolved. Read the emitted chunks and say which peers the
   // bundle stubbed.
   //
-  // The text below is Vite's own wording for that stub. A Vite upgrade that
-  // rewords it must update this marker: the `stubbedPeers.size === 0` guard
-  // further down turns a stale marker into a failing run rather than a silent
-  // pass, and the omit-every-peer run in `test:package` reaches that guard on
-  // every CI run.
+  // The text below is Vite's own wording for that stub, verified against Vite
+  // 8.1.5. A Vite upgrade that rewords it must update this marker: the
+  // `stubbedPeers.size === 0` guard further down turns a stale marker into a
+  // failing run rather than a silent pass, and the omit-every-peer run in
+  // `test:package` reaches that guard on every CI run.
   const stubMarker = (name) => `Could not resolve "${name}"`;
   const stubbedPeers = new Set();
   for (const entry of readdirSync(consumerDistDirectory, {

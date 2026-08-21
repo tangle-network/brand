@@ -89,6 +89,31 @@ if (unclassifiedPeers.length > 0 || staleClassifications.length > 0) {
   process.exit(1);
 }
 
+// `editor-peers.ts` classifies a resolution failure by the same list. A peer
+// in one list and not the other reads as a missing peer for the build and as
+// an unrelated failure at run time, which is how `@tiptap/core` slipped
+// through once. Read the source list and require the two to agree.
+const peersSourcePath = join(packageDirectory, "src", "editor", "editor-peers.ts");
+const peersSource = readFileSync(peersSourcePath, "utf8");
+const deferredPeersLiteral = peersSource.match(/const DEFERRED_PEERS = \[([^\]]*)\]/);
+if (deferredPeersLiteral === null) {
+  console.error(
+    `validate-dist: no DEFERRED_PEERS array found in ${relative(root, peersSourcePath)}`,
+  );
+  process.exit(1);
+}
+const runtimeDeferredPeers = [...deferredPeersLiteral[1].matchAll(/["']([^"']+)["']/g)].map(
+  (match) => match[1],
+);
+const runtimeOnly = runtimeDeferredPeers.filter((name) => !deferredOptionalPeers.includes(name));
+const scriptOnly = deferredOptionalPeers.filter((name) => !runtimeDeferredPeers.includes(name));
+if (runtimeOnly.length > 0 || scriptOnly.length > 0) {
+  console.error("validate-dist: DEFERRED_PEERS does not match this script's deferred list:");
+  for (const name of runtimeOnly) console.error(`  ${name}: in editor-peers.ts only`);
+  for (const name of scriptOnly) console.error(`  ${name}: in this script only`);
+  process.exit(1);
+}
+
 function specifierPattern(peer) {
   return `${peer.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:/[^"']*)?`;
 }

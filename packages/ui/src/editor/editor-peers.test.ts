@@ -175,6 +175,19 @@ describe("editor optional peer loaders", () => {
     expect(isMissingEditorPeersError(mapped)).toBe(false);
   });
 
+  it("treats a @tiptap/core failure as a missing peer, though no loader imports it", async () => {
+    // The tiptap packages need @tiptap/core in turn, so a consumer that
+    // resolves it to nothing breaks exactly as one missing @tiptap/react
+    // does. Leaving it out of the list left that failure retryable.
+    const coreFailure = new Error('Could not resolve "@tiptap/core"');
+    const mapped = asMissingEditorPeersError(coreFailure, "install the peers");
+
+    expect(isMissingEditorPeersError(mapped)).toBe(true);
+    expect((mapped as Error).message).toBe(
+      "install the peers @tiptap/core did not resolve.",
+    );
+  });
+
   it("keeps the install list alone when the failure names several peers", async () => {
     const both = new Error(
       'Could not resolve "@tiptap/react" or "@hocuspocus/provider"',

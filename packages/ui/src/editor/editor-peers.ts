@@ -114,8 +114,15 @@ function rethrow(error: unknown): never {
   throw error;
 }
 
-/** Every optional peer the loaders in this module import. */
+/**
+ * Every optional peer the `./editor` entry needs at run time. The loaders
+ * import all but `@tiptap/core`, which the tiptap packages need in turn: a
+ * consumer that resolves it to nothing breaks the same way, so a failure that
+ * names it is a missing peer too. `scripts/validate-dist.mjs` holds the same
+ * list and rejects a build where the two disagree.
+ */
 const DEFERRED_PEERS = [
+  "@tiptap/core",
   "@tiptap/react",
   "@tiptap/starter-kit",
   "@tiptap/extension-collaboration",
