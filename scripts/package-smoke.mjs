@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
+import { build as esbuildBuild } from "esbuild";
 import { build } from "vite";
 
 const root = resolve(import.meta.dirname, "..");
@@ -136,6 +137,38 @@ try {
     );
   }
 
+  const declaredOptionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
+    .filter(([, metadata]) => metadata?.optional === true)
+    .map(([name]) => name);
+
+  // The peers to leave uninstalled. An optional peer only earns the name when
+  // a consumer without it still builds, so this run proves the promise the
+  // manifest makes. The package reaches such a peer through a dynamic
+  // import(), which a bundler resolves to a stub it never evaluates.
+  const omittedOptionalPeers = JSON.parse(process.env.PACKAGE_OMIT_OPTIONAL_PEERS ?? "[]");
+  if (
+    !Array.isArray(omittedOptionalPeers) ||
+    omittedOptionalPeers.some((name) => typeof name !== "string")
+  ) {
+    throw new Error("PACKAGE_OMIT_OPTIONAL_PEERS must be a JSON array of package names");
+  }
+  const notOptionalOmissions = omittedOptionalPeers.filter(
+    (name) => !declaredOptionalPeers.includes(name),
+  );
+  if (notOptionalOmissions.length > 0) {
+    throw new Error(
+      `cannot omit peers that the packed manifest does not declare optional: ${notOptionalOmissions.join(", ")}`,
+    );
+  }
+  const contradictedOmissions = omittedOptionalPeers.filter(
+    (name) => peerOverrides[name] !== undefined,
+  );
+  if (contradictedOmissions.length > 0) {
+    throw new Error(
+      `a peer cannot be both omitted and overridden: ${contradictedOmissions.join(", ")}`,
+    );
+  }
+
   const invalidOptionalPeers = Object.keys(manifest.peerDependenciesMeta ?? {}).filter(
     (name) => !manifest.peerDependencies?.[name],
   );
@@ -167,9 +200,9 @@ try {
     return workspacePeerTarballs.get(name);
   }
 
-  const optionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
-    .filter(([, metadata]) => metadata?.optional === true)
-    .map(([name]) => {
+  const optionalPeers = declaredOptionalPeers
+    .filter((name) => !omittedOptionalPeers.includes(name))
+    .map((name) => {
       // An explicit override always wins over the workspace tarball.
       if (peerOverrides[name] !== undefined) {
         return `${name}@${peerOverrides[name]}`;
@@ -217,6 +250,17 @@ try {
     { cwd: consumerDirectory, stdio: "inherit" },
   );
 
+  // Smoke the gauge: a peer that npm still installs through another
+  // dependency would make this run a false green.
+  const leakedOmissions = omittedOptionalPeers.filter((name) =>
+    existsSync(join(consumerDirectory, "node_modules", ...name.split("/"))),
+  );
+  if (leakedOmissions.length > 0) {
+    throw new Error(
+      `omitted optional peers reached the consumer anyway: ${leakedOmissions.join(", ")}`,
+    );
+  }
+
   const installedDirectory = join(
     consumerDirectory,
     "node_modules",
@@ -254,17 +298,122 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
 `,
   );
 
+  const consumerDistDirectory = join(consumerDirectory, "dist");
   await build({
     root: consumerDirectory,
     logLevel: "error",
     build: {
       emptyOutDir: true,
-      outDir: join(consumerDirectory, "dist"),
+      outDir: consumerDistDirectory,
     },
   });
 
+  // A dynamic import of an uninstalled optional peer builds green: the peer
+  // becomes its own chunk that throws when it loads. That is the wanted
+  // behaviour, and it also means a green build no longer proves that an
+  // INSTALLED peer resolved. Read the emitted chunks and say which peers the
+  // bundle stubbed.
+  //
+  // The text below is Vite's own wording for that stub, verified against Vite
+  // 8.1.5. A Vite upgrade that rewords it must update this marker: the
+  // `stubbedPeers.size === 0` guard further down turns a stale marker into a
+  // failing run rather than a silent pass, and the omit-every-peer run in
+  // `test:package` reaches that guard on every CI run.
+  const stubMarker = (name) => `Could not resolve "${name}"`;
+  const stubbedPeers = new Set();
+  for (const entry of readdirSync(consumerDistDirectory, {
+    recursive: true,
+    withFileTypes: true,
+  })) {
+    if (!entry.isFile() || !entry.name.endsWith(".js")) continue;
+    const code = readFileSync(join(entry.parentPath, entry.name), "utf8");
+    for (const name of declaredOptionalPeers) {
+      if (code.includes(stubMarker(name))) stubbedPeers.add(name);
+    }
+  }
+
+  const unresolvedInstalledPeers = declaredOptionalPeers.filter(
+    (name) => !omittedOptionalPeers.includes(name) && stubbedPeers.has(name),
+  );
+  if (unresolvedInstalledPeers.length > 0) {
+    throw new Error(
+      `installed optional peers did not resolve in the consumer: ${unresolvedInstalledPeers.join(", ")}`,
+    );
+  }
+
+  // Not every omitted peer leaves a stub — a peer the package reaches only
+  // through types never reaches the bundle at all. One stub is enough to
+  // prove the run exercised the uninstalled path, and it pins the marker
+  // string that the check above reads.
+  if (omittedOptionalPeers.length > 0 && stubbedPeers.size === 0) {
+    throw new Error(
+      `no omitted optional peer was stubbed; either the build never reached ` +
+        `${omittedOptionalPeers.join(", ")}, or Vite reworded the stub this script reads. ` +
+        `The marker was read from Vite 8.1.5 — compare it against the Vite now installed ` +
+        `and update stubMarker() in this file.`,
+    );
+  }
+
+  // Vite and Rollup leave an unresolved literal `import()` to run time on
+  // their own. esbuild does so only when the call carries a `.catch()`, and
+  // reports a build error otherwise, so a consumer that installs no peers
+  // needs its own bundle to prove the promise the README makes. Building the
+  // same entry a second time is what catches a dropped handler end to end.
+  // A TypeScript consumer resolves the entries through the emitted
+  // declarations, which name the optional peers in their own import
+  // statements. `skipLibCheck` — on in the common consumer setup — skips those
+  // files, so the consumer's own imports still resolve with no peer installed.
+  // This is what fails if a peer type ever reaches a position outside a
+  // declaration file, where no `skipLibCheck` can skip it.
+  const typeEntry = specifiers
+    .map((specifier, index) => `import * as tsEntry${index} from ${JSON.stringify(specifier)};`)
+    .join("\n");
+  writeFileSync(
+    join(consumerDirectory, "src/main.ts"),
+    `${typeEntry}
+export const entries = [${specifiers.map((_, index) => `tsEntry${index}`).join(", ")}];
+`,
+  );
+  writeFileSync(
+    join(consumerDirectory, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        target: "ES2022",
+        module: "ESNext",
+        moduleResolution: "bundler",
+        jsx: "react-jsx",
+        strict: true,
+        noEmit: true,
+        skipLibCheck: true,
+      },
+      include: ["src/main.ts"],
+    }),
+  );
+  execFileSync(join(root, "node_modules", ".bin", "tsc"), ["--noEmit"], {
+    cwd: consumerDirectory,
+    stdio: "inherit",
+  });
+
+  // No loader is configured beyond the default set, because the consumer entry
+  // written above imports JavaScript only. A fixture that grows a stylesheet
+  // import fails here with esbuild's own "No loader is configured" error.
+  await esbuildBuild({
+    entryPoints: [join(consumerDirectory, "src/main.js")],
+    bundle: true,
+    format: "esm",
+    platform: "browser",
+    outfile: join(consumerDirectory, "dist-esbuild/out.js"),
+    logLevel: "error",
+    absWorkingDir: consumerDirectory,
+  });
+
+  const omissionNote =
+    omittedOptionalPeers.length > 0
+      ? ` without ${omittedOptionalPeers.join(", ")}`
+      : "";
   console.log(
-    `Packed ${manifest.name}@${manifest.version} passed a clean consumer build across ${specifiers.length} JS exports`,
+    `Packed ${manifest.name}@${manifest.version} passed a clean Vite and esbuild consumer build ` +
+      `and a TypeScript type-check across ${specifiers.length} exports${omissionNote}`,
   );
 } finally {
   rmSync(workDirectory, { force: true, recursive: true });

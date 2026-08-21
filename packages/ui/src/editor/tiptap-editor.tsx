@@ -1,13 +1,13 @@
 "use client";
 
 import type { AnyExtension } from "@tiptap/core";
-import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCaret from "@tiptap/extension-collaboration-caret";
-import { type Editor, EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useMemo } from "react";
+import type { Editor } from "@tiptap/react";
+import { type ComponentType, Suspense, useEffect, useMemo } from "react";
 import { cn } from "../lib/utils";
 import { type Collaborator, useEditorContext } from "./editor-provider";
+import { retryableLazyEditor } from "./editor-lazy";
+import { EditorLoadingPlaceholder } from "./editor-loading";
+import { type CollaborationPeers, loadCollaborationPeers } from "./editor-peers";
 
 /**
  * Props for TiptapEditor component.
@@ -57,140 +57,149 @@ function getCursorColors(color: string) {
 }
 
 /**
- * TiptapEditor - Collaborative markdown editor with Y.js sync.
- * Must be used within an EditorProvider.
+ * Builds the collaborative editor against loaded tiptap namespaces. The peers
+ * arrive as an argument so that this module reaches them through type-only
+ * imports, which a bundler erases.
  */
-export function TiptapEditor({
-  initialContent,
-  placeholder = "Start writing...",
-  readOnly = false,
-  autoFocus = false,
-  className,
-  contentClassName,
-  onUpdate,
-  onSelectionUpdate,
-  onReady,
-}: TiptapEditorProps) {
-  const { doc, provider, connectionState } = useEditorContext();
+export function createTiptapEditor(
+  peers: CollaborationPeers,
+): ComponentType<TiptapEditorProps> {
+  const { EditorContent, useEditor } = peers.react;
+  const StarterKit = peers.starterKit.default;
+  const Collaboration = peers.collaboration.default;
+  const CollaborationCaret = peers.collaborationCaret.default;
 
-  // Y.js fragment for the editor content
-  const fragment = useMemo(() => doc.getXmlFragment("prosemirror"), [doc]);
+  return function TiptapEditor({
+    initialContent,
+    placeholder = "Start writing...",
+    readOnly = false,
+    autoFocus = false,
+    className,
+    contentClassName,
+    onUpdate,
+    onSelectionUpdate,
+    onReady,
+  }: TiptapEditorProps) {
+    const { doc, provider, connectionState } = useEditorContext();
 
-  // Configure Tiptap extensions
-  const extensions = useMemo(() => {
-    const baseExtensions: AnyExtension[] = [
-      StarterKit.configure({
-        // Disable history - Y.js handles undo/redo
-        ...({ history: false } as any),
-        // Configure code block for syntax highlighting placeholder
-        codeBlock: {
-          HTMLAttributes: {
-            class: "hljs",
-          },
-        },
-      }),
-      Collaboration.configure({
-        fragment,
-      }),
-    ];
+    // Y.js fragment for the editor content
+    const fragment = useMemo(() => doc.getXmlFragment("prosemirror"), [doc]);
 
-    // Add collaboration cursor if provider is available
-    if (provider?.awareness) {
-      baseExtensions.push(
-        CollaborationCaret.configure({
-          provider,
-          user: provider.awareness.getLocalState()?.user ?? {
-            name: "Anonymous",
-            color: "#808080",
-          },
-          render: (user: { name: string; color: string }) => {
-            const { background, text } = getCursorColors(user.color);
-
-            const cursor = document.createElement("span");
-            cursor.className = "collaboration-cursor";
-            cursor.style.borderColor = background;
-
-            const label = document.createElement("span");
-            label.className = "collaboration-cursor-label";
-            label.style.backgroundColor = background;
-            label.style.color = text;
-            label.textContent = user.name;
-
-            cursor.appendChild(label);
-            return cursor;
+    // Configure Tiptap extensions
+    const extensions = useMemo(() => {
+      const baseExtensions: AnyExtension[] = [
+        StarterKit.configure({
+          // Disable history - Y.js handles undo/redo
+          ...({ history: false } as any),
+          // Configure code block for syntax highlighting placeholder
+          codeBlock: {
+            HTMLAttributes: {
+              class: "hljs",
+            },
           },
         }),
-      );
-    }
+        Collaboration.configure({
+          fragment,
+        }),
+      ];
 
-    return baseExtensions;
-  }, [fragment, provider]);
+      // Add collaboration cursor if provider is available
+      if (provider?.awareness) {
+        baseExtensions.push(
+          CollaborationCaret.configure({
+            provider,
+            user: provider.awareness.getLocalState()?.user ?? {
+              name: "Anonymous",
+              color: "#808080",
+            },
+            render: (user: { name: string; color: string }) => {
+              const { background, text } = getCursorColors(user.color);
 
-  // Initialize Tiptap editor
-  const editor = useEditor({
-    extensions,
-    editable: !readOnly,
-    autofocus: autoFocus,
-    editorProps: {
-      attributes: {
-        class: cn(
-          "prose prose-sm sm:prose-base dark:prose-invert max-w-none",
-          "focus:outline-none",
-          contentClassName,
-        ),
-        "data-placeholder": placeholder,
+              const cursor = document.createElement("span");
+              cursor.className = "collaboration-cursor";
+              cursor.style.borderColor = background;
+
+              const label = document.createElement("span");
+              label.className = "collaboration-cursor-label";
+              label.style.backgroundColor = background;
+              label.style.color = text;
+              label.textContent = user.name;
+
+              cursor.appendChild(label);
+              return cursor;
+            },
+          }),
+        );
+      }
+
+      return baseExtensions;
+    }, [fragment, provider]);
+
+    // Initialize Tiptap editor
+    const editor = useEditor({
+      extensions,
+      editable: !readOnly,
+      autofocus: autoFocus,
+      editorProps: {
+        attributes: {
+          class: cn(
+            "prose prose-sm sm:prose-base dark:prose-invert max-w-none",
+            "focus:outline-none",
+            contentClassName,
+          ),
+          "data-placeholder": placeholder,
+        },
       },
-    },
-    onUpdate: ({ editor: ed }) => {
-      onUpdate?.(ed);
-    },
-    onSelectionUpdate: ({ editor: ed }) => {
-      onSelectionUpdate?.(ed);
-    },
-    onCreate: ({ editor: ed }) => {
-      onReady?.(ed);
-    },
-  });
+      onUpdate: ({ editor: ed }) => {
+        onUpdate?.(ed);
+      },
+      onSelectionUpdate: ({ editor: ed }) => {
+        onSelectionUpdate?.(ed);
+      },
+      onCreate: ({ editor: ed }) => {
+        onReady?.(ed);
+      },
+    });
 
-  // Update editable state when readOnly changes
-  useEffect(() => {
-    if (editor) {
-      editor.setEditable(!readOnly);
-    }
-  }, [editor, readOnly]);
+    // Update editable state when readOnly changes
+    useEffect(() => {
+      if (editor) {
+        editor.setEditable(!readOnly);
+      }
+    }, [editor, readOnly]);
 
-  // Handle initial content (only for new documents)
-  useEffect(() => {
-    if (
-      editor &&
-      initialContent &&
-      connectionState === "synced" &&
-      editor.isEmpty
-    ) {
-      editor.commands.setContent(initialContent);
-    }
-  }, [editor, initialContent, connectionState]);
+    // Handle initial content (only for new documents)
+    useEffect(() => {
+      if (
+        editor &&
+        initialContent &&
+        connectionState === "synced" &&
+        editor.isEmpty
+      ) {
+        editor.commands.setContent(initialContent);
+      }
+    }, [editor, initialContent, connectionState]);
 
-  return (
-    <div
-      className={cn(
-        "relative min-h-[200px] w-full rounded-lg border border-border",
-        "bg-background",
-        className,
-      )}
-    >
-      {/* Connection status indicator */}
-      <div className="absolute top-2 right-2 z-10">
-        <ConnectionIndicator state={connectionState} />
-      </div>
+    return (
+      <div
+        className={cn(
+          "relative min-h-[200px] w-full rounded-lg border border-border",
+          "bg-background",
+          className,
+        )}
+      >
+        {/* Connection status indicator */}
+        <div className="absolute top-2 right-2 z-10">
+          <ConnectionIndicator state={connectionState} />
+        </div>
 
-      {/* Editor content */}
-      <div className="p-4 pt-10">
-        <EditorContent editor={editor} />
-      </div>
+        {/* Editor content */}
+        <div className="p-4 pt-10">
+          <EditorContent editor={editor} />
+        </div>
 
-      {/* Placeholder when empty */}
-      <style>{`
+        {/* Placeholder when empty */}
+        <style>{`
         .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
@@ -253,7 +262,30 @@ export function TiptapEditor({
           font-size: inherit;
         }
       `}</style>
-    </div>
+      </div>
+    );
+  };
+}
+
+const lazyTiptapEditor = retryableLazyEditor(async () =>
+  createTiptapEditor(await loadCollaborationPeers()),
+);
+
+/**
+ * TiptapEditor - Collaborative markdown editor with Y.js sync.
+ * Must be used within an EditorProvider. Loads its tiptap, Hocuspocus and
+ * yjs peers on first render.
+ */
+export function TiptapEditor(props: TiptapEditorProps) {
+  const LazyTiptapEditor = lazyTiptapEditor();
+  return (
+    <Suspense
+      fallback={
+        <EditorLoadingPlaceholder className={cn("min-h-[200px]", props.className)} />
+      }
+    >
+      <LazyTiptapEditor {...props} />
+    </Suspense>
   );
 }
 

@@ -1,9 +1,11 @@
 "use client";
 
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import type { HocuspocusProvider } from "@hocuspocus/provider";
 import {
+  type ComponentType,
   createContext,
   type ReactNode,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -11,7 +13,9 @@ import {
   useRef,
   useState,
 } from "react";
-import * as Y from "yjs";
+import type * as Y from "yjs";
+import { retryableLazyEditor } from "./editor-lazy";
+import { type EditorProviderPeers, loadEditorProviderPeers } from "./editor-peers";
 
 /**
  * Connection state for the Hocuspocus provider.
@@ -54,6 +58,9 @@ export interface EditorContextValue {
   disconnect: () => void;
 }
 
+// Module scope, and never inside the factory below: `useEditorContext` and
+// every hook in `use-editor` read THIS context, so a per-build context would
+// leave them with no provider.
 const EditorContext = createContext<EditorContextValue | null>(null);
 
 /**
@@ -122,295 +129,324 @@ function generateUserColor(): string {
 }
 
 /**
- * EditorProvider wraps children with Hocuspocus collaboration context.
- * Manages WebSocket connection, Y.Doc, and awareness state.
+ * Builds the collaboration provider against loaded yjs and Hocuspocus
+ * namespaces. The peers arrive as an argument so that this module reaches
+ * them through type-only imports, which a bundler erases.
  */
-export function EditorProvider({
-  websocketUrl,
-  documentName,
-  token,
-  tokenExpiresAt,
-  user,
-  autoConnect = true,
-  autoReconnect = true,
-  maxReconnectAttempts = 5,
-  onConnectionChange,
-  onSync,
-  onAuthError,
-  onRefreshToken,
-  children,
-}: EditorProviderProps) {
-  const [connectionState, setConnectionState] =
-    useState<ConnectionState>("disconnected");
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [isSynced, setIsSynced] = useState(false);
+export function createEditorProvider(
+  peers: EditorProviderPeers,
+): ComponentType<EditorProviderProps> {
+  const { Doc } = peers.yjs;
+  const { HocuspocusProvider } = peers.hocuspocus;
 
-  // Use refs to avoid recreating provider on every render
-  const docRef = useRef<Y.Doc | null>(null);
-  const providerRef = useRef<HocuspocusProvider | null>(null);
-  const reconnectAttemptsRef = useRef(0);
-  const tokenRef = useRef(token);
-  const tokenExpiryRef = useRef<number | undefined>(tokenExpiresAt);
-  const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
-  const refreshTimerRef = useRef<number | null>(null);
-
-  tokenRef.current = token;
-  tokenExpiryRef.current = tokenExpiresAt;
-
-  // Initialize Y.Doc once
-  if (!docRef.current) {
-    docRef.current = new Y.Doc();
-  }
-  const doc = docRef.current;
-
-  // User color (generate once per session)
-  const userColor = useMemo(
-    () => user.color ?? generateUserColor(),
-    [user.color],
-  );
-
-  // Update connection state and notify callback
-  const updateConnectionState = useCallback(
-    (state: ConnectionState) => {
-      setConnectionState(state);
-      onConnectionChange?.(state);
-    },
-    [onConnectionChange],
-  );
-
-  // Update collaborators from awareness
-  const updateCollaborators = useCallback(
-    (awareness: HocuspocusProvider["awareness"]) => {
-      if (!awareness) return;
-
-      const states = awareness.getStates();
-      const collabs: Collaborator[] = [];
-
-      states.forEach((state: Record<string, unknown>, clientId: number) => {
-        // Skip our own client
-        if (clientId === awareness.clientID) return;
-
-        if (state.user) {
-          collabs.push({
-            clientId,
-            user: state.user as Collaborator["user"],
-          });
-        }
-      });
-
-      setCollaborators(collabs);
-    },
-    [],
-  );
-
-  const clearRefreshTimer = useCallback(() => {
-    if (refreshTimerRef.current != null) {
-      window.clearTimeout(refreshTimerRef.current);
-      refreshTimerRef.current = null;
-    }
-  }, []);
-
-  const refreshToken = useCallback(async (): Promise<string | null> => {
-    if (!onRefreshToken) {
-      return null;
-    }
-
-    if (refreshPromiseRef.current) {
-      return refreshPromiseRef.current;
-    }
-
-    const refreshPromise = (async () => {
-      const next = await onRefreshToken();
-      const resolvedToken = typeof next === "string" ? next : next.token;
-      const resolvedExpiry =
-        typeof next === "string" ? undefined : next.expiresAt;
-
-      tokenRef.current = resolvedToken;
-      tokenExpiryRef.current = resolvedExpiry;
-      return resolvedToken;
-    })()
-      .catch((error) => {
-        onAuthError?.(
-          error instanceof Error ? error : new Error(String(error)),
-        );
-        return null;
-      })
-      .finally(() => {
-        refreshPromiseRef.current = null;
-      });
-
-    refreshPromiseRef.current = refreshPromise;
-    return refreshPromise;
-  }, [onAuthError, onRefreshToken]);
-
-  const scheduleTokenRefresh = useCallback(() => {
-    clearRefreshTimer();
-
-    if (
-      !tokenExpiryRef.current ||
-      !onRefreshToken ||
-      typeof window === "undefined"
-    ) {
-      return;
-    }
-
-    const refreshAtMs = tokenExpiryRef.current * 1000 - 60_000;
-    const delay = refreshAtMs - Date.now();
-
-    if (delay <= 0) {
-      void refreshToken();
-      return;
-    }
-
-    refreshTimerRef.current = window.setTimeout(() => {
-      void refreshToken();
-    }, delay);
-  }, [clearRefreshTimer, onRefreshToken, refreshToken]);
-
-  // Connect to the collaboration server
-  const connect = useCallback(() => {
-    if (providerRef.current) {
-      providerRef.current.connect();
-      return;
-    }
-
-    updateConnectionState("connecting");
-
-    const provider = new HocuspocusProvider({
-      url: websocketUrl,
-      name: documentName,
-      document: doc,
-      token: async () => tokenRef.current,
-
-      onConnect: () => {
-        reconnectAttemptsRef.current = 0;
-        updateConnectionState("connected");
-        scheduleTokenRefresh();
-      },
-
-      onSynced: () => {
-        setIsSynced(true);
-        updateConnectionState("synced");
-        onSync?.();
-      },
-
-      onDisconnect: () => {
-        updateConnectionState("disconnected");
-        setIsSynced(false);
-        clearRefreshTimer();
-
-        // Auto-reconnect logic
-        if (
-          autoReconnect &&
-          reconnectAttemptsRef.current < maxReconnectAttempts
-        ) {
-          reconnectAttemptsRef.current += 1;
-          const delay = Math.min(
-            1000 * 2 ** reconnectAttemptsRef.current,
-            30000,
-          );
-          setTimeout(() => {
-            if (providerRef.current && !(providerRef.current as any).isConnected) {
-              providerRef.current.connect();
-            }
-          }, delay);
-        }
-      },
-
-      onAuthenticationFailed: ({ reason }: { reason?: string }) => {
-        const error = new Error(reason ?? "Authentication failed");
-        updateConnectionState("disconnected");
-        clearRefreshTimer();
-
-        if (onRefreshToken) {
-          void refreshToken().then((nextToken) => {
-            if (nextToken && providerRef.current) {
-              providerRef.current.connect();
-              return;
-            }
-
-            onAuthError?.(error);
-          });
-          return;
-        }
-
-        onAuthError?.(error);
-      },
-
-      onAwarenessUpdate: () => {
-        updateCollaborators(provider.awareness);
-      },
-    });
-
-    // Set local user awareness
-    provider.awareness?.setLocalStateField("user", {
-      name: user.name,
-      color: userColor,
-      userId: user.userId,
-    });
-
-    providerRef.current = provider;
-  }, [
+  return function EditorProvider({
     websocketUrl,
     documentName,
-    doc,
-    user.name,
-    user.userId,
-    userColor,
-    autoReconnect,
-    maxReconnectAttempts,
-    clearRefreshTimer,
-    updateConnectionState,
-    updateCollaborators,
+    token,
+    tokenExpiresAt,
+    user,
+    autoConnect = true,
+    autoReconnect = true,
+    maxReconnectAttempts = 5,
+    onConnectionChange,
     onSync,
     onAuthError,
     onRefreshToken,
-    refreshToken,
-    scheduleTokenRefresh,
-  ]);
+    children,
+  }: EditorProviderProps) {
+    const [connectionState, setConnectionState] =
+      useState<ConnectionState>("disconnected");
+    const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+    const [isSynced, setIsSynced] = useState(false);
 
-  // Disconnect from the collaboration server
-  const disconnect = useCallback(() => {
-    if (providerRef.current) {
-      providerRef.current.disconnect();
-      updateConnectionState("disconnected");
+    // Use refs to avoid recreating provider on every render
+    const docRef = useRef<Y.Doc | null>(null);
+    const providerRef = useRef<HocuspocusProvider | null>(null);
+    const reconnectAttemptsRef = useRef(0);
+    const tokenRef = useRef(token);
+    const tokenExpiryRef = useRef<number | undefined>(tokenExpiresAt);
+    const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
+    const refreshTimerRef = useRef<number | null>(null);
+
+    tokenRef.current = token;
+    tokenExpiryRef.current = tokenExpiresAt;
+
+    // Initialize Y.Doc once
+    if (!docRef.current) {
+      docRef.current = new Doc();
     }
-  }, [updateConnectionState]);
+    const doc = docRef.current;
 
-  // Auto-connect on mount
-  useEffect(() => {
-    if (autoConnect) {
-      connect();
-    }
+    // User color (generate once per session)
+    const userColor = useMemo(
+      () => user.color ?? generateUserColor(),
+      [user.color],
+    );
 
-    return () => {
-      // Cleanup on unmount
-      clearRefreshTimer();
-      if (providerRef.current) {
-        providerRef.current.destroy();
-        providerRef.current = null;
+    // Update connection state and notify callback
+    const updateConnectionState = useCallback(
+      (state: ConnectionState) => {
+        setConnectionState(state);
+        onConnectionChange?.(state);
+      },
+      [onConnectionChange],
+    );
+
+    // Update collaborators from awareness
+    const updateCollaborators = useCallback(
+      (awareness: HocuspocusProvider["awareness"]) => {
+        if (!awareness) return;
+
+        const states = awareness.getStates();
+        const collabs: Collaborator[] = [];
+
+        states.forEach((state: Record<string, unknown>, clientId: number) => {
+          // Skip our own client
+          if (clientId === awareness.clientID) return;
+
+          if (state.user) {
+            collabs.push({
+              clientId,
+              user: state.user as Collaborator["user"],
+            });
+          }
+        });
+
+        setCollaborators(collabs);
+      },
+      [],
+    );
+
+    const clearRefreshTimer = useCallback(() => {
+      if (refreshTimerRef.current != null) {
+        window.clearTimeout(refreshTimerRef.current);
+        refreshTimerRef.current = null;
       }
-    };
-  }, [autoConnect, clearRefreshTimer, connect]);
+    }, []);
 
-  // Context value
-  const contextValue = useMemo<EditorContextValue>(
-    () => ({
+    const refreshToken = useCallback(async (): Promise<string | null> => {
+      if (!onRefreshToken) {
+        return null;
+      }
+
+      if (refreshPromiseRef.current) {
+        return refreshPromiseRef.current;
+      }
+
+      const refreshPromise = (async () => {
+        const next = await onRefreshToken();
+        const resolvedToken = typeof next === "string" ? next : next.token;
+        const resolvedExpiry =
+          typeof next === "string" ? undefined : next.expiresAt;
+
+        tokenRef.current = resolvedToken;
+        tokenExpiryRef.current = resolvedExpiry;
+        return resolvedToken;
+      })()
+        .catch((error) => {
+          onAuthError?.(
+            error instanceof Error ? error : new Error(String(error)),
+          );
+          return null;
+        })
+        .finally(() => {
+          refreshPromiseRef.current = null;
+        });
+
+      refreshPromiseRef.current = refreshPromise;
+      return refreshPromise;
+    }, [onAuthError, onRefreshToken]);
+
+    const scheduleTokenRefresh = useCallback(() => {
+      clearRefreshTimer();
+
+      if (
+        !tokenExpiryRef.current ||
+        !onRefreshToken ||
+        typeof window === "undefined"
+      ) {
+        return;
+      }
+
+      const refreshAtMs = tokenExpiryRef.current * 1000 - 60_000;
+      const delay = refreshAtMs - Date.now();
+
+      if (delay <= 0) {
+        void refreshToken();
+        return;
+      }
+
+      refreshTimerRef.current = window.setTimeout(() => {
+        void refreshToken();
+      }, delay);
+    }, [clearRefreshTimer, onRefreshToken, refreshToken]);
+
+    // Connect to the collaboration server
+    const connect = useCallback(() => {
+      if (providerRef.current) {
+        providerRef.current.connect();
+        return;
+      }
+
+      updateConnectionState("connecting");
+
+      const provider = new HocuspocusProvider({
+        url: websocketUrl,
+        name: documentName,
+        document: doc,
+        token: async () => tokenRef.current,
+
+        onConnect: () => {
+          reconnectAttemptsRef.current = 0;
+          updateConnectionState("connected");
+          scheduleTokenRefresh();
+        },
+
+        onSynced: () => {
+          setIsSynced(true);
+          updateConnectionState("synced");
+          onSync?.();
+        },
+
+        onDisconnect: () => {
+          updateConnectionState("disconnected");
+          setIsSynced(false);
+          clearRefreshTimer();
+
+          // Auto-reconnect logic
+          if (
+            autoReconnect &&
+            reconnectAttemptsRef.current < maxReconnectAttempts
+          ) {
+            reconnectAttemptsRef.current += 1;
+            const delay = Math.min(
+              1000 * 2 ** reconnectAttemptsRef.current,
+              30000,
+            );
+            setTimeout(() => {
+              if (providerRef.current && !(providerRef.current as any).isConnected) {
+                providerRef.current.connect();
+              }
+            }, delay);
+          }
+        },
+
+        onAuthenticationFailed: ({ reason }: { reason?: string }) => {
+          const error = new Error(reason ?? "Authentication failed");
+          updateConnectionState("disconnected");
+          clearRefreshTimer();
+
+          if (onRefreshToken) {
+            void refreshToken().then((nextToken) => {
+              if (nextToken && providerRef.current) {
+                providerRef.current.connect();
+                return;
+              }
+
+              onAuthError?.(error);
+            });
+            return;
+          }
+
+          onAuthError?.(error);
+        },
+
+        onAwarenessUpdate: () => {
+          updateCollaborators(provider.awareness);
+        },
+      });
+
+      // Set local user awareness
+      provider.awareness?.setLocalStateField("user", {
+        name: user.name,
+        color: userColor,
+        userId: user.userId,
+      });
+
+      providerRef.current = provider;
+    }, [
+      websocketUrl,
+      documentName,
       doc,
-      provider: providerRef.current,
-      connectionState,
-      collaborators,
-      isSynced,
-      connect,
-      disconnect,
-    }),
-    [doc, connectionState, collaborators, isSynced, connect, disconnect],
-  );
+      user.name,
+      user.userId,
+      userColor,
+      autoReconnect,
+      maxReconnectAttempts,
+      clearRefreshTimer,
+      updateConnectionState,
+      updateCollaborators,
+      onSync,
+      onAuthError,
+      onRefreshToken,
+      refreshToken,
+      scheduleTokenRefresh,
+    ]);
 
+    // Disconnect from the collaboration server
+    const disconnect = useCallback(() => {
+      if (providerRef.current) {
+        providerRef.current.disconnect();
+        updateConnectionState("disconnected");
+      }
+    }, [updateConnectionState]);
+
+    // Auto-connect on mount
+    useEffect(() => {
+      if (autoConnect) {
+        connect();
+      }
+
+      return () => {
+        // Cleanup on unmount
+        clearRefreshTimer();
+        if (providerRef.current) {
+          providerRef.current.destroy();
+          providerRef.current = null;
+        }
+      };
+    }, [autoConnect, clearRefreshTimer, connect]);
+
+    // Context value
+    const contextValue = useMemo<EditorContextValue>(
+      () => ({
+        doc,
+        provider: providerRef.current,
+        connectionState,
+        collaborators,
+        isSynced,
+        connect,
+        disconnect,
+      }),
+      [doc, connectionState, collaborators, isSynced, connect, disconnect],
+    );
+
+    return (
+      <EditorContext.Provider value={contextValue}>
+        {children}
+      </EditorContext.Provider>
+    );
+  };
+}
+
+const lazyEditorProvider = retryableLazyEditor(async () =>
+  createEditorProvider(await loadEditorProviderPeers()),
+);
+
+/**
+ * EditorProvider wraps children with Hocuspocus collaboration context.
+ * Manages WebSocket connection, Y.Doc, and awareness state. Loads `yjs` and
+ * `@hocuspocus/provider` — and no tiptap package — before it renders children,
+ * because every child hook reads a context that only the loaded provider can
+ * supply. A consumer that drives its own editor from that context therefore
+ * needs those two peers alone.
+ */
+export function EditorProvider(props: EditorProviderProps) {
+  const LazyEditorProvider = lazyEditorProvider();
   return (
-    <EditorContext.Provider value={contextValue}>
-      {children}
-    </EditorContext.Provider>
+    <Suspense fallback={null}>
+      <LazyEditorProvider {...props} />
+    </Suspense>
   );
 }
 
