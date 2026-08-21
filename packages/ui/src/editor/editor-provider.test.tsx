@@ -1,0 +1,167 @@
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { Doc } from "yjs";
+import { createEditorProvider, useEditorContext } from "./editor-provider";
+import type { CollaborationPeers } from "./editor-peers";
+import { useEditorConnection } from "./use-editor";
+
+interface ProviderOptions {
+  url: string;
+  name: string;
+  document: Doc;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}
+
+class StubHocuspocusProvider {
+  static instances: StubHocuspocusProvider[] = [];
+
+  awareness = {
+    clientID: 1,
+    getStates: () => new Map(),
+    getLocalState: () => ({}),
+    setLocalStateField: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+  };
+  connect = vi.fn();
+  disconnect = vi.fn();
+  destroy = vi.fn();
+
+  constructor(readonly options: ProviderOptions) {
+    StubHocuspocusProvider.instances.push(this);
+  }
+}
+
+/** Only the members the provider reads; yjs is the real package. */
+function stubPeers() {
+  return {
+    yjs: { Doc },
+    hocuspocus: { HocuspocusProvider: StubHocuspocusProvider },
+  } as unknown as CollaborationPeers;
+}
+
+function ConnectionProbe() {
+  // Reads the context through the public hook, not through the provider
+  // module, so a context created per factory call would leave it unresolved.
+  const { state, isConnected } = useEditorConnection();
+  const { doc } = useEditorContext();
+  return (
+    <span data-testid="probe" data-fragment={doc.getXmlFragment("prosemirror").length}>
+      {state}
+      {isConnected ? " (live)" : ""}
+    </span>
+  );
+}
+
+afterEach(() => {
+  StubHocuspocusProvider.instances = [];
+  vi.doUnmock("./editor-peers");
+  vi.resetModules();
+});
+
+describe("createEditorProvider", () => {
+  it("builds the document and the transport from the loaded peers", () => {
+    const EditorProvider = createEditorProvider(stubPeers());
+
+    render(
+      <EditorProvider
+        websocketUrl="wss://collab.example/ws"
+        documentName="doc:readme"
+        token="jwt"
+        user={{ name: "Ada" }}
+      >
+        <ConnectionProbe />
+      </EditorProvider>,
+    );
+
+    expect(StubHocuspocusProvider.instances).toHaveLength(1);
+    const [provider] = StubHocuspocusProvider.instances;
+    expect(provider.options.url).toBe("wss://collab.example/ws");
+    expect(provider.options.name).toBe("doc:readme");
+    // The Y.Doc came from `peers.yjs.Doc`, and the editor asks it for this
+    // fragment, so the transport and the editor must share the one instance.
+    expect(provider.options.document).toBeInstanceOf(Doc);
+    expect(provider.awareness.setLocalStateField).toHaveBeenCalledWith(
+      "user",
+      expect.objectContaining({ name: "Ada" }),
+    );
+  });
+
+  it("serves the connection state to hooks that read the shared context", async () => {
+    const EditorProvider = createEditorProvider(stubPeers());
+    const onConnectionChange = vi.fn();
+
+    render(
+      <EditorProvider
+        websocketUrl="wss://collab.example/ws"
+        documentName="doc:readme"
+        token="jwt"
+        user={{ name: "Ada" }}
+        onConnectionChange={onConnectionChange}
+      >
+        <ConnectionProbe />
+      </EditorProvider>,
+    );
+
+    expect(screen.getByTestId("probe")).toHaveTextContent("connecting");
+
+    const [provider] = StubHocuspocusProvider.instances;
+    act(() => {
+      provider.options.onConnect();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("probe")).toHaveTextContent("connected (live)");
+    });
+    expect(onConnectionChange).toHaveBeenCalledWith("connected");
+  });
+
+  it("destroys the transport when it unmounts", () => {
+    const EditorProvider = createEditorProvider(stubPeers());
+
+    const { unmount } = render(
+      <EditorProvider
+        websocketUrl="wss://collab.example/ws"
+        documentName="doc:readme"
+        token="jwt"
+        user={{ name: "Ada" }}
+      >
+        <ConnectionProbe />
+      </EditorProvider>,
+    );
+
+    const [provider] = StubHocuspocusProvider.instances;
+    unmount();
+
+    expect(provider.destroy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("EditorProvider", () => {
+  it("holds children back until the peers load, then renders them", async () => {
+    vi.resetModules();
+    vi.doMock("./editor-peers", () => ({
+      loadCollaborationPeers: async () => stubPeers(),
+    }));
+    const { EditorProvider } = await import("./editor-provider");
+
+    render(
+      <EditorProvider
+        websocketUrl="wss://collab.example/ws"
+        documentName="doc:readme"
+        token="jwt"
+        user={{ name: "Ada" }}
+      >
+        <span data-testid="child">connected surface</span>
+      </EditorProvider>,
+    );
+
+    // A child that rendered before the provider would throw out of
+    // `useEditorContext`, so the wrapper must render nothing until then.
+    expect(screen.queryByTestId("child")).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByTestId("child")).toBeInTheDocument();
+    });
+  });
+});
