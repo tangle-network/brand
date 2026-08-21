@@ -15,7 +15,7 @@ import {
 } from "react";
 import type * as Y from "yjs";
 import { retryableLazyEditor } from "./editor-lazy";
-import { type CollaborationPeers, loadCollaborationPeers } from "./editor-peers";
+import { type EditorProviderPeers, loadEditorProviderPeers } from "./editor-peers";
 
 /**
  * Connection state for the Hocuspocus provider.
@@ -134,7 +134,7 @@ function generateUserColor(): string {
  * them through type-only imports, which a bundler erases.
  */
 export function createEditorProvider(
-  peers: CollaborationPeers,
+  peers: EditorProviderPeers,
 ): ComponentType<EditorProviderProps> {
   const { Doc } = peers.yjs;
   const { HocuspocusProvider } = peers.hocuspocus;
@@ -430,14 +430,16 @@ export function createEditorProvider(
 }
 
 const lazyEditorProvider = retryableLazyEditor(async () =>
-  createEditorProvider(await loadCollaborationPeers()),
+  createEditorProvider(await loadEditorProviderPeers()),
 );
 
 /**
  * EditorProvider wraps children with Hocuspocus collaboration context.
- * Manages WebSocket connection, Y.Doc, and awareness state. Loads its yjs,
- * Hocuspocus and tiptap peers before it renders children, because every child
- * hook reads a context that only the loaded provider can supply.
+ * Manages WebSocket connection, Y.Doc, and awareness state. Loads `yjs` and
+ * `@hocuspocus/provider` — and no tiptap package — before it renders children,
+ * because every child hook reads a context that only the loaded provider can
+ * supply. A consumer that drives its own editor from that context therefore
+ * needs those two peers alone.
  */
 export function EditorProvider(props: EditorProviderProps) {
   const LazyEditorProvider = lazyEditorProvider();

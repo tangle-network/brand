@@ -15,9 +15,10 @@
  * attaches `rethrow`. Webpack has no such rule and needs consumer
  * configuration, which `packages/ui/README.md` gives.
  *
- * The two loaders keep the local editor independent of the collaboration
- * stack: a consumer that installs only tiptap can edit markdown locally, and
- * pays for yjs and Hocuspocus only when it renders the collaborative editor.
+ * Three loaders keep each surface independent of the peers it does not use. A
+ * consumer that installs only tiptap can edit markdown locally. A consumer
+ * that installs only yjs and Hocuspocus can drive its own editor from
+ * `EditorProvider`'s context. Only the collaborative editor needs all six.
  *
  * A missing peer and a transient chunk fetch fail differently, so they carry
  * different types: a missing peer throws `MissingEditorPeersError`, which
@@ -38,17 +39,30 @@ export interface DocumentEditorPeers {
   starterKit: typeof TiptapStarterKit;
 }
 
-/** Namespaces the collaborative editor needs, on top of the local set. */
-export interface CollaborationPeers extends DocumentEditorPeers {
-  collaboration: typeof TiptapCollaboration;
-  collaborationCaret: typeof TiptapCollaborationCaret;
+/**
+ * Namespaces the collaboration transport needs. `EditorProvider` builds the
+ * document and the socket from these two alone, so it must not wait on the
+ * tiptap stack: a consumer can drive its own editor from the provider's
+ * context with nothing else installed.
+ */
+export interface EditorProviderPeers {
   hocuspocus: typeof Hocuspocus;
   yjs: typeof Yjs;
+}
+
+/** Namespaces the collaborative editor needs, on top of the two sets above. */
+export interface CollaborationPeers extends DocumentEditorPeers, EditorProviderPeers {
+  collaboration: typeof TiptapCollaboration;
+  collaborationCaret: typeof TiptapCollaborationCaret;
 }
 
 const DOCUMENT_PEERS_MISSING =
   "@tangle-network/ui/editor needs its optional editor peers. " +
   "Install @tiptap/react and @tiptap/starter-kit.";
+
+const PROVIDER_PEERS_MISSING =
+  "@tangle-network/ui/editor needs its optional collaboration transport peers. " +
+  "Install @hocuspocus/provider and yjs.";
 
 const COLLABORATION_PEERS_MISSING =
   "@tangle-network/ui/editor needs its optional collaboration peers. " +
@@ -100,6 +114,32 @@ function rethrow(error: unknown): never {
   throw error;
 }
 
+/** Every optional peer the loaders in this module import. */
+const DEFERRED_PEERS = [
+  "@tiptap/react",
+  "@tiptap/starter-kit",
+  "@tiptap/extension-collaboration",
+  "@tiptap/extension-collaboration-caret",
+  "@hocuspocus/provider",
+  "yjs",
+];
+
+/**
+ * The one package a resolution failure names, or null when the message names
+ * none or more than one. An install list holds every peer a surface needs, so
+ * this tells a consumer which of them is actually absent.
+ */
+function unresolvedPeerFrom(error: unknown): string | null {
+  if (!(error instanceof Error)) return null;
+  const named = DEFERRED_PEERS.filter((name) => error.message.includes(name));
+  // "@tiptap/extension-collaboration" is a prefix of the caret package, so a
+  // message about the caret names both. Keep only the longest.
+  const longest = named.filter(
+    (name) => !named.some((other) => other !== name && other.includes(name)),
+  );
+  return longest.length === 1 ? longest[0] : null;
+}
+
 /**
  * Turns a rejection that names an unresolved package into the install-list
  * error, and keeps the original as its cause. Any other rejection passes
@@ -110,9 +150,10 @@ export function asMissingEditorPeersError(
   error: unknown,
   missingMessage: string,
 ): unknown {
-  return isMissingPeerError(error)
-    ? new MissingEditorPeersError(missingMessage, { cause: error })
-    : error;
+  if (!isMissingPeerError(error)) return error;
+  const unresolved = unresolvedPeerFrom(error);
+  const detail = unresolved === null ? "" : ` ${unresolved} did not resolve.`;
+  return new MissingEditorPeersError(missingMessage + detail, { cause: error });
 }
 
 async function loadPeers<T>(
@@ -154,13 +195,24 @@ function assertDocumentEditorPeers(
   }
 }
 
-function assertCollaborationPeers(peers: CollaborationPeers): void {
-  assertDocumentEditorPeers(peers, COLLABORATION_PEERS_MISSING);
+function assertEditorProviderPeers(
+  peers: EditorProviderPeers,
+  missingMessage: string,
+): void {
   if (
-    !isConfigurableExtension(peers.collaboration.default) ||
-    !isConfigurableExtension(peers.collaborationCaret.default) ||
     typeof peers.hocuspocus.HocuspocusProvider !== "function" ||
     typeof peers.yjs.Doc !== "function"
+  ) {
+    throw new MissingEditorPeersError(missingMessage);
+  }
+}
+
+function assertCollaborationPeers(peers: CollaborationPeers): void {
+  assertDocumentEditorPeers(peers, COLLABORATION_PEERS_MISSING);
+  assertEditorProviderPeers(peers, COLLABORATION_PEERS_MISSING);
+  if (
+    !isConfigurableExtension(peers.collaboration.default) ||
+    !isConfigurableExtension(peers.collaborationCaret.default)
   ) {
     throw new MissingEditorPeersError(COLLABORATION_PEERS_MISSING);
   }
@@ -174,6 +226,21 @@ async function importDocumentEditorPeers(): Promise<DocumentEditorPeers> {
   return { react, starterKit };
 }
 
+async function importEditorProviderPeers(): Promise<EditorProviderPeers> {
+  const [hocuspocus, yjs] = await Promise.all([
+    import("@hocuspocus/provider").catch(rethrow),
+    import("yjs").catch(rethrow),
+  ]);
+  return { hocuspocus, yjs };
+}
+
+/** Resolve the collaboration transport's peers, or throw and name them. */
+export async function loadEditorProviderPeers(): Promise<EditorProviderPeers> {
+  const peers = await loadPeers(importEditorProviderPeers, PROVIDER_PEERS_MISSING);
+  assertEditorProviderPeers(peers, PROVIDER_PEERS_MISSING);
+  return peers;
+}
+
 /** Resolve the local markdown editor's peers, or throw and name them. */
 export async function loadDocumentEditorPeers(): Promise<DocumentEditorPeers> {
   const peers = await loadPeers(importDocumentEditorPeers, DOCUMENT_PEERS_MISSING);
@@ -184,15 +251,14 @@ export async function loadDocumentEditorPeers(): Promise<DocumentEditorPeers> {
 /** Resolve the collaborative editor's peers, or throw and name them. */
 export async function loadCollaborationPeers(): Promise<CollaborationPeers> {
   const peers = await loadPeers(async () => {
-    const [documentPeers, collaboration, collaborationCaret, hocuspocus, yjs] =
+    const [documentPeers, providerPeers, collaboration, collaborationCaret] =
       await Promise.all([
         importDocumentEditorPeers(),
+        importEditorProviderPeers(),
         import("@tiptap/extension-collaboration").catch(rethrow),
         import("@tiptap/extension-collaboration-caret").catch(rethrow),
-        import("@hocuspocus/provider").catch(rethrow),
-        import("yjs").catch(rethrow),
       ]);
-    return { ...documentPeers, collaboration, collaborationCaret, hocuspocus, yjs };
+    return { ...documentPeers, ...providerPeers, collaboration, collaborationCaret };
   }, COLLABORATION_PEERS_MISSING);
   assertCollaborationPeers(peers);
   return peers;

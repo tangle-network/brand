@@ -144,6 +144,30 @@ describe("editor optional peer loaders", () => {
 
     expect(isMissingEditorPeersError(mapped)).toBe(true);
     expect(mapped).toHaveProperty("cause", resolutionFailure);
+    // The install list holds every peer the surface needs, so the message also
+    // names the one that is actually absent.
+    expect((mapped as Error).message).toBe(
+      "install the peers @tiptap/starter-kit did not resolve.",
+    );
+  });
+
+  it("names the caret package rather than the collaboration package it contains", async () => {
+    // "@tiptap/extension-collaboration" is a prefix of the caret specifier, so
+    // a naive substring match reports the wrong package.
+    const caretFailure = new Error(
+      'Could not resolve "@tiptap/extension-collaboration-caret"',
+    );
+    const mapped = asMissingEditorPeersError(caretFailure, "install the peers");
+
+    expect((mapped as Error).message).toBe(
+      "install the peers @tiptap/extension-collaboration-caret did not resolve.",
+    );
+  });
+
+  it("leaves the install list alone when the failure names no single package", async () => {
+    const vague = new Error("Module not found");
+    const mapped = asMissingEditorPeersError(vague, "install the peers");
+
     expect((mapped as Error).message).toBe("install the peers");
   });
 

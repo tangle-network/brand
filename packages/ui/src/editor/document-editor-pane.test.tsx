@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type * as EditorPeers from "./editor-peers";
 
 const markdown = "# Release notes\n\nThe editor loads on demand.";
 
@@ -7,15 +8,19 @@ afterEach(() => {
   vi.resetModules();
 });
 
-/** Loads the pane with both peer loaders rejecting, as for a consumer that
+/** Loads the pane with every peer loader rejecting, as for a consumer that
  *  installed neither tiptap nor the collaboration stack. */
 async function paneWithoutPeers(message: string) {
   vi.resetModules();
-  vi.doMock("./editor-peers", () => ({
+  vi.doMock("./editor-peers", async () => ({
+    ...(await vi.importActual<typeof EditorPeers>("./editor-peers")),
     loadDocumentEditorPeers: async () => {
       throw new Error(message);
     },
     loadCollaborationPeers: async () => {
+      throw new Error(message);
+    },
+    loadEditorProviderPeers: async () => {
       throw new Error(message);
     },
   }));

@@ -10,4 +10,6 @@ The entry declares `@tiptap/*`, `@hocuspocus/provider` and `yjs` as optional pee
 
 A bundler reads the literal specifier in a dynamic `import()`, so the clean build is not automatic in every bundler. Vite and Rollup leave the unresolved peer to run time on their own. esbuild does so only when the call carries a `.catch()`, which every peer import now has, and `pnpm test:package` builds the packed consumer under esbuild as well as Vite to hold that. webpack has no such rule: a webpack consumer that installs none of the peers must give `resolve.fallback` the value `false` for each one, which `packages/ui/README.md` documents.
 
+`EditorProvider` loads `yjs` and `@hocuspocus/provider` on its own, through `loadEditorProviderPeers`. It reads no tiptap namespace, so a consumer that installs those two peers and drives its own editor from the provider's context keeps working — the same set the provider imported statically before.
+
 Rendering an editor now goes through a `Suspense` boundary: `TiptapEditor` and the local editor show a "Loading editor…" placeholder for the first frame, and `EditorProvider` renders its children only after the peers land, because every child hook reads a context that only the loaded provider supplies.

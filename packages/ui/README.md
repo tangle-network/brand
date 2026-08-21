@@ -32,7 +32,16 @@ Sixteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`,
 
 ## Optional peers
 
-`@tiptap/core`, `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-collaboration`, `@tiptap/extension-collaboration-caret`, `@hocuspocus/provider` and `yjs` back the `./editor` entry. The entry reaches every one of them through a dynamic `import()`, and gets a loud error that names the missing packages only when it renders an editor. `./editor` splits the cost in two: the local markdown editor needs `@tiptap/react` and `@tiptap/starter-kit`; the collaborative editor adds the rest.
+`@tiptap/core`, `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-collaboration`, `@tiptap/extension-collaboration-caret`, `@hocuspocus/provider` and `yjs` back the `./editor` entry. The entry reaches every one of them through a dynamic `import()`, and gets a loud error that names the missing packages only when it renders an editor. `./editor` splits the cost three ways, so each surface costs only the peers it uses:
+
+| Surface | Peers it needs |
+| --- | --- |
+| `DocumentEditorPane` in preview mode | none |
+| `MarkdownDocumentEditor` (local) | `@tiptap/react`, `@tiptap/starter-kit` |
+| `EditorProvider` (collaboration transport) | `@hocuspocus/provider`, `yjs` |
+| `TiptapEditor` (collaborative) | all of the above, plus both collaboration extensions |
+
+`EditorProvider` builds the document and the socket from `yjs` and `@hocuspocus/provider` alone, so a consumer that drives its own editor from its context — through `useEditorConnection`, `useCollaborators` and the other `./editor` hooks — installs those two and no tiptap package.
 
 A bundler still reads the literal specifier in a dynamic `import()`, so what a consumer without the peers must do depends on the bundler:
 
@@ -43,5 +52,7 @@ A bundler still reads the literal specifier in a dynamic `import()`, so what a c
 | webpack | Needs configuration. Give `resolve.fallback` the value `false` for each peer you do not install, for example `resolve: { fallback: { "@tiptap/react": false } }`. |
 
 `pnpm test:package` builds a packed consumer that installs none of the peers, under both Vite and esbuild. `scripts/validate-dist.mjs` rejects a static import of any of them, and rejects a dynamic import that lost its `.catch()`.
+
+Because the peers now resolve at first render rather than at build time, a missing one surfaces as a thrown error while React renders. Wrap the editors in an error boundary, so the install list reaches a surface you control instead of unmounting the tree.
 
 `nanostores` and `@nanostores/react` back `./stores`, and `react-router` backs `./nav`. Those two entries create their values at module scope, so they hold a static import and a consumer that imports them must install the peer. Every other entry stays free of all of these.

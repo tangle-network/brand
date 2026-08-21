@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Doc } from "yjs";
 import { createEditorProvider, useEditorContext } from "./editor-provider";
 import type * as EditorPeers from "./editor-peers";
-import type { CollaborationPeers } from "./editor-peers";
+import type { EditorProviderPeers } from "./editor-peers";
 import { useEditorConnection } from "./use-editor";
 
 interface ProviderOptions {
@@ -39,7 +39,7 @@ function stubPeers() {
   return {
     yjs: { Doc },
     hocuspocus: { HocuspocusProvider: StubHocuspocusProvider },
-  } as unknown as CollaborationPeers;
+  } as unknown as EditorProviderPeers;
 }
 
 function ConnectionProbe() {
@@ -140,6 +140,50 @@ describe("createEditorProvider", () => {
 });
 
 describe("EditorProvider", () => {
+  it("renders with no tiptap package installed", async () => {
+    // The provider builds the document and the socket from yjs and Hocuspocus
+    // alone. A consumer that drives its own editor from this context installs
+    // those two and nothing else, so reaching for a tiptap namespace here
+    // would break that consumer's build-clean install.
+    const tiptapSpecifiers = [
+      "@tiptap/react",
+      "@tiptap/starter-kit",
+      "@tiptap/extension-collaboration",
+      "@tiptap/extension-collaboration-caret",
+    ];
+    vi.resetModules();
+    for (const specifier of tiptapSpecifiers) {
+      vi.doMock(specifier, () => {
+        throw new Error(`Could not resolve "${specifier}"`);
+      });
+    }
+    vi.doMock("yjs", () => ({ Doc }));
+    vi.doMock("@hocuspocus/provider", () => ({
+      HocuspocusProvider: StubHocuspocusProvider,
+    }));
+    const { EditorProvider } = await import("./editor-provider");
+
+    render(
+      <EditorProvider
+        websocketUrl="wss://collab.example/ws"
+        documentName="doc:readme"
+        token="jwt"
+        user={{ name: "Ada" }}
+      >
+        <span data-testid="child">custom editor surface</span>
+      </EditorProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("child")).toBeInTheDocument();
+    });
+    expect(StubHocuspocusProvider.instances).toHaveLength(1);
+
+    for (const specifier of [...tiptapSpecifiers, "yjs", "@hocuspocus/provider"]) {
+      vi.doUnmock(specifier);
+    }
+  });
+
   it("holds children back until the peers load, then renders them", async () => {
     vi.resetModules();
     vi.doMock("./editor-peers", async () => ({

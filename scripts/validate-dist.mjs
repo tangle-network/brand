@@ -102,11 +102,70 @@ function staticImportPattern(peer) {
 // esbuild reports an unresolvable literal `import()` as a build error and
 // leaves it to run time only when the call carries a `.catch()`. A dynamic
 // import that loses its handler still builds here and under Vite, and breaks
-// an esbuild consumer that installs no peers, so match the shape directly.
-function uncaughtDynamicImportPattern(peer) {
-  return new RegExp(
-    `import\\s*\\(\\s*["']${specifierPattern(peer)}["']\\s*\\)(?!\\s*\\.catch\\b)`,
-  );
+// an esbuild consumer that installs no peers.
+//
+// The handler may sit behind other links in the chain — `.then(fn).catch(fn)`
+// satisfies esbuild too — so the chain is walked rather than matched. A regex
+// cannot decide this: a handler such as `.then((m) => m)` carries its own
+// parentheses.
+function skipString(code, quoteIndex) {
+  const quote = code[quoteIndex];
+  for (let index = quoteIndex + 1; index < code.length; index += 1) {
+    if (code[index] === "\\") {
+      index += 1;
+      continue;
+    }
+    if (code[index] === quote) return index;
+  }
+  return -1;
+}
+
+/** Index just past the `)` that closes the `(` at `openIndex`, or -1. */
+function skipArgumentList(code, openIndex) {
+  let depth = 0;
+  for (let index = openIndex; index < code.length; index += 1) {
+    const character = code[index];
+    if (character === '"' || character === "'" || character === "`") {
+      index = skipString(code, index);
+      if (index === -1) return -1;
+      continue;
+    }
+    if (character === "(") depth += 1;
+    else if (character === ")") {
+      depth -= 1;
+      if (depth === 0) return index + 1;
+    }
+  }
+  return -1;
+}
+
+/** True when the method chain starting at `start` reaches a `.catch`. */
+function chainReachesCatch(code, start) {
+  let index = start;
+  const skipSpace = () => {
+    while (index < code.length && /\s/.test(code[index])) index += 1;
+  };
+  for (;;) {
+    skipSpace();
+    if (code[index] !== ".") return false;
+    index += 1;
+    skipSpace();
+    const nameStart = index;
+    while (index < code.length && /[\w$]/.test(code[index])) index += 1;
+    if (code.slice(nameStart, index) === "catch") return true;
+    skipSpace();
+    if (code[index] !== "(") return false;
+    index = skipArgumentList(code, index);
+    if (index === -1) return false;
+  }
+}
+
+function hasUncaughtDynamicImport(code, peer) {
+  const call = new RegExp(`import\\s*\\(\\s*["']${specifierPattern(peer)}["']\\s*\\)`, "g");
+  for (let match = call.exec(code); match !== null; match = call.exec(code)) {
+    if (!chainReachesCatch(code, match.index + match[0].length)) return true;
+  }
+  return false;
 }
 
 // Code-split chunks and nested directories carry imports too, so read every
@@ -127,7 +186,7 @@ for (const file of emittedFiles) {
     if (staticImportPattern(peer).test(code)) {
       staticPeerImports.push(`${label}: ${peer}`);
     }
-    if (uncaughtDynamicImportPattern(peer).test(code)) {
+    if (hasUncaughtDynamicImport(code, peer)) {
       uncaughtPeerImports.push(`${label}: ${peer}`);
     }
   }
