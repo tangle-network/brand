@@ -2,7 +2,7 @@
   "name": "@tangle-network/design-system-monorepo",
   "private": true,
   "version": "0.0.0",
-  "description": "Tangle design-system foundation — brand tokens + generic UI components.",
+  "description": "Tangle design-system foundation \u2014 brand tokens + generic UI components.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "typecheck": "pnpm --filter @tangle-network/brand build && pnpm -r exec tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:package": "node scripts/package-smoke.mjs packages/ui && PACKAGE_PEER_OVERRIDES='{\"react-router\":\"^7\"}' node scripts/package-smoke.mjs packages/ui",
+    "test:package": "node scripts/package-smoke.mjs packages/ui && PACKAGE_PEER_OVERRIDES='{\"react-router\":\"^7\"}' node scripts/package-smoke.mjs packages/ui && PACKAGE_OMIT_OPTIONAL_PEERS='[\"@hocuspocus/provider\",\"@tiptap/core\",\"@tiptap/extension-collaboration\",\"@tiptap/extension-collaboration-caret\",\"@tiptap/react\",\"@tiptap/starter-kit\",\"yjs\"]' node scripts/package-smoke.mjs packages/ui",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"

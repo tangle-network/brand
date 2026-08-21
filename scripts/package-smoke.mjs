@@ -136,6 +136,38 @@ try {
     );
   }
 
+  const declaredOptionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
+    .filter(([, metadata]) => metadata?.optional === true)
+    .map(([name]) => name);
+
+  // The peers to leave uninstalled. An optional peer only earns the name when
+  // a consumer without it still builds, so this run proves the promise the
+  // manifest makes. The package reaches such a peer through a dynamic
+  // import(), which a bundler resolves to a stub it never evaluates.
+  const omittedOptionalPeers = JSON.parse(process.env.PACKAGE_OMIT_OPTIONAL_PEERS ?? "[]");
+  if (
+    !Array.isArray(omittedOptionalPeers) ||
+    omittedOptionalPeers.some((name) => typeof name !== "string")
+  ) {
+    throw new Error("PACKAGE_OMIT_OPTIONAL_PEERS must be a JSON array of package names");
+  }
+  const notOptionalOmissions = omittedOptionalPeers.filter(
+    (name) => !declaredOptionalPeers.includes(name),
+  );
+  if (notOptionalOmissions.length > 0) {
+    throw new Error(
+      `cannot omit peers that the packed manifest does not declare optional: ${notOptionalOmissions.join(", ")}`,
+    );
+  }
+  const contradictedOmissions = omittedOptionalPeers.filter(
+    (name) => peerOverrides[name] !== undefined,
+  );
+  if (contradictedOmissions.length > 0) {
+    throw new Error(
+      `a peer cannot be both omitted and overridden: ${contradictedOmissions.join(", ")}`,
+    );
+  }
+
   const invalidOptionalPeers = Object.keys(manifest.peerDependenciesMeta ?? {}).filter(
     (name) => !manifest.peerDependencies?.[name],
   );
@@ -167,9 +199,9 @@ try {
     return workspacePeerTarballs.get(name);
   }
 
-  const optionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})
-    .filter(([, metadata]) => metadata?.optional === true)
-    .map(([name]) => {
+  const optionalPeers = declaredOptionalPeers
+    .filter((name) => !omittedOptionalPeers.includes(name))
+    .map((name) => {
       // An explicit override always wins over the workspace tarball.
       if (peerOverrides[name] !== undefined) {
         return `${name}@${peerOverrides[name]}`;
@@ -217,6 +249,17 @@ try {
     { cwd: consumerDirectory, stdio: "inherit" },
   );
 
+  // Smoke the gauge: a peer that npm still installs through another
+  // dependency would make this run a false green.
+  const leakedOmissions = omittedOptionalPeers.filter((name) =>
+    existsSync(join(consumerDirectory, "node_modules", ...name.split("/"))),
+  );
+  if (leakedOmissions.length > 0) {
+    throw new Error(
+      `omitted optional peers reached the consumer anyway: ${leakedOmissions.join(", ")}`,
+    );
+  }
+
   const installedDirectory = join(
     consumerDirectory,
     "node_modules",
@@ -254,17 +297,58 @@ console.log([${entries}].map((entry) => Object.keys(entry).length));
 `,
   );
 
+  const consumerDistDirectory = join(consumerDirectory, "dist");
   await build({
     root: consumerDirectory,
     logLevel: "error",
     build: {
       emptyOutDir: true,
-      outDir: join(consumerDirectory, "dist"),
+      outDir: consumerDistDirectory,
     },
   });
 
+  // A dynamic import of an uninstalled optional peer builds green: the peer
+  // becomes its own chunk that throws when it loads. That is the wanted
+  // behaviour, and it also means a green build no longer proves that an
+  // INSTALLED peer resolved. Read the emitted chunks and say which peers the
+  // bundle stubbed.
+  const stubbedPeers = new Set();
+  for (const entry of readdirSync(consumerDistDirectory, {
+    recursive: true,
+    withFileTypes: true,
+  })) {
+    if (!entry.isFile() || !entry.name.endsWith(".js")) continue;
+    const code = readFileSync(join(entry.parentPath, entry.name), "utf8");
+    for (const name of declaredOptionalPeers) {
+      if (code.includes(`Could not resolve "${name}"`)) stubbedPeers.add(name);
+    }
+  }
+
+  const unresolvedInstalledPeers = declaredOptionalPeers.filter(
+    (name) => !omittedOptionalPeers.includes(name) && stubbedPeers.has(name),
+  );
+  if (unresolvedInstalledPeers.length > 0) {
+    throw new Error(
+      `installed optional peers did not resolve in the consumer: ${unresolvedInstalledPeers.join(", ")}`,
+    );
+  }
+
+  // Not every omitted peer leaves a stub — a peer the package reaches only
+  // through types never reaches the bundle at all. One stub is enough to
+  // prove the run exercised the uninstalled path, and it pins the marker
+  // string that the check above reads.
+  if (omittedOptionalPeers.length > 0 && stubbedPeers.size === 0) {
+    throw new Error(
+      `no omitted optional peer was stubbed; the build never reached ${omittedOptionalPeers.join(", ")}`,
+    );
+  }
+
+  const omissionNote =
+    omittedOptionalPeers.length > 0
+      ? ` without ${omittedOptionalPeers.join(", ")}`
+      : "";
   console.log(
-    `Packed ${manifest.name}@${manifest.version} passed a clean consumer build across ${specifiers.length} JS exports`,
+    `Packed ${manifest.name}@${manifest.version} passed a clean consumer build across ${specifiers.length} JS exports${omissionNote}`,
   );
 } finally {
   rmSync(workDirectory, { force: true, recursive: true });
