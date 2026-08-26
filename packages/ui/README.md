@@ -26,6 +26,49 @@ export function App() {
 }
 ```
 
+## Styling
+
+This package ships no CSS. Its components are Tailwind v4 class names in source, and the build emits JavaScript only, so two pieces of consumer setup carry real weight.
+
+### Scan this package
+
+Your Tailwind or UnoCSS build has to read this package's files. Neither scans `node_modules` on its own, so a class that only this package names is never generated. Nothing fails loudly when one is missing: the element still renders, still occupies space and still takes clicks, it just looks inert. A `Switch` with no track colour in either state, a `Tabs` where the selected tab is indistinguishable from the rest, and a `Textarea` collapsed to one row all come out of this.
+
+Tailwind v4, in the stylesheet that imports `tailwindcss`. `@source` paths resolve relative to that stylesheet, so adjust the prefix to wherever yours lives:
+
+```css
+/* from src/styles/app.css, with node_modules two levels up */
+@source "../../node_modules/@tangle-network/ui/src/**/*.tsx";
+@source "../../node_modules/@tangle-network/ui/src/**/*.ts";
+```
+
+`sandbox-ui` runs exactly these two globs in `src/styles/globals.css`, alongside `@import "tailwindcss" source(none)` so the scan is the whole of what the bundle compiles from.
+
+UnoCSS, in `uno.config.ts`:
+
+```ts
+content: {
+  filesystem: ["node_modules/@tangle-network/ui/dist/**/*.js"],
+}
+```
+
+Under pnpm that plain glob can match zero files. `node_modules/@tangle-network/ui` is a symlink into `node_modules/.pnpm`, and UnoCSS's globber does not follow it, which leaves you exactly where you started with no error. Pre-expand the glob with something that does follow symlinks, resolve each hit through `realpath`, and hand UnoCSS concrete paths. `tangle-network/blueprint-agent`'s `apps/web/uno.config.ts` carries a worked version that walks the import graph of the two entries it uses rather than the whole `dist`.
+
+Two things to check after wiring this up, because the failure is silent either way. Read the generated CSS for a class this package alone names, rather than eyeballing the app. And assert the scan resolved a non-zero number of files: a scan that silently matches nothing looks identical to no scan at all.
+
+One consequence worth knowing. This is a scan, not a manifest, so a consumer emits only the classes the version it installed actually names. Upgrading this package can introduce a class your build has never generated, and it will go missing the same silent way.
+
+### Import the brand stylesheet
+
+`@tangle-network/brand` is a peer dependency. It holds the tokens every colour here resolves through, and a few real classes that some components reference by name instead of composing out of utilities. `Badge` with `dot` is the one to know about: it emits `status-dot status-dot-running` and its siblings, which are defined in `@tangle-network/brand/styles/globals.css` and nowhere else. Without that import the dots have no size and no colour.
+
+```css
+@import "@tangle-network/brand/styles";
+@import "tailwindcss";
+```
+
+See [`@tangle-network/brand`'s README](../brand/README.md) for the token-level breakdown, the finer-grained imports, and the fonts, which brand deliberately does not bundle.
+
 ## Subpaths
 
 Sixteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`, `nav`, `redaction`.
