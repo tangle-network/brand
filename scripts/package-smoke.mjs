@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -23,7 +24,12 @@ const packageDirectory = resolve(root, packageArgument);
 const sourceManifest = JSON.parse(
   readFileSync(join(packageDirectory, "package.json"), "utf8"),
 );
-const workDirectory = mkdtempSync(join(tmpdir(), "tangle-package-smoke-"));
+// Vite names emitted HTML relative to its `root`. On macOS `tmpdir()` is a
+// symlink (`/var` -> `/private/var`), so a root under it makes that name
+// escape the root and the build fails; the real path keeps it inside.
+const workDirectory = mkdtempSync(
+  join(realpathSync(tmpdir()), "tangle-package-smoke-"),
+);
 const packDirectory = join(workDirectory, "pack");
 const consumerDirectory = join(workDirectory, "consumer");
 
