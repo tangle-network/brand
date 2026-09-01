@@ -24,6 +24,8 @@ export interface AgentTimelineMessageItem {
   content: string;
   toolCalls?: ReactNode;
   isStreaming?: boolean;
+  /** Shown beside a user bubble on hover. Assistant prose carries no
+   *  timestamp of its own — the turn's user message dates the exchange. */
   timestamp?: Date;
   after?: ReactNode;
 }
@@ -40,6 +42,7 @@ export interface AgentTimelineToolItem {
 export interface AgentTimelineToolGroupItem {
   id: string;
   kind: "tool_group";
+  /** Accessible name of the group. Not drawn — the rows are the label. */
   title?: string;
   calls: ToolCallData[];
   /** Source tool parts, parallel to `calls`. */
@@ -69,6 +72,9 @@ export interface AgentTimelineArtifactItem {
 export interface AgentTimelineCustomItem {
   id: string;
   kind: "custom";
+  /** Laid out as a run row: it takes the same horizontal bleed as tool rows,
+   *  so a `RunRowShell`-based row (reasoning) aligns its glyph with the prose
+   *  edge. */
   content: ReactNode;
 }
 
@@ -88,90 +94,82 @@ export interface AgentTimelineProps {
   /** Optional actions rendered beside each tool item (e.g. "open in artifacts").
    *  Receives the source tool part carried on the item. */
   renderToolActions?: (part: ToolPart) => ReactNode;
-  /** When set, collapse the timeline to the first N spine rows behind a
-   *  "Show N more steps" toggle. Omit to always show every row. */
+  /** When set, collapse the timeline to the first N step rows (every item
+   *  except user messages) behind a "Show N more steps" toggle. Omit to always
+   *  show every row. */
   collapseAfter?: number;
 }
 
-const TONE_STYLES: Record<AgentTimelineTone, { dot: string; card: string; text: string; icon: typeof Info }> = {
+const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; icon: typeof Info }> = {
   default: {
-    dot: "bg-[var(--border-hover)]",
     card: "border-border bg-card",
     text: "text-foreground",
     icon: CircleDot,
   },
   info: {
-    dot: "bg-[var(--surface-info-text)]",
     card: "border-[var(--surface-info-border)] bg-[var(--surface-info-bg)]",
     text: "text-[var(--surface-info-text)]",
     icon: Info,
   },
   success: {
-    dot: "bg-[var(--surface-success-text)]",
     card: "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)]",
     text: "text-[var(--surface-success-text)]",
     icon: CheckCircle2,
   },
   warning: {
-    dot: "bg-[var(--surface-warning-text)]",
     card: "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)]",
     text: "text-[var(--surface-warning-text)]",
     icon: AlertTriangle,
   },
   error: {
-    dot: "bg-[var(--surface-danger-text)]",
     card: "border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)]",
     text: "text-[var(--surface-danger-text)]",
     icon: AlertTriangle,
   },
 };
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+/**
+ * Vertical rhythm. Rows are grouped by what they are, and the gap between two
+ * neighbours follows from the pair: a turn boundary (user message) separates
+ * most, a tool sequence — and prose beside it — sits tightest, cards and
+ * consecutive paragraphs fall between.
+ */
+type StepKind = "user" | "prose" | "tool" | "card";
+
+function stepKind(item: AgentTimelineItem): StepKind {
+  if (item.kind === "message") return item.role === "user" ? "user" : "prose";
+  if (item.kind === "status" || item.kind === "artifact") return "card";
+  return "tool";
 }
 
-interface AgentTimelineRowProps {
-  isLast: boolean;
-  accentClassName: string;
-  /** Dot top-offset. Defaults to aligning with the first text line; card rows
-   * pass CARD_ROW_DOT to center the dot on the card header instead. */
-  dotClassName?: string;
-  children: ReactNode;
+function spacingBefore(prev: StepKind | undefined, next: StepKind): string {
+  if (prev === undefined) return "";
+  if (prev === "user" || next === "user") return "mt-4";
+  if (prev === "card" || next === "card") return "mt-2";
+  if (prev === "tool" || next === "tool") return "mt-1";
+  return "mt-3";
 }
 
-// Centers the dot on a RunRowShell card header (2.5rem: h-6 badge + py-2),
-// so tool and reasoning rows read as dot-aligned rather than top-anchored.
-const CARD_ROW_DOT = "mt-[calc((2.5rem-var(--timeline-dot-size))/2)]";
-
-function AgentTimelineRow({ isLast, accentClassName, dotClassName = "mt-2", children }: AgentTimelineRowProps) {
-  return (
-    <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-4">
-      <div className="relative flex justify-center">
-        {!isLast && (
-          <span className="absolute top-4 bottom-[-0.75rem] left-1/2 w-px -translate-x-1/2 bg-border" />
-        )}
-        <span className={cn("relative h-[var(--timeline-dot-size)] w-[var(--timeline-dot-size)] rounded-full ring-4 ring-[var(--bg-root)]", dotClassName, accentClassName)} />
-      </div>
-      <div className="min-w-0 pb-3">{children}</div>
-    </div>
-  );
-}
+// Tool rows bleed past the prose edge so the resting glyph sits ON the edge:
+// RunRowShell's 8px header inset plus the 4px that centers a 14px glyph in its
+// 22px slot = 12px. The hover fill then wraps the row. The column's `px-4` is
+// wider than the bleed, so nothing clips.
+const ROW_BLEED = "-mx-3";
 
 function AssistantMessage({ item }: { item: AgentTimelineMessageItem }) {
   return (
-    <div className="-mt-0.5">
-      {item.timestamp && (
-        <div className="mb-2 text-[var(--font-size-xs)] text-muted-foreground">
-          {formatTime(item.timestamp)}
-        </div>
-      )}
+    <div>
       {item.content && (
-        <Markdown className="tangle-prose text-[var(--font-size-base)] leading-[var(--line-height-base)]">{item.content}</Markdown>
+        <Markdown className="tangle-prose text-[var(--font-size-base)] leading-[1.5]">{item.content}</Markdown>
       )}
       {item.isStreaming && (
-        <span className="ml-0.5 inline-block h-4 w-2 animate-pulse rounded-sm bg-primary align-text-bottom" />
+        <span
+          aria-hidden
+          data-streaming-caret=""
+          className="ml-0.5 inline-block h-[1em] w-0.5 animate-pulse rounded-full bg-muted-foreground align-text-bottom"
+        />
       )}
-      {item.toolCalls && <div className="mt-3">{item.toolCalls}</div>}
+      {item.toolCalls && <div className="mt-1">{item.toolCalls}</div>}
       {item.after && (
         <div className="mt-3 border-t border-border pt-3">
           {item.after}
@@ -245,9 +243,10 @@ function ArtifactCard({ item }: { item: AgentTimelineArtifactItem }) {
 }
 
 /**
- * AgentTimeline — unified mixed-content timeline for agent-backed sandbox
- * sessions. Renders messages, tool steps, status cards, and artifact handoffs in
- * a single execution narrative.
+ * AgentTimeline — unified mixed-content transcript for agent-backed sandbox
+ * sessions. Renders messages, tool rows, status cards, and artifact handoffs
+ * as one plain column: prose at the reading size, tool calls as quiet
+ * one-liners between the paragraphs, no connector chrome.
  */
 export function AgentTimeline({
   items,
@@ -274,143 +273,106 @@ export function AgentTimeline({
   const isUserMessage = (item: AgentTimelineItem) =>
     item.kind === "message" && item.role === "user";
 
-  // Items on the vertical connector (user messages render off-spine).
-  const timelineItems = renderedItems.filter((item) => !isUserMessage(item));
+  // Step rows are everything but user messages; the collapse limit counts them.
+  const stepItems = renderedItems.filter((item) => !isUserMessage(item));
 
   const limit = collapseAfter ?? Infinity;
-  const collapsible = timelineItems.length > limit;
+  const collapsible = stepItems.length > limit;
   const collapsed = collapsible && !expanded;
 
-  // While collapsed, keep only the first `limit` spine rows (and any user
+  // While collapsed, keep only the first `limit` step rows (and any user
   // messages that precede them); the rest hides behind the toggle.
   let renderList = renderedItems;
   let hiddenCount = 0;
   if (collapsed) {
     const visible: AgentTimelineItem[] = [];
-    let spineCount = 0;
+    let stepCount = 0;
     for (const item of renderedItems) {
-      if (spineCount >= limit) break;
+      if (stepCount >= limit) break;
       visible.push(item);
-      if (!isUserMessage(item)) spineCount += 1;
+      if (!isUserMessage(item)) stepCount += 1;
     }
     renderList = visible;
-    hiddenCount = timelineItems.length - limit;
+    hiddenCount = stepItems.length - limit;
   }
 
-  const visibleSpine = renderList.filter((item) => !isUserMessage(item));
-  // When a toggle row follows, no real row is last — the toggle owns the tail.
-  const lastSpineItem = collapsible
-    ? undefined
-    : visibleSpine[visibleSpine.length - 1];
+  const renderItem = (item: AgentTimelineItem): ReactNode => {
+    if (item.kind === "message") {
+      return item.role === "user" ? (
+        <UserMessage content={item.content} timestamp={item.timestamp} />
+      ) : (
+        <AssistantMessage item={item} />
+      );
+    }
+
+    if (item.kind === "tool") {
+      return (
+        <ToolCallStep
+          type={item.call.type}
+          label={item.call.label}
+          status={item.call.status}
+          detail={item.call.detail}
+          output={item.call.output}
+          duration={item.call.duration}
+          part={item.part}
+          actions={item.part ? renderToolActions?.(item.part) : undefined}
+        />
+      );
+    }
+
+    if (item.kind === "tool_group") {
+      return (
+        <ToolCallGroup title={item.title}>
+          {item.calls.map((call, callIndex) => {
+            const part = item.parts?.[callIndex];
+            return (
+              <ToolCallStep
+                key={call.id}
+                type={call.type}
+                label={call.label}
+                status={call.status}
+                detail={call.detail}
+                output={call.output}
+                duration={call.duration}
+                part={part}
+                actions={part ? renderToolActions?.(part) : undefined}
+              />
+            );
+          })}
+        </ToolCallGroup>
+      );
+    }
+
+    if (item.kind === "status") return <StatusCard item={item} />;
+    if (item.kind === "artifact") return <ArtifactCard item={item} />;
+    return item.content;
+  };
 
   return (
-    <div className={cn("mx-auto w-full max-w-5xl px-4 py-4", className)}>
-      {renderList.map((item) => {
-        // User messages: right-aligned bubble, off-spine — needs its own vertical
-        // rhythm so it doesn't sit flush against the status/tool/agent row below.
-        if (item.kind === "message" && item.role === "user") {
-          return (
-            <div key={item.id} className="mt-6 mb-4 first:mt-0">
-              <UserMessage content={item.content} timestamp={item.timestamp} />
-            </div>
-          );
-        }
-
-        const isLast = item === lastSpineItem;
-
-        if (item.kind === "message") {
-          return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--brand-glow)]">
-              <AssistantMessage item={item} />
-            </AgentTimelineRow>
-          );
-        }
-
-        if (item.kind === "tool") {
-          return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
-              <ToolCallStep
-                type={item.call.type}
-                label={item.call.label}
-                status={item.call.status}
-                detail={item.call.detail}
-                output={item.call.output}
-                duration={item.call.duration}
-                part={item.part}
-                actions={item.part ? renderToolActions?.(item.part) : undefined}
-              />
-            </AgentTimelineRow>
-          );
-        }
-
-        if (item.kind === "tool_group") {
-          return (
-            <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
-              <ToolCallGroup title={item.title}>
-                {item.calls.map((call, callIndex) => {
-                  const part = item.parts?.[callIndex];
-                  return (
-                    <ToolCallStep
-                      key={call.id}
-                      type={call.type}
-                      label={call.label}
-                      status={call.status}
-                      detail={call.detail}
-                      output={call.output}
-                      duration={call.duration}
-                      part={part}
-                      actions={part ? renderToolActions?.(part) : undefined}
-                    />
-                  );
-                })}
-              </ToolCallGroup>
-            </AgentTimelineRow>
-          );
-        }
-
-        if (item.kind === "status") {
-          return (
-            <AgentTimelineRow
-              key={item.id}
-              isLast={isLast}
-              accentClassName={TONE_STYLES[item.tone ?? "default"].dot}
-            >
-              <StatusCard item={item} />
-            </AgentTimelineRow>
-          );
-        }
-
-        if (item.kind === "artifact") {
-          return (
-            <AgentTimelineRow
-              key={item.id}
-              isLast={isLast}
-              accentClassName={TONE_STYLES[item.tone ?? "default"].dot}
-            >
-              <ArtifactCard item={item} />
-            </AgentTimelineRow>
-          );
-        }
-
-        // custom
+    <div className={cn("mx-auto flex w-full max-w-5xl flex-col px-4 py-4", className)}>
+      {renderList.map((item, index) => {
+        const kind = stepKind(item);
+        const prev = index > 0 ? stepKind(renderList[index - 1]) : undefined;
         return (
-          <AgentTimelineRow key={item.id} isLast={isLast} accentClassName="bg-[var(--border-hover)]" dotClassName={CARD_ROW_DOT}>
-            {(item as AgentTimelineCustomItem).content}
-          </AgentTimelineRow>
+          <div
+            key={item.id}
+            data-timeline-step={kind}
+            className={cn(spacingBefore(prev, kind), kind === "tool" && ROW_BLEED)}
+          >
+            {renderItem(item)}
+          </div>
         );
       })}
       {collapsible ? (
-        <AgentTimelineRow isLast accentClassName="bg-[var(--border-hover)]">
-          <button
-            type="button"
-            onClick={() => setExpanded((value) => !value)}
-            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {collapsed
-              ? `Show ${hiddenCount} more step${hiddenCount === 1 ? "" : "s"}`
-              : "Show less"}
-          </button>
-        </AgentTimelineRow>
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-2 self-start text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          {collapsed
+            ? `Show ${hiddenCount} more step${hiddenCount === 1 ? "" : "s"}`
+            : "Show less"}
+        </button>
       ) : null}
     </div>
   );

@@ -17,9 +17,11 @@ function formatTime(date: Date): string {
 }
 
 /**
- * The single user message bubble — a quiet, right-aligned bordered bubble on the
- * muted surface (no loud fill, no uppercase label). Used by both the run/message
- * list (session-model `parts`) and AgentTimeline (direct `content`/`timestamp`).
+ * The single user message bubble — a quiet, right-aligned fill on the muted
+ * surface (no border, no loud fill, no uppercase label). The timestamp sits
+ * beside the bubble and appears on hover, so it costs no height. Used by both
+ * the run/message list (session-model `parts`) and AgentTimeline (direct
+ * `content`/`timestamp`).
  */
 export const UserMessage = memo(
   ({ message: _message, parts, content, timestamp, actions }: UserMessageProps) => {
@@ -34,14 +36,17 @@ export const UserMessage = memo(
 
     return (
       <div className="flex justify-end">
-        <div className="flex max-w-[78%] flex-col items-end gap-2">
-          <div className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3">
+        <div className="group flex max-w-[78%] flex-col items-end gap-2">
+          <div className="relative w-full rounded-2xl bg-muted/50 px-4 py-3">
             {timestamp ? (
-              <div className="mb-1.5 text-right text-[var(--font-size-xs)] text-muted-foreground">
+              <span
+                data-user-message-time=""
+                className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-[var(--font-size-xs)] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              >
                 {formatTime(timestamp)}
-              </div>
+              </span>
             ) : null}
-            <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)] text-foreground">
+            <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[1.5] text-foreground">
               {text}
             </div>
           </div>
