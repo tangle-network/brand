@@ -8,6 +8,8 @@
 export type FileFormat =
   | "pdf"
   | "image"
+  | "video"
+  | "audio"
   | "csv"
   | "spreadsheet"
   | "code"
@@ -17,7 +19,20 @@ export type FileFormat =
   | "text"
   | "unknown";
 
-const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "svg", "webp"];
+/**
+ * How a file surface renders a file. Every format maps to its own renderer;
+ * `unknown` becomes `binary`, which renders string content as text and offers a
+ * download for anything else.
+ */
+export type FilePreviewKind = Exclude<FileFormat, "unknown"> | "binary";
+
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "svg", "webp", "avif"];
+const VIDEO_EXTENSIONS = ["mp4", "webm", "mov"];
+const AUDIO_EXTENSIONS = ["mp3", "wav", "ogg", "m4a"];
+const SPREADSHEET_MIME_TYPES = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+];
 
 const EXTENSION_TO_SYNTAX_LANGUAGE: Record<string, string> = {
   ts: "typescript",
@@ -97,14 +112,19 @@ export function detectFileFormat(filename: string, mimeType?: string): FileForma
   // 1. Specific MIME types are authoritative — they outrank the extension.
   if (mime === "application/pdf") return "pdf";
   if (mime.startsWith("image/")) return "image";
+  if (mime.startsWith("video/")) return "video";
+  if (mime.startsWith("audio/")) return "audio";
   if (mime === "text/markdown") return "markdown";
   if (mime === "application/json") return "json";
   if (mime === "text/csv" || mime === "application/csv") return "csv";
+  if (SPREADSHEET_MIME_TYPES.includes(mime)) return "spreadsheet";
   if (mime === "application/yaml" || mime === "application/x-yaml" || mime === "text/yaml") return "yaml";
 
   // 2. Fall back to the file extension.
   if (ext === "pdf") return "pdf";
   if (IMAGE_EXTENSIONS.includes(ext)) return "image";
+  if (VIDEO_EXTENSIONS.includes(ext)) return "video";
+  if (AUDIO_EXTENSIONS.includes(ext)) return "audio";
   if (ext === "csv") return "csv";
   if (ext === "xlsx" || ext === "xls") return "spreadsheet";
   if (CODE_EXTENSIONS.has(ext)) return "code";
@@ -119,13 +139,28 @@ export function detectFileFormat(filename: string, mimeType?: string): FileForma
   return "unknown";
 }
 
-/** Human-facing label for a detected format. */
-export function getFormatLabel(format: FileFormat): string {
+/**
+ * The preview renderer for a file, from its name and optional MIME type only.
+ * Same precedence as `detectFileFormat` (MIME outranks extension); a file that
+ * matches nothing is `binary`. Content is not an input: the preview renders a
+ * `binary` file's string content as text and offers a download otherwise.
+ */
+export function resolveFilePreviewKind(filename: string, mimeType?: string): FilePreviewKind {
+  const format = detectFileFormat(filename, mimeType);
+  return format === "unknown" ? "binary" : format;
+}
+
+/** Human-facing label for a detected format or preview kind. */
+export function getFormatLabel(format: FileFormat | FilePreviewKind): string {
   switch (format) {
     case "pdf":
       return "PDF";
     case "image":
       return "Image";
+    case "video":
+      return "Video";
+    case "audio":
+      return "Audio";
     case "csv":
       return "CSV";
     case "spreadsheet":
@@ -161,7 +196,10 @@ export function getSyntaxLanguage(filename: string): string | undefined {
  * a MIME type on an extensionless file (where the extension can't reveal it);
  * any other code format keys off the extension.
  */
-export function getCodeLanguage(filename: string, format: FileFormat): string | undefined {
+export function getCodeLanguage(
+  filename: string,
+  format: FileFormat | FilePreviewKind,
+): string | undefined {
   if (format === "json" || format === "yaml") return format;
   return getSyntaxLanguage(filename);
 }

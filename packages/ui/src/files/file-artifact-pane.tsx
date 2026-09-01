@@ -51,13 +51,16 @@ export interface FileArtifactPaneProps extends Omit<FilePreviewProps, "className
 
 /**
  * FileArtifactPane — opinionated artifact frame for file previews with tabs and
- * header actions.
+ * header actions. The body is `FilePreview`, so every kind it renders (image,
+ * PDF, video, audio, CSV, spreadsheet, markdown, code, text) renders here too;
+ * `onDownload` drives both the header button and the body's download cards.
  */
 export function FileArtifactPane({
   filename,
   content,
   blobUrl,
   mimeType,
+  size,
   onClose,
   onDownload,
   path,
@@ -188,6 +191,8 @@ export function FileArtifactPane({
         content={content}
         blobUrl={blobUrl}
         mimeType={mimeType}
+        size={size}
+        onDownload={onDownload}
         hideHeader={true}
       />
     </ArtifactPane>

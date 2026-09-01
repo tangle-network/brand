@@ -12,7 +12,12 @@ export {
   type RichFileTreeGitStatus,
   type RichFileTreeThemeVars,
 } from "./rich-file-tree";
-export { FilePreview, type FilePreviewProps } from "./file-preview";
+export {
+  CSV_PREVIEW_ROW_LIMIT,
+  FilePreview,
+  parseCsv,
+  type FilePreviewProps,
+} from "./file-preview";
 export { FileTabs, type FileTabsProps, type FileTabData } from "./file-tabs";
 export { FileArtifactPane, type FileArtifactPaneProps } from "./file-artifact-pane";
 export {
@@ -21,5 +26,7 @@ export {
   getCodeLanguage,
   getFormatLabel,
   getSyntaxLanguage,
+  resolveFilePreviewKind,
   type FileFormat,
+  type FilePreviewKind,
 } from "./file-format";
