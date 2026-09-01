@@ -1,49 +1,44 @@
 import { useState, type ReactNode } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { Loader2, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
 import { formatDuration } from "../utils/format";
-import { LiveDuration } from "./run-item-primitives";
 
 export type RunRowStatus = "running" | "success" | "error" | "idle";
 
 /**
- * Trailing status indicator shared by every run row: a spinner while running,
- * a green/red dot on terminal states, nothing when idle. Status is shown here
- * — it never replaces the row's semantic lead icon.
+ * Trailing status indicator shared by every run row. Only `error` draws a
+ * mark (a red dot). Success is silence, and a running row carries its state in
+ * the title — a `TextShimmer` sweep — so neither renders anything here.
  */
 export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
-  if (status === "running") {
-    return <Loader2 className="h-3 w-3 shrink-0 animate-spin text-[var(--accent-text)]" />;
-  }
-  if (status === "success") {
-    return (
-      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--surface-success-text)]" />
-    );
-  }
-  if (status === "error") {
-    return (
-      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--surface-danger-text)]" />
-    );
-  }
-  return null;
+  if (status !== "error") return null;
+  return (
+    <span
+      data-run-row-status="error"
+      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--surface-danger-text)]"
+    />
+  );
 }
 
 export interface RunRowShellProps {
-  /** Semantic lead glyph — always visible; never replaced by status. */
+  /** Semantic lead glyph (14px). At rest it is the row's only ornament; on
+   *  hover and while open the expand chevron takes its slot. */
   icon: ReactNode;
   /** Row title. A string in the common case; a node when the title carries its
-   *  own treatment (e.g. an active-state shimmer sweep) — it renders inline in
-   *  the shell's title slot either way. */
+   *  own treatment — a running row passes `<TextShimmer>` here, which is the
+   *  whole in-flight signal (the shell draws no spinner). */
   title: ReactNode;
   /** Secondary inline text (tool path/command, or a reasoning preview). */
   description?: string;
   /** Render the description in mono (tools) vs prose (reasoning). */
   descriptionMono?: boolean;
   status?: RunRowStatus;
-  /** Live-ticks a duration while running. */
+  /** @deprecated The shell no longer ticks a live duration while running; the
+   *  running state lives in the title (`TextShimmer`). Accepted and ignored so
+   *  existing callers keep compiling. */
   startTime?: number;
-  /** Static duration shown once the row is no longer running. */
+  /** Static duration, revealed on hover once the row is no longer running. */
   durationMs?: number;
   /** Radius shaping when rows are stacked into a group. */
   groupPosition?: "single" | "first" | "middle" | "last";
@@ -70,11 +65,17 @@ const SHAPE_CLASS: Record<
   last: "rounded-t-[var(--radius-sm)] rounded-b-[var(--radius-lg)]",
 };
 
+// Header geometry: 8px inset, 22px glyph slot, 8px gap. The collapsed error
+// indents by their sum so it starts under the title, not under the glyph.
+const HEADER_INSET = "px-2 py-1";
+const ERROR_INDENT = "pl-[2.375rem]";
+
 /**
- * Shared shell for the agent activity rows (reasoning + tool). Owns the
- * bordered container, the lead icon badge, title/description, the trailing
- * meta cluster (duration + status + chevron) and the collapsible body, so
- * both row kinds read as one family instead of two bespoke layouts.
+ * Shared shell for the agent activity rows (reasoning + tool). A quiet
+ * one-liner at rest — bare glyph, muted title and description, no fill, no
+ * border — that becomes a bordered card only while open. The border is always
+ * present (transparent at rest) so hover and expand never shift layout.
+ * Both row kinds render through it so they read as one family.
  */
 export function RunRowShell({
   icon,
@@ -82,7 +83,6 @@ export function RunRowShell({
   description,
   descriptionMono = false,
   status = "idle",
-  startTime,
   durationMs,
   groupPosition = "single",
   collapsedError,
@@ -109,11 +109,14 @@ export function RunRowShell({
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <div className="flex items-start gap-2">
         <div
+          data-run-row=""
+          data-state={open ? "open" : "closed"}
           className={cn(
-            "min-w-0 flex-1 overflow-hidden border transition-colors",
-            "border-[var(--border-subtle)] bg-[var(--md3-surface-container)]",
-            expandable && "hover:border-border",
-            open && "border-border",
+            "group min-w-0 flex-1 overflow-hidden border transition-colors",
+            open
+              ? "border-border bg-[var(--md3-surface-container)]"
+              : "border-transparent bg-transparent",
+            expandable && !open && "hover:bg-[var(--md3-surface-container)]",
             SHAPE_CLASS[groupPosition],
             className,
           )}
@@ -122,21 +125,48 @@ export function RunRowShell({
             <button
               type="button"
               className={cn(
-                "flex w-full items-center gap-2.5 px-3 py-2 text-left",
+                "flex w-full items-center gap-2 text-left",
+                HEADER_INSET,
                 expandable ? "cursor-pointer" : "cursor-default",
               )}
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-muted text-muted-foreground">
-                {icon}
+              <span
+                aria-hidden
+                className="flex h-[1.375rem] w-[1.375rem] shrink-0 items-center justify-center text-muted-foreground"
+              >
+                <span
+                  data-run-row-glyph=""
+                  className={cn(
+                    "flex items-center justify-center",
+                    expandable && "group-hover:hidden",
+                    open && "hidden",
+                  )}
+                >
+                  {icon}
+                </span>
+                {expandable ? (
+                  <ChevronRight
+                    data-run-row-chevron=""
+                    className={cn(
+                      "hidden h-3.5 w-3.5 transition-transform group-hover:block",
+                      open && "block rotate-90",
+                    )}
+                  />
+                ) : null}
               </span>
 
-              <span className="shrink-0 whitespace-nowrap text-xs font-medium text-foreground">
+              <span
+                className={cn(
+                  "shrink-0 whitespace-nowrap text-sm font-normal text-muted-foreground transition-colors group-hover:text-foreground",
+                  open && "text-foreground",
+                )}
+              >
                 {title}
               </span>
               {description ? (
                 <span
                   className={cn(
-                    "hidden min-w-0 flex-1 truncate text-xs text-muted-foreground sm:inline",
+                    "hidden min-w-0 flex-1 truncate text-sm text-muted-foreground transition-colors group-hover:text-foreground sm:inline",
                     descriptionMono && "font-mono",
                   )}
                 >
@@ -144,29 +174,27 @@ export function RunRowShell({
                 </span>
               ) : null}
 
-              <div className="ml-auto flex shrink-0 items-center gap-1.5">
-                {isRunning && startTime != null ? (
-                  <LiveDuration startTime={startTime} />
-                ) : durationMs != null ? (
-                  <span className="text-[10px] font-mono tabular-nums text-muted-foreground">
+              <span className="ml-auto flex shrink-0 items-center gap-1.5">
+                {!isRunning && durationMs != null ? (
+                  <span
+                    data-run-row-duration=""
+                    className="font-mono text-[10px] tabular-nums text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                  >
                     {formatDuration(durationMs)}
                   </span>
                 ) : null}
                 <RunRowStatusDot status={status} />
-                {expandable ? (
-                  <ChevronRight
-                    className={cn(
-                      "h-3 w-3 shrink-0 text-muted-foreground transition-transform",
-                      open && "rotate-90",
-                    )}
-                  />
-                ) : null}
-              </div>
+              </span>
             </button>
           </Collapsible.Trigger>
 
           {collapsedError && !open ? (
-            <div className="border-t border-border px-3 py-2 text-xs text-[var(--surface-danger-text)]">
+            <div
+              className={cn(
+                "pb-1.5 pr-2 text-xs leading-snug text-[var(--surface-danger-text)]",
+                ERROR_INDENT,
+              )}
+            >
               {collapsedError}
             </div>
           ) : null}

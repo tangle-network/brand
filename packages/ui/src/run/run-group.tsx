@@ -28,8 +28,9 @@ import { Markdown } from "../markdown/markdown";
 
 /**
  * One row on the run's timeline spine: a connector line + accent dot in a
- * narrow gutter, content to the right. Mirrors AgentTimeline's row so a run
- * reads as separated, distinct steps — not one filled box.
+ * narrow gutter, content to the right, so a run reads as separated, distinct
+ * steps — not one filled box. The dot's top offset centers it on a 30px run
+ * row header (RunRowShell: 22px glyph slot + 4px inset each side).
  */
 function SpineRow({
   accentClassName,
@@ -48,7 +49,7 @@ function SpineRow({
         )}
         <span
           className={cn(
-            "relative mt-1.5 h-[var(--timeline-dot-size,0.5rem)] w-[var(--timeline-dot-size,0.5rem)] rounded-full ring-4 ring-[var(--bg-root)]",
+            "relative mt-2.5 h-[var(--timeline-dot-size,0.5rem)] w-[var(--timeline-dot-size,0.5rem)] rounded-full ring-4 ring-[var(--bg-root)]",
             accentClassName,
           )}
         />

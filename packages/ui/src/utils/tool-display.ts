@@ -43,11 +43,6 @@ function extractFilePath(input: unknown): string | undefined {
   );
 }
 
-function cleanPath(path: string): string {
-  const parts = path.split("/");
-  return parts.length > 3 ? ".../" + parts.slice(-2).join("/") : path;
-}
-
 // ---------------------------------------------------------------------------
 // Category icons (emoji shorthand used by compact views)
 // ---------------------------------------------------------------------------
@@ -116,6 +111,12 @@ export function getToolCategory(toolName: string): ToolCategory {
 // Main metadata resolver
 // ---------------------------------------------------------------------------
 
+/**
+ * Title is the bare verb ("Read", "Edit", "Shell"); the path, command, pattern
+ * or query lives in `description` only, so a row prints its subject once.
+ * `targetPath` / `commandSnippet` carry the untruncated value for consumers
+ * that need it (diff headers, expanded detail).
+ */
 export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
   const name = normalizeToolName(part.tool);
   const input = part.state.status !== "pending" ? part.state.input : undefined;
@@ -128,7 +129,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "command":
     case "execute":
       return {
-        title: "Run command",
+        title: "Shell",
         description: command ? truncateCommand(command) : undefined,
         displayVariant: "command",
         commandSnippet: command,
@@ -138,7 +139,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "write_file":
     case "create_file":
       return {
-        title: filePath ? `Write ${cleanPath(filePath)}` : "Write file",
+        title: "Write",
         description: filePath,
         displayVariant: "write-file",
         targetPath: filePath,
@@ -147,7 +148,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "edit":
     case "patch":
       return {
-        title: filePath ? `Edit ${cleanPath(filePath)}` : "Edit file",
+        title: "Edit",
         description: filePath,
         hasDiffOutput: true,
         diffFilePath: filePath,
@@ -159,7 +160,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "read_file":
     case "cat":
       return {
-        title: filePath ? `Read ${cleanPath(filePath)}` : "Read file",
+        title: "Read",
         description: filePath,
         displayVariant: "read-file",
         targetPath: filePath,
@@ -170,7 +171,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "rg": {
       const pattern = extractString(input, "pattern");
       return {
-        title: pattern ? `Search: ${pattern}` : "Search",
+        title: "Search",
         description: pattern,
         displayVariant: "grep",
       };
@@ -181,7 +182,7 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
     case "ls": {
       const pattern = extractString(input, "pattern");
       return {
-        title: pattern ? `Find: ${pattern}` : "Find files",
+        title: "Find",
         description: pattern,
         displayVariant: "glob",
       };
@@ -193,8 +194,8 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
       const query =
         extractString(input, "query") ?? extractString(input, "url");
       return {
-        title: query ? `Web: ${truncateCommand(query)}` : "Web search",
-        description: query,
+        title: name === "web_search" ? "Web search" : "Fetch",
+        description: query ? truncateCommand(query) : undefined,
         displayVariant: "web-search",
       };
     }
@@ -206,8 +207,8 @@ export function getToolDisplayMetadata(part: ToolPart): ToolDisplayMetadata {
         extractString(input, "description") ??
         extractString(input, "prompt");
       return {
-        title: desc ? `Task: ${truncateCommand(desc)}` : "Agent task",
-        description: desc,
+        title: "Task",
+        description: desc ? truncateCommand(desc) : undefined,
       };
     }
 

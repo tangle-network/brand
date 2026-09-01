@@ -3,6 +3,7 @@ import { Brain } from "lucide-react";
 import { truncateText } from "../utils/format";
 import type { ReasoningPart } from "../types/parts";
 import { Markdown } from "../markdown/markdown";
+import { TextShimmer } from "../primitives/text-shimmer";
 import { RunRowShell } from "./run-row-shell";
 import { ExpandableContent } from "./expandable-content";
 
@@ -52,10 +53,9 @@ export const InlineThinkingItem = memo(
     return (
       <RunRowShell
         icon={<Brain className="h-3.5 w-3.5" />}
-        title={isActive ? "Thinking…" : "Reasoning"}
+        title={isActive ? <TextShimmer>Thinking…</TextShimmer> : "Reasoning"}
         description={preview}
         status={isActive ? "running" : "idle"}
-        startTime={startTime}
         durationMs={durationMs}
         open={open}
         onOpenChange={setOpen}

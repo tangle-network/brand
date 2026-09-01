@@ -135,8 +135,8 @@ const bashTool: ToolPart = {
   },
 }
 
-// Reasoning and tool rows adjacent — they must read as one family (shared
-// badge geometry, trailing status/duration, chevron), not two designs.
+// Reasoning and tool rows adjacent — they must read as one family (same glyph
+// slot, same type scale, same hover reveal), not two designs.
 export const UnifiedWithToolRow: Story = {
   name: 'Unified shell (reasoning + tool)',
   render: () => (

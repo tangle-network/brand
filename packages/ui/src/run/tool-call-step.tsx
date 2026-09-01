@@ -7,6 +7,7 @@
  */
 
 import { type ReactNode } from "react";
+import { cn } from "../lib/utils";
 import { CodeBlock } from "../markdown/code-block";
 import type { ToolPart, ToolStatus } from "../types/parts";
 import { InlineToolItem } from "./inline-tool-item";
@@ -129,7 +130,9 @@ export function ToolCallStep({
 }
 
 /**
- * ToolCallGroup — groups multiple tool calls under a heading.
+ * ToolCallGroup — a tight stack of consecutive tool rows. The title names the
+ * group for assistive tech only; the rows themselves are the visible label, so
+ * no heading is drawn above them.
  */
 export interface ToolCallGroupProps {
   title?: string;
@@ -139,12 +142,11 @@ export interface ToolCallGroupProps {
 
 export function ToolCallGroup({ title, children, className }: ToolCallGroupProps) {
   return (
-    <div className={["my-2 space-y-2", className].filter(Boolean).join(" ")}>
-      {title && (
-        <div className="mb-1 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {title}
-        </div>
-      )}
+    <div
+      role="group"
+      aria-label={title}
+      className={cn("flex flex-col gap-1", className)}
+    >
       {children}
     </div>
   );

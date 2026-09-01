@@ -20,6 +20,7 @@ import {
 import type { ToolPart } from "../types/parts";
 import type { ToolCategory } from "../types/run";
 import type { CustomToolRenderer } from "../types/tool-display";
+import { TextShimmer } from "../primitives/text-shimmer";
 import { ExpandedToolDetail } from "./expanded-tool-detail";
 import { RunRowShell, type RunRowStatus } from "./run-row-shell";
 
@@ -60,10 +61,11 @@ function toRowStatus(status: ToolPart["state"]["status"]): RunRowStatus {
 }
 
 /**
- * Compact single-line tool call display. Shows a category icon, title,
- * description, duration and status, and expands on click to show
- * ExpandedToolDetail. Rendered through the shared RunRowShell so it stays
- * consistent with the reasoning row.
+ * Compact single-line tool call display: a category glyph, the tool verb, and
+ * the path or command it acted on. While the call runs the verb shimmers;
+ * once it completes the row goes quiet (duration on hover, a red dot only on
+ * error). Expands on click to show ExpandedToolDetail. Rendered through the
+ * shared RunRowShell so it stays consistent with the reasoning row.
  */
 export const InlineToolItem = memo(
   ({
@@ -88,15 +90,15 @@ export const InlineToolItem = memo(
 
     const category = getToolCategory(part.tool);
     const DefaultIcon = TOOL_CATEGORY_ICON_MAP[category] ?? Settings;
+    const status = toRowStatus(part.state.status);
 
     return (
       <RunRowShell
         icon={<DefaultIcon className="h-3.5 w-3.5" />}
-        title={title}
+        title={status === "running" ? <TextShimmer>{title}</TextShimmer> : title}
         description={description}
         descriptionMono
-        status={toRowStatus(part.state.status)}
-        startTime={startTime}
+        status={status}
         durationMs={durationMs}
         groupPosition={groupPosition}
         collapsedError={errorText ?? undefined}

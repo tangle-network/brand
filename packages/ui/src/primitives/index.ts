@@ -87,6 +87,9 @@ export { Switch } from "./switch";
 
 export { Skeleton, SkeletonCard, SkeletonTable } from "./skeleton";
 
+export { TextShimmer } from "./text-shimmer";
+export type { TextShimmerProps } from "./text-shimmer";
+
 export { ToastContainer, ToastProvider, useToast } from "./toast";
 export type { Toast } from "./toast";
 

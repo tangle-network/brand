@@ -104,6 +104,65 @@ describe("ChatContainer timeline tool rendering", () => {
     expect(screen.queryByText(/"path"/)).not.toBeInTheDocument()
   })
 
+  it("titles the tool row with the bare verb and prints the path once", () => {
+    const { container } = render(
+      <ChatContainer
+        messages={messages}
+        partMap={partMap}
+        isStreaming={false}
+        presentation="timeline"
+      />,
+    )
+
+    expect(screen.getByText("Edit")).toBeInTheDocument()
+    expect(screen.getAllByText("src/batch-writer.ts")).toHaveLength(1)
+    expect(container.textContent).not.toContain("Edit src/batch-writer.ts")
+  })
+
+  it("stacks consecutive tool calls with no visible group header", () => {
+    const readPart: ToolPart = {
+      type: "tool",
+      id: "tool-2",
+      tool: "read",
+      state: { status: "completed", input: { path: "src/lib/jitter.ts" }, output: "ok" },
+    }
+    render(
+      <ChatContainer
+        messages={messages}
+        partMap={{ m1: [editPart, readPart] }}
+        isStreaming={false}
+        presentation="timeline"
+      />,
+    )
+
+    expect(screen.queryByText(/tool activity/i)).not.toBeInTheDocument()
+    expect(screen.getByRole("group", { name: "Tool activity" })).toBeInTheDocument()
+    expect(screen.getByText("Edit")).toBeInTheDocument()
+    expect(screen.getByText("Read")).toBeInTheDocument()
+  })
+
+  it("shimmers a running tool's verb and shows no spinner", () => {
+    const running: ToolPart = {
+      type: "tool",
+      id: "tool-3",
+      tool: "bash",
+      state: { status: "running", input: { command: "pnpm build" }, time: { start: 1 } },
+    }
+    const { container } = render(
+      <ChatContainer
+        messages={[{ id: "user-1", role: "user" }, { id: "m1", role: "assistant" }]}
+        partMap={{ "user-1": [{ type: "text", text: "build" }], m1: [running] }}
+        isStreaming
+        presentation="timeline"
+      />,
+    )
+
+    const shimmer = container.querySelector(".tangle-text-shimmer")
+    expect(shimmer).not.toBeNull()
+    expect(shimmer!.textContent).toBe("Shell")
+    expect(container.querySelector(".animate-spin")).toBeNull()
+  })
+
   it("threads renderTimelineToolActions to the timeline tool item with its source part", () => {
     const renderTimelineToolActions = vi.fn((part: ToolPart) => (
       <button type="button">Open {part.id}</button>
