@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.9.0
+
+### Minor Changes
+
+- b047084: Expose react-markdown's typed `urlTransform` hook through the shared Markdown component.
+
 ## 11.8.0
 
 ### Minor Changes
