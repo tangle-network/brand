@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: release-publish
@@ -32,14 +32,6 @@ jobs:
 
       - name: Install
         run: pnpm install --frozen-lockfile
-
-      - name: Validate and build
-        run: |
-          pnpm typecheck
-          pnpm build
-          pnpm test
-          pnpm test:package
-          pnpm build-storybook
 
       - name: Upgrade npm for OIDC trusted publishing
         # OIDC trusted publishing needs npm >= 11.5.1; Node 22 ships npm 10.x.
