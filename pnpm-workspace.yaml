@@ -1,2 +1,9 @@
 packages:
   - "packages/*"
+
+overrides:
+  browserslist: 4.28.7
+  electron-to-chromium: 1.5.418
+  "@rolldown/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
+  "@oxc-parser/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
+  "@oxc-resolver/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
