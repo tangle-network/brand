@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 import { Markdown } from "./markdown";
 
 describe("Markdown", () => {
@@ -19,5 +19,29 @@ describe("Markdown", () => {
     expect(inlineCode).toHaveClass("border-border");
     expect(inlineCode).toHaveClass("bg-card");
     expect(inlineCode).toHaveClass("text-[var(--code-keyword)]");
+  });
+
+  it("passes parsed URLs through the typed transform hook", () => {
+    const urlTransform = vi.fn((url: string, key: string) => (
+      key === "href" && url === "system/brief.md"
+        ? "/app/ws-1/vault?file=system%2Fbrief.md"
+        : url
+    ));
+
+    render(
+      <Markdown urlTransform={urlTransform}>
+        {'[Brief](system/brief.md)'}
+      </Markdown>,
+    );
+
+    expect(screen.getByRole("link", { name: "Brief" })).toHaveAttribute(
+      "href",
+      "/app/ws-1/vault?file=system%2Fbrief.md",
+    );
+    expect(urlTransform).toHaveBeenCalledWith(
+      "system/brief.md",
+      "href",
+      expect.objectContaining({ tagName: "a" }),
+    );
   });
 });

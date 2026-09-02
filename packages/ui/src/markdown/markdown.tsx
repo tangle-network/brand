@@ -1,5 +1,5 @@
 import { memo } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import { CodeBlock, CopyButton } from "./code-block";
@@ -8,13 +8,15 @@ import { cn } from "../lib/utils";
 export interface MarkdownProps {
   children: string;
   className?: string;
+  /** Transform parsed link and image URLs before sanitisation. */
+  urlTransform?: UrlTransform;
 }
 
 /**
  * Renders Markdown content with GFM support, XSS sanitisation, and
  * custom code block rendering via our CodeBlock component.
  */
-export const Markdown = memo(({ children, className }: MarkdownProps) => {
+export const Markdown = memo(({ children, className, urlTransform }: MarkdownProps) => {
   return (
     <div
       className={cn("tangle-prose max-w-none text-sm", className)}
@@ -22,6 +24,7 @@ export const Markdown = memo(({ children, className }: MarkdownProps) => {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSanitize]}
+        urlTransform={urlTransform}
         components={{
           pre({ children: preChildren }) {
             return <>{preChildren}</>;
