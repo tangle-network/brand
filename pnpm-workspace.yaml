@@ -7,3 +7,7 @@ overrides:
   "@rolldown/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
   "@oxc-parser/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
   "@oxc-resolver/binding-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
+
+allowBuilds:
+  canvas: false
+  esbuild: true
