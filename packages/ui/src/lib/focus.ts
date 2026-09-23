@@ -26,12 +26,14 @@ export const focusField =
   "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
 
 /**
- * The field treatment for a container whose focus lives in a child, such as a
- * composer that wraps a borderless textarea and its buttons. Hover yields while
- * the child is focused, so the focus border never flickers back to neutral.
+ * The field treatment for a container that wraps a borderless field, such as a
+ * composer around a textarea and its buttons. It lights while the FIELD has
+ * focus, not while any descendant does: a click on the send button focuses the
+ * button, and that must not read as field focus or stack a second indicator
+ * around the button's own ring. Hover yields while anything inside is focused.
  */
 export const focusFieldWithin =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus-within:border-[var(--border-strong)] focus-within:border-[var(--focus-border)] focus-within:ring-3 focus-within:ring-[var(--focus-halo)]";
+  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus-within:border-[var(--border-strong)] has-[:is(input,textarea,select):focus]:border-[var(--focus-border)] has-[:is(input,textarea,select):focus]:ring-3 has-[:is(input,textarea,select):focus]:ring-[var(--focus-halo)]";
 
 /** Error state for a field: a danger hairline and the same focus shape in danger. Compose after `focusField`. */
 export const focusFieldInvalid =
