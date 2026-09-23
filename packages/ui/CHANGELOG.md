@@ -1,5 +1,27 @@
 # @tangle-network/ui
 
+## 11.10.0
+
+### Minor Changes
+
+- 4649d22: Replace the hard 2px indigo focus ring with one soft focus treatment for every control.
+  
+  brand adds `--focus-border`, `--focus-halo`, `--focus-border-danger`, `--focus-halo-danger` and `--border-strong`. Each derives from the ring, danger-ink, border and foreground tokens, so every theme, named theme and light island resolves its own values. The focus border clears 3:1 against the field in every theme, which `focus.test.ts` enforces.
+  
+  brand's `globals.css` also gives any control that styles no focus of its own (a hand-rolled button, link, radio card or tab) the same keyboard focus line and halo in the base layer, in place of the browser's blue outline. Component utilities still override it.
+  
+  ui exports `focusField`, `focusFieldWithin`, `focusFieldInvalid`, `focusRing` and `focusRingInset` from `utils`, and the primitives use them:
+  
+  - `Input`, `Textarea`, `SelectTrigger` and `TerminalInput` rest on the neutral `border-border` hairline instead of the muted-text `border-input`, darken slightly on hover, and on focus shift the border to `--focus-border` with a 3px `--focus-halo` ring. The `default` and `sandbox` variants now render the same field.
+  - `Button`, `Tabs`, `Switch`, `Badge`, `SegmentedControl`, the dialog and toast close buttons, the auth menu trigger, and the chat and file controls show a 1px focus line with the same halo on `:focus-visible` only. A mouse click no longer draws a ring.
+  - Interactive `Card`, tool-preview and code-block hovers darken the border instead of tinting it indigo.
+  
+  A consumer that removed the old ring with `focus-visible:ring-0` on a field should pass `focus:ring-0` instead, because the field ring now keys off `:focus`.
+
+### Patch Changes
+
+- 53add99: `focusFieldWithin` lights the container only while a field inside it has focus: a text input, textarea, select or contenteditable editor. It used `:focus-within`, so clicking a composer's send button drew the field ring around the whole composer, and tabbing to that button showed two indicators. A focused button, checkbox or button-type input inside the container now shows only its own ring. Because the rule keys off `:has()`, a consumer's `focus-within:*` class does not override it; compose your own classes for a different container focus.
+
 ## 11.9.0
 
 ### Minor Changes
