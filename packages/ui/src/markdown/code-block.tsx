@@ -9,6 +9,7 @@ import {
 } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { Check, Copy } from "lucide-react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 // Theme-aware syntax highlighting — reads CSS custom properties at render time.
@@ -191,7 +192,10 @@ export const CopyButton = memo(({ text }: { text: string }) => {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center justify-center w-6 h-6 rounded-md bg-muted border border-border hover:border-primary/20 transition-colors"
+      className={cn(
+        "flex items-center justify-center w-6 h-6 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
+        focusRing,
+      )}
       title="Copy to clipboard"
     >
       {copied ? (

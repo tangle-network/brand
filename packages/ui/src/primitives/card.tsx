@@ -22,8 +22,7 @@ const Card = React.forwardRef<
         "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow]",
         "duration-[var(--transition-default)]",
         variants[variant],
-        hover &&
-          "cursor-pointer hover:border-primary/30",
+        hover && "cursor-pointer hover:border-[var(--border-strong)]",
         className,
       )}
       {...props}

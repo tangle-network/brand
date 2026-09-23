@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import * as React from "react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 const toastVariants = cva(
@@ -76,7 +77,10 @@ function ToastComponent({
       <button
         type="button"
         onClick={() => onDismiss(id)}
-        className="shrink-0 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className={cn(
+          "shrink-0 rounded-md p-1 opacity-70 transition-[opacity,box-shadow] hover:opacity-100 focus-visible:opacity-100",
+          focusRing,
+        )}
         aria-label="Dismiss notification"
       >
         <X className="h-4 w-4" />

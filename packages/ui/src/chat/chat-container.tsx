@@ -5,6 +5,7 @@ import {
   useRef,
 } from "react";
 import { ArrowDown } from "lucide-react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import type { SessionMessage } from "../types/message";
 import type { SessionPart, TextPart, ToolPart } from "../types/parts";
@@ -459,7 +460,7 @@ export const ChatContainer = memo(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
                 "border border-border bg-card shadow-[0_6px_16px_rgba(15,23,42,0.08)]",
                 "text-xs text-foreground transition-colors hover:bg-accent",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+                focusRing,
               )}
             >
               <ArrowDown className="w-3 h-3" />

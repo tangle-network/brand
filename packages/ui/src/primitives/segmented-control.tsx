@@ -3,6 +3,7 @@
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
 import * as React from "react"
+import { focusRing, focusRingInset } from "../lib/focus"
 import { cn } from "../lib/utils"
 
 /**
@@ -120,9 +121,10 @@ export function SegmentedControl<T extends string = string>({
               if (!active) onValueChange(option.value)
             }}
             className={cn(
-              "relative inline-flex items-center gap-2 whitespace-nowrap text-sm transition-colors",
-              variant === "row" && "rounded-md px-3 py-1.5",
-              variant === "tabs" && "rounded-none border-b-2 -mb-px px-4 py-2",
+              "relative inline-flex items-center gap-2 whitespace-nowrap text-sm transition-[color,background-color,border-color,box-shadow]",
+              variant === "row" && ["rounded-md px-3 py-1.5", focusRing],
+              // The strip scrolls horizontally, which would clip an outer ring.
+              variant === "tabs" && ["rounded-none border-b-2 -mb-px px-4 py-2", focusRingInset],
               // Active styling is the ONLY styled state — unselected
               // segments stay transparent on purpose so they don't
               // compete visually with the selection.

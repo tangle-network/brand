@@ -4,6 +4,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { PencilLine, Save, Users, Wifi, WifiOff } from "lucide-react";
 import { Markdown } from "../markdown/markdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../primitives/tabs";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { ArtifactPane, type ArtifactPaneProps } from "../primitives/artifact-pane";
 import {
@@ -276,7 +277,10 @@ export function DocumentEditorPane({
             type="button"
             onClick={() => void onSave(draft)}
             disabled={saving || !isDirty}
-            className="inline-flex items-center gap-2 rounded-[var(--radius-full)] border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-[var(--radius-full)] border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-[var(--border-strong)] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50",
+              focusRing,
+            )}
           >
             <Save className="h-3.5 w-3.5" />
             {saving ? "Saving..." : saveLabel}

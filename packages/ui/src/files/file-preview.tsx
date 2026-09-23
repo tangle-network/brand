@@ -22,6 +22,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { Button } from "../primitives/button";
 import { Markdown } from "../markdown/markdown";
@@ -219,7 +220,8 @@ function ImagePreview({ src, filename }: { src: string; filename: string }) {
         aria-pressed={naturalSize}
         aria-label={naturalSize ? "Fit image to pane" : "Show image at natural size"}
         className={cn(
-          "flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60",
+          "flex items-center justify-center",
+          focusRingInset,
           naturalSize ? "m-auto cursor-zoom-out" : "h-full w-full cursor-zoom-in p-4",
         )}
       >

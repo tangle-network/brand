@@ -8,3 +8,10 @@ export {
   TOOL_CATEGORY_ICONS,
 } from './tool-display';
 export { cn } from '../lib/utils';
+export {
+  focusField,
+  focusFieldInvalid,
+  focusFieldWithin,
+  focusRing,
+  focusRingInset,
+} from '../lib/focus';

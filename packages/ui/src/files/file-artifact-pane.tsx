@@ -5,6 +5,7 @@ import {
   type DocumentEditorMode,
   type DocumentEditorPaneCollaborationConfig,
 } from "../editor/document-editor-pane";
+import { focusRing } from "../lib/focus";
 import { ArtifactPane, type ArtifactPaneProps } from "../primitives/artifact-pane";
 import { detectFileFormat } from "./file-format";
 import { FilePreview, type FilePreviewProps } from "./file-preview";
@@ -99,7 +100,7 @@ export function FileArtifactPane({
           type="button"
           aria-label={`Download ${filename}`}
           onClick={onDownload}
-          className="rounded-[var(--radius-sm)] p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+          className={`rounded-[var(--radius-sm)] p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground ${focusRing}`}
         >
           <Download className="h-4 w-4" />
         </button>
@@ -109,7 +110,7 @@ export function FileArtifactPane({
           type="button"
           aria-label={`Close ${filename}`}
           onClick={onClose}
-          className="rounded-[var(--radius-sm)] p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+          className={`rounded-[var(--radius-sm)] p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground ${focusRing}`}
         >
           <X className="h-4 w-4" />
         </button>

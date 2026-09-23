@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
+import { focusFieldWithin } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 export interface TerminalDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -142,11 +143,13 @@ TerminalCursor.displayName = "TerminalCursor";
 export interface TerminalInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onSubmit"> {
   onSubmit?: (value: string) => void;
+  /** Both values render the same field. */
   variant?: "default" | "sandbox";
 }
 
 const TerminalInput = React.forwardRef<HTMLInputElement, TerminalInputProps>(
-  ({ className, onSubmit, variant = "default", ...props }, ref) => {
+  // `variant` is taken out so it never reaches the DOM element.
+  ({ className, onSubmit, variant: _variant, ...props }, ref) => {
     const [value, setValue] = React.useState("");
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -156,16 +159,11 @@ const TerminalInput = React.forwardRef<HTMLInputElement, TerminalInputProps>(
       }
     };
 
-    const variants = {
-      default: "border-border focus-within:border-border",
-      sandbox: "border-border focus-within:border-[var(--border-accent-hover)]",
-    };
-
     return (
       <div
         className={cn(
-          "flex items-center rounded-lg border bg-background px-4 py-2.5 font-mono text-sm transition-colors",
-          variants[variant],
+          "flex items-center rounded-lg border bg-background px-4 py-2.5 font-mono text-sm",
+          focusFieldWithin,
           className,
         )}
       >
