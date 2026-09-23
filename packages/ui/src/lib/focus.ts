@@ -36,8 +36,11 @@ export const focusField =
  * has focus: a text input, textarea, select or contenteditable editor. A
  * focused button, checkbox or button-type input inside the container shows only
  * its own ring, so a click on the send button does not read as field focus and
- * a tab to it does not stack two indicators. The field selector is written out
- * in full because Tailwind reads class names statically.
+ * a tab to it does not stack two indicators. `:focus-within` cannot tell the
+ * two apart, so the rule keys off `:has()`; a consumer's `focus-within:*` class
+ * therefore does not replace it. To style that container's focus differently,
+ * compose your own classes instead of this helper. The field selector is
+ * written out in full because Tailwind reads class names statically.
  */
 export const focusFieldWithin =
   "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:border-[var(--focus-border)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-3 has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-[var(--focus-halo)]";
