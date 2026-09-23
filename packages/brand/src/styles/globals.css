@@ -19,6 +19,31 @@
       "ss01" 1;
   }
 
+  /* The default keyboard focus for any control that does not style its own:
+   * the same 1px --focus-border line and soft halo as ui's `focusRing`, in
+   * place of the browser's blue outline. It sits in the base layer, so a
+   * component's own focus utilities always win over it. Text fields are left
+   * out: they show focus on their border (ui's `focusField`). */
+  :where(
+      a[href],
+      button,
+      summary,
+      input:is([type="checkbox"], [type="radio"]),
+      [role="button"],
+      [role="checkbox"],
+      [role="link"],
+      [role="menuitem"],
+      [role="option"],
+      [role="radio"],
+      [role="switch"],
+      [role="tab"],
+      [tabindex]:not([tabindex="-1"])
+    ):focus-visible {
+    outline: 1px solid var(--focus-border);
+    outline-offset: 0;
+    box-shadow: 0 0 0 4px var(--focus-halo);
+  }
+
   ::selection {
     background: var(--bg-selection);
     color: hsl(var(--hsl-foreground));

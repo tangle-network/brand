@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import type { ToolPart } from "../types/parts";
 import { PreviewCard, PreviewError, PreviewLoading } from "./preview-primitives";
@@ -76,7 +77,10 @@ export const CommandPreview = memo(({ part }: CommandPreviewProps) => {
     >
       <button
         onClick={() => setExpanded((value) => !value)}
-        className="flex w-full items-center gap-2 rounded-[var(--radius-md)] border border-border bg-muted px-3 py-2 text-left transition-colors hover:border-[var(--border-accent-hover)] hover:bg-accent/45"
+        className={cn(
+          "flex w-full items-center gap-2 rounded-[var(--radius-md)] border border-border bg-muted px-3 py-2 text-left transition-colors hover:border-[var(--border-strong)] hover:bg-accent/45",
+          focusRing,
+        )}
       >
         <code className="min-w-0 flex-1 truncate text-xs font-mono text-foreground">
           {command}

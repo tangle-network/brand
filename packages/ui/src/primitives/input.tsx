@@ -1,16 +1,21 @@
 import * as React from "react";
+import { focusField, focusFieldInvalid } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
 const inputVariants = cva(
-  "flex w-full rounded-lg border bg-card px-4 py-2 text-sm transition-all duration-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-sm",
+  cn(
+    "flex w-full rounded-lg border bg-card px-4 py-2 text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-sm",
+    focusField,
+  ),
   {
     variants: {
+      // `default` and `sandbox` render the same field; both names stay valid.
       variant: {
-        default: "border-input focus:ring-ring",
-        sandbox: "border-border focus:border-[var(--border-accent-hover)] focus:ring-[var(--border-accent)]",
-        error: "border-[var(--surface-danger-border)] focus:ring-[var(--surface-danger-border)]",
+        default: "",
+        sandbox: "",
+        error: focusFieldInvalid,
       },
       size: {
         default: "h-11",
@@ -75,6 +80,7 @@ Input.displayName = "Input";
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /** Both values render the same field. */
   variant?: "default" | "sandbox";
   label?: string;
   error?: string;
@@ -83,26 +89,21 @@ export interface TextareaProps
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
-    { className, variant = "default", label, error, hint, id, ...props },
+    // `variant` is taken out so it never reaches the DOM element.
+    { className, variant: _variant, label, error, hint, id, ...props },
     ref,
   ) => {
     const textareaId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
-
-    const variants = {
-      default: "border-input focus:ring-ring",
-      sandbox:
-        "border-border focus:border-[var(--border-accent-hover)] focus:ring-[var(--border-accent)]",
-    };
 
     const textarea = (
       <textarea
         id={textareaId}
         className={cn(
-          "flex min-h-[120px] w-full resize-y rounded-lg border bg-card px-4 py-3 text-sm transition-all duration-200",
+          "flex min-h-[120px] w-full resize-y rounded-lg border bg-card px-4 py-3 text-sm",
           "placeholder:text-muted-foreground",
-          "focus:outline-none focus:ring-2 focus:ring-offset-0",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          error ? "border-[var(--surface-danger-border)] focus:ring-[var(--surface-danger-border)]" : variants[variant],
+          focusField,
+          error && focusFieldInvalid,
           className,
         )}
         ref={ref}

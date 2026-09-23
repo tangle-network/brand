@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { Globe } from "lucide-react";
+import { focusRing } from "../lib/focus";
 import type { ToolPart } from "../types/parts";
 import { PreviewCard, PreviewEmpty, PreviewError, PreviewLoading } from "./preview-primitives";
 
@@ -94,7 +95,7 @@ export const WebSearchPreview = memo(({ part }: WebSearchPreviewProps) => {
             href={result.url}
             target="_blank"
             rel="noreferrer"
-            className="block rounded-[var(--radius-md)] border border-border bg-muted/55 px-3 py-3 transition-colors hover:border-[var(--border-accent-hover)] hover:bg-accent/50"
+            className={`block rounded-[var(--radius-md)] border border-border bg-muted/55 px-3 py-3 transition-colors hover:border-[var(--border-strong)] hover:bg-accent/50 ${focusRing}`}
           >
             <div className="text-sm font-medium text-foreground">
               {result.title}

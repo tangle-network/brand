@@ -1,6 +1,7 @@
 "use client";
 
 import type * as React from "react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../primitives/avatar";
 import { Button, type ButtonProps } from "../primitives/button";
@@ -120,7 +121,10 @@ export function UserMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+          className={cn(
+            "flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-accent",
+            focusRing,
+          )}
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src={undefined} alt={user.name ?? user.email} />

@@ -69,6 +69,20 @@ One consequence worth knowing. This is a scan, not a manifest, so a consumer emi
 
 See [`@tangle-network/brand`'s README](../brand/README.md) for the token-level breakdown, the finer-grained imports, and the fonts, which brand deliberately does not bundle.
 
+### Focus treatment
+
+Every control shares one focus treatment, exported from `utils` as class strings.
+Compose them with `cn` so tailwind-merge resolves any override.
+
+- `focusField` — a text field: neutral hairline, a slightly darker border on hover, and on `:focus` a `--focus-border` border with a 3px `--focus-halo` ring.
+- `focusFieldWithin` — the same, for a container whose focus lives in a child, such as a composer around a borderless textarea.
+- `focusFieldInvalid` — the error state of a field. Compose it after `focusField`.
+- `focusRing` — keyboard focus on a button, tab, switch or link: a 1px `--focus-border` outline with the halo beyond it, on `:focus-visible` only.
+- `focusRingInset` — `focusRing` drawn inside the box, for a control in a scrolling strip.
+
+The colors come from the `--focus-*` tokens in `@tangle-network/brand`, so they need brand 1.6 or later.
+To remove the ring from a field nested in a focusable container, pass `focus:ring-0 border-0` and put `focusFieldWithin` on the container.
+
 ## Subpaths
 
 Sixteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`, `nav`, `redaction`.

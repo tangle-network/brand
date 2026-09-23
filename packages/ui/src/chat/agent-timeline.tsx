@@ -6,6 +6,7 @@ import {
   FileText,
   Info,
 } from "lucide-react";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { type MessageRole } from "./chat-message";
 import { UserMessage } from "./user-message";
@@ -235,7 +236,11 @@ function ArtifactCard({ item }: { item: AgentTimelineArtifactItem }) {
           item.onClick?.();
         }
       }}
-      className="block w-full text-left transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      // Rounded like the card inside it, so the focus ring follows its corners.
+      className={cn(
+        "block w-full rounded-[var(--radius-lg)] text-left transition-transform hover:-translate-y-0.5",
+        focusRing,
+      )}
     >
       {content}
     </div>

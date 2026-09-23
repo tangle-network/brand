@@ -3,6 +3,7 @@
  */
 
 import { X, FileText, FileCode, FileSpreadsheet } from "lucide-react";
+import { focusRing, focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 export interface FileTabData {
@@ -49,7 +50,10 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, className }: FileT
             <button
               type="button"
               onClick={() => onSelect(tab.id)}
-              className="flex min-w-0 items-center gap-1.5 px-3 py-1.5 text-xs transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60"
+              className={cn(
+                "flex min-w-0 items-center gap-1.5 px-3 py-1.5 text-xs transition-colors hover:text-foreground",
+                focusRingInset,
+              )}
             >
               <Icon className="h-3 w-3 shrink-0" />
               <span className="max-w-[120px] truncate">{tab.name}</span>
@@ -59,7 +63,10 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, className }: FileT
               type="button"
               aria-label={`Close ${tab.name}`}
               onClick={() => onClose(tab.id)}
-              className="mr-1 rounded p-0.5 opacity-0 transition-opacity hover:bg-accent focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 group-hover:opacity-100"
+              className={cn(
+                "mr-1 rounded p-0.5 opacity-0 transition-opacity hover:bg-accent focus-visible:opacity-100 group-hover:opacity-100",
+                focusRing,
+              )}
             >
               <X className="h-2.5 w-2.5" />
             </button>
