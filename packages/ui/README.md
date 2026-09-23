@@ -75,7 +75,7 @@ Every control shares one focus treatment, exported from `utils` as class strings
 Compose them with `cn` so tailwind-merge resolves any override.
 
 - `focusField` — a text field: neutral hairline, a slightly darker border on hover, and on `:focus` a `--focus-border` border with a 3px `--focus-halo` ring.
-- `focusFieldWithin` — the same, for a container whose focus lives in a child, such as a composer around a borderless textarea.
+- `focusFieldWithin` — the same, for a container that wraps a borderless field, such as a composer around a textarea. It lights while a text input, textarea, native `<select>` or contenteditable editor inside it has focus, not while a button inside it does. It keys off `:has()`, so a `focus-within:*` class does not override it.
 - `focusFieldInvalid` — the error state of a field. Compose it after `focusField`.
 - `focusRing` — keyboard focus on a button, tab, switch or link: a 1px `--focus-border` outline with the halo beyond it, on `:focus-visible` only.
 - `focusRingInset` — `focusRing` drawn inside the box, for a control in a scrolling strip.

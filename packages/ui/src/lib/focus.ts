@@ -21,17 +21,29 @@
  * in forced-colors mode.
  */
 
-/** Resting hairline, neutral hover, and `:focus` border plus halo for a text field. */
+/**
+ * Resting hairline, neutral hover, and `:focus` border plus halo for a text
+ * field. The hover is a plain `hover:` class so a consumer's `hover:border-*`
+ * replaces it through tailwind-merge; the focus border outranks it because
+ * Tailwind emits `focus:` after `hover:`.
+ */
 export const focusField =
   "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
 
 /**
- * The field treatment for a container whose focus lives in a child, such as a
- * composer that wraps a borderless textarea and its buttons. Hover yields while
- * the child is focused, so the focus border never flickers back to neutral.
+ * The field treatment for a container that wraps a borderless field, such as a
+ * composer around a textarea and its buttons. It lights while a FIELD inside
+ * has focus: a text input, textarea, native select or contenteditable editor. A
+ * focused button, checkbox or button-type input inside the container shows only
+ * its own ring, so a click on the send button does not read as field focus and
+ * a tab to it does not stack two indicators. `:focus-within` cannot tell the
+ * two apart, so the rule keys off `:has()`; a consumer's `focus-within:*` class
+ * therefore does not replace it. To style that container's focus differently,
+ * compose your own classes instead of this helper. The field selector is
+ * written out in full because Tailwind reads class names statically.
  */
 export const focusFieldWithin =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus-within:border-[var(--border-strong)] focus-within:border-[var(--focus-border)] focus-within:ring-3 focus-within:ring-[var(--focus-halo)]";
+  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:border-[var(--focus-border)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-3 has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-[var(--focus-halo)]";
 
 /** Error state for a field: a danger hairline and the same focus shape in danger. Compose after `focusField`. */
 export const focusFieldInvalid =
