@@ -55,7 +55,7 @@ import { Logo, TangleKnot } from "@tangle-network/brand";
 - **Depth stack** — `#0C0B1D` → `#262448` (dark); `#f4f4f9` → `#dcdbe8` (light)
 - **Status** — emerald / amber / coral for running / stopped / error
 - **Radii** — 6/8/12/16px (dark); 2/4/6/8px (light/"vault")
-- **Focus** — `--focus-border` and `--focus-halo` (plus `-danger` variants) for a focused control, and `--border-strong` for a hovered field. They derive from the ring and border tokens, so every theme gets its own. `@tangle-network/ui` applies them through `focusField` and `focusRing`.
+- **Focus** — `--focus-border` and `--focus-halo` (plus `-danger` variants) for a focused control, and `--border-strong` for a hovered field. They derive from the ring and border tokens, so every theme gets its own. `@tangle-network/ui` applies them through `focusField` and `focusRing`. `globals.css` gives a control or native text field that styles no focus of its own a fallback: a control gets the 1px line and halo on keyboard focus, and a text field gets the 1px line over its border.
 
 Light theme activates via `data-sandbox-theme="vault"` on a parent element.
 
