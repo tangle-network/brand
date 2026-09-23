@@ -21,23 +21,29 @@
  * in forced-colors mode.
  */
 
-/** Resting hairline, neutral hover, and `:focus` border plus halo for a text field. */
+/**
+ * Resting hairline, neutral hover, and `:focus` border plus halo for a text
+ * field. The hover skips a focused field, so the focus border stays under the
+ * pointer, and a disabled one.
+ */
 export const focusField =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
+  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus:not-disabled:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
 
 /**
  * The field treatment for a container that wraps a borderless field, such as a
- * composer around a textarea and its buttons. It lights while the FIELD has
- * focus, not while any descendant does: a click on the send button focuses the
- * button, and that must not read as field focus or stack a second indicator
- * around the button's own ring. Hover yields while anything inside is focused.
+ * composer around a textarea and its buttons. It lights while a FIELD inside
+ * has focus: a text input, textarea, select or contenteditable editor. A
+ * focused button, checkbox or button-type input inside the container shows only
+ * its own ring, so a click on the send button does not read as field focus and
+ * a tab to it does not stack two indicators. The field selector is written out
+ * in full because Tailwind reads class names statically.
  */
 export const focusFieldWithin =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus-within:border-[var(--border-strong)] has-[:is(input,textarea,select):focus]:border-[var(--focus-border)] has-[:is(input,textarea,select):focus]:ring-3 has-[:is(input,textarea,select):focus]:ring-[var(--focus-halo)]";
+  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:border-[var(--focus-border)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-3 has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-[var(--focus-halo)]";
 
 /** Error state for a field: a danger hairline and the same focus shape in danger. Compose after `focusField`. */
 export const focusFieldInvalid =
-  "border-[var(--surface-danger-border)] hover:border-[var(--surface-danger-border)] focus:border-[var(--focus-border-danger)] focus:ring-[var(--focus-halo-danger)]";
+  "border-[var(--surface-danger-border)] hover:not-focus:not-disabled:border-[var(--surface-danger-border)] focus:border-[var(--focus-border-danger)] focus:ring-[var(--focus-halo-danger)]";
 
 const focusRingBase =
   "focus-visible:outline-1 focus-visible:outline-[var(--focus-border)] focus-visible:ring-4 focus-visible:ring-[var(--focus-halo)]";
