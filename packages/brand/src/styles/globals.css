@@ -22,8 +22,8 @@
   /* The default keyboard focus for any control that does not style its own:
    * the same 1px --focus-border line and soft halo as ui's `focusRing`, in
    * place of the browser's blue outline. It sits in the base layer, so a
-   * component's own focus utilities always win over it. Text fields are left
-   * out: they show focus on their border (ui's `focusField`). */
+   * component's own focus utilities always win over it. Text fields have
+   * their own fallback below. */
   :where(
       a[href],
       button,
@@ -42,6 +42,36 @@
     outline: 1px solid var(--focus-border);
     outline-offset: 0;
     box-shadow: 0 0 0 4px var(--focus-halo);
+  }
+
+  /* The fallback focus for a native text field that styles none: a 1px
+   * --focus-border line laid over the field's own border, in place of the
+   * browser's blue outline. It is an outline because any border-colour
+   * utility on the field outranks a base-layer border colour. It has no halo:
+   * a field that hands its focus to a container clears the line with
+   * `outline-none`, which a base-layer box-shadow would ignore. ui's
+   * `focusField` gives the full border and halo. */
+  :where(
+      input:not(
+          [type="button"],
+          [type="checkbox"],
+          [type="color"],
+          [type="file"],
+          [type="hidden"],
+          [type="image"],
+          [type="radio"],
+          [type="range"],
+          [type="reset"],
+          [type="submit"]
+        ),
+      select,
+      textarea
+    ):focus-visible {
+    outline: 1px solid var(--focus-border);
+    outline-offset: -1px;
+    /* A field with an explicit tabindex also matches the control rule above;
+     * drop that rule's halo. */
+    box-shadow: none;
   }
 
   ::selection {
