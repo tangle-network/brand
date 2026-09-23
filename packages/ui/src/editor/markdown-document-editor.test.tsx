@@ -29,6 +29,11 @@ async function freshEditor(load: () => Promise<EditorPeers.DocumentEditorPeers>)
   return (await import("./markdown-document-editor")).MarkdownDocumentEditor;
 }
 
+// The first render imports tiptap for real. A cold import on a busy runner
+// takes several seconds, well past waitFor's 1s and a test's 5s defaults.
+const PEERS_LOADED = { timeout: 15_000 };
+const LOADS_PEERS = 30_000;
+
 afterEach(() => {
   vi.doUnmock("./editor-peers");
   vi.resetModules();
@@ -42,7 +47,7 @@ describe("MarkdownDocumentEditor", () => {
 
     await waitFor(() => {
       expect(container.querySelector(".ProseMirror")).not.toBeNull();
-    });
+    }, PEERS_LOADED);
 
     const surface = container.querySelector(".ProseMirror");
     expect(surface?.querySelector("h1")?.textContent).toBe("Title");
@@ -50,7 +55,7 @@ describe("MarkdownDocumentEditor", () => {
     // StarterKit arrives through `peers.starterKit.default`. A broken hand-off
     // leaves the document without the heading node that StarterKit configures.
     expect(screen.getByTitle(/^Bold/)).toBeInTheDocument();
-  });
+  }, LOADS_PEERS);
 
   it("holds a placeholder while the peers are still loading", async () => {
     let releasePeers: (() => void) | null = null;
@@ -85,7 +90,7 @@ describe("MarkdownDocumentEditor", () => {
 
     await waitFor(() => {
       expect(container.querySelector(".ProseMirror")).not.toBeNull();
-    });
+    }, PEERS_LOADED);
 
     // The editor reports once when it parses the initial content. What must
     // not grow is the count across a value-prop write: pushing that back
@@ -98,7 +103,7 @@ describe("MarkdownDocumentEditor", () => {
       expect(container.querySelector(".ProseMirror h1")?.textContent).toBe("Changed");
     });
     expect(onChange).toHaveBeenCalledTimes(callsAfterMount);
-  });
+  }, LOADS_PEERS);
 
   it("fails with the install list when the peers cannot be loaded", async () => {
     const missing = "install @tiptap/react and @tiptap/starter-kit";

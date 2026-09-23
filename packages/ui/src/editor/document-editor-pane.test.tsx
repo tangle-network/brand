@@ -32,6 +32,8 @@ async function paneWithoutPeers(message: string) {
   return { DocumentEditorPane, loaders };
 }
 
+// The pane is imported on a fresh module graph, which re-transforms its whole
+// dependency tree: seconds on a busy runner, past the 5s default.
 describe("DocumentEditorPane without the editor peers", () => {
   it("renders the preview, because only the edit tab needs the peers", async () => {
     const { DocumentEditorPane, loaders } = await paneWithoutPeers(
@@ -54,5 +56,5 @@ describe("DocumentEditorPane without the editor peers", () => {
     expect(loaders.loadDocumentEditorPeers).not.toHaveBeenCalled();
     expect(loaders.loadCollaborationPeers).not.toHaveBeenCalled();
     expect(loaders.loadEditorProviderPeers).not.toHaveBeenCalled();
-  });
+  }, 30_000);
 });
