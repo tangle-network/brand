@@ -33,7 +33,7 @@ export const focusField =
 /**
  * The field treatment for a container that wraps a borderless field, such as a
  * composer around a textarea and its buttons. It lights while a FIELD inside
- * has focus: a text input, textarea, select or contenteditable editor. A
+ * has focus: a text input, textarea, native select or contenteditable editor. A
  * focused button, checkbox or button-type input inside the container shows only
  * its own ring, so a click on the send button does not read as field focus and
  * a tab to it does not stack two indicators. `:focus-within` cannot tell the
