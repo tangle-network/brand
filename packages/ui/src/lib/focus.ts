@@ -23,11 +23,12 @@
 
 /**
  * Resting hairline, neutral hover, and `:focus` border plus halo for a text
- * field. The hover skips a focused field, so the focus border stays under the
- * pointer, and a disabled one.
+ * field. The hover is a plain `hover:` class so a consumer's `hover:border-*`
+ * replaces it through tailwind-merge; the focus border outranks it because
+ * Tailwind emits `focus:` after `hover:`.
  */
 export const focusField =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:not-focus:not-disabled:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
+  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
 
 /**
  * The field treatment for a container that wraps a borderless field, such as a
@@ -43,7 +44,7 @@ export const focusFieldWithin =
 
 /** Error state for a field: a danger hairline and the same focus shape in danger. Compose after `focusField`. */
 export const focusFieldInvalid =
-  "border-[var(--surface-danger-border)] hover:not-focus:not-disabled:border-[var(--surface-danger-border)] focus:border-[var(--focus-border-danger)] focus:ring-[var(--focus-halo-danger)]";
+  "border-[var(--surface-danger-border)] hover:border-[var(--surface-danger-border)] focus:border-[var(--focus-border-danger)] focus:ring-[var(--focus-halo-danger)]";
 
 const focusRingBase =
   "focus-visible:outline-1 focus-visible:outline-[var(--focus-border)] focus-visible:ring-4 focus-visible:ring-[var(--focus-halo)]";
