@@ -36,10 +36,13 @@
     "./styles/tokens.css": "./src/styles/tokens.css",
     "./styles/globals.css": "./src/styles/globals.css",
     "./styles/theme.css": "./src/styles/theme.css",
-    "./styles/named-themes.css": "./src/styles/named-themes.css"
+    "./styles/named-themes.css": "./src/styles/named-themes.css",
+    "./styles/ladders.css": "./src/styles/ladders.css",
+    "./styles/system.css": "./src/styles/system.css"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
+    "gen:ladders": "node scripts/gen-ladders.mjs",
     "dev": "tsup src/index.ts --format esm --dts --watch"
   },
   "peerDependencies": {

@@ -39,6 +39,27 @@ Fonts are **not** bundled — see [Fonts](#fonts) below.
 @import "@tangle-network/brand/styles/globals";
 ```
 
+### Colour ladders (opt in)
+
+```css
+@import "@tangle-network/brand/styles";
+@import "@tangle-network/brand/styles/ladders.css";
+@import "@tangle-network/brand/styles/system.css";
+```
+
+`ladders.css` defines 12 ramps of 12 steps each, in light and dark, from Radix Colors 3.0.0: mauve (neutral), iris (brand), green, amber, red and blue (status), and plum, orange, grass, bronze, crimson and olive (domains).
+Each step has one job: 1–2 backgrounds, 3–5 control fills, 6–8 borders, 9–10 solid fills, 11 secondary text and 12 primary text.
+Role aliases (`--gray-*`, `--accent-*`, `--success-*`, `--warning-*`, `--danger-*`, `--info-*`) point at the ramps.
+Setting `data-domain="tax"` (or another domain key) on an element gives its subtree `--domain-1..12`.
+
+`system.css` maps every token family in `tokens.css` onto a ladder step and adds semantic tokens (`--bg-page`, `--line`, `--fg-muted`, `--accent-text`, `--ink`), role radii, type roles, motion and three shadow levels.
+Light pages become white, and dark becomes a neutral mauve ladder.
+Import it after `tokens.css`; it is opt in because it changes every surface of the app that loads it.
+
+Both files are generated.
+Change a value in `scripts/gen-ladders.mjs` or `scripts/radix-ramps.json`, then run `pnpm --filter @tangle-network/brand gen:ladders`.
+An app that ships ahead of a release copies the two generated files verbatim, so its copy stays identical.
+
 ### Logo
 
 ```tsx
