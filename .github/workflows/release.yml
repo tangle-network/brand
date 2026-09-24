@@ -58,12 +58,13 @@ jobs:
 
       - name: Create release PR or publish
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          publish: pnpm release
-          version: pnpm version-packages
-          commit: "chore: release"
-          title: "chore: release"
+          publish-script: pnpm release
+          version-script: pnpm version-packages
+          commit-message: "chore(release): publish packages"
+          pr-title: "chore(release): publish packages"
+          push-with-git-cli: true
         # No NODE_AUTH_TOKEN: with `id-token: write` + a configured npm trusted
         # publisher for @tangle-network/brand and @tangle-network/ui, npm
         # authenticates the publish via OIDC. A token here forces token auth,
@@ -86,7 +87,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          echo '${{ steps.changesets.outputs.publishedPackages }}' \
+          echo '${{ steps.changesets.outputs['published-packages'] }}' \
             | jq -r '.[] | [.name, .version] | @tsv' \
             | while IFS=$'\t' read -r name version; do
                 dir="packages/${name#@tangle-network/}"
