@@ -73,6 +73,42 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
+      # Mirror the tarballs npm serves. Repacking a workspace directory with plain
+      # npm keeps pnpm `workspace:` ranges (ui peers on `@tangle-network/brand:
+      # workspace:^`), which no consumer outside this repository can install.
+      - name: Fetch the exact npm artifacts to mirror
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs['published-packages'] }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mirror"
+          cd "$RUNNER_TEMP/mirror"
+          jq -r '.[] | "\(.name)@\(.version)"' <<<"$PUBLISHED_PACKAGES" | while read -r spec; do
+            for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+              if npm pack "$spec" --registry https://registry.npmjs.org; then break; fi
+              if [ "$attempt" = 12 ]; then
+                echo "::error::$spec is not fetchable from npm after 12 attempts"
+                exit 1
+              fi
+              sleep 10
+            done
+          done
+          shopt -s nullglob
+          tarballs=(*.tgz)
+          if [ "${#tarballs[@]}" -eq 0 ]; then
+            echo "::error::no npm artifacts were fetched"
+            exit 1
+          fi
+          for tgz in "${tarballs[@]}"; do
+            manifest="$(tar -xzOf "$tgz" package/package.json)"
+            ranges="$(jq '[.. | strings | select(startswith("workspace:"))] | length' <<<"$manifest")"
+            if [ "$ranges" != 0 ]; then
+              echo "::error::$tgz still declares $ranges workspace: range(s)"
+              exit 1
+            fi
+          done
+
       - name: Configure npm for GitHub Packages
         if: steps.changesets.outputs.published == 'true'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -87,10 +123,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          echo '${{ steps.changesets.outputs['published-packages'] }}' \
-            | jq -r '.[] | [.name, .version] | @tsv' \
-            | while IFS=$'\t' read -r name version; do
-                dir="packages/${name#@tangle-network/}"
-                echo "Publishing $name@$version from $dir to GitHub Packages"
-                (cd "$dir" && npm publish)
-              done
+          shopt -s nullglob
+          tarballs=("$RUNNER_TEMP/mirror"/*.tgz)
+          if [ "${#tarballs[@]}" -eq 0 ]; then
+            echo "::error::no fetched npm artifacts to mirror"
+            exit 1
+          fi
+          for tgz in "${tarballs[@]}"; do
+            echo "Publishing exact npm artifact $(basename "$tgz") to GitHub Packages"
+            npm publish "$tgz"
+          done
