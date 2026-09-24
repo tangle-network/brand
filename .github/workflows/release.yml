@@ -88,8 +88,18 @@ jobs:
             private="$(jq -r '.private // false' "$file")"
             if [ "$private" = true ]; then continue; fi
             spec="$name@$version"
-            expected="$(npm view "$spec" dist.integrity --json --registry=https://registry.npmjs.org | jq -r '.')"
-            pack="$(npm pack "$spec" --json --pack-destination "$mirror" --registry=https://registry.npmjs.org)"
+            # A just-published version may take time to become fetchable.
+            for attempt in {1..12}; do
+              if expected="$(npm view "$spec" dist.integrity --json --registry=https://registry.npmjs.org | jq -r '.')" && \
+                 pack="$(npm pack "$spec" --json --pack-destination "$mirror" --registry=https://registry.npmjs.org)"; then
+                break
+              fi
+              if [ "$attempt" = 12 ]; then
+                echo "::error::$spec is not fetchable from npm after 12 attempts"
+                exit 1
+              fi
+              sleep 10
+            done
             filename="$(jq -r '.[0].filename' <<<"$pack")"
             actual="$(jq -r '.[0].integrity' <<<"$pack")"
             if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
@@ -102,7 +112,7 @@ jobs:
               echo "::error::$spec npm tarball has the wrong manifest"
               exit 1
             fi
-            if [ "$(jq '[.dependencies, .optionalDependencies, .peerDependencies] | map(. // {} | to_entries[]?.value | select(startswith("workspace:"))) | length' <<<"$manifest")" != 0 ]; then
+            if [ "$(jq '[.. | strings | select(startswith("workspace:"))] | length' <<<"$manifest")" != 0 ]; then
               echo "::error::$spec npm tarball has an unpublishable workspace dependency"
               exit 1
             fi
