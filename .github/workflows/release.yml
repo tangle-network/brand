@@ -73,24 +73,130 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
+      # Changesets reports only versions published in this run. On a retry after
+      # npm succeeded, that list is empty. Rebuild the mirror plan from the
+      # versioned package manifests and fetch npm's immutable tarballs instead.
+      - name: Fetch and verify npm release artifacts
+        run: |
+          set -euo pipefail
+          mirror="$RUNNER_TEMP/release-mirror"
+          mkdir -p "$mirror"
+          : > "$mirror/artifacts.ndjson"
+          for file in packages/*/package.json; do
+            name="$(jq -r '.name' "$file")"
+            version="$(jq -r '.version' "$file")"
+            private="$(jq -r '.private // false' "$file")"
+            if [ "$private" = true ]; then continue; fi
+            spec="$name@$version"
+            expected="$(npm view "$spec" dist.integrity --json --registry=https://registry.npmjs.org | jq -r '.')"
+            pack="$(npm pack "$spec" --json --pack-destination "$mirror" --registry=https://registry.npmjs.org)"
+            filename="$(jq -r '.[0].filename' <<<"$pack")"
+            actual="$(jq -r '.[0].integrity' <<<"$pack")"
+            if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
+              echo "::error::$spec npm tarball integrity differs from registry metadata"
+              exit 1
+            fi
+            tarball="$mirror/$filename"
+            manifest="$(tar -xzOf "$tarball" package/package.json)"
+            if [ "$(jq -r '.name + "@" + .version' <<<"$manifest")" != "$spec" ]; then
+              echo "::error::$spec npm tarball has the wrong manifest"
+              exit 1
+            fi
+            if [ "$(jq '[.dependencies, .optionalDependencies, .peerDependencies] | map(. // {} | to_entries[]?.value | select(startswith("workspace:"))) | length' <<<"$manifest")" != 0 ]; then
+              echo "::error::$spec npm tarball has an unpublishable workspace dependency"
+              exit 1
+            fi
+            jq -cn --arg name "$name" --arg version "$version" --arg file "$tarball" --arg integrity "$expected" \
+              '{name:$name,version:$version,file:$file,integrity:$integrity}' >> "$mirror/artifacts.ndjson"
+          done
+          if [ ! -s "$mirror/artifacts.ndjson" ]; then
+            echo "::error::No public package versions were found"
+            exit 1
+          fi
+          consumer="$RUNNER_TEMP/release-consumer"
+          mkdir -p "$consumer"
+          printf '{"name":"release-artifact-consumer","private":true}\n' > "$consumer/package.json"
+          mapfile -t tarballs < <(jq -r '.file' "$mirror/artifacts.ndjson")
+          npm install --prefix "$consumer" --package-lock=false --ignore-scripts --no-audit --no-fund "${tarballs[@]}"
+
       - name: Configure npm for GitHub Packages
-        if: steps.changesets.outputs.published == 'true'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22.23.1
           registry-url: https://npm.pkg.github.com
           scope: "@tangle-network"
 
-      - name: Publish to GitHub Packages
-        if: steps.changesets.outputs.published == 'true'
+      - name: Reconcile GitHub Packages from the npm artifacts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          echo '${{ steps.changesets.outputs['published-packages'] }}' \
-            | jq -r '.[] | [.name, .version] | @tsv' \
-            | while IFS=$'\t' read -r name version; do
-                dir="packages/${name#@tangle-network/}"
-                echo "Publishing $name@$version from $dir to GitHub Packages"
-                (cd "$dir" && npm publish)
-              done
+          while IFS= read -r artifact; do
+            name="$(jq -r '.name' <<<"$artifact")"
+            version="$(jq -r '.version' <<<"$artifact")"
+            tarball="$(jq -r '.file' <<<"$artifact")"
+            expected="$(jq -r '.integrity' <<<"$artifact")"
+            spec="$name@$version"
+            error="$RUNNER_TEMP/github-package-view.err"
+            if observed="$(npm view "$spec" dist.integrity --json --registry=https://npm.pkg.github.com 2>"$error" | jq -r '.')"; then
+              if [ "$observed" != "$expected" ]; then
+                # Brand 1.7.0 was published before exact-artifact mirroring.
+                # Its separate npm pack differs but has passed a strict external
+                # install. Any new mismatch remains a release failure.
+                known="$(jq -c --arg spec "$spec" '.[$spec] // null' .github/release-artifact-exceptions.json)"
+                if [ "$(jq -r '.npm' <<<"$known")" = "$expected" ] && \
+                   [ "$(jq -r '.github' <<<"$known")" = "$observed" ]; then
+                  echo "::warning::$spec is a verified legacy mirror with different tarball bytes"
+                  continue
+                fi
+                echo "::error::$spec exists at GitHub Packages with different bytes"
+                exit 1
+              fi
+              echo "$spec already mirrors npm exactly"
+              continue
+            fi
+            if ! grep -Eq 'E404|404 Not Found' "$error"; then cat "$error"; exit 1; fi
+            npm publish "$tarball" --registry=https://npm.pkg.github.com --provenance=false
+            for _ in {1..12}; do
+              observed="$(npm view "$spec" dist.integrity --json --registry=https://npm.pkg.github.com 2>/dev/null | jq -r '.' || true)"
+              if [ "$observed" = "$expected" ]; then break; fi
+              sleep 5
+            done
+            if [ "$observed" != "$expected" ]; then
+              echo "::error::$spec GitHub Packages integrity is missing or differs after publish"
+              exit 1
+            fi
+          done < "$RUNNER_TEMP/release-mirror/artifacts.ndjson"
+
+      - name: Reconcile GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r artifact; do
+            name="$(jq -r '.name' <<<"$artifact")"
+            version="$(jq -r '.version' <<<"$artifact")"
+            tag="$name@$version"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$tag already has a GitHub Release"
+              continue
+            fi
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              gh release create "$tag" --verify-tag --title "$tag" --generate-notes
+              continue
+            fi
+            # First-parent history identifies the merge that introduced this
+            # version, even when this workflow is rerun after a later push.
+            package="packages/${name#@tangle-network/}/package.json"
+            source=""
+            while IFS= read -r sha; do
+              observed="$(git show "$sha:$package" 2>/dev/null | jq -r '.version' 2>/dev/null || true)"
+              if [ "$observed" != "$version" ]; then break; fi
+              source="$sha"
+            done < <(git rev-list --first-parent HEAD)
+            if [ -z "$source" ]; then
+              echo "::error::Cannot identify the source merge for $tag"
+              exit 1
+            fi
+            gh release create "$tag" --target "$source" --title "$tag" --generate-notes
+          done < "$RUNNER_TEMP/release-mirror/artifacts.ndjson"
