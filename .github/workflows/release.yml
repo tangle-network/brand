@@ -89,9 +89,10 @@ jobs:
             if [ "$private" = true ]; then continue; fi
             spec="$name@$version"
             # A just-published version may take time to become fetchable.
+            # npm 12 changed --json output shapes; use the single-spec text result.
             for attempt in {1..12}; do
-              if expected="$(npm view "$spec" dist.integrity --json --registry=https://registry.npmjs.org | jq -r '.')" && \
-                 pack="$(npm pack "$spec" --json --pack-destination "$mirror" --registry=https://registry.npmjs.org)"; then
+              if expected="$(npm view "$spec" dist.integrity --registry=https://registry.npmjs.org)" && \
+                 filename="$(npm pack "$spec" --silent --pack-destination "$mirror" --registry=https://registry.npmjs.org)"; then
                 break
               fi
               if [ "$attempt" = 12 ]; then
@@ -100,13 +101,16 @@ jobs:
               fi
               sleep 10
             done
-            filename="$(jq -r '.[0].filename' <<<"$pack")"
-            actual="$(jq -r '.[0].integrity' <<<"$pack")"
-            if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
+            tarball="$mirror/$filename"
+            if [ ! -f "$tarball" ] || [[ "$expected" != sha512-* ]]; then
+              echo "::error::$spec npm tarball or integrity metadata is missing"
+              exit 1
+            fi
+            actual="sha512-$(openssl dgst -sha512 -binary "$tarball" | openssl base64 -A)"
+            if [ "$expected" != "$actual" ]; then
               echo "::error::$spec npm tarball integrity differs from registry metadata"
               exit 1
             fi
-            tarball="$mirror/$filename"
             manifest="$(tar -xzOf "$tarball" package/package.json)"
             if [ "$(jq -r '.name + "@" + .version' <<<"$manifest")" != "$spec" ]; then
               echo "::error::$spec npm tarball has the wrong manifest"
@@ -148,7 +152,7 @@ jobs:
             expected="$(jq -r '.integrity' <<<"$artifact")"
             spec="$name@$version"
             error="$RUNNER_TEMP/github-package-view.err"
-            if observed="$(npm view "$spec" dist.integrity --json --registry=https://npm.pkg.github.com 2>"$error" | jq -r '.')"; then
+            if observed="$(npm view "$spec" dist.integrity --registry=https://npm.pkg.github.com 2>"$error")"; then
               if [ "$observed" != "$expected" ]; then
                 # Brand 1.7.0 was published before exact-artifact mirroring.
                 # Its separate npm pack differs but has passed a strict external
@@ -168,7 +172,7 @@ jobs:
             if ! grep -Eq 'E404|404 Not Found' "$error"; then cat "$error"; exit 1; fi
             npm publish "$tarball" --registry=https://npm.pkg.github.com --provenance=false
             for _ in {1..12}; do
-              observed="$(npm view "$spec" dist.integrity --json --registry=https://npm.pkg.github.com 2>/dev/null | jq -r '.' || true)"
+              observed="$(npm view "$spec" dist.integrity --registry=https://npm.pkg.github.com 2>/dev/null || true)"
               if [ "$observed" = "$expected" ]; then break; fi
               sleep 5
             done
