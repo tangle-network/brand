@@ -93,15 +93,17 @@ jobs:
             private="$(jq -r '.private // false' "$file")"
             if [ "$private" = true ]; then continue; fi
             spec="$name@$version"
-            # A just-published version may take time to become fetchable.
+            # A just-published version can take several minutes to become fetchable:
+            # brand 1.8.0 was still 404 two minutes after publish (run 36313361431).
+            # Poll for six minutes.
             # npm 12 changed --json output shapes; use the single-spec text result.
-            for attempt in {1..12}; do
+            for attempt in {1..36}; do
               if expected="$(npm view "$spec" dist.integrity --registry=https://registry.npmjs.org)" && \
                  filename="$(npm pack "$spec" --silent --pack-destination "$mirror" --registry=https://registry.npmjs.org)"; then
                 break
               fi
-              if [ "$attempt" = 12 ]; then
-                echo "::error::$spec is not fetchable from npm after 12 attempts"
+              if [ "$attempt" = 36 ]; then
+                echo "::error::$spec is not fetchable from npm after 36 attempts"
                 exit 1
               fi
               sleep 10
