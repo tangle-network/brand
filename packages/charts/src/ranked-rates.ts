@@ -285,7 +285,7 @@ function wide(rows: RateRow[], layout: Layout, noun: { setup: string }, o: Ranke
       });
     }
   }
-  return svgRoot(WIDE, bottom + 24, grid + head + body + axis);
+  return svgRoot(WIDE, bottom + (axis ? 24 : 8), grid + head + body + axis);
 }
 
 function narrow(rows: RateRow[], layout: Layout, o: RankedRatesOptions): string {
