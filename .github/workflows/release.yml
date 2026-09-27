@@ -77,7 +77,11 @@ jobs:
       # Changesets reports only versions published in this run. On a retry after
       # npm succeeded, that list is empty. Rebuild the mirror plan from the
       # versioned package manifests and fetch npm's immutable tarballs instead.
+      # When changesets are pending, the action opened or updated the release PR
+      # and published nothing: the checkout holds that PR's unpublished versions,
+      # so every reconcile step waits for the run that merges it.
       - name: Fetch and verify npm release artifacts
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         run: |
           set -euo pipefail
           mirror="$RUNNER_TEMP/release-mirror"
@@ -135,6 +139,7 @@ jobs:
           npm install --prefix "$consumer" --package-lock=false --ignore-scripts --no-audit --no-fund "${tarballs[@]}"
 
       - name: Configure npm for GitHub Packages
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22.23.1
@@ -142,6 +147,7 @@ jobs:
           scope: "@tangle-network"
 
       - name: Reconcile GitHub Packages from the npm artifacts
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -184,6 +190,7 @@ jobs:
           done < "$RUNNER_TEMP/release-mirror/artifacts.ndjson"
 
       - name: Reconcile GitHub Releases
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
