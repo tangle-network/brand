@@ -718,3 +718,54 @@
    * paper, lighter on a dark card, never tinted. */
   --border-strong: color-mix(in srgb, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 20%);
 }
+
+/* Chart marks — the palette behind @tangle-network/charts.
+ *
+ * One accent marks the measure a reader decides on (a rate bar, a frontier
+ * point, a solved attempt). One muted grey marks everything secondary. An
+ * ordinal indigo ramp marks App Grade tiers C < B < A < S; F has no fill and
+ * draws as a --chart-muted outline, the same mark as an unsolved attempt. No
+ * categorical palette ships: identity is carried by direct labels.
+ *
+ * Contrast against the dark canvas (#151523) and white paper, checked with the
+ * dataviz palette validator and WCAG ratios:
+ *   ink 14.45 / 13.70, ink-muted 7.34 / 5.56, accent 6.05 / 7.41,
+ *   muted 5.54 / 4.41, grid 1.46 / 1.12 (recessive by design).
+ * Tiers pass the ordinal checks in both modes: one hue, monotone lightness,
+ * visible steps. They are iris ladder steps (ladders.css) except #8b87f0 dark
+ * and #7c7fe3 light, which sit between two steps to keep the gaps even.
+ *
+ * The aliases re-resolve on every theme scope, as the focus rule above does,
+ * so a named theme's ink and hairlines carry into its charts. */
+:root,
+.dark,
+.light,
+[data-sandbox-ui],
+[data-sandbox-theme],
+[data-theme] {
+  --chart-ink: var(--text-primary);
+  --chart-ink-muted: var(--text-dim);
+  --chart-muted: var(--md3-outline);
+  --chart-grid: var(--md3-surface-container-high);
+  --chart-rule: var(--md3-outline-variant);
+  --chart-shade: var(--bg-hover);
+  --chart-accent: var(--brand-cool);
+  --chart-tier-c: #4a4a95;
+  --chart-tier-b: #5b5bd6;
+  --chart-tier-a: #8b87f0;
+  --chart-tier-s: #b1a9ff;
+}
+
+/* Light: the accent is the indigo fill (#4c3fc6, 7.41:1 on white) and the tier
+ * ramp runs light to dark. `[data-theme$="-light"]` covers the named light
+ * themes, which would otherwise inherit the dark ramp from :root. */
+[data-sandbox-theme="vault"],
+[data-theme="light"],
+.light,
+[data-theme$="-light"] {
+  --chart-accent: hsl(var(--hsl-primary));
+  --chart-tier-c: #9b9ef0;
+  --chart-tier-b: #7c7fe3;
+  --chart-tier-a: #5b5bd6;
+  --chart-tier-s: #272962;
+}
