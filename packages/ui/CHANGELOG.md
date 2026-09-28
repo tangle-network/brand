@@ -1,5 +1,13 @@
 # @tangle-network/ui
 
+## 11.11.0
+
+### Minor Changes
+
+- dc84d1c: Update every dependency to its latest release and build with tsdown on TypeScript 7.
+  `@tangle-network/ui` now accepts `@nanostores/react` 2 as a peer, moves to lucide-react 1 and marked 18, and drops the unused `react-pdf` and `@radix-ui/react-toast` dependencies.
+  Export paths are unchanged; internal chunk file names differ.
+
 ## 11.10.0
 
 ### Minor Changes
