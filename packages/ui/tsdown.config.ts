@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: {
@@ -21,10 +21,11 @@ export default defineConfig({
     redaction: "src/redaction/index.ts",
   },
   format: ["esm"],
+  platform: "neutral",
   dts: true,
-  splitting: true,
   clean: true,
-  esbuildOptions(options) {
-    options.jsx = "automatic";
-  },
+  fixedExtension: false,
+  // Bundling drops per-file "use client" directives, as tsup did before.
+  // Consumers mark their own client boundaries.
+  checks: { moduleLevelDirective: false },
 });

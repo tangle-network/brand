@@ -1,12 +1,12 @@
 {
   "name": "@tangle-network/charts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Benchmark figures as static SVG and HTML tables: ranked rates, cost frontier, comparison intervals, task matrix and breakdown. Draws from producer data and refuses what it cannot draw honestly.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tangle-network/brand",
+    "url": "git+https://github.com/tangle-network/brand.git",
     "directory": "packages/charts"
   },
   "bugs": {
@@ -30,11 +30,11 @@
   },
   "scripts": {
     "gen:css": "node scripts/gen-css.mjs",
-    "build": "node scripts/gen-css.mjs --check && tsup src/index.ts --format esm --dts --clean && cp src/figure.css dist/figure.css"
+    "build": "node scripts/gen-css.mjs --check && tsdown && cp src/figure.css dist/figure.css"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.6.0"
+    "tsdown": "^0.23.0",
+    "typescript": "^7.0.2"
   },
   "keywords": [
     "tangle",
