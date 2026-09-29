@@ -64,8 +64,8 @@ const deferredOptionalPeers = [
 // Optional peers whose entry cannot run without them: `./stores` creates its
 // atoms at module scope, and `./nav` re-exports react-router components. Both
 // entries hold a static import, so a consumer that imports them must install
-// the peer. Only their own entries carry that cost, because the package
-// splits one file per export.
+// the peer. The package root re-exports `./stores`, so it also requires both
+// nanostores peers; other subpath entries avoid that cost.
 const eagerOptionalPeers = ["@nanostores/react", "nanostores", "react-router"];
 
 const declaredOptionalPeers = Object.entries(manifest.peerDependenciesMeta ?? {})

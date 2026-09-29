@@ -114,4 +114,7 @@ A TypeScript consumer resolves these entries through the emitted declarations, a
 
 Because the peers now resolve at first render rather than at build time, a missing one surfaces as a thrown error while React renders. Wrap the editors in an error boundary, so the install list reaches a surface you control instead of unmounting the tree.
 
-`nanostores` and `@nanostores/react` back `./stores`, and `react-router` backs `./nav`. Those two entries create their values at module scope, so they hold a static import and a consumer that imports them must install the peer. Every other entry stays free of all of these.
+`nanostores` and `@nanostores/react` back `./stores`, and `react-router` backs `./nav`.
+Those entries create values at module scope, so consumers must install their peers before importing them.
+The package root also re-exports `./stores`, so a root import requires both nanostores peers.
+Consumers that use only other subpath entries do not need these three peers.

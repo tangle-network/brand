@@ -66,9 +66,10 @@ jobs:
           commit-message: "chore(release): publish packages"
           pr-title: "chore(release): publish packages"
           push-with-git-cli: true
-        # No NODE_AUTH_TOKEN: with `id-token: write` + a configured npm trusted
-        # publisher for @tangle-network/brand and @tangle-network/ui, npm
-        # authenticates the publish via OIDC. A token here forces token auth,
+        # No NODE_AUTH_TOKEN: with `id-token: write` and configured npm trusted
+        # publishers for @tangle-network/brand, @tangle-network/ui, and
+        # @tangle-network/charts, npm authenticates the publish via OIDC.
+        # A token here forces token auth,
         # which 404s on this scope (see sandbox-ui's release.yml note).
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
