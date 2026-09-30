@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.2
+
+### Patch Changes
+
+- 1f0b651: Keep the native field fallback outline off borderless editors inside composite fields. The shared focusFieldWithin helper retains the rounded outer border and halo; standalone fields keep their own focus treatment.
+
 ## 1.8.1
 
 ### Patch Changes
