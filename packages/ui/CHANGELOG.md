@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.11.2
+
+### Patch Changes
+
+- 658ae83: Use each colored AgentTimeline card's tone foreground for its status detail and artifact text.
+  Keep neutral cards on the normal muted foreground.
+
 ## 11.11.1
 
 ### Patch Changes
