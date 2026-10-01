@@ -1,7 +1,7 @@
 /**
  * `comparisonIntervals`: is each step in an order real.
  *
- * One row per comparison, "{favored} over {other}", with the pair count. x is
+ * One row per comparison, "{favored} − {other}", with the pair count. x is
  * the difference in points with a muted zero line. The clustered interval is a
  * 6 px accent bar, the exact interval a 2 px muted bar under it, and a dashed
  * ink tick marks the row's registered minimum effect. There is no point
@@ -52,7 +52,7 @@ export function comparisonIntervals(
 ): Figure | Refusal {
   const id = o.id ?? "comparison-intervals";
   const name = (setupId: string) => setups.find((s) => s.id === setupId)?.label ?? setupId;
-  const title = (row: ComparisonRow) => `${name(row.favored)} over ${name(row.other)}`;
+  const title = (row: ComparisonRow) => `${name(row.favored)} − ${name(row.other)}`;
   if (rows.length === 0) return { id, refused: "No comparison was registered." };
   const drawn: Drawn[] = [];
   const refused: string[] = [];
@@ -157,10 +157,11 @@ function draw(drawn: Drawn[], domain: [number, number], width: number, plotX: nu
     } else {
       const label = wrap(title, width, 14);
       marks += textBlock(label.lines, 0, y + 14, 18, `class="tgc-ink" font-size="14"`);
-      marks += text(width, y + 14, `${row.pairs} pairs`, { cls: "tgc-ink-muted tgc-num", anchor: "end" });
-      barY = y + label.lines.length * 18 + 4;
+      marks += text(0, y + 14 + label.lines.length * 18, `${row.pairs} pairs`, { cls: "tgc-ink-muted tgc-num" });
+      barY = y + label.lines.length * 18 + 22;
       y = barY + 24;
     }
+    if (labelW === 0) marks += line(x(0), barY - 8, x(0), barY + 20, "tgc-zero");
     const lo = x(row.interval!.lower);
     const hi = x(row.interval!.upper);
     marks += rect(lo, barY, Math.max(hi - lo, 2), 6, "tgc-ci");
@@ -177,7 +178,7 @@ function draw(drawn: Drawn[], domain: [number, number], width: number, plotX: nu
     );
   }
   const zero = x(0);
-  let axis = line(zero, rowsTop, zero, y, "tgc-zero");
+  let axis = labelW > 0 ? line(zero, rowsTop, zero, y, "tgc-zero") : "";
   for (const t of linearTicks(domain[0], domain[1], width > 400 ? 6 : 3)) {
     axis += text(x(t), y + 16, pts(t), { cls: "tgc-ink-muted tgc-num", anchor: "middle" });
   }
