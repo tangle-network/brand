@@ -450,6 +450,21 @@ export const StatusTones: Story = {
   },
 }
 
+export const ErrorArtifact: Story = {
+  args: {
+    items: [
+      {
+        id: 'artifact-error',
+        kind: 'artifact',
+        title: 'Build output',
+        description: 'The compiler stopped before writing the bundle.',
+        meta: 'Exit code 1',
+        tone: 'error',
+      },
+    ],
+  },
+}
+
 // ---------------------------------------------------------------------------
 // Full transcript through ChatContainer — the real consumer path. Tool titles
 // and descriptions come from `getToolDisplayMetadata`, so this story shows the
