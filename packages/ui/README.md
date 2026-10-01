@@ -85,7 +85,14 @@ To remove the ring from a field nested in a focusable container, pass `focus:rin
 
 ## Subpaths
 
-Sixteen named exports: `primitives`, `chat`, `run`, `openui`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`, `nav`, `redaction`.
+Seventeen named exports: `primitives`, `chat`, `run`, `openui`, `openui-schema`, `files`, `editor`, `markdown`, `auth`, `hooks`, `sdk-hooks`, `stores`, `types`, `utils`, `tool-previews`, `nav`, `redaction`.
+
+`openui-schema` has no React imports.
+Use `OPENUI_NODE_JSON_SCHEMA` to describe one model-authored node and `validateOpenUIJsonNode(value)` before writing it.
+Use `validateOpenUIJsonArtifact(value)` for a saved single node or node array.
+Both validators return `{ ok: true }` or `{ ok: false, issue: { path, message } }`.
+They reject unknown node types, hidden fields, malformed cells, and unsupported nested children.
+The renderer reports an unsupported saved node at its path instead of silently omitting it.
 
 ## Optional peers
 

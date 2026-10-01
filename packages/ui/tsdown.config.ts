@@ -7,6 +7,7 @@ export default defineConfig({
     chat: "src/chat/index.ts",
     run: "src/run/index.ts",
     openui: "src/openui/index.ts",
+    "openui-schema": "src/openui/schema.ts",
     files: "src/files/index.ts",
     editor: "src/editor/index.ts",
     markdown: "src/markdown/index.ts",
