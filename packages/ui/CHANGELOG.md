@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.11.7
+
+### Patch Changes
+
+- cad5ba2: Use inverse theme colors for user messages and leave assistant prose unboxed across the shared chat renderers.
+
 ## 11.11.6
 
 ### Patch Changes
