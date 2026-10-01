@@ -301,9 +301,6 @@ importers:
       '@tangle-network/brand':
         specifier: workspace:^
         version: link:../brand
-      ajv:
-        specifier: 8.17.1
-        version: 8.17.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -371,6 +368,9 @@ importers:
       '@types/turndown':
         specifier: ^5.0.6
         version: 5.0.6
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
       nanostores:
         specifier: ^1.5.4
         version: 1.5.4
