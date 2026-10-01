@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import type { UrlTransform } from "react-markdown";
 import { PencilLine, Save, Users, Wifi, WifiOff } from "lucide-react";
 import { Markdown } from "../markdown/markdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../primitives/tabs";
@@ -36,6 +37,8 @@ export interface DocumentEditorPaneProps
   tabs?: ArtifactPaneProps["tabs"];
   toolbar?: ReactNode;
   markdown?: string;
+  /** Transform Markdown links and images through the shared URL policy. */
+  urlTransform?: UrlTransform;
   mode?: DocumentEditorMode;
   defaultMode?: DocumentEditorMode;
   onModeChange?: (mode: DocumentEditorMode) => void;
@@ -188,6 +191,7 @@ export function DocumentEditorPane({
   tabs,
   toolbar,
   markdown = "",
+  urlTransform,
   mode,
   defaultMode = "preview",
   onModeChange,
@@ -300,7 +304,7 @@ export function DocumentEditorPane({
         previewClassName,
       )}
     >
-      <Markdown>{draft}</Markdown>
+      <Markdown urlTransform={urlTransform}>{draft}</Markdown>
     </div>
   );
 

@@ -64,6 +64,7 @@ export function FileArtifactPane({
   size,
   onClose,
   onDownload,
+  urlTransform,
   path,
   tabs = [],
   activeTabId,
@@ -154,6 +155,7 @@ export function FileArtifactPane({
           headerClassName={headerClassName}
           hideTitleBlock={hideTitleBlock}
           markdown={content ?? ""}
+          urlTransform={urlTransform}
           mode={editor.mode}
           defaultMode={editor.defaultMode}
           onModeChange={editor.onModeChange}
@@ -193,6 +195,7 @@ export function FileArtifactPane({
         blobUrl={blobUrl}
         mimeType={mimeType}
         size={size}
+        urlTransform={urlTransform}
         onDownload={onDownload}
         hideHeader={true}
       />
