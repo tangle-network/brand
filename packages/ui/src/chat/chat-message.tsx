@@ -1,5 +1,5 @@
 /**
- * ChatMessage — single message bubble in the conversation.
+ * ChatMessage — one message in the conversation.
  *
  * Supports user messages (plain text) and assistant messages
  * (rich markdown with inline tool call activity).
@@ -41,6 +41,7 @@ export function ChatMessage({
   hideRoleLabel,
 }: ChatMessageProps) {
   const isUser = role === "user";
+  const isAssistant = role === "assistant";
 
   return (
     <div
@@ -63,19 +64,18 @@ export function ChatMessage({
         </div>
       )}
 
-      {/* Bubble */}
       <div
         className={cn(
-          "min-w-0 max-w-[85%] space-y-1 rounded-[var(--radius-lg)] border",
-          "px-[var(--chat-message-px)] py-[var(--chat-message-py)]",
+          "min-w-0 max-w-[85%] space-y-1",
           isUser
-            ? "border-border bg-muted/50"
-            : "border-border bg-card",
+            ? "rounded-[var(--radius-lg)] bg-foreground px-[var(--chat-message-px)] py-[var(--chat-message-py)] text-background"
+            : isAssistant
+              ? "text-foreground"
+              : "rounded-[var(--radius-lg)] border border-border bg-card px-[var(--chat-message-px)] py-[var(--chat-message-py)]",
         )}
       >
-        {/* Message body */}
         {isUser ? (
-          <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)] text-foreground">
+          <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)]">
             {content}
           </div>
         ) : (
