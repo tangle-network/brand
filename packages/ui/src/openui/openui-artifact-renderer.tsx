@@ -13,6 +13,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../primitives/table";
 import { CodeBlock } from "../primitives/code-block";
 import { Markdown } from "../markdown/markdown";
+import { findUnsupportedOpenUINode, type OPENUI_NODE_TYPES } from "./schema";
 
 export type OpenUIPrimitive = string | number | boolean | null | undefined;
 
@@ -148,21 +149,14 @@ export interface OpenUIArtifactRendererProps {
   className?: string;
 }
 
-const NODE_TYPES = new Set([
-  "heading",
-  "text",
-  "badge",
-  "stat",
-  "key_value",
-  "code",
-  "markdown",
-  "table",
-  "actions",
-  "separator",
-  "stack",
-  "grid",
-  "card",
-]);
+type RendererNodeTypesMatchSchema =
+  Exclude<OpenUIComponentNode["type"], (typeof OPENUI_NODE_TYPES)[number]> extends never
+    ? Exclude<(typeof OPENUI_NODE_TYPES)[number], OpenUIComponentNode["type"]> extends never
+      ? true
+      : never
+    : never;
+const rendererNodeTypesMatchSchema: RendererNodeTypesMatchSchema = true;
+void rendererNodeTypesMatchSchema;
 
 const GAP_STYLES = {
   sm: "gap-2",
@@ -198,16 +192,6 @@ function formatValue(value: ReactNode | OpenUIPrimitive) {
 
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
-}
-
-function isOpenUIComponentNode(value: unknown): value is OpenUIComponentNode {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "type" in value &&
-    typeof (value as { type?: unknown }).type === "string" &&
-    NODE_TYPES.has((value as { type: string }).type)
-  );
 }
 
 function renderActions(actions: OpenUIAction[], onAction?: (action: OpenUIAction) => void) {
@@ -394,7 +378,7 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
                         column.align === "right" && "text-right tabular-nums",
                       )}
                     >
-                      {formatValue(row[column.key])}
+                      {formatValue(Object.prototype.hasOwnProperty.call(row, column.key) ? row[column.key] : undefined)}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -510,7 +494,15 @@ export function OpenUIArtifactRenderer({
   onAction,
   className,
 }: OpenUIArtifactRendererProps) {
-  const nodes = (Array.isArray(schema) ? schema : [schema]).filter(isOpenUIComponentNode);
+  const issue = findUnsupportedOpenUINode(schema);
+  if (issue) {
+    return (
+      <div role="alert" className={cn("rounded-[var(--radius-xl)] border border-border bg-card p-5 text-sm text-foreground", className)}>
+        Cannot display this saved view. {issue.message} Path: {issue.path}.
+      </div>
+    );
+  }
+  const nodes = Array.isArray(schema) ? schema : [schema];
 
   if (nodes.length === 0) {
     return (

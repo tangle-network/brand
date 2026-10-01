@@ -18,3 +18,13 @@ export {
   type OpenUIGridNode,
   type OpenUICardNode,
 } from "./openui-artifact-renderer";
+
+export {
+  OPENUI_NODE_TYPES,
+  OPENUI_NODE_JSON_SCHEMA,
+  findUnsupportedOpenUINode,
+  validateOpenUIJsonNode,
+  validateOpenUIJsonArtifact,
+  type OpenUISchemaIssue,
+  type OpenUISchemaValidation,
+} from "./schema";
