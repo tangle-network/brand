@@ -12,7 +12,7 @@ import {
 } from "../primitives/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../primitives/table";
 import { CodeBlock } from "../primitives/code-block";
-import { Markdown } from "../markdown/markdown";
+import { Markdown, type MarkdownProps } from "../markdown/markdown";
 import { findUnsupportedOpenUINode, type OPENUI_NODE_TYPES } from "./schema";
 
 export type OpenUIPrimitive = string | number | boolean | null | undefined;
@@ -147,6 +147,7 @@ export interface OpenUIArtifactRendererProps {
   schema: OpenUIComponentNode | OpenUIComponentNode[];
   onAction?: (action: OpenUIAction) => void;
   className?: string;
+  urlTransform?: MarkdownProps["urlTransform"];
 }
 
 type RendererNodeTypesMatchSchema =
@@ -218,7 +219,11 @@ function renderActions(actions: OpenUIAction[], onAction?: (action: OpenUIAction
   );
 }
 
-function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction) => void): ReactNode {
+function renderNode(
+  node: OpenUIComponentNode,
+  onAction?: (action: OpenUIAction) => void,
+  urlTransform?: MarkdownProps["urlTransform"],
+): ReactNode {
   switch (node.type) {
     case "heading": {
       const level = node.level ?? 2;
@@ -341,7 +346,9 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
     case "markdown":
       return (
         <div className="rounded-[var(--radius-lg)] border border-border bg-card p-5">
-          <Markdown className="prose-sm max-w-none">{node.content}</Markdown>
+          <Markdown className="prose-sm max-w-none" urlTransform={urlTransform}>
+            {node.content}
+          </Markdown>
         </div>
       );
 
@@ -425,7 +432,7 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
         >
           {asArray<OpenUIComponentNode>(node.children).map((child, index) => (
             <Fragment key={child.id ?? `${child.type}-${index}`}>
-              {renderNode(child, onAction)}
+              {renderNode(child, onAction, urlTransform)}
             </Fragment>
           ))}
         </div>
@@ -439,7 +446,7 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
         <div className={cn("grid", GRID_STYLES[node.columns ?? 2], GAP_STYLES[node.gap ?? "md"])}>
           {asArray<OpenUIComponentNode>(node.children).map((child, index) => (
             <Fragment key={child.id ?? `${child.type}-${index}`}>
-              {renderNode(child, onAction)}
+              {renderNode(child, onAction, urlTransform)}
             </Fragment>
           ))}
         </div>
@@ -473,7 +480,7 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
             <CardContent className="space-y-4 p-4">
               {asArray<OpenUIComponentNode>(node.children).map((child, index) => (
                 <Fragment key={child.id ?? `${child.type}-${index}`}>
-                  {renderNode(child, onAction)}
+                  {renderNode(child, onAction, urlTransform)}
                 </Fragment>
               ))}
             </CardContent>
@@ -493,6 +500,7 @@ export function OpenUIArtifactRenderer({
   schema,
   onAction,
   className,
+  urlTransform,
 }: OpenUIArtifactRendererProps) {
   const issue = findUnsupportedOpenUINode(schema);
   if (issue) {
@@ -526,7 +534,7 @@ export function OpenUIArtifactRenderer({
     <div className={cn("space-y-4", className)}>
       {nodes.map((node, index) => (
         <Fragment key={node.id ?? `${node.type}-${index}`}>
-          {renderNode(node, onAction)}
+          {renderNode(node, onAction, urlTransform)}
         </Fragment>
       ))}
     </div>
