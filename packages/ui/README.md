@@ -95,6 +95,15 @@ Both validators return `{ ok: true, value }` with a typed renderer node, or `{ o
 They reject unknown node types, hidden fields, malformed cells, and unsupported nested children.
 The renderer reports an unsupported saved node at its path instead of silently omitting it.
 
+### Markdown and OpenUI links
+
+`Markdown` adds GitHub-style heading IDs before sanitising the rendered document.
+The existing sanitizer keeps its `user-content-` prefix to prevent DOM clobbering.
+For a link into another Markdown file, use `getSanitizedMarkdownHeadingIdFromRawFragment` with raw fragment text, without a leading `#` or sanitizer prefix.
+`Markdown` applies the same mapping to local `#fragment` links.
+Custom URL transforms still pass through ReactMarkdown's safe protocol check.
+`OpenUIArtifactRenderer` forwards its `urlTransform` prop to nested Markdown nodes.
+
 ## Optional peers
 
 `@tiptap/core`, `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-collaboration`, `@tiptap/extension-collaboration-caret`, `@hocuspocus/provider` and `yjs` back the `./editor` entry. The entry reaches every one of them through a dynamic `import()`, and gets a loud error that names the missing packages only when it renders an editor. `./editor` splits the cost three ways, so each surface costs only the peers it uses:

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { getSanitizedMarkdownHeadingIdFromRawFragment } from "../markdown/markdown";
 import { OpenUIArtifactRenderer } from "./openui-artifact-renderer";
 import { OPENUI_NODE_JSON_SCHEMA, OPENUI_NODE_TYPES, validateOpenUIJsonArtifact, validateOpenUIJsonNode } from "./schema";
 
@@ -63,6 +64,44 @@ describe("OpenUI JSON contract", () => {
     expect(validateOpenUIJsonNode(table).ok).toBe(true);
     render(<OpenUIArtifactRenderer schema={table} />);
     expect(screen.getByText("Value")).toBeTruthy();
+  });
+
+  it("forwards URL transforms and keeps cross-file fragments aligned with sanitized headings", () => {
+    const urlTransform = vi.fn((url: string, key: string) => {
+      if (key !== "href") return url;
+      const separator = url.indexOf("#");
+      const fragment = separator >= 0
+        ? "#" + getSanitizedMarkdownHeadingIdFromRawFragment(url.slice(separator + 1))
+        : "";
+      return "/app/ws-1/vault?file=campaigns%2Fpacket.md" + fragment;
+    });
+
+    render(
+      <OpenUIArtifactRenderer
+        schema={{
+          type: "card",
+          children: [{
+            type: "markdown",
+            content: "[Packet](campaigns/packet.md#Cr%C3%A8me%20br%C3%BBl%C3%A9e)\n\n# Crème brûlée",
+          }],
+        }}
+        urlTransform={urlTransform}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Packet" })).toHaveAttribute(
+      "href",
+      "/app/ws-1/vault?file=campaigns%2Fpacket.md#user-content-crème-brûlée",
+    );
+    expect(screen.getByRole("heading", { name: "Crème brûlée" })).toHaveAttribute(
+      "id",
+      "user-content-crème-brûlée",
+    );
+    expect(urlTransform).toHaveBeenCalledWith(
+      "campaigns/packet.md#Cr%C3%A8me%20br%C3%BBl%C3%A9e",
+      "href",
+      expect.objectContaining({ tagName: "a" }),
+    );
   });
 
   it("shows an explicit error for an old unsupported artifact", () => {

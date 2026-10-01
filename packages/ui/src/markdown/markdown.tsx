@@ -1,14 +1,50 @@
 import { memo } from "react";
-import ReactMarkdown, { type UrlTransform } from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform, type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import rehypeSlug from "rehype-slug";
+import GithubSlugger from "github-slugger";
 import { CodeBlock, CopyButton } from "./code-block";
 import { cn } from "../lib/utils";
+
+const SANITIZED_HEADING_ID_PREFIX = "user-content-";
+
+/** Converts a raw Markdown fragment to the ID rehype-sanitize emits for its heading. */
+export function getSanitizedMarkdownHeadingIdFromRawFragment(rawFragment: string): string {
+  let decodedFragment = rawFragment;
+  try {
+    decodedFragment = decodeURIComponent(rawFragment);
+  } catch {
+    // Keep malformed percent escapes literal, as browsers do for fragment targets.
+  }
+  const slugger = new GithubSlugger();
+  return SANITIZED_HEADING_ID_PREFIX + slugger.slug(decodedFragment);
+}
+
+function safeUrl(url: string): string | undefined {
+  return defaultUrlTransform(url) ?? undefined;
+}
+
+function transformMarkdownUrl(
+  url: string,
+  key: string,
+  node: Parameters<UrlTransform>[2],
+  urlTransform?: UrlTransform,
+) {
+  const transformed = urlTransform ? urlTransform(url, key, node) : url;
+  if (transformed == null) return undefined;
+
+  if (key === "href" && transformed === url && url.startsWith("#")) {
+    return safeUrl("#" + getSanitizedMarkdownHeadingIdFromRawFragment(url.slice(1)));
+  }
+
+  return safeUrl(transformed);
+}
 
 export interface MarkdownProps {
   children: string;
   className?: string;
-  /** Transform parsed link and image URLs before sanitisation. */
+  /** Transform parsed link and image URLs while retaining protocol safety checks. */
   urlTransform?: UrlTransform;
 }
 
@@ -23,8 +59,8 @@ export const Markdown = memo(({ children, className, urlTransform }: MarkdownPro
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize]}
-        urlTransform={urlTransform}
+        rehypePlugins={[rehypeSlug, rehypeSanitize]}
+        urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform)}
         components={{
           pre({ children: preChildren }) {
             return <>{preChildren}</>;
