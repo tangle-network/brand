@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.11.8
+
+### Patch Changes
+
+- dc29f33: Use semantic theme colors for inline code in Markdown and the InlineCode primitive.
+
 ## 11.11.7
 
 ### Patch Changes
