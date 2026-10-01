@@ -11,7 +11,7 @@ export function InlineCode({ className, children, ...props }: InlineCodeProps) {
   return (
     <code
       className={cn(
-        "rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--code-keyword)]",
+        "rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground",
         className,
       )}
       {...props}
@@ -20,3 +20,4 @@ export function InlineCode({ className, children, ...props }: InlineCodeProps) {
     </code>
   );
 }
+
