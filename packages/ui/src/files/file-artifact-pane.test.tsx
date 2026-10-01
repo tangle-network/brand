@@ -113,6 +113,47 @@ describe("FileArtifactPane previews", () => {
     expect(container.querySelector("strong")).toHaveTextContent("bold");
   });
 
+  it("forwards Markdown URL transforms to file and rich editor previews", async () => {
+    const urlTransform = vi.fn((url: string, key: string) => (
+      key === "href" && url === "sibling.md"
+        ? "/app/ws-1/vault?file=docs%2Fsibling.md"
+        : url
+    ));
+    const readOnly = render(
+      <FileArtifactPane
+        filename="README.md"
+        content={"[Sibling](sibling.md)"}
+        urlTransform={urlTransform}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Sibling" })).toHaveAttribute(
+      "href",
+      "/app/ws-1/vault?file=docs%2Fsibling.md",
+    );
+    readOnly.unmount();
+
+    render(
+      <FileArtifactPane
+        path="docs/README.md"
+        filename="README.md"
+        content={"[Sibling](sibling.md)"}
+        urlTransform={urlTransform}
+        editor={{ enabled: true, defaultMode: "preview" }}
+      />,
+    );
+
+    expect(await screen.findByRole("link", { name: "Sibling" })).toHaveAttribute(
+      "href",
+      "/app/ws-1/vault?file=docs%2Fsibling.md",
+    );
+    expect(urlTransform).toHaveBeenCalledWith(
+      "sibling.md",
+      "href",
+      expect.objectContaining({ tagName: "a" }),
+    );
+  });
+
   it("renders a binary file with no download link as one muted sentence", () => {
     const onDownload = vi.fn();
     const withDownload = render(

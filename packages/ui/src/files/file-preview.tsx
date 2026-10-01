@@ -22,6 +22,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import type { UrlTransform } from "react-markdown";
 import { focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { Button } from "../primitives/button";
@@ -44,6 +45,8 @@ export interface FilePreviewProps {
   mimeType?: string;
   /** Size in bytes; download cards show it when known. */
   size?: number;
+  /** Transform Markdown links and images through the shared URL policy. */
+  urlTransform?: UrlTransform;
   onClose?: () => void;
   onDownload?: () => void;
   hideHeader?: boolean;
@@ -301,10 +304,16 @@ function TextPreview({ content }: { content: string }) {
   );
 }
 
-function MarkdownPreview({ content }: { content: string }) {
+function MarkdownPreview({
+  content,
+  urlTransform,
+}: {
+  content: string;
+  urlTransform?: UrlTransform;
+}) {
   return (
     <div className="rounded-[var(--radius-md)] border border-border bg-background p-5">
-      <Markdown>{content}</Markdown>
+      <Markdown urlTransform={urlTransform}>{content}</Markdown>
     </div>
   );
 }
@@ -358,6 +367,7 @@ function PreviewBody({
   content,
   blobUrl,
   size,
+  urlTransform,
   onDownload,
 }: {
   kind: FilePreviewKind;
@@ -365,6 +375,7 @@ function PreviewBody({
   content?: string;
   blobUrl?: string;
   size?: number;
+  urlTransform?: UrlTransform;
   onDownload?: () => void;
 }) {
   const hasText = typeof content === "string";
@@ -404,7 +415,7 @@ function PreviewBody({
       if (hasText) return <CodePreview content={content} filename={filename} kind={kind} />;
       return card(NO_INLINE_CONTENT);
     case "markdown":
-      if (hasText) return <MarkdownPreview content={content} />;
+      if (hasText) return <MarkdownPreview content={content} urlTransform={urlTransform} />;
       return card(NO_INLINE_CONTENT);
     case "text":
       if (hasText) return <TextPreview content={content} />;
@@ -423,6 +434,7 @@ export function FilePreview({
   blobUrl,
   mimeType,
   size,
+  urlTransform,
   onClose,
   onDownload,
   hideHeader = false,
@@ -473,6 +485,7 @@ export function FilePreview({
           content={content}
           blobUrl={blobUrl}
           size={size}
+          urlTransform={urlTransform}
           onDownload={onDownload}
         />
       </div>
