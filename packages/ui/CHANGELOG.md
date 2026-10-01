@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.11.5
+
+### Patch Changes
+
+- 688868d: Add sanitized heading IDs and URL transform forwarding for Markdown rendered in OpenUI artifacts.
+
 ## 11.11.4
 
 ### Patch Changes
