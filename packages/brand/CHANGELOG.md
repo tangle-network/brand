@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.1
+
+### Patch Changes
+
+- 0687011: Make prose inline code use the consumer semantic muted surface in light and dark themes.
+
 ## 1.9.0
 
 ### Minor Changes
