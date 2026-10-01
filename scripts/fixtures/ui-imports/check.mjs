@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
-import { appendFileSync, cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { build, version as esbuildVersion } from "esbuild";
@@ -60,8 +60,13 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
   // Do not npm-install twice: that could re-resolve ranges and confound bytes.
   // Never touch peers, the consumer lockfile, or the repository's dist.
   function mountTarball(path) {
-    rmSync(installedDirectory, { recursive: true, force: true });
-    mkdirSync(installedDirectory, { recursive: true });
+    // npm may place conflicting transitive versions here rather than hoist
+    // them. Keep those exact dependencies across both archive overlays.
+    for (const name of readdirSync(installedDirectory)) {
+      if (name !== "node_modules") {
+        rmSync(join(installedDirectory, name), { recursive: true, force: true });
+      }
+    }
     execFileSync("tar", ["-xzf", path, "--strip-components=1", "-C", installedDirectory]);
     assert.deepEqual(json(join(installedDirectory, "package.json")), manifest);
     for (const value of Object.values(manifest.exports)) {
