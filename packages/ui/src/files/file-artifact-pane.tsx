@@ -18,6 +18,8 @@ const LazyDocumentEditorPane = lazy(async () => {
 
 export interface FileArtifactPaneEditorOptions {
   enabled?: boolean;
+  /** Persisted baseline when content is the current draft. */
+  savedContent?: string;
   mode?: DocumentEditorMode;
   defaultMode?: DocumentEditorMode;
   onModeChange?: (mode: DocumentEditorMode) => void;
@@ -155,6 +157,7 @@ export function FileArtifactPane({
           headerClassName={headerClassName}
           hideTitleBlock={hideTitleBlock}
           markdown={content ?? ""}
+          savedMarkdown={editor.savedContent}
           urlTransform={urlTransform}
           mode={editor.mode}
           defaultMode={editor.defaultMode}
