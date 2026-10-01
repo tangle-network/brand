@@ -3,13 +3,19 @@ import { describe, expect, it } from "vitest"
 import { UserMessage } from "./user-message"
 
 describe("UserMessage", () => {
-  it("renders the text in a borderless muted bubble", () => {
+  it("renders the text in a bordered card that wraps in narrow panes", () => {
     const { container } = render(<UserMessage content="Run the tests." />)
     expect(screen.getByText("Run the tests.")).toBeInTheDocument()
     const bubble = container.querySelector(".rounded-2xl")
     expect(bubble).not.toBeNull()
-    expect(bubble!.className).toContain("bg-muted/50")
-    expect(bubble!.className).not.toMatch(/(^|\s)border(\s|$)/)
+    expect(bubble!.className).toContain("bg-card")
+    expect(bubble!.className).toContain("border-border")
+    expect(container.querySelector(".group")?.className).toContain(
+      "min-w-0",
+    )
+    expect(screen.getByText("Run the tests.").className).toContain(
+      "break-words",
+    )
   })
 
   it("keeps the timestamp beside the bubble as a hover-revealed label", () => {
