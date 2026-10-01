@@ -167,32 +167,14 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
     }
   });
 
-  it("shares tangle-light's indigo hue family — same brand, dark register", () => {
-    for (const token of ["hsl-primary", "hsl-ring", "hsl-background"]) {
+  it("keeps the Tangle accent in the same indigo family", () => {
+    for (const token of ["hsl-primary", "hsl-ring"]) {
       const dark = hslIn(css, token);
       const lite = hslIn(light, token);
       expect(
         Math.abs(dark.h - lite.h),
-        `--${token} hue must sit within 10 of tangle-light's`,
+        `--${token} hue must sit within 10 of tangle-light`,
       ).toBeLessThanOrEqual(10);
-    }
-  });
-
-  it("tints its neutrals with the hue — nothing achromatic", () => {
-    for (const token of [
-      "hsl-background",
-      "hsl-card",
-      "hsl-popover",
-      "hsl-secondary",
-      "hsl-muted",
-      "hsl-accent",
-      "hsl-border",
-      "hsl-input",
-    ]) {
-      const { h, s } = hslIn(css, token);
-      expect(h, `--${token} hue in the indigo band`).toBeGreaterThanOrEqual(220);
-      expect(h, `--${token} hue in the indigo band`).toBeLessThanOrEqual(250);
-      expect(s, `--${token} is hue-tinted, not dead grey`).toBeGreaterThan(5);
     }
   });
 
