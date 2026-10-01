@@ -51,6 +51,21 @@ describe("OpenUI JSON contract", () => {
       .toMatchObject({ ok: false, issue: { path: "$.rows[0].hidden" } });
   });
 
+  it("rejects arrays passed as a single node and empty cards", () => {
+    expect(validateOpenUIJsonNode([{ type: "text", text: "ok" }]))
+      .toMatchObject({ ok: false, issue: { path: "$" } });
+    expect(validateOpenUIJsonNode({ type: "card" }).ok).toBe(false);
+    expect(validateOpenUIJsonNode({ type: "card", title: " " }).ok).toBe(false);
+    expect(validateOpenUIJsonNode({ type: "card", title: "A result" }).ok).toBe(true);
+  });
+
+  it("renders an absent prototype-named table cell safely", () => {
+    const table = JSON.parse('{"type":"table","columns":[{"key":"__proto__","header":"Value"}],"rows":[{}]}');
+    expect(validateOpenUIJsonNode(table).ok).toBe(true);
+    render(<OpenUIArtifactRenderer schema={table} />);
+    expect(screen.getByText("Value")).toBeTruthy();
+  });
+
   it("shows an explicit error for an old unsupported artifact", () => {
     const oldArtifact = { type: "card", children: [{ type: "section", children: [{ type: "text", text: "hidden" }] }] };
     render(<OpenUIArtifactRenderer schema={oldArtifact as never} />);

@@ -378,7 +378,7 @@ function renderNode(node: OpenUIComponentNode, onAction?: (action: OpenUIAction)
                         column.align === "right" && "text-right tabular-nums",
                       )}
                     >
-                      {formatValue(row[column.key])}
+                      {formatValue(Object.prototype.hasOwnProperty.call(row, column.key) ? row[column.key] : undefined)}
                     </TableCell>
                   ))}
                 </TableRow>
