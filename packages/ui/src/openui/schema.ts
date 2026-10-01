@@ -175,6 +175,8 @@ export function validateOpenUIJsonArtifact(value: unknown): OpenUISchemaValidati
   if (value.length === 0) {
     return { ok: false, issue: { path: "$", message: "An OpenUI artifact needs at least one node." } };
   }
+  const unsupported = findUnsupportedOpenUINode(value);
+  if (unsupported) return { ok: false, issue: unsupported };
   for (const [index, node] of value.entries()) {
     const result = validateOpenUIJsonNode(node);
     if (!result.ok) {

@@ -39,6 +39,8 @@ describe("OpenUI JSON contract", () => {
       .toMatchObject({ ok: false, issue: { path: "$.children[0]", message: expect.stringContaining("section") } });
     expect(validateOpenUIJsonArtifact([{ type: "text", text: "visible" }, nested]))
       .toMatchObject({ ok: false, issue: { path: "$[1].children[0]" } });
+    expect(validateOpenUIJsonArtifact(Array.from({ length: 1001 }, () => ({ type: "text", text: "too many" }))))
+      .toMatchObject({ ok: false, issue: { path: "$[1000]" } });
   });
 
   it("rejects fields the renderer would ignore and table cells with no column", () => {
