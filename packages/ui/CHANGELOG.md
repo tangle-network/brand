@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.11.6
+
+### Patch Changes
+
+- f58fc3d: Resolve the file tree theme peer without changing the diff theme context.
+
 ## 11.11.5
 
 ### Patch Changes
