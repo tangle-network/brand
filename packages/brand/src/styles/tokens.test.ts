@@ -13,12 +13,9 @@ import {
 /**
  * The canonical spine's structural contract.
  *
- * The whole point of this palette is that a surface separates from the one below
- * it by its own FILL. A flat, desaturated ladder pushes that job onto borders,
- * and the app reads grey and washed out — which is the state this replaced. The
- * numbers are therefore not decoration; they are the contract. These assertions
- * pin the PROPERTIES rather than the exact values, so a retune stays free but a
- * collapse back to flat does not.
+ * The canonical surface and ink spine is neutral so purple can signal interaction.
+ * Each surface remains distinct by fill and elevation. These assertions pin that
+ * structure without fixing every shade, so the ladder can be retuned safely.
  */
 const tokens = readFileSync(
   path.resolve(import.meta.dirname, "tokens.css"),
@@ -31,27 +28,73 @@ const tokens = readFileSync(
 const DARK = blockIn(tokens, ".dark");
 const LIGHT = blockIn(tokens, ".light");
 
-describe("canonical dark spine", () => {
-  it("keeps the canvas in the brand's hue family, at any strength", () => {
-    const bg = hslIn(DARK, "hsl-background");
-    // HUE is the brand constraint and does not move: the greys are cool and sit
-    // in the indigo band, so they belong to the same family as the accent rather
-    // than reading as a foreign neutral pasted underneath it.
-    expect(bg.h, "canvas hue sits in the indigo band").toBeGreaterThanOrEqual(
-      215,
-    );
-    expect(bg.h).toBeLessThanOrEqual(260);
-    // SATURATION is a taste dial, not a contract. How far the surfaces lean —
-    // near-neutral graphite with the indigo purely in the accents, or a fully
-    // indigo-cast ground — is a live product decision, so the only thing pinned
-    // here is that the canvas is not dead grey. Asserting a band instead makes
-    // this test fail every time that decision is revisited, which tells you
-    // nothing about whether the palette is correct.
-    expect(bg.s, "a colourless canvas has left the brand behind").toBeGreaterThan(
-      5,
-    );
-  });
+describe("canonical surfaces, ink, and chrome are neutral", () => {
+  const neutralHslRoles = [
+    "hsl-background",
+    "hsl-foreground",
+    "hsl-card",
+    "hsl-card-foreground",
+    "hsl-popover",
+    "hsl-popover-foreground",
+    "hsl-secondary",
+    "hsl-secondary-foreground",
+    "hsl-muted",
+    "hsl-muted-foreground",
+    "hsl-accent",
+    "hsl-accent-foreground",
+    "hsl-border",
+    "hsl-input",
+    "sidebar-background",
+    "sidebar-foreground",
+    "sidebar-accent",
+    "sidebar-accent-foreground",
+    "sidebar-border",
+  ];
+  const neutralHexRoles = [
+    "md3-surface",
+    "md3-surface-dim",
+    "md3-surface-bright",
+    "md3-surface-container-lowest",
+    "md3-surface-container-low",
+    "md3-surface-container",
+    "md3-surface-container-high",
+    "md3-surface-container-highest",
+    "md3-surface-variant",
+    "md3-on-surface",
+    "md3-on-surface-variant",
+    "md3-outline",
+    "md3-outline-variant",
+    "depth-1",
+    "depth-2",
+    "depth-3",
+    "depth-4",
+  ];
 
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    it(`${theme}: shared surface and ink roles are achromatic`, () => {
+      for (const token of neutralHslRoles) {
+        expect(hslIn(spine, token).s, `--${token}`).toBe(0);
+      }
+      for (const token of neutralHexRoles) {
+        const hex = spine.match(
+          new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`),
+        )?.[1];
+        expect(hex, `--${token} must be defined`).toBeDefined();
+        expect(hex?.slice(1, 3), `--${token} red equals green`).toBe(
+          hex?.slice(3, 5),
+        );
+        expect(hex?.slice(3, 5), `--${token} green equals blue`).toBe(
+          hex?.slice(5, 7),
+        );
+      }
+    });
+  }
+});
+
+describe("canonical dark spine", () => {
   it("guards reading comfort at the INK, not at the canvas", () => {
     // A deep canvas is fine — glare comes from the ratio between ink and ground,
     // not from the ground alone. So the floor here is loose, and the real guard
@@ -388,7 +431,7 @@ describe("input tokens carry two DIFFERENT roles and must not be conflated", () 
 });
 
 describe("canonical light spine", () => {
-  it("is white paper on a tinted canvas, never white-on-white", () => {
+  it("is white paper on a neutral canvas, never white-on-white", () => {
     const canvas = hslIn(LIGHT, "hsl-background");
     const card = hslIn(LIGHT, "hsl-card");
     expect(card.l, "the card is paper").toBe(100);
@@ -396,22 +439,11 @@ describe("canonical light spine", () => {
       canvas.l,
       "a pure-white canvas gives a white card nothing to lift off",
     ).toBeLessThan(97);
-    // Mirrors the dark spine exactly: HUE is the brand constraint and is pinned;
-    // saturation is a taste dial and is not. How far the surfaces lean is a live
-    // product decision, so asserting a band here only guarantees this test fails
-    // the next time that decision is revisited.
-    expect(canvas.h, "canvas hue sits in the indigo band").toBeGreaterThanOrEqual(
-      215,
-    );
-    expect(canvas.h).toBeLessThanOrEqual(260);
-    expect(canvas.s, "a colourless canvas has left the brand behind").toBeGreaterThan(
-      5,
-    );
   });
 
   it("ALTERNATES paper and well — light elevation is not a darkening ramp", () => {
-    // Deliberately not monotonic. On a tinted canvas a raised plane is paper and
-    // a recessed one is a tinted well, so the ladder alternates. Pinning it stops
+    // Deliberately not monotonic. On a neutral canvas a raised plane is paper and
+    // a recessed one is a neutral well, so the ladder alternates. Pinning it stops
     // a well-meaning "fix" from forcing a strictly-ordered ramp, which is exactly
     // what produced the white-on-white flatness this palette replaced.
     const paper = ["md3-surface-container", "md3-surface-container-highest"];

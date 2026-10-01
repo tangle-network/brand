@@ -17,8 +17,8 @@ function formatTime(date: Date): string {
 }
 
 /**
- * The single user message bubble — a quiet, right-aligned fill on the muted
- * surface (no border, no loud fill, no uppercase label). The timestamp sits
+ * The single user message bubble — a quiet, right-aligned card with a subtle
+ * semantic border (no loud fill, no uppercase label). The timestamp sits
  * beside the bubble and appears on hover, so it costs no height. Used by both
  * the run/message list (session-model `parts`) and AgentTimeline (direct
  * `content`/`timestamp`).
@@ -36,8 +36,10 @@ export const UserMessage = memo(
 
     return (
       <div className="flex justify-end">
-        <div className="group flex max-w-[78%] flex-col items-end gap-2">
-          <div className="relative w-full rounded-2xl bg-muted/50 px-4 py-3">
+        <div className="group flex min-w-0 max-w-[78%] flex-col items-end gap-2">
+          <div
+            className="relative w-full min-w-0 rounded-2xl border border-border bg-card px-4 py-3"
+          >
             {timestamp ? (
               <span
                 data-user-message-time=""
@@ -46,7 +48,7 @@ export const UserMessage = memo(
                 {formatTime(timestamp)}
               </span>
             ) : null}
-            <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[1.5] text-foreground">
+            <div className="break-words whitespace-pre-wrap text-[var(--font-size-base)] leading-[1.5] text-foreground">
               {text}
             </div>
           </div>
