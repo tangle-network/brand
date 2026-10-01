@@ -114,7 +114,8 @@
     }
   },
   "scripts": {
-    "build": "tsdown && node ../../scripts/validate-dist.mjs",
+    "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",
+    "gen:openui-schema": "node scripts/generate-openui-validators.mjs",
     "dev": "tsdown --watch"
   },
   "dependencies": {
