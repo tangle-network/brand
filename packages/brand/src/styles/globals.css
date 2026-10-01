@@ -201,7 +201,7 @@
 }
 .tangle-prose hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 1.2em 0; }
 .tangle-prose :not(pre) > code {
-  background: var(--md3-surface-container-high);
+  background: hsl(var(--muted));
   padding: 0.12em 0.36em;
   border-radius: 4px;
   font-size: 0.9em;
@@ -235,3 +235,4 @@
 .tangle-prose th:not(:first-child), .tangle-prose td:not(:first-child) {
   border-left: 1px solid var(--border-subtle);
 }
+
