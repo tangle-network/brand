@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.12.0
+
+### Minor Changes
+
+- c7953d8: Allow document and file editors to compare controlled drafts against a separate persisted baseline.
+  This preserves unsaved changes when a host switches between Source and Rich views.
+
 ## 11.11.8
 
 ### Patch Changes
