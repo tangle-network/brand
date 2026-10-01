@@ -1,4 +1,7 @@
 import Ajv from "ajv";
+import type { OpenUIComponentNode } from "./openui-artifact-renderer";
+
+export type { OpenUIComponentNode } from "./openui-artifact-renderer";
 
 /** JSON nodes the maintained OpenUI renderer can display. */
 export const OPENUI_NODE_TYPES = [
@@ -101,8 +104,12 @@ export interface OpenUISchemaIssue {
   message: string;
 }
 
-export type OpenUISchemaValidation =
+type OpenUISchemaCheck =
   | { ok: true }
+  | { ok: false; issue: OpenUISchemaIssue };
+
+export type OpenUISchemaValidation<T> =
+  | { ok: true; value: T }
   | { ok: false; issue: OpenUISchemaIssue };
 
 const nodeTypes: ReadonlySet<string> = new Set(OPENUI_NODE_TYPES);
@@ -155,14 +162,15 @@ export function findUnsupportedOpenUINode(value: unknown): OpenUISchemaIssue | n
 }
 
 /** Validate one model-authored JSON node before a product persists or spends on it. */
-export function validateOpenUIJsonNode(value: unknown): OpenUISchemaValidation {
+export function validateOpenUIJsonNode(value: unknown): OpenUISchemaValidation<OpenUIComponentNode> {
   const unsupported = findUnsupportedOpenUINode(value);
   if (unsupported) return { ok: false, issue: unsupported };
-  return validateNode(value as Record<string, unknown>, "$", 0);
+  const result = validateNode(value as Record<string, unknown>, "$", 0);
+  return result.ok ? { ok: true, value: value as OpenUIComponentNode } : result;
 }
 
 /** Validate the renderer's single-node or nonempty node-array artifact shape. */
-export function validateOpenUIJsonArtifact(value: unknown): OpenUISchemaValidation {
+export function validateOpenUIJsonArtifact(value: unknown): OpenUISchemaValidation<OpenUIComponentNode | OpenUIComponentNode[]> {
   if (!Array.isArray(value)) return validateOpenUIJsonNode(value);
   if (value.length === 0) {
     return { ok: false, issue: { path: "$", message: "An OpenUI artifact needs at least one node." } };
@@ -176,10 +184,10 @@ export function validateOpenUIJsonArtifact(value: unknown): OpenUISchemaValidati
       };
     }
   }
-  return { ok: true };
+  return { ok: true, value: value as OpenUIComponentNode[] };
 }
 
-function validateNode(record: Record<string, unknown>, path: string, depth: number): OpenUISchemaValidation {
+function validateNode(record: Record<string, unknown>, path: string, depth: number): OpenUISchemaCheck {
   if (depth > 32) return { ok: false, issue: { path, message: "OpenUI exceeds the 32-level limit." } };
   if (record.type === "stack" || record.type === "grid" || record.type === "card") {
     if (Array.isArray(record.children)) {

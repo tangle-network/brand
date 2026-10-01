@@ -27,8 +27,8 @@ describe("OpenUI JSON contract", () => {
   it("advertises every renderer node and accepts nested JSON with primitive cells", () => {
     expect(OPENUI_NODE_TYPES).toHaveLength(13);
     expect(OPENUI_NODE_JSON_SCHEMA.$defs.node.oneOf).toHaveLength(13);
-    expect(validateOpenUIJsonNode(validPage)).toEqual({ ok: true });
-    expect(validateOpenUIJsonArtifact([validPage, { type: "text", text: "Afterword" }])).toEqual({ ok: true });
+    expect(validateOpenUIJsonNode(validPage)).toMatchObject({ ok: true, value: validPage });
+    expect(validateOpenUIJsonArtifact([validPage, { type: "text", text: "Afterword" }])).toMatchObject({ ok: true });
   });
 
   it("rejects an unsupported top-level or nested section before it can be dropped", () => {
