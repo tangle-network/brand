@@ -73,8 +73,8 @@ describe("Markdown", () => {
     const inlineCode = container.querySelector("code");
 
     expect(inlineCode).toHaveClass("border-border");
-    expect(inlineCode).toHaveClass("bg-card");
-    expect(inlineCode).toHaveClass("text-[var(--code-keyword)]");
+    expect(inlineCode).toHaveClass("bg-muted");
+    expect(inlineCode).toHaveClass("text-foreground");
   });
 
   it("passes parsed URLs through the typed transform hook", () => {
@@ -101,3 +101,4 @@ describe("Markdown", () => {
     );
   });
 });
+
