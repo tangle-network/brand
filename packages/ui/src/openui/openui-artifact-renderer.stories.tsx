@@ -28,6 +28,9 @@ export const NestedCard: Story = {
 
 export const UnsupportedSavedNode: Story = {
   args: {
-    schema: { type: "section", children: [{ type: "text", text: "This content must not disappear silently." }] } as never,
+    schema: {
+      type: "card",
+      children: [{ type: "section", children: [{ type: "text", text: "This content must not disappear silently." }] }],
+    } as never,
   },
 };

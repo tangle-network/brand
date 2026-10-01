@@ -498,7 +498,7 @@ export function OpenUIArtifactRenderer({
   if (issue) {
     return (
       <div role="alert" className={cn("rounded-[var(--radius-xl)] border border-border bg-card p-5 text-sm text-foreground", className)}>
-        Unsupported view at {issue.path}: {issue.message}
+        Cannot display this saved view. {issue.message} Path: {issue.path}.
       </div>
     );
   }
