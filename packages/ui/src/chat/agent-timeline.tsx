@@ -101,30 +101,35 @@ export interface AgentTimelineProps {
   collapseAfter?: number;
 }
 
-const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; icon: typeof Info }> = {
+const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; supportingText: string; icon: typeof Info }> = {
   default: {
     card: "border-border bg-card",
     text: "text-foreground",
+    supportingText: "text-muted-foreground",
     icon: CircleDot,
   },
   info: {
     card: "border-[var(--surface-info-border)] bg-[var(--surface-info-bg)]",
     text: "text-[var(--surface-info-text)]",
+    supportingText: "text-[var(--surface-info-text)]",
     icon: Info,
   },
   success: {
     card: "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)]",
     text: "text-[var(--surface-success-text)]",
+    supportingText: "text-[var(--surface-success-text)]",
     icon: CheckCircle2,
   },
   warning: {
     card: "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)]",
     text: "text-[var(--surface-warning-text)]",
+    supportingText: "text-[var(--surface-warning-text)]",
     icon: AlertTriangle,
   },
   error: {
     card: "border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)]",
     text: "text-[var(--surface-danger-text)]",
+    supportingText: "text-[var(--surface-danger-text)]",
     icon: AlertTriangle,
   },
 };
@@ -191,7 +196,7 @@ function StatusCard({ item }: { item: AgentTimelineStatusItem }) {
         <div className="min-w-0">
           <div className={cn("text-sm font-medium", tone.text)}>{item.label}</div>
           {item.detail && (
-            <div className="mt-0.5 text-sm text-muted-foreground">{item.detail}</div>
+            <div className={cn("mt-0.5 text-sm", tone.supportingText)}>{item.detail}</div>
           )}
         </div>
       </div>
@@ -208,12 +213,12 @@ function ArtifactCard({ item }: { item: AgentTimelineArtifactItem }) {
           {item.icon ?? <FileText className="h-4 w-4" />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium text-foreground">{item.title}</div>
+          <div className={cn("text-sm font-medium", tone.text)}>{item.title}</div>
           {item.description && (
-            <div className="mt-1 text-sm text-muted-foreground">{item.description}</div>
+            <div className={cn("mt-1 text-sm", tone.supportingText)}>{item.description}</div>
           )}
           {item.meta && (
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <div className={cn("mt-2 flex flex-wrap items-center gap-2 text-xs", tone.supportingText)}>
               {item.meta}
             </div>
           )}
