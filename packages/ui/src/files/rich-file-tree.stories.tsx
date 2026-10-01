@@ -8,7 +8,7 @@ const meta: Meta<typeof RichFileTree> = {
   parameters: { layout: "padded", backgrounds: { default: "dark" } },
   decorators: [
     (Story) => (
-      <div className="w-[420px] h-[480px] rounded-xl border border-border bg-card overflow-hidden">
+      <div className="w-full max-w-[420px] h-[480px] rounded-xl border border-border bg-card overflow-hidden">
         <Story />
       </div>
     ),

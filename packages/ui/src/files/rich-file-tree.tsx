@@ -74,8 +74,7 @@ export interface RichFileTreeProps {
 
   /**
    * Theme override map for shadow-DOM CSS variables. Most consumers can
-   * leave this — defaults derive from the host element's computed
-   * tokens via `cssVarFromToken()`.
+   * leave this — defaults reference the host's canonical color tokens.
    */
   themeOverrides?: Partial<RichFileTreeThemeVars>;
 
@@ -101,7 +100,7 @@ export interface RichFileTreeThemeVars {
 }
 
 /**
- * Map a sandbox-ui design token (e.g. `--accent-surface-soft`) to a CSS
+ * Map a Brand design token (e.g. `--accent-surface-soft`) to a CSS
  * `var(--token)` reference. Pierre's CSS-variable surface accepts any
  * valid CSS color expression, so passing `var(--token)` lets the host
  * theme propagate through without us having to read computed styles.
@@ -113,10 +112,10 @@ function cssVarFromToken(name: string): string {
 const DEFAULT_THEME: RichFileTreeThemeVars = {
   selectedBg: cssVarFromToken("--accent-surface-soft"),
   selectedFg: cssVarFromToken("--accent-text"),
-  fg: cssVarFromToken("--foreground"),
-  hoverBg: cssVarFromToken("--muted"),
-  border: cssVarFromToken("--border"),
-  mutedFg: cssVarFromToken("--muted-foreground"),
+  fg: cssVarFromToken("--text-primary"),
+  hoverBg: cssVarFromToken("--bg-hover"),
+  border: cssVarFromToken("--border-default"),
+  mutedFg: cssVarFromToken("--text-muted"),
 };
 
 /**
@@ -210,10 +209,14 @@ export function RichFileTree({
     () => ({
       ["--trees-selected-bg-override" as string]: theme.selectedBg,
       ["--trees-selected-fg-override" as string]: theme.selectedFg,
+      ["--trees-focus-ring-color-override" as string]: theme.selectedFg,
+      ["--trees-selected-focused-border-color-override" as string]: theme.selectedFg,
+      ["--trees-bg-override" as string]: cssVarFromToken("--bg-root"),
+      ["--trees-input-bg-override" as string]: cssVarFromToken("--bg-input"),
       ["--trees-fg-override" as string]: theme.fg,
-      ["--trees-hover-bg-override" as string]: theme.hoverBg,
+      ["--trees-bg-muted-override" as string]: theme.hoverBg,
       ["--trees-border-color-override" as string]: theme.border,
-      ["--trees-muted-fg-override" as string]: theme.mutedFg,
+      ["--trees-fg-muted-override" as string]: theme.mutedFg,
       height: height ?? "100%",
       ...style,
     }),
