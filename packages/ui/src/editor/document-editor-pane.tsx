@@ -37,6 +37,8 @@ export interface DocumentEditorPaneProps
   tabs?: ArtifactPaneProps["tabs"];
   toolbar?: ReactNode;
   markdown?: string;
+  /** Persisted baseline when the host controls the current markdown draft. */
+  savedMarkdown?: string;
   /** Transform Markdown links and images through the shared URL policy. */
   urlTransform?: UrlTransform;
   mode?: DocumentEditorMode;
@@ -191,6 +193,7 @@ export function DocumentEditorPane({
   tabs,
   toolbar,
   markdown = "",
+  savedMarkdown,
   urlTransform,
   mode,
   defaultMode = "preview",
@@ -212,7 +215,7 @@ export function DocumentEditorPane({
     useState<DocumentEditorMode>(defaultMode);
   const activeMode = mode ?? uncontrolledMode;
   const isCollaborative = backend === "collaborative" && Boolean(collaboration);
-  const isDirty = normalizeMarkdown(draft) !== normalizeMarkdown(markdown);
+  const isDirty = normalizeMarkdown(draft) !== normalizeMarkdown(savedMarkdown ?? markdown);
   const saveStateLabel = readOnly
     ? "Read only"
     : isCollaborative

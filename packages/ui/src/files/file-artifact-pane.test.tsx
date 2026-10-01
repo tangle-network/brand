@@ -231,3 +231,26 @@ describe("parseCsv", () => {
     expect(parseCsv("\n\n")).toEqual([]);
   });
 });
+
+describe("FileArtifactPane controlled drafts", () => {
+  it("retains a host draft and saves it against the persisted baseline", async () => {
+    const onSave = vi.fn();
+    const draft = "# Unsaved source draft";
+    const props = {
+      filename: "notes.md",
+      content: draft,
+      editor: { enabled: true, savedContent: "# Saved notes", onSave },
+    };
+    const view = render(<FileArtifactPane {...props} />);
+    const save = await screen.findByRole("button", { name: "Save changes" });
+    expect(screen.getByRole("heading", { name: "Unsaved source draft" })).toBeVisible();
+    expect(screen.getByText("Unsaved changes")).toBeVisible();
+    expect(save).toBeEnabled();
+    fireEvent.click(save);
+    expect(onSave).toHaveBeenCalledWith(draft);
+
+    view.rerender(<FileArtifactPane {...props} editor={{ ...props.editor, savedContent: draft }} />);
+    expect(screen.getByText("Saved")).toBeVisible();
+    expect(save).toBeDisabled();
+  });
+});
