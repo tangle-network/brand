@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useId } from 'react'
 import { Input, Textarea } from './input'
+import { Label } from './label'
 
 const meta: Meta<typeof Input> = {
   title: 'Primitives/Input',
@@ -110,4 +112,30 @@ export const Overview: Story = {
       />
     </div>
   ),
+}
+
+export const FieldRelationships: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Repeated labels must focus their own fields. Inspect accessible descriptions: caller help, hints, and errors coexist. The final field uses an explicit ID and the standalone shared Label.',
+      },
+    },
+  },
+  render: function FieldRelationships() {
+    const id = useId()
+    const descriptionId = `${id}-instructions`
+    return (
+      <div className="flex w-96 flex-col gap-4">
+        <p id={descriptionId}>Shared instructions: choose a descriptive name.</p>
+        <Input label="Name" hint="First name." aria-describedby={descriptionId} />
+        <Input label="Name" hint="Second name." error="A name is required." aria-describedby={descriptionId} />
+        <Textarea label="Name" hint="Explain the name." error="More detail is needed." aria-describedby={descriptionId} />
+        <div className="space-y-1.5">
+          <Label htmlFor={`${id}-explicit`}>External label</Label>
+          <Input id={`${id}-explicit`} hint="Explicit field ID is preserved." />
+        </div>
+      </div>
+    )
+  },
 }
