@@ -92,20 +92,10 @@ export const OPENUI_NODE_JSON_SCHEMA = {
       align: { enum: ["start", "center", "end", "stretch"] }, wrap: boolean, children,
     }, ["children"]),
     grid: node("grid", { columns: { enum: [1, 2, 3, 4] }, gap, children }, ["children"]),
-    card: {
-      ...node("card", {
-        title: string, description: string, eyebrow: string,
-        badge: { $ref: "#/$defs/badge" }, actions, children,
-      }),
-      anyOf: [
-        { required: ["title"], properties: { title: { type: "string", pattern: "\\S" } } },
-        { required: ["description"], properties: { description: { type: "string", pattern: "\\S" } } },
-        { required: ["eyebrow"], properties: { eyebrow: { type: "string", pattern: "\\S" } } },
-        { required: ["badge"] },
-        { required: ["actions"] },
-        { required: ["children"] },
-      ],
-    },
+    card: node("card", {
+      title: string, description: string, eyebrow: string,
+      badge: { $ref: "#/$defs/badge" }, actions, children,
+    }),
   },
 } as const;
 

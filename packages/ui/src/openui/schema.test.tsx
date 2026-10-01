@@ -51,11 +51,10 @@ describe("OpenUI JSON contract", () => {
       .toMatchObject({ ok: false, issue: { path: "$.rows[0].hidden" } });
   });
 
-  it("rejects arrays passed as a single node and empty cards", () => {
+  it("rejects arrays passed as a single node while keeping optional card fields", () => {
     expect(validateOpenUIJsonNode([{ type: "text", text: "ok" }]))
       .toMatchObject({ ok: false, issue: { path: "$" } });
-    expect(validateOpenUIJsonNode({ type: "card" }).ok).toBe(false);
-    expect(validateOpenUIJsonNode({ type: "card", title: " " }).ok).toBe(false);
+    expect(validateOpenUIJsonNode({ type: "card" }).ok).toBe(true);
     expect(validateOpenUIJsonNode({ type: "card", title: "A result" }).ok).toBe(true);
   });
 
