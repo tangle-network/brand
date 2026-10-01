@@ -75,7 +75,7 @@ export const Markdown = memo(({ children, className, urlTransform }: MarkdownPro
               return (
                 <code
                   className={cn(
-                    "px-1.5 py-0.5 rounded border border-border bg-card text-[var(--code-keyword)] text-[0.85em] font-mono",
+                    "px-1.5 py-0.5 rounded border border-border bg-muted text-foreground text-[0.85em] font-mono",
                     codeClass,
                   )}
                   {...rest}
@@ -99,3 +99,4 @@ export const Markdown = memo(({ children, className, urlTransform }: MarkdownPro
   );
 });
 Markdown.displayName = "Markdown";
+
