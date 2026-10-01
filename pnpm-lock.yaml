@@ -265,9 +265,12 @@ importers:
 
   packages/ui:
     dependencies:
+      '@pierre/theme':
+        specifier: 1.1.0
+        version: 1.1.0
       '@pierre/trees':
         specifier: 1.0.0-beta.6
-        version: 1.0.0-beta.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 1.0.0-beta.6(@pierre/theme@1.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@radix-ui/react-avatar':
         specifier: ^1.2.6
         version: 1.2.6(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1108,6 +1111,10 @@ packages:
     resolution: {integrity: sha512-VPoCAhKvCQTlG7vxqaBXcmuvbh77BfnGXj8g0pbvVXpm1F/R8rDVwqIWcEbMzrI1JvJlm8v7T9uMVQb6UctMRg==}
     cpu: [x64]
     os: [win32]
+
+  '@pierre/theme@1.1.0':
+    resolution: {integrity: sha512-GC2OWTAfTIIWWYhPCygwG8t2EtePQkRfON4MI2rwIkJylmiyqIttJID2dCL8sUD8cNdEvYkEyfEHHKMeCiDLoQ==}
+    engines: {vscode: ^1.0.0}
 
   '@pierre/theming@1.0.0':
     resolution: {integrity: sha512-WsdrnhKfjeyXGDikZmN9pkpeZ5S/cl6EE72feiSc0tlynT1tMYqXqouhuv/foK+PY9OEnebOAVRQn3+rAstR8g==}
@@ -4659,14 +4666,17 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.21.2':
     optional: true
 
-  '@pierre/theming@1.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@pierre/theme@1.1.0': {}
+
+  '@pierre/theming@1.0.0(@pierre/theme@1.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     optionalDependencies:
+      '@pierre/theme': 1.1.0
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@pierre/trees@1.0.0-beta.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@pierre/trees@1.0.0-beta.6(@pierre/theme@1.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@pierre/theming': 1.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@pierre/theming': 1.0.0(@pierre/theme@1.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       preact: 11.0.0-beta.0
       preact-render-to-string: 6.6.5(preact@11.0.0-beta.0)
       react: 19.3.0
