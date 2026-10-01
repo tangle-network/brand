@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.11.3
+
+### Patch Changes
+
+- 717bb42: Pass Markdown URL transforms through file and rich editor previews.
+- 4c8afe1: Export the renderer's OpenUI JSON schema and validator, and show unsupported saved nodes explicitly.
+
 ## 11.11.2
 
 ### Patch Changes
