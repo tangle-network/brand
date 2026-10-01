@@ -12,7 +12,7 @@ Tangle has two core themes:
 `@tangle-network/brand` owns:
 
 - Logo and knot usage.
-- Color, type, radius, shadow, status, and semantic CSS tokens.
+- Color, type, radius, motion, shadow, status, and semantic CSS tokens.
 - Theme contracts for dark, light, and product-specific surfaces.
 - Brand assets and guidance for generated atmospheres, diagrams, and editorial imagery.
 
@@ -28,16 +28,26 @@ Consumer apps own:
 - Screenshots, demos, and diagrams using real UI and real data.
 - Page-level copy, navigation, and product hierarchy.
 
+## Theme Contract and Authoring
+
+Author shared decisions in Brand's `tokens.css`; named product overrides live in `named-themes.css`. `theme.css` registers that contract for Tailwind, including inline variable-dependent utilities and checked font/radius defaults. HSL channel aliases and full-color aliases are distinct public APIs; do not change their value formats or copy their palettes into app globals.
+
+Brand stays dark-default. Explicit `.light` / `.dark` or `data-theme="light"` / `"dark"` boundaries must work on the document and in nested opposite-mode islands. The existing named families retain their palettes and mode names. Intelligence remains dark-only under `.dark[data-theme="intelligence"]`; switching to light keeps its identity and falls back to canonical light. Existing legacy `vault` / `dawn` light markers remain supported, with an explicit `.dark` on the same element taking precedence. Do not author contradictory mode markers on one boundary.
+
+The one light-default compatibility projection exists for Agent App's established default contract. Brand owns its generator, export and freshness check. Its values derive from canonical CSS, not from a maintained compatibility palette. It leaves the host's `--radius` alone. Importing it is an explicit consumer migration, not permission to layer it over another global theme system; component-specific consumer CSS still needs reconciliation. See [the package contract](../packages/brand/README.md#existing-light-default-consumers).
+
+UI's root theme control must tolerate SSR and unavailable storage, update its resolved system preference, and preserve named product identities. Components consume semantic variables in their own scope; syntax highlighting must not sample document-root colors. A mode preference is not a product identity, and a nested explicit mode is not a request to change the whole document.
+
+The optional `ladders.css` / `system.css` remain opt-in. This contract does not introduce a theme provider, a token DSL, or an automatic rollout of those styles. Shared motion variables do not apply animations by themselves and must respect reduced motion when consumed.
+
 ## Visual Direction
 
-Purple is the production identity. Dark surfaces carry the main product story. Light surfaces carry reading, research, docs, and quieter reference material.
-
-Dark means deep violet/navy, not black. Pure black should be reserved for depth accents, image contrast, or rare technical surfaces where the content needs it.
+Indigo/purple is the interaction and brand accent. The canonical product surface ladder is neutral grey, with a dark canvas above pure black and light paper cards on a grey canvas. Named product themes may intentionally retint their surfaces; they are explicit opt-ins, not copies of a second global palette.
 
 Use:
 
-- Deep violet, indigo, periwinkle, paper, and ink as the main brand range.
-- A dark surface ladder with visible purple/navy temperature.
+- Indigo, periwinkle, neutral surfaces, paper, and ink as the main brand range.
+- Distinct surface planes with visible fill and border relationships.
 - Smooth wave assets for hero, launch, and brand-system work.
 - Light wave and paper assets for research pages and editorial graphics.
 - Real product UI, trace diagrams, or screenshot composites when explaining the product.
@@ -46,7 +56,7 @@ Use:
 Avoid:
 
 - Green as the production identity.
-- Near-black as the default canvas.
+- Pure black as the default canvas.
 - Tiny eyebrow labels above headings.
 - Taxonomy chips as design.
 - Traffic-light rows, fake status boards, and generic agent step cards as marketing graphics.
@@ -150,9 +160,10 @@ For run and tool UI:
 Before a brand, marketing, or component PR merges:
 
 - The first viewport has no tiny eyebrow label.
-- Purple/dark remains the production mood unless the surface is explicitly editorial.
+- Indigo accents and dark product surfaces remain the production mood unless the surface is explicitly editorial.
 - The page has a real visual asset, diagram, screenshot, or composition.
 - Product hierarchy does not mix products, open-source tools, and example agents at equal weight.
 - Component stories do not create new visual precedent for stale UI.
 - Any new token has a cross-app reason.
 - Any new reusable component has at least one consuming product or a named migration target.
+- Token changes regenerate the compatibility stylesheet and pass its generation check; mode changes are exercised in nested and named scopes.

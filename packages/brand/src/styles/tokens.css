@@ -30,10 +30,26 @@
  * work here. The hairline is about 1.5:1 against the resting card — quiet by design,
  * enough to state an edge without drawing a box around every panel.
  */
+/* Seed a complete baseline on every supported boundary BEFORE mode overrides.
+ * Inherited var() aliases are already substituted at their parent; declaring
+ * them here lets a nested light/dark/named scope resolve its own palette.
+ * Light scopes are deliberately included in this baseline, then override it
+ * below. Named themes only author their product-specific differences. */
 :root,
 [data-sandbox-ui],
+[data-sandbox-theme="vault"],
+[data-sandbox-theme="dawn"],
 [data-theme="dark"],
+[data-theme="light"],
+[data-theme="aubergine"],
+[data-theme="aubergine-light"],
+[data-theme="arena"],
+[data-theme="arena-light"],
+[data-theme="tangle-dark"],
+[data-theme="tangle-light"],
+.light,
 .dark {
+  color-scheme: dark;
   --md3-surface: #161616;                   /* L0 page canvas */
   --md3-surface-dim: #101010;               /* recessed page */
   --md3-surface-bright: #3b3b3b;
@@ -66,6 +82,7 @@
   --md3-on-secondary-container: #E8E5FF;
 
   --md3-tertiary: #10B981;
+  --md3-tertiary-container: var(--surface-success-bg);
   --md3-outline: #8e8e8e;
   --md3-outline-variant: #4c4c4c;
 
@@ -390,7 +407,8 @@
   --tool-card-py: 0.5rem;
   --tool-icon-size: 1.75rem;
 
-  /* Syntax highlighting — override per-theme in vault section */
+  /* Syntax highlighting — the light palette is authored below. */
+  --code-header-bg: hsl(var(--hsl-background));
   --syntax-comment: #8b8fbc;
   --syntax-keyword: #A78FFF;
   --syntax-string: #10b981;
@@ -401,7 +419,29 @@
   --syntax-variable: #C4C0D8;
   --syntax-foreground: #E8E6F6;
 
-  /* Transitions */
+  /* Shared motion vocabulary, previously authored by the light-default Agent
+   * App consumer. These are tokens only, not automatic animation classes. */
+  --duration-instant: 90ms;
+  --duration-fast: 150ms;
+  --duration-base: 240ms;
+  --duration-slow: 360ms;
+  --duration-stream: 420ms;
+  --duration-arrive: 600ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-expo: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-control: var(--duration-fast) var(--ease-standard);
+  --motion-surface: var(--duration-base) var(--ease-entrance);
+  --motion-dismiss: var(--duration-instant) var(--ease-exit);
+  --motion-stream: var(--duration-stream) var(--ease-expo);
+  --motion-arrive: var(--duration-arrive) var(--ease-expo);
+  --stagger-step: 50ms;
+  --stagger-index: 0;
+  --arrive-distance: 8px;
+  --stream-blur: 4px;
+
+  /* Transitions — retain the existing Brand timings. */
   --transition-fast: 0.1s ease;
   --transition-default: 0.16s ease;
   --transition-medium: 0.24s ease;
@@ -416,10 +456,25 @@
  * `[data-theme="light"]` / `.light` switch. Both blocks are single-attribute/
  * class selectors, and this one is later in source order, so when an element
  * carries both `data-sandbox-ui` (dark) and `data-theme="light"`, light wins. */
-[data-sandbox-theme="vault"],
+[data-sandbox-theme="vault"]:where(:not(.dark)),
+[data-sandbox-theme="dawn"]:where(:not(.dark)),
 [data-theme="light"],
+[data-theme="aubergine-light"],
+[data-theme="arena-light"],
+[data-theme="tangle-light"],
 .light {
+  color-scheme: light;
   /* Light theme — neutral surfaces with purple accents */
+  --code-header-bg: color-mix(in srgb, hsl(var(--hsl-muted)) 50%, transparent);
+  --syntax-foreground: #24292f;
+  --syntax-comment: #57606a;
+  --syntax-keyword: #6d28d9;
+  --syntax-string: #047857;
+  --syntax-function: #1d4ed8;
+  --syntax-number: #92400e;
+  --syntax-meta: #7c3aed;
+  --syntax-variable: #24292f;
+  --syntax-error: #b91c1c;
 
   /* MD3 surface hierarchy */
   /* The light ladder ALTERNATES; it is not monotonic, and that is deliberate.
@@ -752,7 +807,8 @@
 /* Light: the accent is the indigo fill (#4c3fc6, 7.41:1 on white) and the tier
  * ramp runs light to dark. `[data-theme$="-light"]` covers the named light
  * themes, which would otherwise inherit the dark ramp from :root. */
-[data-sandbox-theme="vault"],
+[data-sandbox-theme="vault"]:where(:not(.dark)),
+[data-sandbox-theme="dawn"]:where(:not(.dark)),
 [data-theme="light"],
 .light,
 [data-theme$="-light"] {
@@ -761,4 +817,29 @@
   --chart-tier-b: #7c7fe3;
   --chart-tier-a: #5b5bd6;
   --chart-tier-s: #272962;
+}
+
+
+/* Motion is opt-in at the component, but its reduced-motion preference is
+ * shared. Re-declare composites at the same boundary as their durations. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  .dark,
+  .light,
+  [data-sandbox-ui],
+  [data-sandbox-theme],
+  [data-theme] {
+    --duration-instant: 0ms;
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+    --duration-stream: 0ms;
+    --duration-arrive: 0ms;
+    --stagger-step: 0ms;
+    --motion-control: var(--duration-fast) var(--ease-standard);
+    --motion-surface: var(--duration-base) var(--ease-entrance);
+    --motion-dismiss: var(--duration-instant) var(--ease-exit);
+    --motion-stream: var(--duration-stream) var(--ease-expo);
+    --motion-arrive: var(--duration-arrive) var(--ease-expo);
+  }
 }

@@ -1,0 +1,116 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Brand mode contract browser checks</title>
+<h1>Brand mode contract</h1>
+<p>Tests actual CSS in isolated documents. No React, Tailwind compiler, or test-library dependency.</p>
+<pre id="results">Running…</pre>
+<script type="module">
+const results = [];
+const equal = (actual, expected, name) => {
+  if (actual !== expected) throw new Error(`${name}: ${actual} !== ${expected}`);
+  results.push(name);
+};
+const frames = [];
+try {
+  for (const compat of [false, true]) {
+    const frame = document.createElement('iframe');
+    frames.push(frame);
+    document.body.append(frame);
+    const doc = frame.contentDocument;
+    doc.open();
+    doc.write('<!doctype html><html><head></head><body></body></html>');
+    doc.close();
+    for (const name of compat ? ['legacy-light.css'] : ['tokens.css', 'named-themes.css']) {
+      // A runner may supply the exact source text when file URLs are disabled.
+      if (window.themeContractCss?.[name]) {
+        const sheet = doc.createElement('style');
+        sheet.textContent = window.themeContractCss[name];
+        doc.head.append(sheet);
+        continue;
+      }
+      await new Promise((resolve, reject) => {
+        const link = doc.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = new URL(`../src/styles/${name}`, location.href);
+        link.onload = resolve; link.onerror = reject;
+        doc.head.append(link);
+      });
+    }
+    const style = (el) => frame.contentWindow.getComputedStyle(el);
+    const value = (el, token) => style(el).getPropertyValue(token).trim();
+    const root = doc.documentElement;
+    const modeLabel = compat ? 'compat' : 'brand';
+    equal(style(root).colorScheme, compat ? 'light' : 'dark', `${modeLabel}: default`);
+    // Pin a host radius in a layer. Only the legacy projection leaves it owned
+    // by the app; canonical Brand intentionally supplies its own --radius.
+    const host = doc.createElement('style');
+    host.textContent = '@layer base { :root { --radius: 19px; } }';
+    doc.head.append(host);
+    equal(value(root, '--radius'), compat ? '19px' : '0.5rem', `${modeLabel}: host radius contract`);
+    const variants = [
+      ['class', 'dark', 'dark'], ['class', 'light', 'light'],
+      ['data-theme', 'dark', 'dark'], ['data-theme', 'light', 'light'],
+      ['data-theme', 'aubergine', 'dark'], ['data-theme', 'aubergine-light', 'light'],
+      ['data-theme', 'arena', 'dark'], ['data-theme', 'arena-light', 'light'],
+      ['data-theme', 'tangle-dark', 'dark'], ['data-theme', 'tangle-light', 'light'],
+      ['data-sandbox-theme', 'vault', 'light'], ['data-sandbox-theme', 'dawn', 'light'],
+    ];
+    for (const [attr, name, mode] of variants) {
+      root.removeAttribute('class'); root.removeAttribute('data-theme'); root.removeAttribute('data-sandbox-theme');
+      root.setAttribute(attr, name);
+      equal(style(root).colorScheme, mode, `${modeLabel}: root ${name}`);
+      const expected = new Map(['--card', '--syntax-keyword', '--syntax-foreground', '--surface-success-text', '--font-sans', '--radius-md', '--motion-control'].map(token => [token, value(root, token)]));
+      // The exact same scope must render identically inside BOTH parent modes.
+      root.removeAttribute(attr);
+      for (const parentMode of ['light', 'dark']) {
+        root.className = parentMode;
+        doc.body.innerHTML = `<section><code style="color:var(--syntax-keyword, currentColor)">const</code><span style="background:var(--color-card)">card</span></section>`;
+        const island = doc.querySelector('section');
+        island.setAttribute(attr, name);
+        equal(style(island).colorScheme, mode, `${modeLabel}: ${parentMode} > ${name} mode`);
+        for (const [token, wanted] of expected) {
+          equal(value(island, token), wanted, `${modeLabel}: ${parentMode} > ${name} ${token}`);
+        }
+        const probe = doc.createElement('span');
+        probe.style.backgroundColor = 'hsl(var(--card))';
+        island.append(probe);
+        equal(style(island.querySelector('span')).backgroundColor, style(probe).backgroundColor, `${modeLabel}: ${parentMode} > ${name} precompiled color alias`);
+      }
+    }
+    root.removeAttribute('data-sandbox-theme'); root.className = 'dark'; root.dataset.theme = 'intelligence';
+    equal(value(root, '--md3-surface'), '#0d0a10', `${modeLabel}: Intelligence dark-only surface`);
+    root.className = 'light';
+    equal(value(root, '--md3-surface'), '#eaeaea', `${modeLabel}: Intelligence light fallback`);
+    equal(root.dataset.theme, 'intelligence', `${modeLabel}: Intelligence identity preserved`);
+    root.removeAttribute('data-theme'); root.dataset.sandboxTheme = 'vault'; root.className = 'dark';
+    equal(style(root).colorScheme, 'dark', `${modeLabel}: legacy vault with explicit dark`);
+    root.dataset.sandboxTheme = 'dawn';
+    equal(style(root).colorScheme, 'dark', `${modeLabel}: legacy dawn with explicit dark`);
+    root.removeAttribute('data-sandbox-theme');
+    doc.body.innerHTML = '<section class="light"><code style="color:var(--syntax-keyword, currentColor)">const</code><small style="color:var(--syntax-comment,currentColor)">1</small></section>';
+    const scope = doc.querySelector('section'); const code = doc.querySelector('code');
+    const before = style(code).color;
+    scope.className = 'dark';
+    if (style(code).color === before) throw new Error(`${modeLabel}: class change did not recolor immediately`);
+    results.push(`${modeLabel}: immediate class recoloring without rerender`);
+    scope.className = ''; scope.dataset.theme = 'arena-light';
+    equal(style(code).color, before, `${modeLabel}: immediate named-theme recoloring`);
+    scope.style.setProperty('--syntax-keyword', 'rgb(1, 2, 3)');
+    scope.style.setProperty('--syntax-comment', 'rgb(4, 5, 6)');
+    equal(style(code).color, 'rgb(1, 2, 3)', `${modeLabel}: immediate local syntax override`);
+    equal(style(doc.querySelector('small')).color, 'rgb(4, 5, 6)', `${modeLabel}: line numbers use semantic comment`);
+    const reduced = frame.contentWindow.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    equal(value(scope, '--duration-fast'), reduced ? '0ms' : '150ms', `${modeLabel}: motion preference`);
+    if (reduced && !value(scope, '--motion-control').startsWith('0ms ')) throw new Error('motion composite inherited a stale duration');
+    results.push(`${modeLabel}: motion composite resolves in scope`);
+  }
+  document.documentElement.dataset.result = 'pass';
+  document.querySelector('#results').textContent = `PASS ${results.length} assertions\n${results.join('\n')}`;
+} catch (error) {
+  document.documentElement.dataset.result = 'fail';
+  document.querySelector('#results').textContent = `FAIL after ${results.length} assertions\n${error.stack ?? error}`;
+  console.error(error);
+} finally {
+  frames.forEach(frame => frame.remove());
+}
+</script>
