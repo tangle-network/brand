@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0
+
+### Minor Changes
+
+- 720de9a: Normalize the shared neutral palette and regenerate standalone chart tokens so charts follow the palette. Make user message cards wrap in narrow layouts.
+
+### Patch Changes
+
+- d163fb8: Align the named tangle-dark island with the neutral canonical dark spine while keeping Tangle accents and dark status colors intact.
+
 ## 1.8.2
 
 ### Patch Changes
