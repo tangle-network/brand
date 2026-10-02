@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.14.0
+
+### Minor Changes
+
+- 999438e: Add DialogContent hideCloseButton with a false default. It hides only the built-in close button, preserving Radix dismissal handlers, explicit close actions, variants and refs. Callers that require an explicit choice must still guard Escape/outside events and provide an accessible cancel or completion action.
+
 ## 11.13.1
 
 ### Patch Changes
