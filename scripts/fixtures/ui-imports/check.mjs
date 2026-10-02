@@ -96,6 +96,7 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
       });
       const graph = emittedGraph(result.metafile);
       const reachable = reachableGraph(result.metafile, `ui-imports/${fixture}.mjs`);
+      const initial = reachableGraph(result.metafile, `ui-imports/${fixture}.mjs`, { followDynamic: false });
       assert.equal(graph.external.length, 0, `${fixture}: no externalized dependencies in byte measurements`);
       assert.ok(Object.keys(result.metafile.inputs).every((name) => !name.startsWith("../") && !name.startsWith("/")),
         "consumer must not read workspace source or workspace dependencies");
@@ -104,8 +105,10 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
       const reachableFiles = result.outputFiles.filter((file) => reachablePaths.has(file.path));
       assert.equal(reachableFiles.length, reachable.outputPaths.length, "every reachable resource must be measured");
       const reachableBytes = compressedBytes(reachableFiles.map((file) => file.contents));
+      const initialPaths = new Set(initial.outputPaths.map((name) => resolve(consumerDirectory, name)));
+      const initialBytes = compressedBytes(result.outputFiles.filter((file) => initialPaths.has(file.path)).map((file) => file.contents));
       measurements[fixture] = {
-        bytes, reachableBytes,
+        bytes, reachableBytes, initialBytes, initialGraph: initial,
         orphanBytes: Object.fromEntries(Object.entries(bytes).map(([name, total]) => [name, total - reachableBytes[name]])),
         reachableGraph: reachable,
         chunks: result.outputFiles.length, ...graph,
@@ -139,16 +142,22 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
           assert.ok(id.startsWith(`${consumerDirectory}/`) || id.startsWith("\0"), `Vite input outside clean consumer: ${id}`);
           return [relative(consumerDirectory, id), { bytesInOutput: module.renderedLength }];
         })),
-        imports: [...value.imports, ...value.dynamicImports].map((path) => ({ path, external: !resources.some((resource) => resource.fileName === path) })),
+        imports: [
+          ...value.imports.map((path) => ({ path, kind: "import-statement" })),
+          ...value.dynamicImports.map((path) => ({ path, kind: "dynamic-import" })),
+        ].map((dependency) => ({ ...dependency, external: !resources.some((resource) => resource.fileName === dependency.path) })),
       }]));
       const graph = emittedGraph({ outputs });
       const reachable = reachableGraph({ outputs }, `ui-imports/${fixture}.mjs`);
+      const initial = reachableGraph({ outputs }, `ui-imports/${fixture}.mjs`, { followDynamic: false });
       assert.equal(graph.external.length, 0, "Vite measurements must bundle dependencies");
       const contents = (value) => Buffer.from(value.type === "chunk" ? value.code : value.source);
       const bytes = compressedBytes(resources.map(contents));
       const reachableNames = new Set(reachable.outputPaths);
       const reachableBytes = compressedBytes(resources.filter((value) => reachableNames.has(value.fileName)).map(contents));
-      measurements[fixture] = { bytes, reachableBytes, reachableGraph: reachable, chunks: resources.length, ...graph, forbidden: forbiddenModules(graph) };
+      const initialNames = new Set(initial.outputPaths);
+      const initialBytes = compressedBytes(resources.filter((value) => initialNames.has(value.fileName)).map(contents));
+      measurements[fixture] = { bytes, reachableBytes, initialBytes, initialGraph: initial, reachableGraph: reachable, chunks: resources.length, ...graph, forbidden: forbiddenModules(graph) };
       writeFileSync(join(reports, `${label}-${fixture}.vite-graph.json`), JSON.stringify({ outputs }, null, 2));
       console.log(`UI_IMPORTS_VITE ${label} ${fixture}: all artifacts ${JSON.stringify(bytes)}; reachable ${JSON.stringify(reachableBytes)}; ${graph.modules.length} emitted modules`);
     }
@@ -221,6 +230,11 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
   for (const measurements of [after, afterVite]) {
     assert.ok(measurements.markdown.reachableGraph.modules.some((name) => name.includes("/react-syntax-highlighter/")),
       "the positive-control markdown fixture must retain syntax highlighting");
+    assert.deepEqual(measurements.markdown.initialGraph.modules.filter((name) =>
+      /\/(?:react-syntax-highlighter|highlight\.js|lowlight|prismjs|refractor)\//.test(name)), [],
+    "the initial markdown consumer graph must not fetch the syntax engine");
+    assert.ok(measurements.markdown.initialBytes.gzip < measurements.markdown.reachableBytes.gzip,
+      "the markdown highlighter must occupy a lazy resource");
     for (const peer of ["@tiptap/core", "@tiptap/react"]) {
       assert.ok(measurements.editor.reachableGraph.modules.some((name) => name.includes(`/${peer}/`)), `editor must retain ${peer}`);
     }

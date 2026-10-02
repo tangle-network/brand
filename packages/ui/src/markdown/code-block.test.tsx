@@ -1,16 +1,20 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
+import SyntaxHighlighter from "react-syntax-highlighter";
 import { afterEach, describe, expect, it } from "vitest";
 import { CodeBlock, CopyButton } from "./code-block";
 
 afterEach(cleanup);
 
 describe("CodeBlock scoped semantic colors", () => {
-  it("emits live CSS variables through the real highlighter, not sampled root colors", () => {
+  it("keeps code readable before the renderer loads, then applies live semantic colors and line numbers", async () => {
     const { container } = render(<CodeBlock code={'const message = "hello";'} language="javascript" showLineNumbers />);
-    expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)");
+    expect(container.querySelector("pre code")?.textContent).toBe('const message = "hello";');
+    await waitFor(() => expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)"));
     expect(container.innerHTML).toContain("var(--syntax-string, currentColor)");
     expect(container.innerHTML).toContain("var(--syntax-comment, currentColor)");
+    expect(container.querySelector(".react-syntax-highlighter-line-number")).not.toBeNull();
+    expect(container.querySelector("pre code")?.textContent?.replace(/^1/, "")).toBe('const message = "hello";');
   });
 
   it("inherits a named scope by default without inserting its own mode", () => {
@@ -35,10 +39,12 @@ describe("CodeBlock scoped semantic colors", () => {
     expect(screen.getByRole("button", { name: "Copy example" })).toBeTruthy();
   });
 
-  it("server-renders the same semantic references independent of document theme", () => {
+  it("server-renders readable code with the same semantic references independent of document theme", () => {
     const source = <CodeBlock code="const x = 1" language="javascript" />;
     document.documentElement.className = "dark";
     const dark = renderToString(source);
+    expect(dark).toContain("const x = 1");
+    expect(dark).toContain("var(--syntax-foreground, currentColor)");
     document.documentElement.className = "light";
     expect(renderToString(source)).toBe(dark);
     document.documentElement.removeAttribute("class");
@@ -50,6 +56,34 @@ describe("CodeBlock", () => {
   it("renders the code through the syntax highlighter", () => {
     const { container } = render(<CodeBlock code={"const x = 1;"} language="typescript" />);
     expect(container.querySelector("code")).not.toBeNull();
+  });
+
+  it.each([
+    ["javascript", "const answer = 42;"],
+    ["js", "const answer = 42;"],
+    ["brainfuck", "++[>+++<-]"],
+    ["not-a-language", "const answer = 42;"],
+  ])("keeps the default highlighter's tokens for language %s", async (language, code) => {
+    const baseline = document.createElement("div");
+    baseline.innerHTML = renderToString(<SyntaxHighlighter language={language}>{code}</SyntaxHighlighter>);
+    const expected = Array.from(baseline.querySelectorAll("pre code span"), (span) => span.textContent);
+    expect(expected.length).toBeGreaterThan(0);
+
+    const { container } = render(<CodeBlock code={code} language={language} />);
+    await waitFor(() => expect(container.querySelectorAll("pre code span").length).toBe(expected.length));
+    expect(Array.from(container.querySelectorAll("pre code span"), (span) => span.textContent)).toEqual(expected);
+    expect(container.querySelector("pre code")?.textContent).toBe(code);
+  });
+
+  it("preserves whitespace and line numbering after the renderer loads", async () => {
+    const code = "\tfirst  \n  second\n";
+    const baseline = document.createElement("div");
+    baseline.innerHTML = renderToString(<SyntaxHighlighter language="text" showLineNumbers>{code}</SyntaxHighlighter>);
+    const { container } = render(<CodeBlock code={code} language="text" showLineNumbers />);
+    expect(container.querySelector("pre code")?.textContent).toBe(code);
+    await waitFor(() => expect(container.querySelectorAll(".react-syntax-highlighter-line-number").length)
+      .toBe(baseline.querySelectorAll(".react-syntax-highlighter-line-number").length));
+    expect(container.querySelector("pre code")?.textContent).toBe(baseline.querySelector("pre code")?.textContent);
   });
 
   it("uses `label` as the header text, overriding `language`", () => {

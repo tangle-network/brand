@@ -7,7 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
+import type SyntaxHighlighter from "react-syntax-highlighter";
 import { Check, Copy } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
@@ -65,6 +65,20 @@ const syntaxTheme: { [key: string]: React.CSSProperties } = (() => {
   };
 })();
 
+type Highlighter = typeof SyntaxHighlighter;
+let highlighterPromise: Promise<Highlighter> | undefined;
+
+function loadHighlighter(): Promise<Highlighter> {
+  // Preserve the default renderer's language behavior, including alias inputs
+  // and unknown-language auto-detection. Its light async variant differs.
+  return highlighterPromise ??= import("react-syntax-highlighter/dist/esm/default-highlight")
+    .then((module) => module.default)
+    .catch((error: unknown) => {
+      highlighterPromise = undefined;
+      throw error;
+    });
+}
+
 export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   code: string;
   language?: string;
@@ -82,8 +96,28 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
 
 export const CodeBlock = memo(
   ({ code, language, label, showLineNumbers = false, light, className, children, ...props }: CodeBlockProps) => {
+    const [Highlighter, setHighlighter] = useState<Highlighter | null>(null);
+    useEffect(() => {
+      let active = true;
+      void loadHighlighter().then((component) => {
+        if (active) setHighlighter(() => component);
+      }).catch(() => {
+        // A failed chunk leaves the code readable; a later mount can retry.
+      });
+      return () => { active = false; };
+    }, []);
+
     const headerLabel = label ?? language;
     const mode = light === undefined ? {} : { "data-theme": light ? "light" : "dark" };
+    const customStyle = {
+      margin: 0,
+      padding: "var(--code-padding-y, 0.625rem) var(--code-padding-x, 0.75rem)",
+      background: "transparent",
+      fontSize: "var(--code-font-size, 0.8125rem)",
+      lineHeight: "var(--code-line-height, 1.5)",
+      overflowX: "auto" as const,
+    };
+    const codeTagProps = { style: { fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)" } };
 
     return (
       <div
@@ -104,28 +138,27 @@ export const CodeBlock = memo(
             {children}
           </div>
         )}
-        <SyntaxHighlighter
-          language={language ?? "text"}
-          style={syntaxTheme}
-          showLineNumbers={showLineNumbers}
-          lineNumberStyle={{
-            color: "var(--syntax-comment, currentColor)",
-            minWidth: "2.5em",
-            paddingRight: "1em",
-          }}
-          customStyle={{
-            margin: 0,
-            padding: "var(--code-padding-y, 0.625rem) var(--code-padding-x, 0.75rem)",
-            background: "transparent",
-            fontSize: "var(--code-font-size, 0.8125rem)",
-            lineHeight: "var(--code-line-height, 1.5)",
-            overflowX: "auto",
-          }}
-          codeTagProps={{ style: { fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)" } }}
-          wrapLines={false}
-        >
-          {code}
-        </SyntaxHighlighter>
+        {Highlighter ? (
+          <Highlighter
+            language={language ?? "text"}
+            style={syntaxTheme}
+            showLineNumbers={showLineNumbers}
+            lineNumberStyle={{
+              color: "var(--syntax-comment, currentColor)",
+              minWidth: "2.5em",
+              paddingRight: "1em",
+            }}
+            customStyle={customStyle}
+            codeTagProps={codeTagProps}
+            wrapLines={false}
+          >
+            {code}
+          </Highlighter>
+        ) : (
+          <pre style={{ ...syntaxTheme.hljs, ...customStyle }}>
+            <code style={{ ...codeTagProps.style, whiteSpace: "pre" }}>{code}</code>
+          </pre>
+        )}
       </div>
     );
   },

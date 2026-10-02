@@ -28,6 +28,15 @@ test("a heavy module in a lazy chunk fails the gauge", () => {
   assert.throws(() => assertLightGraph(graph), /heavy code/);
 });
 
+test("the initial graph excludes a lazy syntax chunk while the complete graph retains it", () => {
+  const metafile = { outputs: {
+    "entry.js": { entryPoint: "markdown.mjs", imports: [{ path: "highlight.js", kind: "dynamic-import" }], inputs: { "markdown.mjs": { bytesInOutput: 30 } } },
+    "highlight.js": { inputs: { [syntax]: { bytesInOutput: 20 } } },
+  } };
+  assert.deepEqual(reachableGraph(metafile, "markdown.mjs", { followDynamic: false }).outputPaths, ["entry.js"]);
+  assert.ok(reachableGraph(metafile, "markdown.mjs").modules.includes(syntax));
+});
+
 test("externalizing a dependency cannot manufacture a small bundle", () => {
   const graph = emittedGraph({ outputs: { "entry.js": {
     inputs: {}, imports: [{ path: "@tiptap/react", external: true }],
