@@ -1,181 +1,119 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import * as React from "react";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { Metric, MetricStrip } from "./metric-strip";
 
+afterEach(cleanup);
+
 describe("MetricStrip", () => {
-  it("pairs each label with its value as a described term", () => {
-    render(
+  it("pairs labels, values and qualifiers as native described terms", () => {
+    const { container } = render(
       <MetricStrip>
-        <Metric label="Balance" value="$248.55" />
+        <Metric label="Balance" value="$248.55" hint="Personal wallet" />
+        <Metric label="Runs" value="41" />
       </MetricStrip>,
     );
-    // The label is wrapped for truncation, so assert the term it belongs to.
     expect(screen.getByText("Balance").closest("dt")).not.toBeNull();
     expect(screen.getByText("$248.55").tagName).toBe("DD");
-  });
-
-  // axe's `definition-list` rule allows only dt, dd, script, template and div
-  // as direct children of a dl. The hint is a second dd for this reason: a <p>
-  // between the terms is a violation, and it was one.
-  it("puts only permitted elements directly inside the dl", () => {
-    const { container } = render(
-      <MetricStrip>
-        <Metric label="Spend" value="$12.00" hint="This month" />
-        <Metric label="Runs" value="41" />
-      </MetricStrip>,
-    );
-    const dl = container.querySelector("dl") as HTMLElement;
+    expect(screen.getByText("Personal wallet").tagName).toBe("DD");
+    const dl = container.querySelector("dl")!;
     const permitted = new Set(["DT", "DD", "SCRIPT", "TEMPLATE", "DIV"]);
-    for (const child of Array.from(dl.children)) {
-      expect(permitted).toContain(child.tagName);
-    }
+    for (const child of Array.from(dl.children)) expect(permitted).toContain(child.tagName);
+    expect(dl.querySelectorAll("dt")).toHaveLength(2);
+    expect(dl.querySelectorAll("dd")).toHaveLength(3);
   });
 
-  it("renders the hint as a dd rather than a paragraph", () => {
-    render(
-      <MetricStrip>
-        <Metric label="Spend" value="$12.00" hint="Personal wallet" />
-      </MetricStrip>,
-    );
-    const hint = screen.getByText("Personal wallet");
-    expect(hint.tagName).toBe("DD");
-  });
-
-  it("omits the hint entirely when not given", () => {
+  it("omits absent qualifiers but preserves a numeric zero qualifier inside dd", () => {
     const { container } = render(
       <MetricStrip>
-        <Metric label="Runs" value="41" />
+        <Metric label="Unknown" value="—" />
+        <Metric label="Known zero" value={0} hint={0} />
+        <Metric label="Unavailable" value={null} hint={false} />
+        <Metric label="Empty hint" value="" hint="" />
       </MetricStrip>,
     );
-    expect(container.querySelectorAll("dd")).toHaveLength(1);
+    expect(container.querySelectorAll("dd")).toHaveLength(5);
+    expect(screen.getByText("Unknown").closest("div")!.querySelector("dd")!.textContent).toBe("—");
+    const zero = screen.getByText("Known zero").closest("div")!;
+    expect(Array.from(zero.querySelectorAll("dd")).map((node) => node.textContent)).toEqual(["0", "0"]);
+    expect(Array.from(zero.childNodes).every((node) => node.nodeType === Node.ELEMENT_NODE)).toBe(true);
+    expect(screen.getByText("Unavailable").closest("div")!.querySelector("dd")!.textContent).toBe("");
   });
 
-  // `attention` means a person has to do something, so it shows a pill next to
-  // the label. A zero on its own is not attention.
-  it("shows a pill beside the label only when attention is set", () => {
-    const { rerender, container } = render(
-      <MetricStrip>
-        <Metric label="Balance" value="$0.00" />
-      </MetricStrip>,
-    );
+  it("does not infer attention from zero; explicit danger retains its pill and value tone", () => {
+    const { rerender, container } = render(<MetricStrip><Metric label="Balance" value="$0.00" /></MetricStrip>);
     expect(container.querySelector("svg")).toBeNull();
-
-    rerender(
-      <MetricStrip>
-        <Metric
-          attention={{ tone: "danger", label: "Empty" }}
-          label="Balance"
-          value="$0.00"
-        />
-      </MetricStrip>,
-    );
+    rerender(<MetricStrip><Metric label="Balance" value="$0.00" attention={{ tone: "danger", label: "Empty" }} /></MetricStrip>);
     expect(screen.getByText("Empty")).toBeInTheDocument();
     expect(container.querySelector("svg")).not.toBeNull();
-  });
-
-  it("raises the value's tone only for a danger attention", () => {
-    const { container } = render(
-      <MetricStrip>
-        <Metric
-          attention={{ tone: "danger", label: "Empty" }}
-          label="Balance"
-          value="$0.00"
-        />
-      </MetricStrip>,
-    );
-    const value = screen.getByText("$0.00");
-    expect(value.className).toContain("--surface-danger-text");
+    expect(screen.getByText("$0.00").className).toContain("--surface-danger-text");
     expect(container.querySelectorAll("dd")).toHaveLength(1);
+    rerender(<MetricStrip><Metric label="Balance" value="$0.00" attention={{ tone: "warning", label: "Review" }} /></MetricStrip>);
+    expect(screen.getByText("$0.00").className).not.toContain("--surface-danger-text");
   });
 
-  // The divider is drawn only where it belongs, never drawn and then
-  // suppressed: `border-l` alongside `border-l-0` variants puts both in one
-  // conflict group whose winner is decided by emitted-rule order, and that
-  // resolved the wrong way at every breakpoint — every item kept a left border,
-  // including the first in each row.
-  it("draws the divider without a suppressing counterpart", () => {
-    const { container } = render(
-      <MetricStrip>
-        <Metric label="Balance" value="$0.00" />
-      </MetricStrip>,
-    );
-    const item = (container.querySelector("dl") as HTMLElement)
-      .children[0] as HTMLElement;
-    expect(item.className).not.toContain("border-l-0");
+  it("retains the default two / sm:four grid", () => {
+    const { container } = render(<MetricStrip><Metric label="Runs" value={0} /></MetricStrip>);
+    const dl = container.querySelector("dl")!;
+    expect(dl.className.split(" ")).toEqual(expect.arrayContaining(["grid-cols-2", "sm:grid-cols-4"]));
+    expect(dl.className).not.toContain("lg:grid-cols");
   });
 
-  // The row-start test has to name the same column count the grid does, at each
-  // breakpoint. Nothing in the type system ties them together, so changing the
-  // grid to three columns without moving the divider puts a rule mid-row. Read
-  // both out of the rendered classes and require them to agree, so the coupling
-  // is enforced rather than only described.
-  it("keeps the divider's row-start test matching the grid's column count", () => {
+  it.each([3, 4, 5, 6] as const)("owns the grid and all nonoverlapping row-start guards for %i columns", (columns) => {
     const { container } = render(
-      <MetricStrip>
-        <Metric label="Balance" value="$0.00" />
+      <MetricStrip columns={columns}>
+        {Array.from({ length: columns }, (_, i) => <Metric key={i} label={`Metric ${i}`} value={i} />)}
       </MetricStrip>,
     );
-    const dl = container.querySelector("dl") as HTMLElement;
-    const item = dl.children[0] as HTMLElement;
-
-    // `grid-cols-N` unprefixed is the base breakpoint; `<bp>:grid-cols-N` is that
-    // breakpoint. The divider spells the same breakpoints as `max-<bp>:` / `<bp>:`.
-    const columnsAt = (prefix: string) => {
-      const re = prefix
-        ? new RegExp(`(?:^| )${prefix}:grid-cols-(\\d+)(?: |$)`)
-        : /(?:^| )grid-cols-(\d+)(?: |$)/;
-      const m = dl.className.match(re);
-      return m ? Number(m[1]) : null;
-    };
-    const modulusAt = (prefix: string) => {
-      const m = item.className.match(
-        new RegExp(`(?:^| )${prefix}:\\[&:not\\(:nth-child\\((\\d+)n\\+1\\)\\)\\]:border-l(?: |$)`),
-      );
-      return m ? Number(m[1]) : null;
-    };
-
-    // base grid (below sm) is guarded by the `max-sm:` divider rule
-    expect(modulusAt("max-sm")).toBe(columnsAt(""));
-    // the `sm:` grid is guarded by the `sm:` divider rule
-    expect(modulusAt("sm")).toBe(columnsAt("sm"));
-
-    // Every grid-cols breakpoint the strip declares must have a divider rule.
-    const declared = [...dl.className.matchAll(/(?:^| )(?:([a-z]+):)?grid-cols-\d+(?= |$)/g)]
-      .map((m) => m[1] ?? "");
-    for (const bp of declared) {
-      const guard = bp === "" ? "max-sm" : bp;
-      expect(
-        modulusAt(guard),
-        `grid-cols at "${bp || "base"}" has no matching ${guard}: divider rule`,
-      ).not.toBeNull();
+    const dl = container.querySelector("dl")!;
+    expect(dl).not.toHaveAttribute("columns");
+    expect(dl.className).toContain("max-sm:[&>div:not(:nth-child(2n+1))]:border-l");
+    if (columns <= 4) {
+      expect(dl.className).toContain(`sm:grid-cols-${columns}`);
+      expect(dl.className).toContain(`sm:[&>div:not(:nth-child(${columns}n+1))]:border-l`);
+    } else {
+      expect(dl.className).toContain("sm:grid-cols-3");
+      expect(dl.className).toContain("sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l");
+      expect(dl.className).toContain(`lg:grid-cols-${columns}`);
+      expect(dl.className).toContain(`lg:[&>div:not(:nth-child(${columns}n+1))]:border-l`);
     }
+    expect(dl.className).not.toContain("border-l-0");
+    for (const item of Array.from(dl.children)) expect(item.className).not.toContain("nth-child");
   });
 
-  it("titles the hint too, so a truncated qualifier stays recoverable", () => {
-    render(
-      <MetricStrip>
-        <Metric
-          hint="Personal wallet (0x1234abcd5678efgh)"
-          label="Balance"
-          value="$248.55"
-        />
-      </MetricStrip>,
-    );
-    expect(screen.getByText("Personal wallet (0x1234abcd5678efgh)")).toHaveAttribute(
-      "title",
-      "Personal wallet (0x1234abcd5678efgh)",
-    );
+  it("does not give a standalone Metric a strip divider", () => {
+    const { container } = render(<Metric label="Runs" value={0} />);
+    expect(container.firstElementChild!.className).not.toContain("border-l");
   });
 
-  it("titles a string value so a truncated figure stays readable", () => {
-    render(
-      <MetricStrip>
-        <Metric label="Balance" value="$1,284,003.10" />
+  it("wraps full labels, values and qualifiers without relying on a mouse title", () => {
+    render(<MetricStrip><Metric label="Very long account label without loss" value="$1,284,003.10" hint="Personal wallet (0x1234abcd5678efgh)" /></MetricStrip>);
+    for (const text of ["Very long account label without loss", "$1,284,003.10", "Personal wallet (0x1234abcd5678efgh)"]) {
+      const node = screen.getByText(text);
+      expect(node.className).toContain("[overflow-wrap:anywhere]");
+      expect(node.className).not.toContain("truncate");
+    }
+    expect(screen.getByText("$1,284,003.10")).toHaveAttribute("title", "$1,284,003.10");
+    expect(screen.getByText("Personal wallet (0x1234abcd5678efgh)")).toHaveAttribute("title", "Personal wallet (0x1234abcd5678efgh)");
+  });
+
+  it("preserves refs, attributes, caller classes and fragment/conditional DOM order", () => {
+    const strip = React.createRef<HTMLDListElement>();
+    const item = React.createRef<HTMLDivElement>();
+    const { container } = render(
+      <MetricStrip ref={strip} aria-label="Usage" className="mb-6 sm:grid-cols-3">
+        <><Metric ref={item} data-testid="first" className="max-sm:col-span-2 max-sm:border-b" label="Spend" value={0} /></>
+        {false && <Metric label="Hidden" value={0} />}
+        <Metric className="max-sm:border-l-0!" label="Calls" value={0} />
+        <Metric className="max-sm:border-l!" label="Average" value="—" />
       </MetricStrip>,
     );
-    expect(screen.getByText("$1,284,003.10")).toHaveAttribute(
-      "title",
-      "$1,284,003.10",
-    );
+    expect(strip.current).toBe(container.querySelector("dl"));
+    expect(strip.current).toHaveAttribute("aria-label", "Usage");
+    expect(item.current).toBe(screen.getByTestId("first"));
+    expect(item.current!.className).toContain("max-sm:col-span-2");
+    expect(strip.current!.className).toContain("sm:grid-cols-3");
+    expect(strip.current!.className).not.toContain("sm:grid-cols-4");
+    expect(Array.from(strip.current!.querySelectorAll("dt")).map((node) => node.textContent)).toEqual(["Spend", "Calls", "Average"]);
   });
 });

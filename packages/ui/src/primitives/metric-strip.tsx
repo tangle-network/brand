@@ -2,32 +2,32 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import { StatusPill, type StatusTone } from "./status-pill";
 
-/**
- * The headline figures for a console page, as ONE statement rather than four.
- *
- * A row of separate stat cards is the default and it is usually wrong here.
- * Each card is a box that must be tall enough for its longest member, so a row
- * mixing "$248.55 / Personal wallet" against a bare "0" leaves the short ones
- * mostly empty; and four bordered boxes read as four unrelated facts when they
- * are four readings of one account. `MetricStrip` puts them on one plane
- * divided by hairlines: same information, one object, no holes.
- *
- * The divider is a border on the item rather than a `divide-*` utility on the
- * parent, because these wrap. `divide-x` draws from DOM order and leaves a
- * stray rule at the start of every wrapped line; a per-item leading border
- * suppressed at each row start does not.
- */
+// Each finite preset owns its grid AND its row-start rules. Keep the strings
+// literal so host Tailwind consumers scanning the published source emit them.
+// Ranges do not overlap: no drawn border is subsequently suppressed.
+const layouts = {
+  3: "grid-cols-2 sm:grid-cols-3 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(3n+1))]:border-l",
+  4: "grid-cols-2 sm:grid-cols-4 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(4n+1))]:border-l",
+  5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(5n+1))]:border-l",
+  6: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(6n+1))]:border-l",
+} as const;
+
+/** Headline readings on one plane, with native definition-list semantics. */
 export interface MetricStripProps
   extends React.HTMLAttributes<HTMLDListElement> {
   children: React.ReactNode;
+  /** Desktop columns. Default retains the existing two / sm:four layout.
+   * Five and six use three columns between sm and lg. Never inferred from data. */
+  columns?: 3 | 4 | 5 | 6;
 }
 
 const MetricStrip = React.forwardRef<HTMLDListElement, MetricStripProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children, columns = 4, ...props }, ref) => (
     <dl
       ref={ref}
       className={cn(
-        "grid grid-cols-2 rounded-[var(--radius-lg)] border border-border bg-card shadow-[var(--shadow-card)] sm:grid-cols-4",
+        "grid min-w-0 rounded-[var(--radius-lg)] border border-border bg-card shadow-[var(--shadow-card)]",
+        layouts[columns],
         className,
       )}
       {...props}
@@ -43,72 +43,38 @@ export interface MetricProps extends React.HTMLAttributes<HTMLDivElement> {
   value: React.ReactNode;
   /** The qualifying line: which wallet, which window, what the limit is. */
   hint?: React.ReactNode;
-  /** Raises the value's tone and shows a pill beside the label. A metric is
-   *  `attention` only when a person has to DO something — not merely when a
-   *  number is zero. */
+  /** Attention is a caller-owned action requirement, never inferred from zero. */
   attention?: { tone: StatusTone; label: string };
 }
 
-/**
- * One reading inside a `MetricStrip`.
- *
- * `<dt>` carries the label and `<dd>` the value, so the pair is announced as a
- * described term rather than as two loose strings — the semantic that makes a
- * figure legible without the visual grouping.
- *
- * The value is `tabular-nums`: these sit in a row and change on a timer, and
- * proportional digits make the column jitter every time a 1 becomes an 8.
- */
+/** A described term; the strip, not this item, decides where separators belong. */
 const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
   ({ className, label, value, hint, attention, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(
-        // Leading hairline, DRAWN only where a divider belongs — never drawn
-        // and then suppressed. Stating it as `border-l` plus `border-l-0`
-        // variants puts both in one conflict group, where the winner is decided
-        // by emitted-rule order rather than by intent; that resolved the wrong
-        // way at every breakpoint and left a rule down the start of each row.
-        // `:not(:nth-child(Nn+1))` is the row-start test for the column count
-        // at that breakpoint, so no rule ever contradicts another.
-        //
-        // N is COUPLED to the grid template on `MetricStrip`: 2 columns below
-        // `sm`, 4 from `sm`. A new breakpoint there — `md:grid-cols-3`, say —
-        // needs its `md:[&:not(:nth-child(3n+1))]:border-l` here in the same
-        // change, or the dividers land mid-row at that width.
-        "border-border p-4 sm:p-5",
-        "max-sm:[&:not(:nth-child(2n+1))]:border-l",
-        "sm:[&:not(:nth-child(4n+1))]:border-l",
-        className,
-      )}
+      className={cn("min-w-0 border-border p-4 sm:p-5", className)}
       {...props}
     >
-      <dt className="flex items-center gap-2 text-muted-foreground text-sm">
-        <span className="truncate">{label}</span>
+      <dt className="flex min-w-0 flex-wrap items-center gap-2 text-muted-foreground text-sm">
+        <span className="min-w-0 whitespace-normal [overflow-wrap:anywhere]">{label}</span>
         {attention && (
           <StatusPill tone={attention.tone}>{attention.label}</StatusPill>
         )}
       </dt>
-      {/* `truncate`, and a step down until the column is wide enough for the
-          longest figure this strip carries. A balance renders as "$248.55" on a
-          funded account and as "$1,284,003.10" on a busy one, and at four
-          columns the wide case has nowhere to go — it either overflows its cell
-          or pushes the whole strip past the page. */}
+      {/* Values and qualifiers must be readable on touch, not only in a hover
+          title. Wrap even unbroken values without making the grid wider. */}
       <dd
         className={cn(
-          "mt-1 truncate font-semibold text-xl tabular-nums tracking-tight lg:text-2xl",
+          "mt-1 whitespace-normal [overflow-wrap:anywhere] font-semibold text-xl tabular-nums tracking-tight lg:text-2xl",
           attention?.tone === "danger" && "text-[var(--surface-danger-text)]",
         )}
         title={typeof value === "string" ? value : undefined}
       >
         {value}
       </dd>
-      {hint && (
-        // Titled for the same reason the value is: the line truncates, and a
-        // hint is where the qualifying detail lives — which wallet, which
-        // window — so a clipped one is the case most worth recovering.
+      {hint !== undefined && hint !== null && hint !== false && hint !== "" && (
         <dd
-          className="mt-0.5 truncate text-[var(--text-dim)] text-xs"
+          className="mt-0.5 whitespace-normal [overflow-wrap:anywhere] text-[var(--text-dim)] text-xs"
           title={typeof hint === "string" ? hint : undefined}
         >
           {hint}
