@@ -65,7 +65,7 @@ const scopes: Array<{ name: string; sources: string[] }> = [
   })),
   ...["aubergine-light", "arena-light", "tangle-light"].map((name) => ({
     name,
-    sources: [...blocksIn(themes, `[data-theme="${name}"]`), lightStatus, DARK],
+    sources: [...blocksIn(themes, `[data-theme="${name}"]`), lightStatus, LIGHT, DARK],
   })),
   {
     name: "intelligence",

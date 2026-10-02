@@ -5,35 +5,43 @@
  * is the neutral "tangle" theme — also selectable by name as "tangle-dark";
  * "<name>-light" scopes are the light variants. */
 
-/* Bridge — the actual re-skin mechanism. Tailwind utilities read the --color-*
- * layer (theme.css @theme: `bg-card` → var(--color-card) = hsl(var(--card))).
- * Both --color-* and its --card/--hsl-card source are declared only at :root, so
- * a descendant [data-theme] that changes --hsl-card never re-substitutes the
- * :root-computed --color-card the utility consumes — the value is frozen at the
- * root color (double-indirection inheritance trap). Redeclaring the --color-*
- * layer directly on any themed element forces each one to recompute from that
- * element's own --hsl-*. Tokens a theme doesn't override fall back to the
- * inherited neutral --hsl-* (all defined at :root), so this is always valid. */
+/* Compatibility for consumers compiled to var(--color-*). Tailwind's inline
+ * theme mapping handles newly compiled utilities, but precompiled consumers
+ * must also re-resolve their aliases on every theme boundary, not only root. */
+:root,
+.dark,
+.light,
+[data-sandbox-ui],
+[data-sandbox-theme],
 [data-theme] {
-  --color-background: hsl(var(--hsl-background));
-  --color-foreground: hsl(var(--hsl-foreground));
-  --color-card: hsl(var(--hsl-card));
-  --color-card-foreground: hsl(var(--hsl-card-foreground));
-  --color-popover: hsl(var(--hsl-popover));
-  --color-popover-foreground: hsl(var(--hsl-popover-foreground));
-  --color-primary: hsl(var(--hsl-primary));
-  --color-primary-foreground: hsl(var(--hsl-primary-foreground));
-  --color-secondary: hsl(var(--hsl-secondary));
-  --color-secondary-foreground: hsl(var(--hsl-secondary-foreground));
-  --color-muted: hsl(var(--hsl-muted));
-  --color-muted-foreground: hsl(var(--hsl-muted-foreground));
-  --color-accent: hsl(var(--hsl-accent));
-  --color-accent-foreground: hsl(var(--hsl-accent-foreground));
-  --color-destructive: hsl(var(--hsl-destructive));
-  --color-destructive-foreground: hsl(var(--hsl-destructive-foreground));
-  --color-border: hsl(var(--hsl-border));
-  --color-input: hsl(var(--hsl-muted-foreground));
-  --color-ring: hsl(var(--hsl-ring));
+  --text-display: var(--font-size-display);
+  --text-hero: var(--font-size-hero);
+  --text-page: var(--font-size-3xl);
+  --text-section: var(--font-size-xl);
+  --text-eyebrow: var(--font-size-sm);
+  --color-depth-1: var(--depth-1);
+  --color-depth-2: var(--depth-2);
+  --color-depth-3: var(--depth-3);
+  --color-depth-4: var(--depth-4);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
   --color-surface-container-lowest: var(--md3-surface-container-lowest);
   --color-surface-container-low: var(--md3-surface-container-low);
   --color-surface-container: var(--md3-surface-container);
@@ -44,45 +52,13 @@
   --color-fg-dim: var(--text-dim);
 }
 
-/* Light-tuned status palette for the named light scopes. Without this they
- * inherit the dark :root status colors (bright #f87171/#34D399/…), which fail
- * WCAG on a light surface — status text + glyphs drop to ~2.5:1. These mirror
- * tokens.css `[data-theme="light"]` (dark-on-light status text that passes AA). */
+/* Named-specific light ink. All shared status and syntax colors now come
+ * from the complete canonical light baseline in tokens.css. */
 [data-theme="aubergine-light"],
 [data-theme="arena-light"],
 [data-theme="tangle-light"] {
-  --surface-success-bg: #ecfdf5; --surface-success-border: #a7f3d0; --surface-success-text: #047857;
-  --surface-warning-bg: #fffbeb; --surface-warning-border: #fde68a; --surface-warning-text: #ab4f09;
-  --surface-danger-bg: #fff1f2; --surface-danger-border: #fecdd3; --surface-danger-text: #b91c1c;
-  --surface-info-bg: #f0f9ff; --surface-info-border: #bae6fd; --surface-info-text: #0369a1;
-  /* Light-tuned interactive tokens — without these the named light scopes
-   * inherit the dark :root values on a light surface: destructive white-on-red
-   * fell to 3.67, and the secondary badge inherited near-white foreground (~1.05). */
-  --hsl-destructive: 0 72% 41%;
-  --hsl-destructive-foreground: 0 0% 100%;
   --hsl-secondary-foreground: 0 0% 10%;
-  /* neutral status label inherited var(--text-muted) which was ~3.8:1 on the
-   * light row surface; pin a darker slate that clears AA on light surfaces. */
   --surface-neutral-text: #4b5563;
-}
-
-/* Light-tuned syntax highlighting for ALL light scopes (incl. base light).
- * --syntax-* is defined only in the dark :root (near-white foreground), so on a
- * light code surface (bg-card ≈ white) code was ~1.2:1 — invisible. Dark-on-light
- * palette, all ≥4.5:1 on white. */
-[data-theme="light"],
-[data-theme="aubergine-light"],
-[data-theme="arena-light"],
-[data-theme="tangle-light"] {
-  --syntax-foreground: #24292f;
-  --syntax-comment: #57606a;
-  --syntax-keyword: #6d28d9;
-  --syntax-string: #047857;
-  --syntax-function: #1d4ed8;
-  --syntax-number: #92400e;
-  --syntax-meta: #7c3aed;
-  --syntax-variable: #24292f;
-  --syntax-error: #b91c1c;
 }
 
 /* ───────────────────────── Aubergine (bazaar) — dark purple ──────────────── */
