@@ -1,5 +1,15 @@
 # @tangle-network/ui
 
+## 11.15.0
+
+### Minor Changes
+
+- 1327903: Use scoped recessed field fills, readable link-action ink and time-valued control motion. Add opt-in compact/touch control sizing and three-to-six-column MetricStrip presets that own their separators. Preserve existing sizes, imports and interaction contracts; wrap metric content and retain numeric-zero qualifiers as descriptions.
+
+### Patch Changes
+
+- cb72f8d: Give the shared Select its designed states by default: accent border and surface while open, a rotating chevron, the dropdown shadow on the menu, and accent focus and checked rows with an accent checkmark. Consumers no longer need per-app overrides to avoid a flat menu.
+
 ## 11.14.0
 
 ### Minor Changes
