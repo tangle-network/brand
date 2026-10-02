@@ -33,8 +33,14 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     variant?: "default" | "sandbox";
+    /**
+     * Hide only the built-in close button. Escape/outside dismissal still follows
+     * Radix's handlers; prevent those events explicitly when a choice is required
+     * and provide an accessible way to finish or cancel the operation.
+     */
+    hideCloseButton?: boolean;
   }
->(({ className, children, variant = "default", ...props }, ref) => {
+>(({ className, children, variant = "default", hideCloseButton = false, ...props }, ref) => {
   const variants = {
     default: "border-border",
     sandbox: "border-[var(--border-accent)] shadow-[var(--shadow-accent)]",
@@ -59,15 +65,17 @@ const DialogContent = React.forwardRef<
         {...props}
       >
         {children}
-        <DialogPrimitive.Close
-          className={cn(
-            "absolute top-4 right-4 rounded-sm opacity-70 transition-[opacity,box-shadow] hover:opacity-100 focus-visible:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-            focusRing,
-          )}
-        >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
+        {!hideCloseButton && (
+          <DialogPrimitive.Close
+            className={cn(
+              "absolute top-4 right-4 rounded-sm opacity-70 transition-[opacity,box-shadow] hover:opacity-100 focus-visible:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+              focusRing,
+            )}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
       </DialogPrimitive.Content>
     </DialogPortal>
   );
