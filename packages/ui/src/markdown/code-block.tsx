@@ -12,23 +12,19 @@ import { Check, Copy } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
-// Theme-aware syntax highlighting — reads CSS custom properties at render time.
-// Override --syntax-* tokens in tokens.css per theme.
-function getSyntaxTheme(): { [key: string]: React.CSSProperties } {
-  const el = typeof document !== "undefined" ? document.documentElement : null;
-  const v = (name: string, fallback: string) =>
-    el ? getComputedStyle(el).getPropertyValue(name).trim() || fallback : fallback;
-
-  const comment  = v("--syntax-comment", "#6B7094");
-  const keyword  = v("--syntax-keyword", "#A78FFF");
-  const string   = v("--syntax-string", "#10b981");
-  const fn       = v("--syntax-function", "#6D9FFF");
-  const number   = v("--syntax-number", "#FFB347");
-  const meta     = v("--syntax-meta", "#8263FF");
-  const error    = v("--syntax-error", "#FF4D6D");
-  const variable = v("--syntax-variable", "#C4C0D8");
-  const fg       = v("--syntax-foreground", "#E8E6F6");
-
+// Leave variables unresolved: the browser resolves them on each token span,
+// including nested themes, inline overrides and CSS/media changes. No document
+// sampling, observers, layout reads or React re-render are needed to recolor code.
+const syntaxTheme: { [key: string]: React.CSSProperties } = (() => {
+  const comment = "var(--syntax-comment, currentColor)";
+  const keyword = "var(--syntax-keyword, currentColor)";
+  const string = "var(--syntax-string, currentColor)";
+  const fn = "var(--syntax-function, currentColor)";
+  const number = "var(--syntax-number, currentColor)";
+  const meta = "var(--syntax-meta, currentColor)";
+  const error = "var(--syntax-error, currentColor)";
+  const variable = "var(--syntax-variable, currentColor)";
+  const fg = "var(--syntax-foreground, currentColor)";
   return {
     "hljs-comment":           { color: comment, fontStyle: "italic" },
     "hljs-quote":             { color: comment, fontStyle: "italic" },
@@ -67,10 +63,7 @@ function getSyntaxTheme(): { [key: string]: React.CSSProperties } {
     "hljs-emphasis":          { fontStyle: "italic" },
     "hljs":                   { color: fg, background: "transparent" },
   };
-}
-
-// tangleLight removed — getSyntaxTheme() reads --syntax-* CSS vars which are overridden
-// per theme in tokens.css (vault, dawn themes set light values).
+})();
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   code: string;
@@ -82,55 +75,25 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
    */
   label?: string;
   showLineNumbers?: boolean;
-  /** Force light theme; defaults to dark */
+  /** Force light (true) or dark (false); omitted inherits the nearest theme. */
   light?: boolean;
   children?: ReactNode;
 }
 
-const LIGHT_THEMES = new Set(["vault", "dawn"]);
-
-function detectLightTheme() {
-  return (
-    typeof document !== "undefined" &&
-    LIGHT_THEMES.has(document.documentElement.getAttribute("data-sandbox-theme") ?? "")
-  );
-}
-
-function useIsLightTheme(): boolean {
-  const [isLight, setIsLight] = useState(detectLightTheme);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    setIsLight(detectLightTheme());
-    const observer = new MutationObserver(() => setIsLight(detectLightTheme()));
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-sandbox-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  return isLight;
-}
-
 export const CodeBlock = memo(
-  ({ code, language, label, showLineNumbers = false, light: lightProp, className, children, ...props }: CodeBlockProps) => {
-    const isLight = useIsLightTheme();
-    const light = lightProp ?? isLight;
-    const theme = getSyntaxTheme();
-    const bg = "bg-card border-border";
-    const headerBg = light ? "bg-muted/50 border-border" : "bg-background border-border";
-    const langColor = "text-muted-foreground";
+  ({ code, language, label, showLineNumbers = false, light, className, children, ...props }: CodeBlockProps) => {
     const headerLabel = label ?? language;
+    const mode = light === undefined ? {} : { "data-theme": light ? "light" : "dark" };
 
     return (
       <div
-        className={cn("group relative overflow-hidden rounded-lg border font-mono", bg, className)}
+        className={cn("group relative overflow-hidden rounded-lg border font-mono", "bg-card border-border", className)}
         {...props}
+        {...mode}
       >
         {headerLabel && (
-          <div className={cn("flex items-center justify-between border-b px-3 py-1", headerBg)}>
-            <span className={cn("text-[calc(var(--font-size-xs)-1px)] font-mono font-medium uppercase tracking-widest", langColor)}>
+          <div className="flex items-center justify-between border-b border-border px-3 py-1 bg-[var(--code-header-bg,hsl(var(--background)))]">
+            <span className="text-[calc(var(--font-size-xs)-1px)] font-mono font-medium uppercase tracking-widest text-muted-foreground">
               {headerLabel}
             </span>
             {children}
@@ -143,10 +106,10 @@ export const CodeBlock = memo(
         )}
         <SyntaxHighlighter
           language={language ?? "text"}
-          style={theme}
+          style={syntaxTheme}
           showLineNumbers={showLineNumbers}
           lineNumberStyle={{
-            color: light ? "#8B92B8" : "#4A4D6A",
+            color: "var(--syntax-comment, currentColor)",
             minWidth: "2.5em",
             paddingRight: "1em",
           }}

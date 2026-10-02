@@ -38,11 +38,14 @@
     "./styles/theme.css": "./src/styles/theme.css",
     "./styles/named-themes.css": "./src/styles/named-themes.css",
     "./styles/ladders.css": "./src/styles/ladders.css",
-    "./styles/system.css": "./src/styles/system.css"
+    "./styles/system.css": "./src/styles/system.css",
+    "./styles/legacy-light.css": "./src/styles/legacy-light.css"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "node scripts/gen-compat.mjs --check && tsdown",
     "gen:ladders": "node scripts/gen-ladders.mjs",
+    "gen:compat": "node scripts/gen-compat.mjs",
+    "check:compat": "node scripts/gen-compat.mjs --check && node --test scripts/gen-compat.test.mjs",
     "dev": "tsdown --watch"
   },
   "peerDependencies": {

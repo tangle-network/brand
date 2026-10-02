@@ -1,43 +1,78 @@
 # @tangle-network/brand
 
-Single source of truth for the Tangle design system. Design tokens, logo, and a Tailwind v4 theme preset, shared across every Tangle app (`tangle-website`, `sandbox-ui`, `evals`, `agent-builder`, product surfaces).
-
-**Scope:** tokens, not components. Shared components live in `@tangle-network/ui`; product-specific components stay in their product repos.
-
-For the broader visual, copy, graphic, and component standards, see the repo-level [brand guidelines](../../docs/brand-guidelines.md).
+The authoring owner of shared Tangle color, typography, radius, motion, shadow and status decisions. Generic components live in `@tangle-network/ui`; product composition stays in its product repository. See the [brand guidelines](../../docs/brand-guidelines.md) for visual, copy and component standards.
 
 ## Install
 
-```bash
+```sh
 pnpm add @tangle-network/brand
 ```
 
 ## Use
 
-### Tailwind v4 app
+### Tailwind v4
 
 ```css
-/* app.css */
+@import "tailwindcss";
 @import "@tangle-network/brand/styles";
-@import "tailwindcss";
 ```
 
-That single import wires:
+The standard import supplies canonical tokens, the Tailwind theme, named themes and globals. **Brand remains dark-default.** It does not import the optional ladder/system styles or load fonts.
 
-- CSS custom properties for dark (`:root`) and light (`[data-sandbox-theme="vault"]`)
-- Tailwind v4 `@theme` block so `bg-brand`, `text-fg-muted`, `rounded-lg`, `font-display`, etc. just work
-- Base styles and a handful of utility classes (`.text-gradient-brand`, `.depth-1..4`, `.status-dot-*`)
-
-Fonts are **not** bundled — see [Fonts](#fonts) below.
-
-### Finer control
+For finer control, use the exported filenames:
 
 ```css
-@import "@tangle-network/brand/styles/tokens";
 @import "tailwindcss";
-@import "@tangle-network/brand/styles/theme";
-@import "@tangle-network/brand/styles/globals";
+@import "@tangle-network/brand/styles/tokens.css";
+@import "@tangle-network/brand/styles/theme.css";
+@import "@tangle-network/brand/styles/named-themes.css";
+@import "@tangle-network/brand/styles/globals.css";
 ```
+
+### Mode contract
+
+| Scope | Behavior |
+| --- | --- |
+| Unpinned root; `[data-sandbox-ui]` | Canonical dark baseline |
+| `.dark` or `data-theme="dark"` | Explicit dark, including a nested dark island |
+| `.light` or `data-theme="light"` | Explicit light, including a nested light island |
+| `data-sandbox-theme="vault"` or `"dawn"` | Existing legacy light names; an explicit `.dark` on that same element takes precedence |
+| `aubergine` / `aubergine-light`, `arena` / `arena-light`, `tangle-dark` / `tangle-light` | Existing named dark/light pairs, applied with `data-theme` |
+| `.dark[data-theme="intelligence"]` | Existing dark-only product surface; `.light` keeps the identity and uses canonical light |
+
+Set one coherent mode on each boundary; do not author contradictory `.light`/`.dark`/named-mode markers. Named light variants keep their existing palettes; `tangle-light` is not silently retuned to the neutral base light palette. Each known boundary receives a complete baseline before named overrides, so nested scopes do not inherit opposite-mode syntax, status or already-resolved HSL aliases.
+
+`--background`, `--card`, `--input`, and the other shadcn aliases remain **HSL channel triples**: consume them as `hsl(var(--card))`. Full-color aliases such as `--bg-card`, `--text-primary` and `--syntax-keyword` remain full CSS colors. `--input` is the border/off-track, not the recessed field fill (`--bg-input`). Tailwind's variable-dependent registrations use `@theme inline`; the named-theme bridge keeps precompiled `var(--color-*)` consumers scoped too.
+
+`@tangle-network/ui`'s existing `useTheme()` / `ThemeToggle` control the document root, not individual islands. `useTheme()` retains `theme` and `setTheme` and also exposes `resolvedTheme`. With no valid stored preference or explicit initial mode, it follows the system. The hook validates the existing `theme` storage key, tolerates denied storage, synchronizes mounted controls and cross-tab events, and updates its resolved state on system changes. It sets both mode classes, updates plain mode attributes, switches known named pairs within the same family, and never replaces an unpaired product identity with `light` or `dark`.
+
+SSR uses a deterministic dark placeholder for the control without accessing browser APIs; hydration then resolves the client preference. This is not an app-level pre-paint theme script. Apps needing a preference-correct first paint still own their server/cookie or pre-paint initialization. Custom, unpaired themes retain ownership of how their CSS responds to the mode classes.
+
+`CodeBlock` leaves `--syntax-*` references in the rendered styles, so the browser resolves them where the code lives and recolors on class, attribute, stylesheet or inline-variable changes without a React rerender. An omitted `light` prop inherits; `light={true}` / `light={false}` explicitly pins a local light/dark scope. Line numbers use the syntax-comment role, not a second palette.
+
+### Existing light-default consumers
+
+The Agent App light-default contract is an explicit exception to Brand's default, not a second palette authoring source. Use the generated, opt-in shared-token projection:
+
+```css
+@import "tailwindcss";
+@import "@tangle-network/brand/styles/legacy-light.css";
+@import "@tangle-network/brand/styles/theme.css";
+/* Import globals.css separately only when the host already intends those globals. */
+```
+
+Choose this **instead of** `styles`, `tokens.css` and `named-themes.css`; do not stack the two default contracts. The projection contains canonical declarations with a zero-specificity light root default, keeps all explicit mode selectors, and omits `--radius`, which the legacy consumer deliberately leaves to its host. It includes no global component rules, keyframes or automatic ladder/system imports.
+
+This export is the shared migration boundary, **not a claim that Agent App has already migrated** and not a replacement for that package's entire stylesheet. Its component-specific variables, neutral-ramp API, keyframes and structural rules remain consumer-owned until a separate, explicit migration reconciles them. Remove duplicate shared palette declarations in that migration rather than placing competing global token systems on the same page.
+
+The only authoring inputs are `src/styles/tokens.css` and `named-themes.css`. Never edit `legacy-light.css` by hand:
+
+```sh
+pnpm --filter @tangle-network/brand gen:compat
+pnpm --filter @tangle-network/brand check:compat
+```
+
+Brand's build rejects a stale artifact. The main test suite also runs the generation contract: every projected declaration is compared with the canonical source, and color, named-color, typography, radius and motion mutations must change the artifact. The package export is checked too.
 
 ### Colour ladders (opt in)
 
@@ -47,18 +82,9 @@ Fonts are **not** bundled — see [Fonts](#fonts) below.
 @import "@tangle-network/brand/styles/system.css";
 ```
 
-`ladders.css` defines 12 ramps of 12 steps each, in light and dark, from Radix Colors 3.0.0: mauve (neutral), iris (brand), green, amber, red and blue (status), and plum, orange, grass, bronze, crimson and olive (domains).
-Each step has one job: 1–2 backgrounds, 3–5 control fills, 6–8 borders, 9–10 solid fills, 11 secondary text and 12 primary text.
-Role aliases (`--gray-*`, `--accent-*`, `--success-*`, `--warning-*`, `--danger-*`, `--info-*`) point at the ramps.
-Setting `data-domain="tax"` (or another domain key) on an element gives its subtree `--domain-1..12`.
+These existing optional styles remain separate. `ladders.css` defines twelve twelve-step Radix color ramps and role/domain aliases. `system.css` maps the token families to those ladders and adds semantic roles. It changes every surface of an app that loads it; neither normal Brand nor the compatibility export opts a consumer in.
 
-`system.css` maps every token family in `tokens.css` onto a ladder step and adds semantic tokens (`--bg-page`, `--line`, `--fg-muted`, `--accent-text`, `--ink`), role radii, type roles, motion and three shadow levels.
-Light pages become white, and dark becomes a neutral mauve ladder.
-Import it after `tokens.css`; it is opt in because it changes every surface of the app that loads it.
-
-Both files are generated.
-Change a value in `scripts/gen-ladders.mjs` or `scripts/radix-ramps.json`, then run `pnpm --filter @tangle-network/brand gen:ladders`.
-An app that ships ahead of a release copies the two generated files verbatim, so its copy stays identical.
+Both files are generated by `scripts/gen-ladders.mjs` from its declarations and `scripts/radix-ramps.json`. Run `pnpm --filter @tangle-network/brand gen:ladders` after changing those sources. A consumer temporarily copying them ahead of a release copies the generated files verbatim.
 
 ### Logo
 
@@ -70,90 +96,47 @@ import { Logo, TangleKnot } from "@tangle-network/brand";
 <TangleKnot size={48} />
 ```
 
-## What's in the palette
+## Palette and typography
 
-- **Accent** — indigo `#6366F1` / `#818CF8` / `#A5AAFC`
-- **Depth stack** — `#0C0B1D` → `#262448` (dark); `#f4f4f9` → `#dcdbe8` (light)
-- **Status** — emerald / amber / coral for running / stopped / error
-- **Radii** — 6/8/12/16px (dark); 2/4/6/8px (light/"vault")
-- **Focus** — `--focus-border` and `--focus-halo` (plus `-danger` variants) for a focused control, and `--border-strong` for a hovered field. They derive from the ring and border tokens, so every theme gets its own. `@tangle-network/ui` applies them through `focusField` and `focusRing`. `globals.css` gives a control or native text field that styles no focus of its own a fallback: a control gets the 1px line and halo on keyboard focus, and a text field gets the 1px line over its border.
+The base dark surface ladder is neutral `#161616` / `#303030` / `#353535` / `#3b3b3b`. Light uses a neutral `#eaeaea` canvas, white paper cards and overlays, and `#f2f2f2` nested wells. Indigo is the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
 
-Light theme activates via `data-sandbox-theme="vault"` on a parent element.
+Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
+
+Existing `--transition-*` values are preserved. The shared `--duration-*`, `--ease-*` and `--motion-*` vocabulary comes from the existing Agent App contract. It does not apply animations automatically. Reduced motion zeroes those durations and re-resolves composites at theme boundaries.
+
+Focus uses `--focus-border`, `--focus-halo`, their danger variants, and `--border-strong`, derived from the local ring/border palette. UI's `focusField` / `focusRing` consume them. `globals.css` supplies the existing fallback for controls without their own focus treatment.
 
 ## Fonts
 
-brand references the following font families in its design tokens but does **not** bundle them — consumer apps must load the fonts themselves. This is deliberate:
+Fonts are referenced, **not bundled or remotely fetched**. Consumers own loading, privacy and network fallbacks. For example:
 
-- (a) `@import url(...)` inside library CSS breaks downstream when CSS chain-imports get reordered — once the dist CSS is inlined after any rule, the URL `@import` is no longer at the top of the merged stylesheet, the CSS spec disallows it, and PostCSS rejects the build. Mirrors `tangle-network/sandbox-ui#28`.
-- (b) Shipping a third-party Google Fonts request from a library is privacy-hostile.
-- (c) Consumers cannot fall back when the network fails.
-
-| Family       | Role                                | Used as CSS variable |
-| ------------ | ----------------------------------- | -------------------- |
-| Geist        | UI body text (dark)                 | `--font-sans`        |
-| Geist Mono   | Code, terminal                      | `--font-mono`        |
-| Outfit       | Display / headings (dark)           | `--font-display`     |
-| Manrope      | Display / headings (vault)          | `--font-display`     |
-| Inter        | UI body text (vault)                | `--font-sans`        |
-
-Pick one loading strategy that fits your app:
-
-**1. Self-hosted via `@fontsource/*`** (recommended — no external network request):
-
-```bash
-pnpm add @fontsource/geist-sans @fontsource/geist-mono @fontsource/outfit @fontsource/manrope @fontsource/inter
+```sh
+pnpm add @fontsource/inter @fontsource/geist-mono
 ```
 
 ```tsx
-// app entry
-import "@fontsource/geist-sans/400.css";
-import "@fontsource/geist-sans/500.css";
-import "@fontsource/geist-sans/600.css";
-import "@fontsource/geist-sans/700.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
-import "@fontsource/outfit/500.css";
-import "@fontsource/outfit/700.css";
-import "@fontsource/manrope/500.css";
-import "@fontsource/manrope/700.css";
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/600.css";
 ```
 
-**2. Google Fonts via HTML `<link>`:**
+Omitted families fall back through the `--font-*` stacks. Keep external font imports out of library CSS: they can break reordered CSS imports and should not impose a third-party request on every consumer.
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-/>
-```
+## Policy and development
 
-Any family you omit falls back per the `--font-*` token chain.
+Shared tokens land here, not in copied app palettes. Additions require a cross-app reason. Version the package with semver; breaking public token changes require a major release. Shared UI and actual consuming apps are the stress-test surfaces.
 
-## Policy
-
-- **No additions without a cross-app audit.** New tokens land here or nowhere; do not fork this into apps.
-- **Version as a product.** Semver. Breaking token changes are major bumps.
-- **Sandbox-ui as the stress-test surface.** Tokens ship here only after sandbox-ui has used them in anger.
-
-## Development
-
-```bash
-pnpm install
+```sh
+pnpm install --frozen-lockfile
+pnpm --filter @tangle-network/brand check:compat
+pnpm typecheck
 pnpm build
+pnpm test
 ```
 
-To iterate inside a consuming app, link locally:
+For actual browser cascade checks, serve the repository with any local static server and open `packages/brand/scripts/theme-browser.html`. Repeat with light/dark color preferences and reduced motion. The page reports assertions for both default contracts, all named modes, nested scopes, aliases and immediate code-color changes. This CSS fixture does not substitute for the React SSR/hydration tests or a consuming app build.
 
-```bash
-# in ~/webb/brand
-pnpm link --global
-
-# in the consumer
-pnpm link --global @tangle-network/brand
-```
-
-Or use a `file:` path dependency (`"@tangle-network/brand": "file:../brand"`).
+For local consumer iteration, use workspace linking or a `file:` dependency, then run that consumer's real build and browser path before release.
