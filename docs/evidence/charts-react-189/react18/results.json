@@ -1,0 +1,32 @@
+[
+  {
+    "case": "desktop-light",
+    "width": 1100,
+    "tooltip_top_layer": true,
+    "transformed_ancestor": true,
+    "reduced_motion": true,
+    "keyboard": true,
+    "touch": false,
+    "page_errors": []
+  },
+  {
+    "case": "desktop-dark",
+    "width": 1100,
+    "tooltip_top_layer": true,
+    "transformed_ancestor": true,
+    "reduced_motion": true,
+    "keyboard": true,
+    "touch": false,
+    "page_errors": []
+  },
+  {
+    "case": "phone-light",
+    "width": 390,
+    "tooltip_top_layer": true,
+    "transformed_ancestor": true,
+    "reduced_motion": true,
+    "keyboard": true,
+    "touch": true,
+    "page_errors": []
+  }
+]
