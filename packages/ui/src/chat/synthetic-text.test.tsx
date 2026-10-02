@@ -74,7 +74,7 @@ describe("user text boundaries", () => {
     const { rerender } = render(<SyntheticText text="No trace captured" />);
     expect(screen.getByRole("note", { name: "Application note" })).toHaveTextContent("No trace captured");
     expect(screen.getByText("Application note")).toBeVisible();
-    rerender(<SyntheticText text=" \n " />);
+    rerender(<SyntheticText text={" \n "} />);
     expect(screen.queryByRole("note")).not.toBeInTheDocument();
   });
 });
