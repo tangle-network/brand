@@ -1,0 +1,76 @@
+{
+  "base": "6fc2fe4cd5579caf67019e17381104cc795d3e90",
+  "scope": "Supplementary native-DOM CSS utility probe; not React, Radix, packed package, complete theme cascade, or live app evidence",
+  "css_probe": {
+    "status": "passed",
+    "toolchain": {
+      "tailwind": "4.1.10",
+      "chromium": "144.0.7559.96"
+    },
+    "cases": [
+      {
+        "width": 390,
+        "mode": "light",
+        "fill": "rgb(245, 245, 245)",
+        "duration": "0.15s",
+        "input_height": 44,
+        "compact_height": 36,
+        "touch_height": 44,
+        "link_canvas_contrast": 5.0714
+      },
+      {
+        "width": 390,
+        "mode": "dark",
+        "fill": "rgb(31, 31, 31)",
+        "duration": "0.15s",
+        "input_height": 44,
+        "compact_height": 36,
+        "touch_height": 44,
+        "link_canvas_contrast": 9.0774
+      },
+      {
+        "width": 1280,
+        "mode": "light",
+        "fill": "rgb(245, 245, 245)",
+        "duration": "0.15s",
+        "input_height": 44,
+        "compact_height": 36,
+        "touch_height": 44,
+        "link_canvas_contrast": 5.0714
+      },
+      {
+        "width": 1280,
+        "mode": "dark",
+        "fill": "rgb(31, 31, 31)",
+        "duration": "0.15s",
+        "input_height": 44,
+        "compact_height": 36,
+        "touch_height": 44,
+        "link_canvas_contrast": 9.0774
+      }
+    ],
+    "boundary_cases": 16,
+    "screenshots": {
+      "css-only-1280-dark.png": "fdef679cef11593fa4c0ff1e304f09fb5b366107e238dee22f1b637fce359e7e",
+      "css-only-390-dark.png": "b64d5f0276955615779edeff1db7f55c97889658967309c4a5e22e55d3809186",
+      "css-only-390-light.png": "46df04682d98ba0cd289389daefea8b1a7e90e5928a962f855db7a918991564a",
+      "css-only-1280-light.png": "7327f1ea4273ac99a3fe0f79721877731ff534e98ff076c44a882e7bef1fdd54"
+    }
+  },
+  "executed_checks": [
+    "TypeScript 5.8.3 syntax/isolated transpilation: 9 files, zero diagnostics",
+    "Node syntax: packed runtime fixture",
+    "Python compilation: browser proof",
+    "Byte equality: Button behavior and Select content/items"
+  ],
+  "not_passed": [
+    "Repository unit tests, semantic typecheck, build and packed consumer: dependencies unavailable",
+    "Actual Storybook browser: ERR_BLOCKED_BY_ADMINISTRATOR",
+    "Native saved-profile autofill, other browser engines, published packages, live applications"
+  ],
+  "production_input_sha256": {
+    "packages/ui/src/lib/control-presentation.ts": "b141084b4cdf995335fb79ee865ed1049efe66842184afc0444b301e6245335e",
+    "packages/ui/src/primitives/button.tsx": "e0baa84a678a6640a19a80da8631ab0c91a582919d130c4696346b0134126a0f",
+    "packages/ui/src/primitives/metric-strip.tsx": "7076f8bc1b633514c86d78d7410059522e6bbf2f0c0e3125b3572a154fb10074"
+  }
+}

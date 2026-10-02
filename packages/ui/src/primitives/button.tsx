@@ -1,27 +1,28 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 import * as React from "react";
+import { controlMotion, controlSizes } from "../lib/control-presentation";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium text-sm transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
+  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium text-sm transition-[color,background-color,border-color,box-shadow,transform,scale] ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97] duration-[var(--transition-fast)]",
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97] duration-[var(--transition-fast)]",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97]",
         outline:
-          "border border-border bg-card hover:bg-muted active:scale-[0.97] duration-[var(--transition-fast)] text-foreground",
+          "border border-border bg-card hover:bg-muted active:scale-[0.97] text-foreground",
         secondary:
-          "bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97] duration-[var(--transition-fast)]",
+          "bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97]",
         ghost:
-          "hover:bg-muted hover:text-foreground duration-[var(--transition-fast)] text-muted-foreground border border-transparent",
-        link: "text-primary underline-offset-4 hover:underline",
+          "hover:bg-muted hover:text-foreground text-muted-foreground border border-transparent",
+        link: "text-[var(--accent-text)] underline-offset-4 hover:underline",
         sandbox:
-          "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97] duration-[var(--transition-fast)]",
+          "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97]",
       },
       size: {
         default: "h-[var(--control-height)] px-4 py-2",
@@ -29,6 +30,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-lg px-7 text-sm",
         xl: "h-13 rounded-xl px-9 text-base",
         icon: "h-[var(--control-height)] w-[var(--control-height)]",
+        ...controlSizes,
       },
     },
     defaultVariants: {
@@ -41,7 +43,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | null;
-  size?: "default" | "sm" | "lg" | "xl" | "icon" | null;
+  size?: "default" | "sm" | "lg" | "xl" | "icon" | "compact" | "touch" | null;
   asChild?: boolean;
   loading?: boolean;
   children?: React.ReactNode;
