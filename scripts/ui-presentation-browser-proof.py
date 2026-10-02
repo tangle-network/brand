@@ -11,19 +11,22 @@ from pathlib import Path
 import shutil
 import sys
 import traceback
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 origin = sys.argv[1].rstrip("/")
 out = Path(sys.argv[2])
 out.mkdir(parents=True, exist_ok=True)
 url = origin + "/iframe.html?id=primitives-control-presentation--presentation&viewMode=story"
 report = {"url": url, "status": "running", "cases": [], "gaps": ["Native saved-profile autofill UI", "WebKit/Firefox", "Published/live applications"]}
-style = """e => {
+style = r"""e => {
   const s = getComputedStyle(e);
   const resolve = value => {
-    const p = document.createElement('span');
-    p.style.backgroundColor = value; e.parentElement.append(p);
-    const color = getComputedStyle(p).backgroundColor; p.remove(); return color;
+    const expanded = value.replace(/var\((--[^)]+)\)/g, (_, token) => s.getPropertyValue(token).trim());
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1;
+    const context = canvas.getContext('2d'); context.fillStyle = expanded;
+    context.fillRect(0, 0, 1, 1);
+    const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
+    return `rgb(${red}, ${green}, ${blue})`;
   };
   return { background: s.backgroundColor, color: s.color, border: s.borderColor,
     height: e.getBoundingClientRect().height, font: s.fontSize,
@@ -48,6 +51,13 @@ def contrast(a, b):
         return sum(x * y for x, y in zip(linear, [0.2126, 0.7152, 0.0722]))
     high, low = sorted([luminance(a), luminance(b)], reverse=True)
     return (high + 0.05) / (low + 0.05)
+
+def seconds(value):
+    if value.endswith("ms"):
+        return float(value[:-2]) / 1000
+    if value.endswith("s"):
+        return float(value[:-1])
+    raise AssertionError(f"Not a CSS time: {value}")
 
 def settle(page):
     # Read the final transition state, but never await the pending spinner.
@@ -94,7 +104,7 @@ try:
                         expected = (36 if name in ["select", "button"] else 44) if size == "default" else height
                         assert fact["height"] == expected, (size, name, fact)
                         assert fact["duration"] == "0.15s", fact
-                        assert fact["fast"] == "150ms", fact
+                        assert abs(seconds(fact["fast"]) - 0.15) < 0.000001, fact
                         if name != "button":
                             assert fact["background"] == fact["well"] != fact["track"], fact
                             assert fact["color"] == fact["ink"], fact
@@ -117,14 +127,14 @@ try:
 
                 # Test changed link ink on actual scoped canvas/card colors,
                 # not raw hex assumptions.
-                action_colors = page.locator("[data-link-action]").evaluate("""e => {
+                action_colors = page.locator("[data-link-action]").evaluate(r"""e => {
                     const c = document.createElement('canvas'); c.width = c.height = 1;
                     const x = c.getContext('2d');
                     const rgb = color => { x.fillStyle=color; x.fillRect(0,0,1,1); return [...x.getImageData(0,0,1,1).data].slice(0,3); };
-                    const probe = document.createElement('span'); e.parentElement.append(probe);
-                    const resolve = value => { probe.style.backgroundColor=value; return rgb(getComputedStyle(probe).backgroundColor); };
+                    const style = getComputedStyle(e);
+                    const resolve = value => rgb(value.replace(/var\((--[^)]+)\)/g, (_, token) => style.getPropertyValue(token).trim()));
                     const result = {ink:rgb(getComputedStyle(e).color), canvas:resolve('hsl(var(--background))'), card:resolve('hsl(var(--card))')};
-                    probe.remove(); return result;
+                    return result;
                 }""")
                 measurements["linkContrast"] = {plane: contrast(action_colors["ink"], action_colors[plane]) for plane in ["canvas", "card"]}
                 assert min(measurements["linkContrast"].values()) >= 4.5, measurements["linkContrast"]
@@ -133,29 +143,41 @@ try:
                 page.get_by_role("textbox", name="default field", exact=True).focus()
                 page.keyboard.press("Tab")
                 trigger = page.get_by_role("combobox", name="default choice", exact=True)
-                assert trigger.evaluate("e => e === document.activeElement")
+                expect(trigger).to_be_focused()
                 page.keyboard.press("Space")
-                page.get_by_role("option", name="First account", exact=True).wait_for()
-                page.keyboard.press("ArrowDown")
+                first_option = page.get_by_role("option", name="First account", exact=True)
+                first_option.wait_for()
+                settle(page)
+                expect(first_option).to_be_focused()
+                second_option = page.get_by_role("option", name="Second account with a descriptive long name", exact=True)
+                # Radix can consume the first arrow while the portalled menu
+                # settles; require keyboard focus to reach the named option.
+                for _ in range(3):
+                    page.keyboard.press("ArrowDown")
+                    if second_option.evaluate("e => e === document.activeElement"):
+                        break
+                expect(second_option).to_be_focused()
                 page.keyboard.press("Enter")
-                assert page.locator("[data-choice]").inner_text() == "two"
-                assert trigger.evaluate("e => e === document.activeElement")
+                expect(page.locator("[data-choice]")).to_have_text("two")
+                expect(trigger).to_be_focused()
                 if width < 500:
                     page.get_by_role("combobox", name="touch choice", exact=True).tap()
                     page.get_by_role("option", name="First account", exact=True).tap()
-                    assert page.locator("[data-choice]").inner_text() == "one"
+                    expect(page.locator("[data-choice]")).to_have_text("one")
                 button = page.locator('[data-size-row="default"]').get_by_role("button", name="Save", exact=True)
                 button.focus(); page.keyboard.press("Enter")
-                assert page.locator("[data-action-count]").inner_text() == "1"
+                expect(page.locator("[data-action-count]")).to_have_text("1")
                 assert page.locator("[data-pending]").is_disabled()
                 assert page.locator("[data-pending]").get_attribute("aria-busy") == "true"
                 link = page.locator("[data-pending-link]")
                 assert link.get_attribute("href") is None
-                link.click(); link.focus(); page.keyboard.press("Enter")
-                assert page.locator("[data-action-count]").inner_text() == "1"
+                # Playwright refuses an aria-disabled click. Dispatch one to
+                # verify the component guard, then try keyboard activation.
+                link.dispatch_event("click"); link.focus(); page.keyboard.press("Enter")
+                expect(page.locator("[data-action-count]")).to_have_text("1")
                 action = page.locator("[data-long-action]")
                 action.tap() if width < 500 else action.click()
-                assert page.locator("[data-action-count]").inner_text() == "2"
+                expect(page.locator("[data-action-count]")).to_have_text("2")
                 assert action.evaluate("e => e.scrollWidth <= e.clientWidth + 1")
 
                 # A forced pseudo-state is a paint check, not a native autofill receipt.
