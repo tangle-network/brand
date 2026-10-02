@@ -9,6 +9,7 @@ export {
   CardDescription,
   CardContent,
 } from "./card";
+export type { CardTitleProps } from "./card";
 
 export {
   Dialog,
@@ -72,6 +73,7 @@ export {
   TableCell,
   TableCaption,
 } from "./table";
+export type { TableProps } from "./table";
 
 export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 
@@ -121,6 +123,12 @@ export { CodeBlock, CopyButton, InlineCode } from "./code-block";
 export type { CodeBlockProps, InlineCodeProps } from "./code-block";
 
 export { ThemeToggle, useTheme } from "./theme-toggle";
+
+export { Heading } from "./heading";
+export type { HeadingProps, HeadingVariant } from "./heading";
+
+export { PageShell } from "./page-shell";
+export type { PageShellProps } from "./page-shell";
 
 export { PageHeader } from "./page-header";
 export type { PageHeaderProps } from "./page-header";

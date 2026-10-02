@@ -1,38 +1,31 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
+import { Heading } from "./heading";
 
 /**
- * The one masthead every console page opens with.
- *
- * A page identifies itself in three separate registers, and each gets its own
- * slot here so they cannot compete for the same one:
- *
- *   - `title` — what the page IS. The `<h1>`, and the only `<h1>`.
- *   - `description` — one line on what it is for. Prose belongs here, never in
- *     the title slot: a paragraph rendered where a heading goes reads as body
- *     copy to a sighted reader and as nothing at all to a screen reader, which
- *     is how a page ends up with no accessible name.
- *   - `actions` — what the reader can DO from here, right-aligned and wrapping
- *     under the title on a narrow viewport rather than squeezing it.
- *
- * `meta` is the fourth register and the one most often missing: the small facts
- * that qualify everything below (a count, a scope, a window). They sit on their
- * own line under the title so a reader can tell the difference between "this
- * page has nothing in it" and "this filter matches nothing".
- *
- * `titleId` is exposed so a page can point `aria-labelledby` at the heading
- * from a region further down without minting a second copy of the string.
+ * A page masthead with separate title, prose, actions and qualifying metadata.
+ * Brand's existing props and header ref are preserved. Sandbox's existing
+ * action/eyebrow/titleAs inputs map into the same renderer, not a second header.
  */
 export interface PageHeaderProps
   extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   title: React.ReactNode;
   description?: React.ReactNode;
+  /** Canonical action slot. If supplied (even null), takes precedence over action. */
   actions?: React.ReactNode;
   meta?: React.ReactNode;
   titleId?: string;
-  /** Renders the title one step down for a nested/tab surface. */
+  /** Existing nested-surface treatment: h2 and section typography. */
   level?: 1 | 2;
+  /** Existing Sandbox action slot; used only when actions is undefined. */
+  action?: React.ReactNode;
+  eyebrow?: React.ReactNode;
+  /** Existing Sandbox semantic override; takes precedence over level's tag only. */
+  titleAs?: React.ElementType;
 }
+
+// A numeric zero is useful metadata, not an absent slot.
+const hasContent = (node: React.ReactNode) => Boolean(node) || node === 0;
 
 const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   (
@@ -41,39 +34,46 @@ const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
       title,
       description,
       actions,
+      action,
+      eyebrow,
       meta,
       titleId,
+      titleAs,
       level = 1,
       ...props
     },
     ref,
   ) => {
-    const Heading = level === 1 ? "h1" : "h2";
+    const resolvedActions = actions === undefined ? action : actions;
     return (
-      <header ref={ref} className={cn("mb-6", className)} {...props}>
-        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-          <div className="min-w-0">
+      <header ref={ref} className={cn("mb-6 min-w-0", className)} {...props}>
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div className="min-w-0 flex-[1_1_16rem]">
+            {hasContent(eyebrow) && (
+              <Heading variant="eyebrow" className="mb-1.5">{eyebrow}</Heading>
+            )}
             <Heading
               id={titleId}
-              className={cn(
-                "text-balance font-semibold tracking-tight",
-                level === 1 ? "text-2xl" : "text-lg",
-              )}
+              variant={level === 1 ? "page" : "section"}
+              as={titleAs ?? (level === 1 ? "h1" : "h2")}
+              className="text-balance"
             >
               {title}
             </Heading>
-            {description && (
-              <p className="mt-1 max-w-prose text-muted-foreground text-sm">
+            {hasContent(description) && (
+              <p className="mt-1 max-w-prose text-muted-foreground text-sm [overflow-wrap:anywhere]">
                 {description}
               </p>
             )}
           </div>
-          {actions && (
-            <div className="flex flex-wrap items-center gap-2">{actions}</div>
+          {hasContent(resolvedActions) && (
+            <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 [overflow-wrap:anywhere] [&>*]:min-w-0 [&>*]:max-w-full">
+              {resolvedActions}
+            </div>
           )}
         </div>
-        {meta && (
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[var(--text-dim)] text-xs">
+        {hasContent(meta) && (
+          <div className="mt-3 flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-[var(--text-dim)] text-xs [overflow-wrap:anywhere]">
             {meta}
           </div>
         )}

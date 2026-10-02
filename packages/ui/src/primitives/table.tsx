@@ -1,18 +1,39 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
-));
+export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+  /** Keep the existing scroll wrapper by default; false returns only the native table. */
+  wrapper?: boolean;
+  /**
+   * Attributes for the wrapper, not the table (ignored when wrapper is false).
+   * For an overflowing table, supply tabIndex and an accessible region name.
+   * No extra tab stop or unnamed landmark is imposed on every small table.
+   */
+  wrapperProps?: Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "dangerouslySetInnerHTML">;
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, wrapper = true, wrapperProps, ...props }, ref) => {
+    const table = (
+      <table
+        ref={ref}
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
+    );
+    if (!wrapper) return table;
+
+    const { className: wrapperClassName, ...attributes } = wrapperProps ?? {};
+    return (
+      <div
+        {...attributes}
+        className={cn("relative w-full overflow-auto", wrapperClassName)}
+      >
+        {table}
+      </div>
+    );
+  },
+);
 Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<
