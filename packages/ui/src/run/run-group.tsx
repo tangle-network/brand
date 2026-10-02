@@ -25,6 +25,7 @@ import type { CustomToolRenderer } from "../types/tool-display";
 import { InlineToolItem } from "./inline-tool-item";
 import { InlineThinkingItem } from "./inline-thinking-item";
 import { Markdown } from "../markdown/markdown";
+import { SyntheticText } from "../chat/synthetic-text";
 
 /**
  * One row on the run's timeline spine: a connector line + accent dot in a
@@ -319,25 +320,23 @@ export const RunGroup = memo(
         return true;
       }
 
-      return part.type === "text" && !part.synthetic && part.text.trim().length > 0;
+      return part.type === "text" && part.text.trim().length > 0;
     });
 
-    if (!hasRenderableParts) {
-      if (!isStreaming) {
-        return null;
-      }
+    const pendingResponse = (
+      <AssistantShell branding={branding} isStreaming={true}>
+        <div className="flex items-center gap-2 px-0.5 py-0.5 text-sm text-[var(--text-muted)]">
+          <span className="flex gap-[5px]">
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "0ms" }} />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "150ms" }} />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "300ms" }} />
+          </span>
+        </div>
+      </AssistantShell>
+    );
 
-      return (
-        <AssistantShell branding={branding} isStreaming={true}>
-          <div className="flex items-center gap-2 px-0.5 py-0.5 text-sm text-[var(--text-muted)]">
-            <span className="flex gap-[5px]">
-              <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "0ms" }} />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "150ms" }} />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "300ms" }} />
-            </span>
-          </div>
-        </AssistantShell>
-      );
+    if (!hasRenderableParts) {
+      return isStreaming ? pendingResponse : null;
     }
 
     const showTraceChrome = allParts.some(({ part }) => {
@@ -353,72 +352,106 @@ export const RunGroup = memo(
     });
 
     if (!showTraceChrome) {
+      // Notes split authored blocks rather than living inside an Agent bubble.
+      // Original message/part indices remain available for keys and callbacks.
+      const segments: Array<
+        | { kind: "note"; key: string; text: string }
+        | { kind: "source"; key: string; entries: typeof allParts }
+      > = [];
+      let lastSourceSegment = -1;
+      for (const entry of allParts) {
+        const { part, msgId, index } = entry;
+        if (part.type === "text" && !part.text.trim()) continue;
+        const key = `${msgId}-${index}`;
+        if (part.type === "text" && part.synthetic) {
+          segments.push({ kind: "note", key, text: part.text });
+        } else {
+          const previous = segments[segments.length - 1];
+          if (previous?.kind === "source") {
+            previous.entries.push(entry);
+          } else {
+            segments.push({ kind: "source", key, entries: [entry] });
+          }
+          lastSourceSegment = segments.length - 1;
+        }
+      }
       return (
-        <AssistantShell branding={branding} isStreaming={isStreaming}>
-            {allParts.map(({ part, msgId, index }) => {
-              const key = `${msgId}-${index}`;
+        <div className="space-y-3">
+          {segments.map((segment, segmentIndex) => segment.kind === "note" ? (
+            <SyntheticText key={segment.key} text={segment.text} />
+          ) : (
+            <AssistantShell
+              key={segment.key}
+              branding={branding}
+              isStreaming={isStreaming && segmentIndex === lastSourceSegment}
+            >
+              {segment.entries.map(({ part, msgId, index }) => {
+                const key = `${msgId}-${index}`;
 
-              if (part.type === "tool" && isOpenUITool(part as ToolPart)) {
-                const toolPart = part as ToolPart;
-                const schema = extractOpenUISchema(toolPart.state.output);
-                const summary = getOpenUISummary(toolPart.state.output);
+                if (part.type === "tool" && isOpenUITool(part as ToolPart)) {
+                  const toolPart = part as ToolPart;
+                  const schema = extractOpenUISchema(toolPart.state.output);
+                  const summary = getOpenUISummary(toolPart.state.output);
 
-                if (toolPart.state.status === "completed" && schema) {
-                  return (
-                    <div
-                      key={key}
-                      className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)]"
-                    >
-                      {summary ? (
-                        <div className="border-b border-[var(--border-subtle)] px-4 py-3 text-sm leading-6 text-foreground">
-                          {summary}
+                  if (toolPart.state.status === "completed" && schema) {
+                    return (
+                      <div
+                        key={key}
+                        className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)]"
+                      >
+                        {summary ? (
+                          <div className="border-b border-[var(--border-subtle)] px-4 py-3 text-sm leading-6 text-foreground">
+                            {summary}
+                          </div>
+                        ) : null}
+                        <div className="p-4">
+                          <OpenUIArtifactRenderer schema={schema} />
                         </div>
-                      ) : null}
-                      <div className="p-4">
-                        <OpenUIArtifactRenderer schema={schema} />
                       </div>
-                    </div>
-                  );
+                    );
+                  }
+
+                  if (toolPart.state.status === "running") {
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground"
+                      >
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        Building view…
+                      </div>
+                    );
+                  }
                 }
 
-                if (toolPart.state.status === "running") {
+                if (part.type === "text" && !part.synthetic && part.text.trim()) {
                   return (
-                    <div
-                      key={key}
-                      className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground"
-                    >
-                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                      Building view…
+                    <div key={key} className="px-0.5">
+                      <Markdown className="tangle-prose text-[15px] leading-7 text-[var(--text-primary)]">
+                        {part.text}
+                      </Markdown>
                     </div>
                   );
                 }
-              }
 
-              if (part.type === "text" && !part.synthetic && part.text.trim()) {
-                return (
-                  <div key={key} className="px-0.5">
-                    <Markdown className="tangle-prose text-[15px] leading-7 text-[var(--text-primary)]">
-                      {part.text}
-                    </Markdown>
-                  </div>
-                );
-              }
-
-              return null;
-            })}
-        </AssistantShell>
+                return null;
+              })}
+            </AssistantShell>
+          ))}
+          {isStreaming && lastSourceSegment === -1 ? pendingResponse : null}
+        </div>
       );
     }
 
-    // Renderable rows: skip empty/synthetic text so spine dots map to real steps.
+    // Keep notes in source order; response statistics still count authored text only.
     const rows = allParts.filter(({ part }) => {
       if (part.type === "tool" || part.type === "reasoning") return true;
-      return part.type === "text" && !part.synthetic && part.text.trim().length > 0;
+      return part.type === "text" && part.text.trim().length > 0;
     });
 
     const dotAccent = (part: SessionPart): string => {
       if (part.type === "reasoning") return "bg-[var(--brand-glow)]";
-      if (part.type === "text") return "bg-primary";
+      if (part.type === "text" && !part.synthetic) return "bg-primary";
       return "bg-[var(--border-hover)]";
     };
 
@@ -532,8 +565,10 @@ export const RunGroup = memo(
                   node = (
                     <InlineThinkingItem part={part as ReasoningPart} defaultOpen={isStreaming} />
                   );
-                } else if (part.type === "text" && !part.synthetic && part.text.trim()) {
-                  node = (
+                } else if (part.type === "text" && part.text.trim()) {
+                  node = part.synthetic ? (
+                    <SyntheticText text={part.text} />
+                  ) : (
                     <div className="px-1 py-0.5">
                       <Markdown className="tangle-prose text-[15px] leading-7">{part.text}</Markdown>
                     </div>
