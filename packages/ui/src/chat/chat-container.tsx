@@ -8,7 +8,7 @@ import { ArrowDown } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import type { SessionMessage } from "../types/message";
-import type { SessionPart, TextPart, ToolPart } from "../types/parts";
+import type { SessionPart, ToolPart } from "../types/parts";
 import type { AgentBranding } from "../types/branding";
 import type { CustomToolRenderer } from "../types/tool-display";
 import type { Run } from "../types/run";
@@ -16,6 +16,7 @@ import { useRunGroups } from "../hooks/use-run-groups";
 import { useRunCollapseState } from "../hooks/use-run-collapse-state";
 import { useAutoScroll } from "../hooks/use-auto-scroll";
 import { MessageList } from "./message-list";
+import { SyntheticText, userTextSegments } from "./synthetic-text";
 import {
   AgentTimeline,
   type AgentTimelineItem,
@@ -219,21 +220,25 @@ function buildTimelineItems(
     const parts = partMap[message.id] ?? [];
 
     if (message.role === "user") {
-      const content = parts
-        .filter((part): part is TextPart => part.type === "text")
-        .map((part) => part.text)
-        .join("\n")
-        .trim();
-
-      if (!content) continue;
-
-      items.push({
-        id: message.id,
-        kind: "message",
-        role: "user",
-        content,
-        timestamp: createdAtFromMessage(message),
-      });
+      const segments = userTextSegments(parts);
+      for (const segment of segments) {
+        const id = segments.length === 1 ? message.id : `${message.id}-user-${segment.index}`;
+        if (segment.synthetic) {
+          items.push({
+            id,
+            kind: "custom",
+            content: <div className="mx-3"><SyntheticText text={segment.text} /></div>,
+          });
+        } else {
+          items.push({
+            id,
+            kind: "message",
+            role: "user",
+            content: segment.text.trim(),
+            timestamp: createdAtFromMessage(message),
+          });
+        }
+      }
       continue;
     }
 
@@ -288,6 +293,18 @@ function buildTimelineItems(
       }
 
       flushToolBuffer(index);
+
+      // A note is neither an assistant reply nor an OpenUI instruction.
+      if (part.type === "text" && part.synthetic) {
+        if (part.text.trim()) {
+          items.push({
+            id: itemId,
+            kind: "custom",
+            content: <div className="mx-3"><SyntheticText text={part.text} /></div>,
+          });
+        }
+        return;
+      }
 
       if (part.type === "text" && !part.synthetic && part.text.trim()) {
         // Check if the text itself contains an OpenUI JSON block
