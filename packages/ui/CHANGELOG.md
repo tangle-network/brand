@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.13.1
+
+### Patch Changes
+
+- 5cbda07: Load the full Highlight.js syntax renderer only when a code block mounts.
+  Keep code readable until highlighting arrives, and leave prose-only Markdown free of syntax-engine requests.
+
 ## 11.13.0
 
 ### Minor Changes
