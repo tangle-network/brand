@@ -26,18 +26,22 @@ export async function verify() {
   }
   const markdown = renderToStaticMarkup(h(Markdown));
   assert.match(markdown, /<h1[^>]*>Packed markdown<\/h1>/);
-  assert.match(markdown, /<span\b[^>]*style="[^"]*color:[^"]*"[^>]*>42<\/span>/);
   assert.match(markdown, /packedAnswer/);
+  assert.match(markdown, /<pre\b[^>]*><code\b[^>]*>const packedAnswer = 42;/);
 
   const root = createRoot(document.getElementById("root"));
   try {
+    root.render(h(Markdown));
+    await until(() => document.querySelector("pre code")?.innerHTML.includes("--syntax-number") &&
+      document.querySelector("pre code")?.textContent.includes("packedAnswer"),
+    "the packed async highlighter must load for fenced code");
     root.render(h(Editor));
     await until(() => document.querySelector('.ProseMirror[contenteditable="true"]')?.textContent.includes("Packed editor"),
       "the installed editor peers must load and mount the local editor");
     root.render(h(Editor, { markdown: "# Updated packed editor", readOnly: true }));
     await until(() => document.querySelector('.ProseMirror[contenteditable="false"]')?.textContent.includes("Updated packed editor"),
       "the packed editor must accept content and read-only updates");
-    console.log("UI_IMPORTS_RUNTIME: primitives SSR, markdown highlighting, legacy identity, local editor mount/update passed");
+    console.log("UI_IMPORTS_RUNTIME: primitives SSR, readable markdown SSR, async highlighting, legacy identity, local editor mount/update passed");
   } finally {
     root.unmount();
   }
