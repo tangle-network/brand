@@ -187,3 +187,51 @@ describe("extracted stacked renderer", () => {
     expect(document.querySelector("b")).toBeNull();
   });
 });
+
+describe("pointer tooltip", () => {
+  function pointer(element: Element, type: string, x = 100, y = 100, eventType = "pointermove") {
+    const event = new Event(eventType, { bubbles: true });
+    Object.defineProperties(event, {
+      pointerType: { value: type }, clientX: { value: x }, clientY: { value: y },
+    });
+    fireEvent(element, event);
+  }
+  it("follows the pointer and keeps the keyboard readout available", () => {
+    const { container } = render(<Controlled />);
+    const bar = screen.getAllByRole("button")[0];
+    fireEvent.mouseEnter(bar, { clientX: 100, clientY: 120 });
+    const tooltip = container.querySelector<HTMLElement>("[data-chart-tooltip]")!;
+    expect(tooltip.textContent).toContain("First series: 2 units");
+    expect(tooltip.style.transform).toBe("translate(114px, 134px)");
+    fireEvent.mouseMove(bar, { clientX: 200, clientY: 220 });
+    expect(tooltip.style.transform).toBe("translate(214px, 234px)");
+    fireEvent.keyDown(bar, { key: "Enter" });
+    expect(container.querySelector("[data-chart-tooltip]")).toBeNull();
+    expect(screen.getByRole("status").textContent).toContain("First bucket");
+  });
+  it("flips inside viewport edges and clears on pen leave", () => {
+    const bounds = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 200, height: 100, x: 0, y: 0, top: 0, right: 200, bottom: 100, left: 0, toJSON: () => ({}),
+    });
+    try {
+      const { container } = render(<Controlled />);
+      const bar = screen.getAllByRole("button")[0];
+      pointer(bar, "pen", window.innerWidth - 5, window.innerHeight - 5);
+      expect(container.querySelector<HTMLElement>("[data-chart-tooltip]")!.style.transform)
+        .toBe(`translate(${window.innerWidth - 219}px, ${window.innerHeight - 119}px)`);
+      pointer(bar, "pen", 0, 0, "pointerout");
+      expect(container.querySelector("[data-chart-tooltip]")).toBeNull();
+    } finally { bounds.mockRestore(); }
+  });
+  it("keeps touch selection without an overlay and accepts the next pen movement", () => {
+    const { container } = render(<Controlled />);
+    const bar = screen.getAllByRole("button")[0];
+    fireEvent.mouseEnter(bar);
+    touchDown(bar);
+    fireEvent.click(bar);
+    expect(container.querySelector("[data-chart-tooltip]")).toBeNull();
+    expect(screen.getByRole("status").textContent).toContain("First bucket");
+    pointer(screen.getAllByRole("button")[1], "pen");
+    expect(container.querySelector("[data-chart-tooltip]")!.textContent).toContain("Second bucket");
+  });
+});

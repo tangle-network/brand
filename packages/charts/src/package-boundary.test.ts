@@ -114,7 +114,9 @@ it("packs an isolated static root and optional React entrypoint", () => {
       files: ["static.ts"],
     };
     writeFileSync(join(consumer, "tsconfig.json"), JSON.stringify(staticConfig));
-    const tsc = require.resolve("typescript/bin/tsc");
+    const typescriptManifestPath = require.resolve("typescript/package.json");
+    const typescriptManifest = JSON.parse(readFileSync(typescriptManifestPath, "utf8"));
+    const tsc = join(dirname(typescriptManifestPath), typescriptManifest.bin.tsc);
     execFileSync(process.execPath, [tsc, "-p", "tsconfig.json"], { cwd: consumer, stdio: "pipe", timeout: 30_000 });
 
     // Only AFTER the React-free runtime/type proofs, supply the workspace's

@@ -3,9 +3,9 @@
  * products/platform/web/src/client/components/UsageChartSvg.tsx.
  * Keeps its viewBox, hit targets, actual-stack highlight and select-never-toggle
  * interaction. Product/category mapping, aggregation, currency and the portal
- * tooltip remain in the application; no React DOM dependency is needed here.
+ * tooltip formatting remain caller-owned; no React DOM dependency is needed here.
  */
-import { Fragment, useId, useRef } from "react";
+import { Fragment, useId, useRef, useState } from "react";
 
 export interface StackedBarSeries {
   readonly id: string;
@@ -92,6 +92,25 @@ export function StackedBarChart(props: StackedBarChartProps) {
   } = props;
   const readoutId = useId();
   const touchInteraction = useRef(false);
+  const [pointerBucketId, setPointerBucketId] = useState<string | null>(null);
+  const pointerPosition = useRef({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const positionTooltip = (element: HTMLDivElement) => {
+    const viewport = element.ownerDocument.defaultView;
+    if (!viewport) return;
+    const { width, height } = element.getBoundingClientRect();
+    const { x, y } = pointerPosition.current;
+    // Flip beside the pointer at viewport edges, then clamp within the window.
+    const left = x + 14 + width <= viewport.innerWidth - 8 ? x + 14 : x - width - 14;
+    const top = y + 14 + height <= viewport.innerHeight - 8 ? y + 14 : y - height - 14;
+    element.style.transform = `translate(${Math.max(8, Math.min(left, viewport.innerWidth - width - 8))}px, ${Math.max(8, Math.min(top, viewport.innerHeight - height - 8))}px)`;
+  };
+  const trackPointer = (event: { clientX: number; clientY: number }, bucketId: string) => {
+    pointerPosition.current = { x: event.clientX, y: event.clientY };
+    if (pointerBucketId !== bucketId) setPointerBucketId(bucketId);
+    // Pointer movement changes only the overlay transform, not chart rendering.
+    if (tooltipRef.current) positionTooltip(tooltipRef.current);
+  };
   validate(props);
   const bySeries = new Map(series.map((entry) => [entry.id, entry]));
   const formatted = (value: number | null) => isValue(value) ? formatValue(value) : unavailableLabel;
@@ -142,12 +161,43 @@ export function StackedBarChart(props: StackedBarChartProps) {
               <g key={bucket.id} role="button" tabIndex={0} data-bucket-id={bucket.id}
                 data-gap={gap || undefined} aria-label={summary(bucket)}
                 aria-describedby={isActive ? readoutId : undefined}
-                onPointerEnter={(event) => { touchInteraction.current = event.pointerType === "touch"; }}
-                onPointerDown={(event) => { touchInteraction.current = event.pointerType === "touch"; }}
-                onMouseEnter={() => { if (!touchInteraction.current) select(); }}
-                onMouseLeave={() => { if (!touchInteraction.current) clear(); }}
+                onPointerEnter={(event) => {
+                  touchInteraction.current = event.pointerType === "touch";
+                  if (!touchInteraction.current) { trackPointer(event, bucket.id); select(); }
+                }}
+                onPointerLeave={() => {
+                  if (!touchInteraction.current) { setPointerBucketId(null); clear(); }
+                }}
+                onPointerDown={(event) => {
+                  touchInteraction.current = event.pointerType === "touch";
+                  if (touchInteraction.current) setPointerBucketId(null);
+                }}
+                onPointerMove={(event) => {
+                  touchInteraction.current = event.pointerType === "touch";
+                  if (!touchInteraction.current) {
+                    trackPointer(event, bucket.id);
+                    if (selectedBucketId !== bucket.id) select();
+                  }
+                }}
+                onMouseEnter={(event) => {
+                  if (!touchInteraction.current) {
+                    trackPointer(event, bucket.id);
+                    select();
+                  }
+                }}
+                onMouseMove={(event) => { if (!touchInteraction.current) {
+                    trackPointer(event, bucket.id);
+                    if (selectedBucketId !== bucket.id) select();
+                  } }}
+                onMouseLeave={() => {
+                  if (!touchInteraction.current) {
+                    setPointerBucketId(null);
+                    clear();
+                  }
+                }}
                 onFocus={select} onBlur={clear} onClick={select}
                 onKeyDown={(event) => {
+                  setPointerBucketId(null);
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     select(); // Select, never toggle after focus/hover/tap.
@@ -187,8 +237,36 @@ export function StackedBarChart(props: StackedBarChartProps) {
           })}
         </svg>
       </section>
-      {/* No portal or viewport state. A consumer may layer its own tooltip on
-          this controlled selection; all values remain readable without one. */}
+      {activeBucket && pointerBucketId === activeBucket.id && !touchInteraction.current && (
+        <div data-chart-tooltip="" role="tooltip" aria-hidden="true" popover="manual"
+          ref={(element) => {
+            tooltipRef.current = element;
+            if (element) {
+              // Native popovers escape clipping and transformed containing blocks.
+              // The fixed-position fallback supports browsers without popovers.
+              if (typeof element.showPopover === "function") element.showPopover();
+              positionTooltip(element);
+            }
+          }}
+          style={{
+            position: "fixed", inset: "auto", margin: 0, left: 0, top: 0, zIndex: 1000, pointerEvents: "none",
+            width: "max-content", maxWidth: "min(280px, calc(100vw - 16px))",
+            padding: "10px 12px", borderRadius: "var(--radius-md, 8px)",
+            background: "var(--md3-surface-container-highest, #3b3b3b)",
+            color: "var(--md3-on-surface, #e6e6e6)",
+            border: "1px solid var(--md3-outline-variant, #4c4c4c)",
+            fontFamily: "inherit", fontSize: "0.75rem", lineHeight: 1.5,
+            overflowWrap: "anywhere",
+          }}>
+          <strong>{activeBucket.label}</strong>
+          <div>Total {formatted(activeBucket.total)}</div>
+          {activeBucket.segments.map((segment) => (
+            <div key={segment.seriesId}>{bySeries.get(segment.seriesId)!.label}: {formatted(segment.value)}</div>
+          ))}
+        </div>
+      )}
+      {/* The persistent readout and table expose full values to keyboard and
+          touch users; the pointer overlay repeats them without another announcement. */}
       <div id={readoutId} role="status" aria-live="polite" aria-atomic="true">
         {activeBucket ? summary(activeBucket) : "Hover, tap, or focus a bar to see its breakdown."}
       </div>

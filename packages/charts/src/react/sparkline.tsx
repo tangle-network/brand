@@ -152,7 +152,7 @@ export function Sparkline({
   if (geometry.points.length === 0) {
     return (
       <span data-sparkline={geometry.gaps > 0 ? "unavailable" : "empty"}
-        className={["text-[11px] text-muted-foreground", className].filter(Boolean).join(" ")}>
+        className={className}>
         <span style={hidden}>{accessibleName}</span>
         <span aria-hidden="true">{geometry.gaps > 0 ? unavailableLabel : emptyLabel}</span>
       </span>

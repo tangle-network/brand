@@ -86,7 +86,7 @@ describe("ported extent sparkline", () => {
       .toBe("Metric: 3 readings, range 1 units to 9 units, falling from 9 units to 1 units");
     const { container } = render(<Sparkline values={[]} label="Runs" emptyLabel="No samples" className="caller" />);
     expect(container.textContent).toContain("No samples");
-    expect(container.firstElementChild?.getAttribute("class")).toBe("text-[11px] text-muted-foreground caller");
+    expect(container.firstElementChild?.getAttribute("class")).toBe("caller");
   });
   it("does not add animation or a keyboard stop to a noninteractive glyph", () => {
     const { container } = render(<Sparkline values={[1, 2]} />);
