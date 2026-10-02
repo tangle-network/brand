@@ -13,6 +13,7 @@ import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { build as esbuildBuild } from "esbuild";
 import { build } from "vite";
+import { runUiImportFixtures } from "./fixtures/ui-imports/check.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const packageArgument = process.argv[2];
@@ -412,6 +413,20 @@ export const entries = [${specifiers.map((_, index) => `tsEntry${index}`).join("
     logLevel: "error",
     absWorkingDir: consumerDirectory,
   });
+
+  // Run the paired layout proof once, with every peer installed. Keep the
+  // existing alternate-peer and omitted-peer smoke contracts unchanged.
+  if (
+    manifest.name === "@tangle-network/ui" &&
+    omittedOptionalPeers.length === 0 &&
+    Object.keys(peerOverrides).length === 0 &&
+    !process.env.PACKAGE_TARBALL
+  ) {
+    await runUiImportFixtures({
+      root, packageDirectory, consumerDirectory, installedDirectory,
+      tarballPath, workDirectory,
+    });
+  }
 
   const omissionNote =
     omittedOptionalPeers.length > 0

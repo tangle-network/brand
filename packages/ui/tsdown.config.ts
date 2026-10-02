@@ -21,12 +21,17 @@ export default defineConfig({
     "tool-previews": "src/tool-previews/index.ts",
     redaction: "src/redaction/index.ts",
   },
+  // Keep component modules independently removable by consumers. In particular,
+  // the existing primitives -> markdown CodeBlock re-export must not co-locate
+  // syntax-highlighter initialization with Button/Input/Card in a shared chunk.
+  // Explicit entry names above retain every existing package export target.
+  unbundle: true,
+  root: "src",
   format: ["esm"],
   platform: "neutral",
   dts: true,
   clean: true,
   fixedExtension: false,
-  // Bundling drops per-file "use client" directives, as tsup did before.
-  // Consumers mark their own client boundaries.
+  // Consumers continue to own their client boundaries.
   checks: { moduleLevelDirective: false },
 });
