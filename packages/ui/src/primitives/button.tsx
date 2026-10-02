@@ -1,11 +1,11 @@
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import * as React from "react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium text-sm transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
+  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium text-sm transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
     variants: {
       variant: {
@@ -47,6 +47,36 @@ export interface ButtonProps
   children?: React.ReactNode;
 }
 
+type ButtonChildProps = React.HTMLAttributes<HTMLElement> & {
+  disabled?: boolean;
+  href?: string;
+};
+
+function preventActivation(event: React.SyntheticEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+function disabledHandlers(props: React.HTMLAttributes<HTMLElement>) {
+  const guardKey = (handler?: React.KeyboardEventHandler<HTMLElement>) =>
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      if (event.key === "Enter" || event.key === " ") preventActivation(event);
+      else handler?.(event);
+    };
+
+  return {
+    onClickCapture: preventActivation,
+    onAuxClickCapture: preventActivation,
+    onDoubleClickCapture: preventActivation,
+    onPointerDownCapture: preventActivation,
+    onPointerUpCapture: preventActivation,
+    onMouseDownCapture: preventActivation,
+    onMouseUpCapture: preventActivation,
+    onKeyDownCapture: guardKey(props.onKeyDownCapture),
+    onKeyUpCapture: guardKey(props.onKeyUpCapture),
+  };
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -61,36 +91,54 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
-
-    // When using asChild, we can't add the loading spinner as it would create multiple children
-    // which breaks Slot's single-child requirement
     if (asChild) {
+      const child = React.isValidElement<ButtonChildProps>(children) ? children : null;
+      const isDisabled = disabled || loading || child?.props.disabled;
+
+      // Slot composes child handlers first. Guard BOTH capture paths so neither
+      // child nor Button activation handlers run, without changing enabled order.
+      // Keep slotted content intact: its action name must survive loading too.
       return (
-        <Comp
+        <Slot
           className={cn(buttonVariants({ variant, size, className }))}
           ref={ref}
           {...props}
+          {...(isDisabled ? disabledHandlers(props) : {})}
         >
-          {children}
-        </Comp>
+          {child ? React.cloneElement(child, {
+            ...(loading ? { "aria-busy": true } : {}),
+            ...(isDisabled ? {
+              "aria-disabled": true,
+              ...(child.type === "button" ? { disabled: true } : { tabIndex: -1 }),
+              // Removing href also prevents native context-menu / middle-click
+              // navigation. Keep link semantics while it is unavailable.
+              ...(child.type === "a" ? {
+                href: undefined,
+                role: child.props.role ?? props.role ?? "link",
+              } : {}),
+              ...disabledHandlers(child.props),
+            } : {}),
+          }) : children}
+        </Slot>
       );
     }
 
     return (
-      <Comp
+      <button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        disabled={disabled || loading}
         {...props}
+        disabled={disabled || loading}
+        aria-busy={loading || props["aria-busy"]}
       >
         {loading && (
           <svg
-            className="mr-2 -ml-1 h-4 w-4 animate-spin"
+            className="mr-2 -ml-1 h-4 w-4 animate-spin motion-reduce:animate-none"
+            aria-hidden="true"
+            focusable="false"
             fill="none"
             viewBox="0 0 24 24"
           >
-            <title>Loading spinner</title>
             <circle
               className="opacity-25"
               cx="12"
@@ -107,7 +155,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
-      </Comp>
+      </button>
     );
   },
 );

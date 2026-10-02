@@ -1,6 +1,9 @@
+"use client";
+
 import * as React from "react";
 import { focusField, focusFieldInvalid } from "../lib/focus";
 import { cn } from "../lib/utils";
+import { Label } from "./label";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -30,6 +33,11 @@ const inputVariants = cva(
   }
 );
 
+// Only rendered descriptions are added; caller IDs and their order are retained.
+function descriptionIds(...ids: Array<string | undefined>) {
+  return [...new Set(ids.join(" ").split(/\s+/).filter(Boolean))].join(" ") || undefined;
+}
+
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     VariantProps<typeof inputVariants> {
@@ -40,10 +48,16 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { className, type, variant, size, label, error, hint, id, ...props },
+    {
+      className, type, variant, size, label, error, hint, id,
+      "aria-describedby": describedBy, "aria-invalid": invalid, ...props
+    },
     ref,
   ) => {
-    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
+    const hintId = hint ? `${inputId}-hint` : undefined;
+    const errorId = error ? `${inputId}-error` : undefined;
 
     const input = (
       <input
@@ -52,6 +66,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className={cn(inputVariants({ variant: error ? "error" : variant, size, className }))}
         ref={ref}
         {...props}
+        aria-describedby={descriptionIds(describedBy, hintId, errorId)}
+        aria-invalid={error || variant === "error" ? true : invalid}
       />
     );
 
@@ -59,19 +75,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="w-full space-y-1.5">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="block font-medium text-foreground text-sm"
-          >
-            {label}
-          </label>
-        )}
+        {label && <Label htmlFor={inputId} className="block">{label}</Label>}
         {input}
-        {error && <p className="text-[var(--surface-danger-text)] text-sm font-medium">{error}</p>}
-        {hint && !error && (
-          <p className="text-[var(--text-dim)] text-sm">{hint}</p>
-        )}
+        {error && <p id={errorId} className="text-[var(--surface-danger-text)] text-sm font-medium">{error}</p>}
+        {hint && <p id={hintId} className="text-[var(--text-dim)] text-sm">{hint}</p>}
       </div>
     );
   },
@@ -90,10 +97,16 @@ export interface TextareaProps
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     // `variant` is taken out so it never reaches the DOM element.
-    { className, variant: _variant, label, error, hint, id, ...props },
+    {
+      className, variant: _variant, label, error, hint, id,
+      "aria-describedby": describedBy, "aria-invalid": invalid, ...props
+    },
     ref,
   ) => {
-    const textareaId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    const generatedId = React.useId();
+    const textareaId = id ?? generatedId;
+    const hintId = hint ? `${textareaId}-hint` : undefined;
+    const errorId = error ? `${textareaId}-error` : undefined;
 
     const textarea = (
       <textarea
@@ -108,6 +121,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         ref={ref}
         {...props}
+        aria-describedby={descriptionIds(describedBy, hintId, errorId)}
+        aria-invalid={error ? true : invalid}
       />
     );
 
@@ -115,19 +130,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     return (
       <div className="w-full space-y-1.5">
-        {label && (
-          <label
-            htmlFor={textareaId}
-            className="block font-medium text-muted-foreground text-sm"
-          >
-            {label}
-          </label>
-        )}
+        {label && <Label htmlFor={textareaId} className="block">{label}</Label>}
         {textarea}
-        {error && <p className="text-[var(--surface-danger-text)] text-sm">{error}</p>}
-        {hint && !error && (
-          <p className="text-[var(--text-dim)] text-sm">{hint}</p>
-        )}
+        {error && <p id={errorId} className="text-[var(--surface-danger-text)] text-sm">{error}</p>}
+        {hint && <p id={hintId} className="text-[var(--text-dim)] text-sm">{hint}</p>}
       </div>
     );
   },
