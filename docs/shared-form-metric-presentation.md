@@ -164,11 +164,35 @@ Observed in this execution:
 See [the scoped receipt](evidence/shared-form-metric/receipt.json). Main #202
 removed automatic PR CI; this PR does not restore it or claim a hosted green run.
 
+## Maintainer verification after the constrained Pro run
+
+The receipt above records the original Pro environment and remains unchanged as
+historical evidence. On an integration host with the repository toolchain,
+maintainer verification later passed: 45 focused component tests,
+`pnpm typecheck`, full `pnpm build`, the packed UI package smoke (including its
+clean runtime, import-graph and TypeScript consumer checks), and
+`pnpm build-storybook`. The Storybook Playwright proof passed in Chromium at 390 and
+1280px in light and dark themes, including keyboard/touch controls, disabled
+activation, scoped wells, forced-autofill paint, reduced motion, all four
+MetricStrip presets and separator boundaries at 639/640/1023/1024px. All four
+cases had no page errors or horizontal overflow.
+
+A separate Vite consumer installed actual packed Brand 1.10.0 and UI 11.14.0
+candidate tarballs with npm and built successfully. Four Chromium phone/desktop
+light/dark cases preserved validation, ARIA, selection, saving and loading
+behavior with no page errors or overflow. The candidate UI tarball SHA256 is
+`2ce738b658ab276b3249d7d5ab21bff716f1a1223896f7b6b84324bc4dcb5fa5`;
+the component source tree remained unchanged during the browser-proof repair.
+The exact commands, results and screenshot hashes are recorded in PR #203's
+maintainer receipt. A forced CSS autofill state is still not a saved-profile
+autofill test; WebKit/Firefox, screen-reader and public-release claims remain
+outside this verification.
+
 ## Remaining owners and gates
 
-Brand maintainers own the unrun full-toolchain unit/type/build/packed/Storybook
-checks and review before merge. The UI publisher owns version assignment,
-registry artifact verification and release; no public release is claimed here.
+Brand maintainers own source review and merge after the checks above. The UI
+publisher owns version assignment, registry artifact verification and release;
+no public release is claimed here.
 Platform owns dependency adoption and the usage-summary override migration.
 Sandbox UI's compatibility/publishing owner owns adoption without changing an
 already-frozen publication cut. Application QA owns live served-page proof,
