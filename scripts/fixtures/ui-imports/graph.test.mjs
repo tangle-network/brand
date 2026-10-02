@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { assertLightGraph, compressedBytes, emittedGraph, forbiddenModules } from "./graph.mjs";
+import { assertLightGraph, compressedBytes, emittedGraph, forbiddenModules, reachableGraph } from "./graph.mjs";
 
 const components = ["button", "input", "card"].map(
   (name) => `node_modules/@tangle-network/ui/dist/primitives/${name}.js`,
@@ -67,4 +67,48 @@ test("gzip and brotli count each resource separately and reproducibly", () => {
     Object.entries(once).map(([name, bytes]) => [name, 2 * bytes]),
   ));
   assert.ok(once.gzip < once.raw && once.brotli < once.raw);
+});
+
+const entry = () => ({ entryPoint: 'light.mjs', inputs: Object.fromEntries(
+  components.map((name) => [name, { bytesInOutput: 10 }])) });
+
+test('an unreachable compiler entry remains visible separately from consumer code', () => {
+  const metafile = { outputs: {
+    'entry.js': entry(),
+    'orphan.js': { entryPoint: 'unused-editor.mjs', inputs: { [syntax]: { bytesInOutput: 20 } } },
+  } };
+  const graph = reachableGraph(metafile, 'light.mjs');
+  assertLightGraph(graph);
+  assert.deepEqual(graph.outputPaths, ['entry.js']);
+  assert.deepEqual(graph.orphanPaths, ['orphan.js']);
+  assert.deepEqual(forbiddenModules(emittedGraph(metafile)), [syntax]);
+});
+
+test('all static, dynamic and shared edges enter the light gate', () => {
+  for (const kind of ['import-statement', 'dynamic-import']) {
+    const metafile = { outputs: {
+      'entry.js': { ...entry(), imports: [{ path: 'shared.js', kind }] },
+      'shared.js': { inputs: {}, imports: [{ path: 'lazy.js', kind: 'dynamic-import' }] },
+      'lazy.js': { inputs: { [syntax]: { bytesInOutput: 20 } }, imports: [{ path: 'shared.js' }] },
+    } };
+    const graph = reachableGraph(metafile, 'light.mjs');
+    assert.deepEqual(graph.outputPaths, ['entry.js', 'lazy.js', 'shared.js']);
+    assert.deepEqual(graph.orphanPaths, []);
+    assert.throws(() => assertLightGraph(graph), /heavy code/);
+  }
+});
+
+test('missing, ambiguous or partial output graphs cannot manufacture a pass', () => {
+  assert.throws(() => reachableGraph({ outputs: {} }, 'light.mjs'), /exactly one/);
+  assert.throws(() => reachableGraph({ outputs: { 'a.js': entry(), 'b.js': entry() } }, 'light.mjs'), /exactly one/);
+  assert.throws(() => reachableGraph({ outputs: {
+    'entry.js': { ...entry(), imports: [{ path: 'missing.js' }] },
+  } }, 'light.mjs'), /missing emitted import/);
+});
+
+test('reachable external dependencies still fail the consumer gate', () => {
+  const graph = reachableGraph({ outputs: {
+    'entry.js': { ...entry(), imports: [{ path: '@tiptap/core', external: true }] },
+  } }, 'light.mjs');
+  assert.throws(() => assertLightGraph(graph), /externals/);
 });

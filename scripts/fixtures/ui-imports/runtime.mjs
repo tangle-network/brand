@@ -26,7 +26,7 @@ export async function verify() {
   }
   const markdown = renderToStaticMarkup(h(Markdown));
   assert.match(markdown, /<h1[^>]*>Packed markdown<\/h1>/);
-  assert.match(markdown, /<span\b[^>]*style="[^"]*color:[^"]*"[^>]*>const<\/span>/);
+  assert.match(markdown, /<span\b[^>]*style="[^"]*color:[^"]*"[^>]*>42<\/span>/);
   assert.match(markdown, /packedAnswer/);
 
   const root = createRoot(document.getElementById("root"));

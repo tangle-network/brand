@@ -3,9 +3,10 @@ import { execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import { appendFileSync, cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { build, version as esbuildVersion } from "esbuild";
-import { assertLightGraph, compressedBytes, emittedGraph, forbiddenModules } from "./graph.mjs";
+import { build as viteBuild, version as viteVersion } from "vite";
+import { assertLightGraph, compressedBytes, emittedGraph, forbiddenModules, reachableGraph } from "./graph.mjs";
 
 const fixtures = ["primitives", "root", "markdown", "editor"];
 const sourceDirectory = import.meta.dirname;
@@ -94,42 +95,101 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
         outdir: join(consumerDirectory, "ui-imports-output", fixture),
       });
       const graph = emittedGraph(result.metafile);
+      const reachable = reachableGraph(result.metafile, `ui-imports/${fixture}.mjs`);
       assert.equal(graph.external.length, 0, `${fixture}: no externalized dependencies in byte measurements`);
       assert.ok(Object.keys(result.metafile.inputs).every((name) => !name.startsWith("../") && !name.startsWith("/")),
         "consumer must not read workspace source or workspace dependencies");
+      const bytes = compressedBytes(result.outputFiles.map((file) => file.contents));
+      const reachablePaths = new Set(reachable.outputPaths.map((name) => resolve(consumerDirectory, name)));
+      const reachableFiles = result.outputFiles.filter((file) => reachablePaths.has(file.path));
+      assert.equal(reachableFiles.length, reachable.outputPaths.length, "every reachable resource must be measured");
+      const reachableBytes = compressedBytes(reachableFiles.map((file) => file.contents));
       measurements[fixture] = {
-        bytes: compressedBytes(result.outputFiles.map((file) => file.contents)),
+        bytes, reachableBytes,
+        orphanBytes: Object.fromEntries(Object.entries(bytes).map(([name, total]) => [name, total - reachableBytes[name]])),
+        reachableGraph: reachable,
         chunks: result.outputFiles.length, ...graph,
         forbidden: forbiddenModules(graph),
       };
       writeFileSync(join(reports, `${label}-${fixture}.metafile.json`), JSON.stringify(result.metafile, null, 2));
-      console.log(`UI_IMPORTS ${label} ${fixture}: ${JSON.stringify(measurements[fixture].bytes)}; ${graph.modules.length} emitted modules`);
+      console.log(`UI_IMPORTS ${label} ${fixture}: all artifacts ${JSON.stringify(bytes)}; reachable ${JSON.stringify(reachableBytes)}; orphans ${JSON.stringify(measurements[fixture].orphanBytes)}; ${graph.modules.length} emitted modules`);
     }
     return measurements;
   }
 
+  // Vite/Rolldown is the maintained application consumer. Preserve esbuild's
+  // complete diagnostic independently: its shared dynamic-entry partitioning
+  // can retain root code which Vite removes, so neither result replaces another.
+  async function measureVite(label) {
+    const measurements = {};
+    for (const fixture of fixtures) {
+      const entry = join(entries, `${fixture}.mjs`);
+      const result = await viteBuild({
+        root: consumerDirectory, configFile: false, logLevel: "error",
+        build: {
+          write: false, minify: true, sourcemap: false, target: "es2022",
+          lib: { entry, formats: ["es"], fileName: "entry" },
+          outDir: join(consumerDirectory, "ui-imports-vite", fixture),
+        },
+      });
+      const resources = (Array.isArray(result) ? result : [result]).flatMap((value) => value.output);
+      const outputs = Object.fromEntries(resources.filter((value) => value.type === "chunk").map((value) => [value.fileName, {
+        ...(value.isEntry ? { entryPoint: `ui-imports/${fixture}.mjs` } : {}),
+        inputs: Object.fromEntries(Object.entries(value.modules).map(([id, module]) => {
+          assert.ok(id.startsWith(`${consumerDirectory}/`) || id.startsWith("\0"), `Vite input outside clean consumer: ${id}`);
+          return [relative(consumerDirectory, id), { bytesInOutput: module.renderedLength }];
+        })),
+        imports: [...value.imports, ...value.dynamicImports].map((path) => ({ path, external: !resources.some((resource) => resource.fileName === path) })),
+      }]));
+      const graph = emittedGraph({ outputs });
+      const reachable = reachableGraph({ outputs }, `ui-imports/${fixture}.mjs`);
+      assert.equal(graph.external.length, 0, "Vite measurements must bundle dependencies");
+      const contents = (value) => Buffer.from(value.type === "chunk" ? value.code : value.source);
+      const bytes = compressedBytes(resources.map(contents));
+      const reachableNames = new Set(reachable.outputPaths);
+      const reachableBytes = compressedBytes(resources.filter((value) => reachableNames.has(value.fileName)).map(contents));
+      measurements[fixture] = { bytes, reachableBytes, reachableGraph: reachable, chunks: resources.length, ...graph, forbidden: forbiddenModules(graph) };
+      writeFileSync(join(reports, `${label}-${fixture}.vite-graph.json`), JSON.stringify({ outputs }, null, 2));
+      console.log(`UI_IMPORTS_VITE ${label} ${fixture}: all artifacts ${JSON.stringify(bytes)}; reachable ${JSON.stringify(reachableBytes)}; ${graph.modules.length} emitted modules`);
+    }
+    return measurements;
+  }
+
+  let beforeVite;
   let before;
   try {
     mountTarball(baselineTarball);
     before = await measure("before");
+    beforeVite = await measureVite("before");
   } finally {
     // A failed baseline must not leave the smoke consumer on the wrong package.
     mountTarball(tarballPath);
   }
   const after = await measure("after");
+  const afterVite = await measureVite("after");
   assert.deepEqual(readFileSync(join(consumerDirectory, "package-lock.json")), dependencyLock,
     "the consumer dependency lock must not change between measurements");
   const report = {
     baseline: "same source and dependencies; pre-change bundled layout (unbundle:false)",
     candidate: "original pnpm-packed package, restored at its npm dependency path",
     revision: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
-    node: process.version, esbuild: esbuildVersion,
+    node: process.version, esbuild: esbuildVersion, vite: viteVersion,
     tsdown: execFileSync("pnpm", ["exec", "tsdown", "--version"], { cwd: packageDirectory, encoding: "utf8" }).trim(),
     workspaceLockSha256: sha256(readFileSync(join(root, "pnpm-lock.yaml"))),
     consumerLockSha256: sha256(dependencyLock),
     tarballSha256: { before: sha256(readFileSync(baselineTarball)), after: sha256(readFileSync(tarballPath)) },
     buildOptions, compression: { gzipLevel: 9, brotliQuality: 11, aggregation: "sum per emitted resource, including lazy chunks" },
     before, after,
+    primaryConsumer: { toolchain: "Vite/Rolldown", before: beforeVite, after: afterVite },
+    esbuildRootDiagnostic: {
+      light: forbiddenModules(after.root.reachableGraph).length === 0,
+      forbidden: forbiddenModules(after.root.reachableGraph),
+      limitation: "esbuild splitting can retain shared dynamic-entry code at the root; universal root isolation is not claimed",
+    },
+    emissionBudget: Object.fromEntries(["primitives", "root"].map((name) => [name, {
+      limit: before[name].bytes, observed: after[name].bytes,
+      rule: "all generated artifacts must not grow relative to the same-source bundled baseline",
+    }])),
   };
   // Retain full metafiles on disk, and emitted graphs in CI logs even without an
   // artifact-upload workflow. Never turn an unmeasured baseline into a number.
@@ -139,16 +199,31 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
   if (process.env.GITHUB_STEP_SUMMARY) {
     appendFileSync(process.env.GITHUB_STEP_SUMMARY,
       "\n## Packed UI imports (same-source layout comparison)\n\n" +
-      "| Consumer | Before gzip / Brotli | After gzip / Brotli |\n|---|---:|---:|\n" +
-      fixtures.map((name) => `| ${name} | ${before[name].bytes.gzip} / ${before[name].bytes.brotli} | ${after[name].bytes.gzip} / ${after[name].bytes.brotli} |`).join("\n") +
-      "\n\nBytes include every emitted chunk; React is bundled. Full emitted graphs are in `UI_IMPORTS_REPORT` in the job log.\n");
+      "| Consumer | Before reachable gzip / Brotli | After reachable gzip / Brotli |\n|---|---:|---:|\n" +
+      fixtures.map((name) => `| ${name} | ${before[name].reachableBytes.gzip} / ${before[name].reachableBytes.brotli} | ${after[name].reachableBytes.gzip} / ${after[name].reachableBytes.brotli} |`).join("\n") +
+      "\n\n| Consumer | Before all artifacts gzip / Brotli | After all artifacts gzip / Brotli | After orphan chunks |\n|---|---:|---:|---:|\n" +
+      fixtures.map((name) => `| ${name} | ${before[name].bytes.gzip} / ${before[name].bytes.brotli} | ${after[name].bytes.gzip} / ${after[name].bytes.brotli} | ${after[name].reachableGraph.orphanPaths.length} |`).join("\n") +
+      "\n\nPrimary Vite/Rolldown light-consumer gzip / Brotli: " +
+      ["primitives", "root"].map((name) => `${name} ${beforeVite[name].reachableBytes.gzip} / ${beforeVite[name].reachableBytes.brotli} → ${afterVite[name].reachableBytes.gzip} / ${afterVite[name].reachableBytes.brotli}`).join("; ") +
+      `\n\nEsbuild root diagnostic: light=${report.esbuildRootDiagnostic.light}, forbidden modules=${report.esbuildRootDiagnostic.forbidden.length}. Universal root isolation is not claimed.\n` +
+      "\n\nReachable bytes include every static and lazy resource reachable from the entry. All compiler artifacts, including orphans, remain in the separate emission counter and complete report. React is bundled.\n");
   }
 
-  for (const fixture of ["primitives", "root"]) assertLightGraph(after[fixture]);
-  assert.ok(after.markdown.modules.some((name) => name.includes("/react-syntax-highlighter/")),
-    "the positive-control markdown fixture must retain syntax highlighting");
-  for (const peer of ["@tiptap/core", "@tiptap/react"]) {
-    assert.ok(after.editor.modules.some((name) => name.includes(`/${peer}/`)), `editor must retain ${peer}`);
+  assertLightGraph(after.primitives.reachableGraph);
+  for (const fixture of ["primitives", "root"]) assertLightGraph(afterVite[fixture].reachableGraph);
+  console.log(`ESBUILD_ROOT_DIAGNOSTIC light=${report.esbuildRootDiagnostic.light}; forbidden=${report.esbuildRootDiagnostic.forbidden.length}; retained in complete report, not the primary Vite gate`);
+  for (const fixture of ["primitives", "root"]) {
+    for (const metric of ["raw", "gzip", "brotli"]) {
+      assert.ok(after[fixture].bytes[metric] <= before[fixture].bytes[metric],
+        `${fixture}: total compiler emission ${metric} exceeds the same-source baseline budget`);
+    }
+  }
+  for (const measurements of [after, afterVite]) {
+    assert.ok(measurements.markdown.reachableGraph.modules.some((name) => name.includes("/react-syntax-highlighter/")),
+      "the positive-control markdown fixture must retain syntax highlighting");
+    for (const peer of ["@tiptap/core", "@tiptap/react"]) {
+      assert.ok(measurements.editor.reachableGraph.modules.some((name) => name.includes(`/${peer}/`)), `editor must retain ${peer}`);
+    }
   }
 
   // Separate behavioral proof; SSR/DOM-test helpers are NOT part of the byte
@@ -159,6 +234,9 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
     absWorkingDir: consumerDirectory, entryPoints: [join(entries, "runtime.mjs")],
     outfile: runtime, bundle: true, platform: "node", format: "cjs", target: "node22",
     external: ["react", "react-dom", "react-dom/*"],
+    // Exercise the packed ESM dependency graph, as Vite does. The legacy
+    // highlighter CJS main has different default-export interop.
+    mainFields: ["module", "main"],
     define: { "process.env.NODE_ENV": '"production"' }, logLevel: "error",
   });
   const require = createRequire(join(root, "package.json"));

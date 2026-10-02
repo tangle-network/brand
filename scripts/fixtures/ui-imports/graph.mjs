@@ -17,6 +17,33 @@ export function emittedGraph(metafile) {
   return { modules: [...modules].sort(), external: [...external].sort() };
 }
 
+// esbuild also emits dynamic-import entrypoints from eliminated modules. Keep
+// those compiler artifacts visible, but follow every actual entry import when
+// measuring a consumer, including dynamic edges and shared chunks.
+export function reachableGraph(metafile, entryPoint) {
+  const outputs = metafile.outputs;
+  const roots = Object.keys(outputs).filter((name) => outputs[name].entryPoint === entryPoint);
+  assert.equal(roots.length, 1, `expected exactly one output for ${entryPoint}`);
+  const visited = new Set();
+  const pending = [...roots];
+  while (pending.length) {
+    const name = pending.pop();
+    if (visited.has(name)) continue;
+    visited.add(name);
+    for (const dependency of outputs[name].imports ?? []) {
+      if (dependency.external) continue;
+      assert.ok(Object.hasOwn(outputs, dependency.path), `missing emitted import: ${dependency.path}`);
+      pending.push(dependency.path);
+    }
+  }
+  const outputPaths = [...visited].sort();
+  return {
+    ...emittedGraph({ outputs: Object.fromEntries(outputPaths.map((name) => [name, outputs[name]])) }),
+    outputPaths,
+    orphanPaths: Object.keys(outputs).filter((name) => !visited.has(name)).sort(),
+  };
+}
+
 export function compressedBytes(files) {
   const totals = { raw: 0, gzip: 0, brotli: 0 };
   for (const file of files) {
