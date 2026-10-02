@@ -1,5 +1,22 @@
 # @tangle-network/ui
 
+## 11.13.0
+
+### Minor Changes
+
+- 11a29e6: Port Sandbox's Heading and PageShell into the generic UI package. Use one
+  Heading renderer for page and card titles; preserve existing PageHeader inputs
+  and map the existing Sandbox inputs. Normalize card padding, keep hover
+  decorative, support explicit card title levels, and make table-wrapper
+  accessibility configurable with a wrapper opt-out for caller-owned scrolling.
+
+### Patch Changes
+
+- 805a2d1: Repair Input and Textarea accessibility relationships with stable generated IDs, shared Label styling, merged descriptions, and invalid state. Keep hints available alongside errors. Preserve Button action names and form defaults while enforcing disabled/loading behavior for native and slotted controls, exposing busy state, and respecting reduced motion.
+- ac3344e: Use canonical Brand colors for the RichFileTree background, search field, rows, hover, border, and focus ring in light and dark themes.
+- 48b9dcf: Keep Brand dark-default while exporting a checked, generated light-default compatibility stylesheet. Re-resolve shared aliases and syntax colors at nested mode boundaries, retain named identities, and make ThemeToggle SSR-, storage- and system-change-safe. CodeBlock now uses scoped semantic CSS variables with immediate browser recoloring.
+- fe145f8: Preserve UI output modules so unused heavyweight exports can be removed through existing package entrypoints, retaining the legacy primitives CodeBlock export. Add packed-consumer import-boundary, compatibility, and controlled bundle-layout comparison checks.
+
 ## 11.12.0
 
 ### Minor Changes
