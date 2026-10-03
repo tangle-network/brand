@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.15.2
+
+### Patch Changes
+
+- 11d515d: Keep file-tree selection callbacks current after rerenders and synchronize controlled selection through the native item API.
+  Closing a file clears its selection so the same file can be opened again.
+
 ## 11.15.1
 
 ### Patch Changes
