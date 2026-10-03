@@ -27,7 +27,7 @@ import type {
   GitStatus,
   GitStatusEntry,
 } from "@pierre/trees";
-import { useEffect, useMemo, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
 import type { FileNode } from "./file-tree";
 
 /**
@@ -169,13 +169,22 @@ export function RichFileTree({
     return [];
   }, [paths, root]);
 
+  // Pierre creates its model once; event handlers must read the current owner.
+  const selectionRef = useRef({ selectedPath, onSelect });
+  selectionRef.current = { selectedPath, onSelect };
+  const syncingSelectionRef = useRef(false);
+  const previousSelectedPathRef = useRef(selectedPath);
+
   const { model } = usePierreFileTree({
     paths: flatPaths,
     search,
     initialExpansion,
     onSelectionChange: (selected) => {
-      const next = selected[0]
-      if (next && next !== selectedPath) onSelect?.(next)
+      const next = selected[0];
+      const current = selectionRef.current;
+      if (!syncingSelectionRef.current && next && next !== current.selectedPath) {
+        current.onSelect?.(next);
+      }
     },
   });
 
@@ -192,17 +201,21 @@ export function RichFileTree({
     model.resetPaths(flatPaths);
   }, [model, flatPaths]);
 
-  // Drive selection from props (controlled). Skip when already selected
-  // to avoid an emit loop with onSelectionChange.
+  // Drive controlled selection with Pierre's public item API, including clearing it.
   useEffect(() => {
-    if (!selectedPath) return;
+    const previous = previousSelectedPathRef.current;
+    previousSelectedPathRef.current = selectedPath;
+    if (selectedPath === undefined && previous === undefined) return;
     const current = model.getSelectedPaths();
-    if (current.length === 1 && current[0] === selectedPath) return;
-    // The public API exposes selection via `select` semantics through the
-    // controller — fall back to direct setter when present, no-op otherwise.
-    const m = model as unknown as { setSelectedPaths?: (paths: readonly string[]) => void };
-    m.setSelectedPaths?.([selectedPath]);
-  }, [model, selectedPath]);
+    if (current.length === (selectedPath ? 1 : 0) && current[0] === selectedPath) return;
+    syncingSelectionRef.current = true;
+    try {
+      for (const path of [...current]) model.getItem(path)?.deselect();
+      if (selectedPath) model.getItem(selectedPath)?.select();
+    } finally {
+      syncingSelectionRef.current = false;
+    }
+  }, [model, selectedPath, flatPaths]);
 
   const theme = { ...DEFAULT_THEME, ...themeOverrides };
   const themeStyle = useMemo<CSSProperties>(
