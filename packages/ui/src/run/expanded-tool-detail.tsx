@@ -60,7 +60,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
 
   // Specialised previews
   if (meta.displayVariant === "command") {
-    return <CommandPreview part={part} />;
+    return <CommandPreview part={part} defaultExpanded />;
   }
 
   if (meta.displayVariant === "write-file") {
