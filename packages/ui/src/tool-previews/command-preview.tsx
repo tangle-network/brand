@@ -145,20 +145,16 @@ export const CommandPreview = memo(
     const bodyId = useId();
     const command = commandOf(part.state.input);
     const { status } = part.state;
-    const extracted = extractCommandOutput(part.state.output);
+    const output = extractCommandOutput(part.state.output);
     // A failed call often persists the same text twice — as its output and as
-    // its error. Print it once: the longer of the two as the output, and the
-    // error region only for text the output does not already carry.
-    const rawError = part.state.error?.trim() ?? "";
-    const stdoutText = extracted.stdout.trim();
+    // its error. Print it once. Only an exact repeat (ignoring whitespace) is
+    // folded: an error that merely CONTAINS the output, or the reverse, is a
+    // distinct message and keeps its own region.
+    const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
     const errorRepeats =
-      rawError.length > 0 &&
-      stdoutText.length > 0 &&
-      (stdoutText.includes(rawError) || rawError.includes(stdoutText));
-    const output =
-      errorRepeats && rawError.length > stdoutText.length
-        ? { ...extracted, stdout: part.state.error ?? "" }
-        : extracted;
+      part.state.error !== undefined &&
+      output.stdout.length > 0 &&
+      normalize(part.state.error) === normalize(output.stdout);
     const errorText = errorRepeats ? undefined : part.state.error;
     const hasBody =
       output.stdout.length > 0 ||
