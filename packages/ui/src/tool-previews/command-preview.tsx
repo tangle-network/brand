@@ -235,20 +235,38 @@ export const CommandPreview = memo(
         {expanded && hasBody ? (
           <div id={bodyId} className="border-t border-white/10">
             {output.stdout ? (
-              <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-all px-3 py-2 leading-relaxed">
+              <pre
+                tabIndex={0}
+                aria-label="stdout"
+                className={cn(
+                  "max-h-80 overflow-auto whitespace-pre-wrap break-all px-3 py-2 leading-relaxed",
+                  focusRing,
+                )}
+              >
                 {output.stdout}
               </pre>
             ) : null}
             {output.stderr ? (
               <pre
+                tabIndex={0}
                 aria-label="stderr"
-                className="max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]"
+                className={cn(
+                  "max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  focusRing,
+                )}
               >
                 {output.stderr}
               </pre>
             ) : null}
             {errorText ? (
-              <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]">
+              <pre
+                tabIndex={0}
+                aria-label="error"
+                className={cn(
+                  "max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  focusRing,
+                )}
+              >
                 {errorText}
               </pre>
             ) : null}
