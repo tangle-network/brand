@@ -79,6 +79,21 @@ function fromObject(obj: Record<string, unknown>): CommandOutput {
   };
 }
 
+/** The keys a serialized command result carries, and nothing else. */
+const ENVELOPE_KEYS = new Set([
+  "stdout",
+  "stderr",
+  "output",
+  "exitCode",
+  "exit_code",
+  "code",
+  "signal",
+  "durationMs",
+  "duration_ms",
+  "timedOut",
+  "timed_out",
+]);
+
 /** A string that is a serialized `{ stdout, stderr, exitCode }` record. */
 function parseStructured(text: string): CommandOutput | undefined {
   const trimmed = text.trimStart();
@@ -89,7 +104,13 @@ function parseStructured(text: string): CommandOutput | undefined {
       return undefined;
     }
     const obj = parsed as Record<string, unknown>;
+    // Only an unambiguous envelope: a stream key, and nothing but envelope keys.
+    // A command whose own stdout is JSON that happens to have a `stdout` field
+    // (`{"stdout":"v","result":"ok"}`) is shown as the text it printed.
     if (!("stdout" in obj) && !("stderr" in obj)) return undefined;
+    if (!Object.keys(obj).every((key) => ENVELOPE_KEYS.has(key))) {
+      return undefined;
+    }
     return fromObject(obj);
   } catch {
     return undefined;
@@ -113,7 +134,9 @@ function ExitBadge({
       </span>
     );
   }
-  const failed = exitCode !== undefined ? exitCode !== 0 : status === "error";
+  // The tool's own error status wins: a runner can fail after the shell exited
+  // 0, and a green "exit 0" beside that error would contradict it.
+  const failed = status === "error" || (exitCode !== undefined && exitCode !== 0);
   const label =
     exitCode !== undefined ? `exit ${exitCode}` : failed ? "error" : null;
   if (label === null) return null;
@@ -146,7 +169,16 @@ export const CommandPreview = memo(
     const command = commandOf(part.state.input);
     const { status } = part.state;
     const output = extractCommandOutput(part.state.output);
-    const errorText = part.state.error;
+    // A failed call often persists the same text twice — as its output and as
+    // its error. Print it once. Only an exact repeat (ignoring whitespace) is
+    // folded: an error that merely CONTAINS the output, or the reverse, is a
+    // distinct message and keeps its own region.
+    const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
+    const errorRepeats =
+      part.state.error !== undefined &&
+      output.stdout.length > 0 &&
+      normalize(part.state.error) === normalize(output.stdout);
+    const errorText = errorRepeats ? undefined : part.state.error;
     const hasBody =
       output.stdout.length > 0 ||
       output.stderr.length > 0 ||
