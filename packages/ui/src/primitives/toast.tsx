@@ -129,8 +129,24 @@ const ToastContext = React.createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<Toast[]>([]);
+  const timers = React.useRef(new Map<string, ReturnType<typeof setTimeout>>());
+
+  React.useEffect(() => {
+    const pendingTimers = timers.current;
+    return () => {
+      for (const timer of pendingTimers.values()) {
+        clearTimeout(timer);
+      }
+      pendingTimers.clear();
+    };
+  }, []);
 
   const dismiss = React.useCallback((id: string) => {
+    const timer = timers.current.get(id);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      timers.current.delete(id);
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
@@ -143,7 +159,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       // Auto-dismiss after duration
       const duration = input.duration ?? 5000;
       if (duration > 0) {
-        setTimeout(() => dismiss(id), duration);
+        timers.current.set(id, setTimeout(() => dismiss(id), duration));
       }
     },
     [dismiss],
