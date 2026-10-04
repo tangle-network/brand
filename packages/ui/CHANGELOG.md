@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.15.3
+
+### Patch Changes
+
+- 2ecce2e: Cancel pending toast auto-dismiss timers when a toast is dismissed or its provider unmounts.
+
 ## 11.15.2
 
 ### Patch Changes
