@@ -52,6 +52,7 @@
 [data-theme="hospitality"],
 [data-theme="agents"],
 [data-theme="agents-light"],
+[data-theme="website"],
 .light,
 .dark {
   color-scheme: dark;
@@ -522,6 +523,7 @@
 [data-sandbox-theme="vault"]:where(:not(.dark)),
 [data-sandbox-theme="dawn"]:where(:not(.dark)),
 [data-theme="hospitality"]:where(:not(.dark)),
+[data-theme="website"]:where(:not(.dark)),
 [data-theme="light"],
 [data-theme="aubergine-light"],
 [data-theme="arena-light"],
@@ -934,6 +936,7 @@
 [data-sandbox-theme="vault"]:where(:not(.dark)),
 [data-sandbox-theme="dawn"]:where(:not(.dark)),
 [data-theme="hospitality"]:where(:not(.dark)),
+[data-theme="website"]:where(:not(.dark)),
 [data-theme="light"],
 .light,
 [data-theme$="-light"] {

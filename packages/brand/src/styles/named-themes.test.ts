@@ -581,3 +581,75 @@ describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () =>
     }
   });
 });
+
+describe('named theme: [data-theme="website"]', () => {
+  const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
+  const light = block('[data-theme="website"]:where(:not(.dark))');
+  const dark = block('.dark[data-theme="website"]');
+  const props = (css: string) =>
+    [...css.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]).sort();
+
+  it("takes its dark mode from the .dark class, so a light island is the same attribute", () => {
+    expect(rules).toMatch(/^\[data-theme="website"\]:where\(:not\(\.dark\)\) \{/m);
+    expect(rules).toMatch(/^\.dark\[data-theme="website"\] \{/m);
+    expect(rules).not.toContain('[data-theme="website-light"]');
+  });
+
+  it("starts from a complete canonical baseline in either mode", () => {
+    const header = (anchor: string) => {
+      const end = tokens.indexOf(anchor);
+      return tokens.slice(tokens.lastIndexOf("}", end) + 1, tokens.indexOf("{", end));
+    };
+    expect(header("color-scheme: dark")).toContain('[data-theme="website"],');
+    expect(header("color-scheme: light")).toContain('[data-theme="website"]:where(:not(.dark)),');
+  });
+
+  it("declares the same properties in both modes", () => {
+    expect(props(dark)).toEqual(props(light));
+  });
+
+  it("changes planes and ink only: accent, status, category and syntax stay canonical", () => {
+    for (const css of [light, dark]) {
+      expect(css).not.toMatch(
+        /--hsl-(primary|ring)|--accent-text|--brand-|--btn-|--(hsl-)?(success|warning|destructive|info|error)\b|--surface-(success|warning|danger|info|neutral)-|--status-|--tone-|--syntax-/,
+      );
+    }
+  });
+
+  it("keeps the canonical ladder roles: paper cards in light, rising planes in dark", () => {
+    expect(hslIn(light, "hsl-card")).toEqual({ h: 0, s: 0, l: 100 });
+    const steps = [
+      "md3-surface-container-lowest",
+      "md3-surface-container-low",
+      "md3-surface-container",
+      "md3-surface-container-high",
+      "md3-surface-container-highest",
+    ].map((token) => hexRelativeLuminanceIn(dark, token));
+    for (let i = 1; i < steps.length; i++) {
+      expect(steps[i], `dark step ${i} must rise`).toBeGreaterThan(steps[i - 1]);
+    }
+  });
+
+  it.each([
+    ["light", light],
+    ["dark", dark],
+  ])("holds AA ink on every plane in %s", (_mode, css) => {
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    const mutedInk = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    const planes = [
+      ["canvas", hslToRgb(hslIn(css, "hsl-background"))],
+      ["card", hslToRgb(hslIn(css, "hsl-card"))],
+      ["muted", hslToRgb(hslIn(css, "hsl-muted"))],
+      ["popover", hslToRgb(hslIn(css, "hsl-popover"))],
+      ["elevated", hexIn(css, "depth-4")],
+      ["highest", hexIn(css, "md3-surface-container-highest")],
+    ] as const;
+    for (const [name, plane] of planes) {
+      expect(contrastRatio(fg, plane), `ink on ${name}`).toBeGreaterThanOrEqual(7);
+      expect(contrastRatio(mutedInk, plane), `muted ink on ${name}`).toBeGreaterThanOrEqual(4.5);
+      for (const token of ["text-secondary", "text-muted", "text-dim"]) {
+        expect(contrastRatio(hexIn(css, token), plane), `${token} on ${name}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+});
