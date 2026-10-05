@@ -430,6 +430,14 @@
   --radius-pill: 999px;
   --radius-full: 999px;
   --radius-composer: 26px;    /* centered composer pill */
+  /* Radius by role. New surfaces pick the role they play; system.css repeats
+     these for pages that load it on its own ladders. */
+  --radius-tag: 4px;
+  --radius-chip: 8px;
+  --radius-field: 12px;
+  --radius-panel: 16px;
+  --radius-cover: 20px;
+  --radius-sheet: 24px;
   --radius: 0.5rem;           /* 8px chrome default (was 10px) */
 
   /* Density */
@@ -860,6 +868,14 @@
   --radius-pill: 999px;
   --radius-full: 999px;
   --radius-composer: 26px;
+  /* Radius by role. New surfaces pick the role they play; system.css repeats
+     these for pages that load it on its own ladders. */
+  --radius-tag: 4px;
+  --radius-chip: 8px;
+  --radius-field: 12px;
+  --radius-panel: 16px;
+  --radius-cover: 20px;
+  --radius-sheet: 24px;
 }
 
 
