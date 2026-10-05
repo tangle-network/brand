@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.16.11
+
+### Patch Changes
+
+- cbfa303: A terminal output whose height cap hides lines ends in a "Show all stdout (N lines)" control that shows the rest in place, so a region that stops flush with its frame no longer hides that more output exists.
+
 ## 11.16.10
 
 ### Patch Changes
