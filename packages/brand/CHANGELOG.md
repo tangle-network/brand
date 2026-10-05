@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.12.0
+
+### Minor Changes
+
+- e05254d: Add the `agents` / `agents-light` named theme for Agent Builder: white light pages whose cards separate by shadow, and a mauve neutral ladder in both modes. `scripts/gen-ladders.mjs` generates it from the same map as `system.css`, restricted to canonical spine tokens and with literal values, so it needs no `ladders.css`. It retints surfaces, text, borders and the three shadow roles only; accent, status and category tokens stay canonical. Both names join the canonical baseline selector lists, so nested scopes re-resolve their aliases.
+  
+  Add `data-tone="<category>"` scopes for the eight categorical tones: an element with `data-tone="orange"` reads that family as `--tone-bg`, `--tone-bg-hover`, `--tone-bg-selected`, `--tone-border`, `--tone-border-selected`, `--tone-text` and `--tone-icon`, in both modes.
+- a2e24c7: Add the Hospitality named theme: `data-theme="hospitality"` is a complete light scope, and with `.dark` on the same element it is a complete dark scope. Both are seeded from the canonical baselines in `tokens.css`, as `vault` is. It retints the surface ladder to sage, moves the accent family (primary, ring, accent text and wells, buttons, sidebar, brand accents) to forest green, and keeps every status and category tone canonical. The Hospitality app uses it in place of its local 166-property theme file.
+- a53b246: Add the `super` and `super-light` named themes for SUPER: warm green-grey surfaces with a forest action colour. Button, selection and accent-surface tokens follow the forest fill. Status and category tones are inherited. `ThemeToggle` keeps the pair when it switches modes.
+
+### Patch Changes
+
+- 6558f63: The `aubergine`, `aubergine-light`, `arena` and `arena-light` named themes retint the base surface: `--md3-surface`, `--md3-surface-dim`, `--md3-surface-bright`, `--md3-surface-variant`, `--md3-on-surface` and `--md3-on-surface-variant` follow each theme's own ladder and text, as they do in the canonical spine. Before, a `bg-surface` element such as a mobile top bar kept the neutral grey surface on a purple or green page.
+- daf8f07: The named themes' secondary text tiers clear WCAG AA on every surface they sit on. `--text-dim` in `aubergine`, `aubergine-light`, `arena`, `arena-light` and `tangle-light`, and `--text-muted` in `aubergine` and the light named themes, measured as low as 2.3:1 on their own canvas, card, panel, elevated or highest container. Each now clears 4.5:1 on all five at the same hue and saturation, with muted still stronger than dim. `tangle-dark` mirrors the canonical dark spine, already passes, and is unchanged.
+
 ## 1.11.0
 
 ### Minor Changes
