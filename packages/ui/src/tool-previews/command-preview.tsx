@@ -128,7 +128,7 @@ function parseStructured(text: string): CommandOutput | undefined {
 /** Exit status as a badge. Red only where the command itself is known to have
  *  failed: a nonzero exit, a timeout, or a signal. A tool that reported an
  *  error with nothing recorded about the command (no exit code, or exit 0
- *  from a runner that failed afterwards) gets a neutral badge; its error text
+ *  from a runner that failed afterwards) gets an amber badge; its error text
  *  prints below. A clean run stays quiet green. */
 function ExitBadge({
   output,
