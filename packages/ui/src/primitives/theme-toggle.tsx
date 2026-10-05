@@ -12,6 +12,7 @@ const namedModes = [
   { dark: "arena", light: "arena-light" },
   { dark: "super", light: "super-light" },
   { dark: "tangle-dark", light: "tangle-light" },
+  { dark: "agents", light: "agents-light" },
 ] as const;
 
 // Client-only preference cache also keeps the control usable when storage is

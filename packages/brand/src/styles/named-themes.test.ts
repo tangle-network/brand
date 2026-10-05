@@ -329,6 +329,66 @@ describe("named themes: secondary text tiers are readable text", () => {
     });
   }
 });
+for (const [name, mode] of [
+  ["agents", "dark"],
+  ["agents-light", "light"],
+] as const) {
+  describe(`named theme: [data-theme="${name}"]`, () => {
+    // The generated block, not the shared named-light ink rule that also lists it.
+    const css = blocksIn(themes, `[data-theme="${name}"]`).find((b) => b.includes("--hsl-background:")) ?? "";
+
+    it("retints surfaces, text and borders only", () => {
+      // The accent, status and category tokens stay canonical, so the theme can
+      // never change what the brand colour, a state or a category looks like.
+      expect(css).not.toMatch(
+        /--(hsl-(primary|ring|destructive|success|warning|info)|sidebar-(primary|ring)|md3-(primary|on-primary|error)|btn-|accent-|brand-|surface-|status-|tone-)[a-z0-9-]*:/,
+      );
+    });
+
+    it("declares only canonical spine names", () => {
+      for (const [, token] of css.matchAll(/--([a-z0-9-]+):/g)) {
+        expect(tokens, `--${token} must be a tokens.css token`).toContain(`--${token}:`);
+      }
+    });
+
+    it("keeps ink readable on every plane", () => {
+      for (const plane of ["hsl-background", "hsl-card", "hsl-popover", "hsl-muted"]) {
+        const bg = hslToRgb(hslIn(css, plane));
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-foreground")), bg),
+          `foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(7);
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-muted-foreground")), bg),
+          `muted foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    if (mode === "light") {
+      it("is a white page whose cards separate by shadow", () => {
+        expect(declIn(css, "hsl-background")).toBe("0 0% 100%");
+        expect(declIn(css, "hsl-card")).toBe("0 0% 100%");
+        expect(declIn(css, "shadow-card")).toMatch(/rgb\(/);
+      });
+    }
+  });
+}
+
+describe("data-tone scopes", () => {
+  it("re-resolve each category alias on every nested mode boundary", () => {
+    for (const name of ["violet", "orange", "teal", "blue", "pink", "brown", "cyan", "lime"]) {
+      const rule = tokens.match(new RegExp(`\\[data-tone="${name}"\\],\\n\\[data-tone="${name}"\\] :is\\(([^)]*)\\) \\{([^}]*)\\}`));
+      expect(rule, `data-tone="${name}" rule`).not.toBeNull();
+      for (const boundary of [".light", ".dark", "[data-theme]", "[data-sandbox-ui]", "[data-sandbox-theme]"]) {
+        expect(rule![1], `${name} boundary list`).toContain(boundary);
+      }
+      for (const role of ["bg", "bg-hover", "bg-selected", "border", "border-selected", "text", "icon"]) {
+        expect(rule![2]).toContain(`--tone-${role}: var(--tone-${name}-${role});`);
+      }
+    }
+  });
+});
 
 describe("named themes: the base surface follows the retint", () => {
   // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome

@@ -74,7 +74,8 @@ Product UI uses color for three separate jobs. A component picks one role and ne
 | Status | Report a state the product observed | Success, warning, danger, info, and neutral tones | Unknown or unrecorded states stay neutral. |
 
 `packages/brand/scripts/gen-ladders.mjs` generates every tone family with matching background, border, text, and icon values in both themes; edit its map, not `system.css`.
-The categorical set today is violet, orange, and teal. Widening it from the existing Radix ramps, so identity tiles and chart series never fall back to a status color, is slice 1 of the design-system program.
+The categorical set is violet, orange, teal, blue, pink, brown, cyan, and lime.
+To paint an element with whichever category its data names, set `data-tone="<category>"` on it and read `--tone-bg`, `--tone-bg-hover`, `--tone-bg-selected`, `--tone-border`, `--tone-border-selected`, `--tone-text`, and `--tone-icon`.
 Badge's `running`, `creating`, `stopped`, `warm`, `cold`, and `deleted` variants are sandbox lifecycle states; slice 1 moves them to `sandbox-ui` adapters over status tones.
 
 Products do not paint states or categories with Tailwind palette utilities such as `bg-amber-500` or with hex literals. The consumer drift check counts both, and a consumer's count may only fall.
