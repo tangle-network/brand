@@ -37,12 +37,12 @@ function UserBubble({ text, timestamp, actions }: {
           {timestamp ? (
             <span
               data-user-message-time=""
-              className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-[var(--font-size-xs)] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-[length:var(--font-size-xs)] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
             >
               {formatTime(timestamp)}
             </span>
           ) : null}
-          <div className="break-words whitespace-pre-wrap text-[var(--font-size-base)] leading-[1.5]">
+          <div className="break-words whitespace-pre-wrap text-[length:var(--font-size-base)] leading-[1.5]">
             {text}
           </div>
         </div>

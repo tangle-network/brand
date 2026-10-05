@@ -205,11 +205,21 @@ const emittedFiles = readdirSync(distDirectory, {
   .filter((entry) => entry.isFile() && entry.name.endsWith(".js"))
   .map((entry) => join(entry.parentPath, entry.name));
 
+// Tailwind reads a bare `text-[var(--x)]` as a color, so a size token written
+// that way sets `color` and leaves the font size wherever it was. The chat's
+// 15px body token rendered at 14px for that reason. A size token must carry
+// its type: `text-[length:var(--font-size-base)]`.
+const untypedSizeClass = /text-\[var\(--(?:font-size|text-size|line-height)[\w-]*\)\]/g;
+
 const staticPeerImports = [];
 const uncaughtPeerImports = [];
+const untypedSizeClasses = [];
 for (const file of emittedFiles) {
   const code = readFileSync(file, "utf8");
   const label = relative(distDirectory, file);
+  for (const match of code.matchAll(untypedSizeClass)) {
+    untypedSizeClasses.push(`${label}: ${match[0]}`);
+  }
   for (const peer of deferredOptionalPeers) {
     if (staticImportPattern(peer).test(code)) {
       staticPeerImports.push(`${label}: ${peer}`);
@@ -232,6 +242,14 @@ if (uncaughtPeerImports.length > 0) {
       "or an esbuild consumer without the peer fails to build:",
   );
   for (const entry of uncaughtPeerImports) console.error(`  ${entry}`);
+  process.exit(1);
+}
+
+if (untypedSizeClasses.length > 0) {
+  console.error(
+    "validate-dist: a size token in text-[var(...)] compiles to a color; write text-[length:var(...)]:",
+  );
+  for (const entry of untypedSizeClasses) console.error(`  ${entry}`);
   process.exit(1);
 }
 

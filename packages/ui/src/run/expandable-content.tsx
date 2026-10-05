@@ -11,6 +11,9 @@ export interface ExpandableContentProps {
    */
   fadeClassName?: string;
   className?: string;
+  /** Classes for the Show more / Show less toggle, e.g. an inset when the
+   *  content sits flush against its card's edges. */
+  toggleClassName?: string;
 }
 
 /**
@@ -23,6 +26,7 @@ export function ExpandableContent({
   collapsedMaxPx = 180,
   fadeClassName = "from-muted",
   className,
+  toggleClassName,
 }: ExpandableContentProps) {
   const [expanded, setExpanded] = useState(false);
   const [overflowing, setOverflowing] = useState(false);
@@ -63,7 +67,10 @@ export function ExpandableContent({
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="mt-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className={cn(
+            "mt-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground",
+            toggleClassName,
+          )}
         >
           {expanded ? "Show less" : "Show more"}
         </button>

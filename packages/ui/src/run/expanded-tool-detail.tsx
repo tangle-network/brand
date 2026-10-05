@@ -23,6 +23,10 @@ export interface ExpandedToolDetailProps {
   part: ToolPart;
 }
 
+// The clamped output sits flush against its card's edges; the toggle under it
+// takes the card's 12px content inset so it does not touch the border.
+const FLUSH_TOGGLE = "mx-3 mb-2";
+
 const EXT_LANG: Record<string, string> = {
   ts: "typescript", tsx: "tsx", js: "javascript", jsx: "jsx",
   rs: "rust", py: "python", go: "go", rb: "ruby",
@@ -147,7 +151,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
               Output
             </span>
           </div>
-          <ExpandableContent fadeClassName="from-card">
+          <ExpandableContent fadeClassName="from-card" toggleClassName={FLUSH_TOGGLE}>
             <CodeBlock
               code={
                 outputStr.length > 2000
@@ -170,7 +174,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
               Error
             </span>
           </div>
-          <ExpandableContent fadeClassName="from-[var(--surface-danger-bg)]">
+          <ExpandableContent fadeClassName="from-[var(--surface-danger-bg)]" toggleClassName={FLUSH_TOGGLE}>
             <pre className="bg-[var(--surface-danger-bg)] p-3 text-xs font-mono whitespace-pre-wrap break-all text-[var(--surface-danger-text)]">
               {error}
             </pre>

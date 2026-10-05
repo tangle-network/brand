@@ -75,12 +75,12 @@ export function ChatMessage({
         )}
       >
         {isUser ? (
-          <div className="whitespace-pre-wrap text-[var(--font-size-base)] leading-[var(--line-height-base)]">
+          <div className="whitespace-pre-wrap text-[length:var(--font-size-base)] leading-[var(--line-height-base)]">
             {content}
           </div>
         ) : (
           <>
-            {content && <Markdown className="tangle-prose text-[var(--font-size-base)] leading-[var(--line-height-base)]">{content}</Markdown>}
+            {content && <Markdown className="tangle-prose text-[length:var(--font-size-base)] leading-[var(--line-height-base)]">{content}</Markdown>}
             {isStreaming && (
               <span className="ml-0.5 inline-block h-4 w-2 animate-pulse rounded-sm bg-[var(--brand-cool)] align-text-bottom" />
             )}
