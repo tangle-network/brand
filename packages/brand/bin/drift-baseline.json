@@ -905,107 +905,56 @@
    ""
   ],
   "branch": "main",
-  "head": "d9d8f341523d",
+  "head": "305f99a0b46e",
   "tsx_files": 97,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.52.14"
+    "0.53.14"
    ],
    "brand": [
-    "1.10.0"
+    "1.13.0"
    ],
    "override:agent-app": [
-    "0.52.14"
+    "0.53.14"
    ],
    "override:brand": [
-    "1.10.0"
+    "1.13.0"
    ],
    "override:sandbox-ui": [
-    "0.121.0"
+    "0.125.3"
    ],
    "override:ui": [
-    "11.15.2"
+    "11.19.0"
    ],
    "sandbox-ui": [
-    "0.121.0"
+    "0.125.3"
    ],
    "ui": [
-    "11.15.2"
+    "11.19.0"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 6,
-   "sandbox-ui": 28,
-   "agent-app": 49
+   "sandbox-ui": 33,
+   "agent-app": 51
   },
   "by_file": {
-   "raw_palette": {
-    "src/components/improve-button.tsx": 5,
-    "src/components/trading/BondingCurveViz.tsx": 4,
-    "src/components/trading/BuySellPanel.tsx": 20,
-    "src/components/trading/MarketStats.tsx": 3,
-    "src/components/trading/TokenInfoCard.tsx": 16,
-    "src/components/trading/TradingPage.tsx": 14,
-    "src/lib/.server/scaffold/onboarding/onboarding-gen.ts": 3,
-    "src/routes/app.$agentId.eval.tsx": 15,
-    "src/routes/app.$agentId.knowledge.tsx": 2,
-    "src/routes/app.$agentId.readiness.tsx": 2,
-    "src/routes/app.$agentId.research.tsx": 7,
-    "src/routes/app.admin.auto-research.tsx": 2,
-    "src/routes/app.admin.findings.tsx": 2,
-    "src/routes/app.admin.integrations.tsx": 1,
-    "src/routes/app.admin.proposals.tsx": 1,
-    "src/routes/app.trade.$slug.tsx": 1,
-    "src/routes/creators.$handle.tsx": 1
-   },
+   "raw_palette": {},
    "hex": {
-    "src/app.css": 2,
-    "src/components/local-time.tsx": 2,
-    "src/components/tool-call-card.tsx": 13,
-    "src/components/trading/TradingViewChart.tsx": 9,
-    "src/components/trading/providers.tsx": 1,
-    "src/root.tsx": 2,
-    "src/routes/agents.$slug.tsx": 1,
-    "src/routes/creators.$handle.tsx": 3,
-    "src/styles/listing.css": 13
+    "src/root.tsx": 2
    },
-   "arbitrary_color": {
-    "src/components/chat-composer.tsx": 1
-   },
-   "css_var_defs": {
-    "src/app.css": 71
-   },
+   "arbitrary_color": {},
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
-  "raw_palette": 99,
-  "hex": 46,
-  "arbitrary_color": 1,
-  "css_var_defs": 71,
+  "raw_palette": 0,
+  "hex": 2,
+  "arbitrary_color": 0,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
-  "palette_top": [
-   [
-    "text-gray-11",
-    78
-   ],
-   [
-    "text-gray-12",
-    18
-   ],
-   [
-    "border-neutral-200",
-    1
-   ],
-   [
-    "text-neutral-500",
-    1
-   ],
-   [
-    "text-neutral-700",
-    1
-   ]
-  ],
+  "palette_top": [],
   "local_primitives": {}
  },
  "blueprint": {
