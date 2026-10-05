@@ -284,3 +284,49 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
     }
   });
 });
+
+for (const [name, mode] of [
+  ["agents", "dark"],
+  ["agents-light", "light"],
+] as const) {
+  describe(`named theme: [data-theme="${name}"]`, () => {
+    // The generated block, not the shared named-light ink rule that also lists it.
+    const css = blocksIn(themes, `[data-theme="${name}"]`).find((b) => b.includes("--hsl-background:")) ?? "";
+
+    it("retints surfaces, text and borders only", () => {
+      // The accent, status and category tokens stay canonical, so the theme can
+      // never change what the brand colour, a state or a category looks like.
+      expect(css).not.toMatch(
+        /--(hsl-(primary|ring|destructive|success|warning|info)|sidebar-(primary|ring)|md3-(primary|on-primary|error)|btn-|accent-|brand-|surface-|status-|tone-)[a-z0-9-]*:/,
+      );
+    });
+
+    it("declares only canonical spine names", () => {
+      for (const [, token] of css.matchAll(/--([a-z0-9-]+):/g)) {
+        expect(tokens, `--${token} must be a tokens.css token`).toContain(`--${token}:`);
+      }
+    });
+
+    it("keeps ink readable on every plane", () => {
+      for (const plane of ["hsl-background", "hsl-card", "hsl-popover", "hsl-muted"]) {
+        const bg = hslToRgb(hslIn(css, plane));
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-foreground")), bg),
+          `foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(7);
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-muted-foreground")), bg),
+          `muted foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    if (mode === "light") {
+      it("is a white page whose cards separate by shadow", () => {
+        expect(declIn(css, "hsl-background")).toBe("0 0% 100%");
+        expect(declIn(css, "hsl-card")).toBe("0 0% 100%");
+        expect(declIn(css, "shadow-card")).toMatch(/rgb\(/);
+      });
+    }
+  });
+}
