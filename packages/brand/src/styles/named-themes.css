@@ -19,6 +19,9 @@
   --text-page: var(--font-size-3xl);
   --text-section: var(--font-size-xl);
   --text-eyebrow: var(--font-size-sm);
+  --color-scrim: var(--scrim);
+  --color-scrim-strong: var(--scrim-strong);
+  --color-on-media: var(--on-media);
   --color-depth-1: var(--depth-1);
   --color-depth-2: var(--depth-2);
   --color-depth-3: var(--depth-3);
