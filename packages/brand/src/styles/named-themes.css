@@ -81,7 +81,7 @@
   --border-subtle: rgba(183,157,255,0.12); --border-default: rgba(183,157,255,0.22);
   --border-hover: rgba(183,157,255,0.40); --accent-text: #c4b0ff;
   --brand-primary: #8f8bff; --brand-glow: #c4b0ff;
-  --text-primary: #f4f1fd; --text-secondary: #cec4e8; --text-muted: #a99fc8; --text-dim: #978eb0;
+  --text-primary: #f4f1fd; --text-secondary: #cec4e8; --text-muted: #b7afd1; --text-dim: #a59ebb;
 }
 [data-theme="aubergine-light"] {
   --hsl-background: 258 60% 96%;  --hsl-foreground: 258 45% 11%;
@@ -100,7 +100,7 @@
   --border-subtle: rgba(60,32,110,0.10); --border-default: rgba(60,32,110,0.16);
   --border-hover: rgba(60,32,110,0.30); --accent-text: #6d28d9;
   --brand-primary: #6d28d9; --brand-glow: #8b5cf6;
-  --text-primary: #160f22; --text-secondary: #3f3460; --text-muted: #5e5577; --text-dim: #6b628a;
+  --text-primary: #160f22; --text-secondary: #3f3460; --text-muted: #585070; --text-dim: #655d82;
 }
 
 /* ───────────────────────── Arena — emerald / green accent ────────────────── */
@@ -121,7 +121,7 @@
   --border-subtle: rgba(52,211,153,0.10); --border-default: rgba(52,211,153,0.18);
   --border-hover: rgba(52,211,153,0.32); --accent-text: #34d399;
   --brand-primary: #10b981; --brand-glow: #34d399;
-  --text-primary: #ecfdf5; --text-secondary: #c2e8d6; --text-muted: #8fb6a3; --text-dim: #6b9580;
+  --text-primary: #ecfdf5; --text-secondary: #c2e8d6; --text-muted: #8fb6a3; --text-dim: #7ba08e;
 }
 [data-theme="arena-light"] {
   --hsl-background: 150 30% 96%;  --hsl-foreground: 158 30% 10%;
@@ -140,7 +140,7 @@
   --border-subtle: rgba(6,95,70,0.10); --border-default: rgba(6,95,70,0.16);
   --border-hover: rgba(6,95,70,0.30); --accent-text: #047857;
   --brand-primary: #059669; --brand-glow: #10b981;
-  --text-primary: #06231a; --text-secondary: #285048; --text-muted: #486356; --text-dim: #517166;
+  --text-primary: #06231a; --text-secondary: #285048; --text-muted: #455f52; --text-dim: #4e6d62;
 }
 
 /* ───────────────────────── Tangle — neutral dark spine ─────────────────────
@@ -188,7 +188,7 @@
   --border-subtle: rgba(20,20,40,0.08); --border-default: rgba(20,20,40,0.14);
   --border-hover: rgba(20,20,40,0.26); --accent-text: #4f46e5;
   --brand-primary: #6366f1; --brand-glow: #818cf8;
-  --text-primary: #15131f; --text-secondary: #3f3a52; --text-muted: #5e5a71; --text-dim: #6c6780;
+  --text-primary: #15131f; --text-secondary: #3f3a52; --text-muted: #59556b; --text-dim: #67627b;
 }
 
 /* ───────────────────── Intelligence — violet surface ramp ────────────────────
