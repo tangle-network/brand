@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.2
+
+### Patch Changes
+
+- 475ea41: Lower the Hospitality drift baseline to the merged migration (hospitality-agent b297d94): hex 168 to 8, css_var_defs 205 to 0.
+
 ## 1.14.1
 
 ### Patch Changes
