@@ -16,9 +16,14 @@
     "./src/styles/*.css",
     "./dist/styles/*.css"
   ],
+  "bin": {
+    "tangle-drift": "./bin/tangle-drift.mjs"
+  },
   "files": [
     "dist",
     "src",
+    "bin/tangle-drift.mjs",
+    "bin/drift-baseline.json",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -46,6 +51,7 @@
     "gen:ladders": "node scripts/gen-ladders.mjs",
     "gen:compat": "node scripts/gen-compat.mjs",
     "check:compat": "node scripts/gen-compat.mjs --check && node --test scripts/gen-compat.test.mjs",
+    "check:drift": "node --test scripts/tangle-drift.test.mjs",
     "dev": "tsdown --watch"
   },
   "peerDependencies": {
