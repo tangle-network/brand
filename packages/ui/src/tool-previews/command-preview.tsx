@@ -237,6 +237,7 @@ export const CommandPreview = memo(
             {output.stdout ? (
               <pre
                 tabIndex={0}
+                role="region"
                 aria-label="stdout"
                 className={cn(
                   "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
@@ -249,6 +250,7 @@ export const CommandPreview = memo(
             {output.stderr ? (
               <pre
                 tabIndex={0}
+                role="region"
                 aria-label="stderr"
                 className={cn(
                   "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
@@ -261,6 +263,7 @@ export const CommandPreview = memo(
             {errorText ? (
               <pre
                 tabIndex={0}
+                role="region"
                 aria-label="error"
                 className={cn(
                   "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
