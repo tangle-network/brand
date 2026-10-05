@@ -1,0 +1,114 @@
+{
+ "cases": [
+  {
+   "story": "primitives-tag-and-chip--content-board-filters",
+   "vp": "desktop",
+   "shot": "primitives-tag-and-chip--content-board-filters--desktop.png",
+   "chips_measured": 18,
+   "min_ratio": 4.92
+  },
+  {
+   "story": "primitives-tag-and-chip--loading",
+   "vp": "desktop",
+   "shot": "primitives-tag-and-chip--loading--desktop.png",
+   "chips_measured": 12,
+   "min_ratio": 7.07
+  },
+  {
+   "story": "primitives-tag-and-chip--tone-set",
+   "vp": "desktop",
+   "shot": "primitives-tag-and-chip--tone-set--desktop.png",
+   "chips_measured": 82,
+   "min_ratio": 4.9
+  },
+  {
+   "story": "primitives-tag-and-chip--worst-case",
+   "vp": "desktop",
+   "shot": "primitives-tag-and-chip--worst-case--desktop.png",
+   "chips_measured": 12,
+   "min_ratio": 6.19
+  },
+  {
+   "story": "primitives-icontile--project-list",
+   "vp": "desktop",
+   "shot": "primitives-icontile--project-list--desktop.png",
+   "chips_measured": 8,
+   "min_ratio": 7.68
+  },
+  {
+   "story": "primitives-icontile--sizes",
+   "vp": "desktop",
+   "shot": "primitives-icontile--sizes--desktop.png",
+   "chips_measured": 4,
+   "min_ratio": 7.44
+  },
+  {
+   "story": "primitives-tag-and-chip--content-board-filters",
+   "vp": "phone",
+   "shot": "primitives-tag-and-chip--content-board-filters--phone.png",
+   "chips_measured": 18,
+   "min_ratio": 4.92
+  },
+  {
+   "story": "primitives-tag-and-chip--loading",
+   "vp": "phone",
+   "shot": "primitives-tag-and-chip--loading--phone.png",
+   "chips_measured": 12,
+   "min_ratio": 7.07
+  },
+  {
+   "story": "primitives-tag-and-chip--tone-set",
+   "vp": "phone",
+   "shot": "primitives-tag-and-chip--tone-set--phone.png",
+   "chips_measured": 82,
+   "min_ratio": 4.9
+  },
+  {
+   "story": "primitives-tag-and-chip--worst-case",
+   "vp": "phone",
+   "shot": "primitives-tag-and-chip--worst-case--phone.png",
+   "chips_measured": 12,
+   "min_ratio": 6.19
+  },
+  {
+   "story": "primitives-icontile--project-list",
+   "vp": "phone",
+   "shot": "primitives-icontile--project-list--phone.png",
+   "chips_measured": 8,
+   "min_ratio": 7.68
+  },
+  {
+   "story": "primitives-icontile--sizes",
+   "vp": "phone",
+   "shot": "primitives-icontile--sizes--phone.png",
+   "chips_measured": 4,
+   "min_ratio": 7.44
+  }
+ ],
+ "keyboard": {
+  "before": "false",
+  "after_space": "true",
+  "after_enter": "false",
+  "focus_visible_style": {
+   "outline": "solid 1px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(189, 196, 255, 0.18) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+  },
+  "rows_with_article_filter": 1,
+  "launch_tag_removed_by_enter": true
+ },
+ "overflow": {
+  "primitives-tag-and-chip--content-board-filters--desktop": 0,
+  "primitives-tag-and-chip--loading--desktop": 0,
+  "primitives-tag-and-chip--tone-set--desktop": 0,
+  "primitives-tag-and-chip--worst-case--desktop": 0,
+  "primitives-icontile--project-list--desktop": 0,
+  "primitives-icontile--sizes--desktop": 0,
+  "primitives-tag-and-chip--content-board-filters--phone": 0,
+  "primitives-tag-and-chip--loading--phone": 0,
+  "primitives-tag-and-chip--tone-set--phone": 0,
+  "primitives-tag-and-chip--worst-case--phone": 0,
+  "primitives-icontile--project-list--phone": 0,
+  "primitives-icontile--sizes--phone": 0
+ },
+ "contrast_failures": []
+}
