@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.0
+
+### Minor Changes
+
+- f13e197: Add the Website named theme. `class="dark" data-theme="website"` gives the public site's indigo-night surface ladder; `data-theme="website"` without `.dark` is its indigo-paper light scope, usable as a nested light island. Both modes are seeded from the canonical baselines in `tokens.css` and declare the same properties. Only planes and ink change: accent, status, category and syntax tones stay canonical. The website uses it in place of its local navy and paper token copies.
+
+### Patch Changes
+
+- e7525d0: Lower the Tax drift baseline to its measured main (tangle-network/tax-agent ff4b703): raw palette 133 to 0, hex 8 to 0, arbitrary colors 7 to 0, redeclared tokens 8 to 0. Tax runs `tangle-drift check --surface tax` in its sign-off, so any new palette class, hex value or token copy now fails its gate.
+
 ## 1.12.0
 
 ### Minor Changes
