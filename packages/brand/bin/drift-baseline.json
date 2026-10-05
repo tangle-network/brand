@@ -667,53 +667,43 @@
    ""
   ],
   "branch": "main",
-  "head": "bae7af661d09",
+  "head": "b297d943cd4a",
   "tsx_files": 27,
-  "css_files": 15,
+  "css_files": 13,
   "versions": {
    "agent-app": [
-    "0.52.18"
+    "0.53.13"
    ],
    "brand": [
-    "1.10.0"
+    "1.13.0"
    ],
    "sandbox-ui": [
-    "0.121.1"
+    "0.125.2"
    ],
    "ui": [
-    "11.15.2"
+    "11.19.0"
    ]
   },
   "importing_files": {
    "brand": 0,
    "ui": 0,
-   "sandbox-ui": 19,
+   "sandbox-ui": 21,
    "agent-app": 40
   },
   "by_file": {
    "raw_palette": {},
    "hex": {
     "src/resetos/demo/preview.css": 7,
-    "src/resetos/resetos.css": 1,
-    "src/ui/operator-dashboard.css": 78,
-    "src/web/AgentProfileSettings.tsx": 1,
-    "src/web/people-files.css": 48,
-    "src/web/web.css": 31,
-    "src/web/workspace.css": 2
+    "src/resetos/resetos.css": 1
    },
    "arbitrary_color": {},
-   "css_var_defs": {
-    "src/design-system/workspace-theme.css": 166,
-    "src/ui/operator-dashboard.css": 7,
-    "src/web/build-apps-workspace.css": 7,
-    "src/web/workspace.css": 25
-   },
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
   "raw_palette": 0,
-  "hex": 168,
+  "hex": 8,
   "arbitrary_color": 0,
-  "css_var_defs": 205,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
