@@ -13,10 +13,10 @@ function part(state: Partial<ToolPart["state"]>): ToolPart {
 }
 
 describe("CommandPreview", () => {
-  it("shows a neutral badge, not a red exit, when a tool errored without an exit code", () => {
+  it("shows an amber badge, not a red exit, when a tool errored without an exit code", () => {
     render(<CommandPreview part={part({ status: "error", output: "warning: x" })} />);
     const badge = screen.getByText("tool reported error");
-    expect(badge.className).toContain("surface-neutral");
+    expect(badge.className).toContain("surface-warning");
     expect(badge.className).not.toContain("surface-danger");
     expect(screen.queryByText("error")).toBeNull();
   });
@@ -52,13 +52,13 @@ describe("CommandPreview", () => {
     expect(screen.getByText("timed out").className).toContain("surface-danger");
   });
 
-  it("keeps a runner error after a clean exit neutral", () => {
+  it("keeps a runner error after a clean exit amber, not red", () => {
     render(
       <CommandPreview
         part={part({ status: "error", output: { stdout: "ok", stderr: "", exitCode: 0 } })}
       />,
     );
-    expect(screen.getByText("exit 0 · tool reported error").className).toContain("surface-neutral");
+    expect(screen.getByText("exit 0 · tool reported error").className).toContain("surface-warning");
   });
 
   it("is a quiet row until opened, then a dark terminal", () => {
