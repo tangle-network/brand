@@ -147,7 +147,7 @@ function ExitBadge({
   }
   const { exitCode, timedOut, signal } = output;
   let label: string | null;
-  let tone: "danger" | "success" | "neutral";
+  let tone: "danger" | "success" | "warning";
   if (timedOut) {
     label = "timed out";
     tone = "danger";
@@ -161,7 +161,7 @@ function ExitBadge({
     // Say what is known: the tool reported an error. Nothing recorded says
     // the command itself failed.
     label = exitCode === 0 ? "exit 0 · tool reported error" : "tool reported error";
-    tone = "neutral";
+    tone = "warning";
   } else {
     label = exitCode === 0 ? "exit 0" : null;
     tone = "success";
@@ -171,13 +171,15 @@ function ExitBadge({
     <span
       className={cn(
         // Every badge has a border, so mixed rows keep one height.
-        "inline-flex shrink-0 items-center rounded-full border px-1.5 py-px text-[11px] font-medium tabular-nums",
+        "inline-flex shrink-0 items-center rounded-full border px-1.5 py-px font-sans text-[11px] font-medium tabular-nums",
         tone === "danger" &&
           "border-transparent bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
         tone === "success" &&
           "border-transparent bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
-        tone === "neutral" &&
-          "border-[var(--surface-neutral-border)] bg-[var(--surface-neutral-bg)] text-[var(--surface-neutral-text)]",
+        // A reported error with nothing recorded about the command deserves
+        // attention, but it is not a failed command: amber, not red.
+        tone === "warning" &&
+          "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)] text-[var(--surface-warning-text)]",
       )}
     >
       {label}
