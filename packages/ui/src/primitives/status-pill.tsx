@@ -11,8 +11,8 @@ import { cn } from "../lib/utils";
  * the tone's COLOUR, and the state's own LABEL as text.
  *
  * The glyphs are chosen to survive at 8px and to differ in outline rather than
- * in fill: a ring reads as "still open", a solid disc as "settled", a slashed
- * disc as "stopped". Two states never share one silhouette.
+ * in fill: a ring reads as "still open", a solid disc as "settled", a cross as
+ * "failed". Two states never share one silhouette.
  *
  * Each tone draws its fill, border and text from ONE matched token triple.
  * That pairing is the whole point: a status colour is solved against its own
@@ -107,8 +107,8 @@ function ToneGlyph({ tone }: { tone: StatusTone }) {
           <circle cx="4" cy="4" r="3.25" />
         </svg>
       );
-    // Settled and bad: a disc with a bar through it, so it differs from
-    // success in OUTLINE and not only in hue.
+    // Settled and bad: a cross, so it differs from success in OUTLINE and not
+    // only in hue. A slashed disc read as "disabled" beside a failed run.
     case "danger":
       return (
         <svg
@@ -116,10 +116,9 @@ function ToneGlyph({ tone }: { tone: StatusTone }) {
           aria-hidden="true"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="1.75"
         >
-          <circle cx="4" cy="4" r="3.1" fill="currentColor" opacity="0.35" />
-          <path d="M1.9 6.1 6.1 1.9" strokeLinecap="round" />
+          <path d="M1.5 1.5 6.5 6.5M6.5 1.5 1.5 6.5" strokeLinecap="round" />
         </svg>
       );
     // Needs a person: a triangle.

@@ -5,6 +5,7 @@ import {
   blockIn,
   compositeOver,
   contrastRatio,
+  hexIn,
   hexRelativeLuminanceIn,
   hslIn,
   hslToRgb,
@@ -488,4 +489,30 @@ describe("canonical light spine", () => {
       );
     }
   });
+});
+
+describe("dark status surfaces carry their tone in hue, not weight", () => {
+  // A warning or error callout sits on the card beside the content it is about.
+  // A saturated fill (the warning was a 41% brown) outweighed that content; a
+  // low-chroma raised fill keeps the lift the chip contract above asks for,
+  // while the border and the text carry the tone.
+  const saturation = ([r, g, b]: [number, number, number]) => {
+    const max = Math.max(r, g, b) / 255;
+    const min = Math.min(r, g, b) / 255;
+    const light = (max + min) / 2;
+    if (max === min) return 0;
+    return (max - min) / (light > 0.5 ? 2 - max - min : max + min);
+  };
+  for (const tone of ["warning", "danger"]) {
+    it(`${tone}: the dark fill stays under 25% saturation`, () => {
+      expect(saturation(hexIn(DARK, `surface-${tone}-bg`))).toBeLessThanOrEqual(0.25);
+    });
+  }
+  for (const tone of ["warning", "danger", "violet"]) {
+    it(`${tone}: its text clears AA on its own dark fill`, () => {
+      expect(
+        contrastRatio(hexIn(DARK, `surface-${tone}-text`), hexIn(DARK, `surface-${tone}-bg`)),
+      ).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });

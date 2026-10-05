@@ -118,7 +118,10 @@ function parseStructured(text: string): CommandOutput | undefined {
 }
 
 /** Exit status as a badge: the code when one is known, else the tool's status.
- *  Red only for a nonzero exit or an error; a clean run stays quiet green. */
+ *  Red only for a recorded nonzero exit. A tool that reported an error with no
+ *  exit code gets a neutral badge: nothing recorded says the command itself
+ *  failed, and its error text still prints below. A clean run stays quiet
+ *  green. */
 function ExitBadge({
   exitCode,
   status,
@@ -136,10 +139,15 @@ function ExitBadge({
   }
   // The tool's own error status wins: a runner can fail after the shell exited
   // 0, and a green "exit 0" beside that error would contradict it.
-  const failed = status === "error" || (exitCode !== undefined && exitCode !== 0);
-  const label =
-    exitCode !== undefined ? `exit ${exitCode}` : failed ? "error" : null;
-  if (label === null) return null;
+  if (exitCode === undefined) {
+    if (status !== "error") return null;
+    return (
+      <span className="inline-flex shrink-0 items-center rounded-full border border-[var(--surface-neutral-border)] bg-[var(--surface-neutral-bg)] px-1.5 py-px text-[11px] font-medium text-[var(--surface-neutral-text)]">
+        tool error
+      </span>
+    );
+  }
+  const failed = status === "error" || exitCode !== 0;
   return (
     <span
       className={cn(
@@ -149,8 +157,37 @@ function ExitBadge({
           : "bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
       )}
     >
-      {label}
+      exit {exitCode}
     </span>
+  );
+}
+
+/** A token no longer than this never breaks: a flag (`--short`) or a path
+ *  segment wraps whole to the next line. A longer token (a full SHA, a long
+ *  URL) would overflow a phone, so it may still break anywhere. */
+const UNBROKEN_TOKEN = 32;
+
+/**
+ * A command split at its spaces, each short token kept whole. Browsers break
+ * after a hyphen, which split `--short` into `--` and `short` on a phone.
+ * The text is unchanged, so a copy still pastes the exact command.
+ */
+function CommandText({ command }: { command: string }) {
+  return (
+    <>
+      {command.split(/(\s+)/).map((token, i) =>
+        token.length > 0 &&
+        token.length <= UNBROKEN_TOKEN &&
+        !/\s/.test(token) ? (
+          // Tokens repeat (two spaces, two "&&"), so position is the key.
+          <span key={i} className="whitespace-nowrap">
+            {token}
+          </span>
+        ) : (
+          token
+        ),
+      )}
+    </>
   );
 }
 
@@ -158,7 +195,9 @@ function ExitBadge({
  * One shell command as a terminal block: a `$ command` prompt line with its
  * exit status, and stdout and stderr in separate regions below it.
  *
- * The block is always dark. It scopes the dark token set onto itself with
+ * Closed, a command is a quiet row on the surface it sits on: a list of
+ * commands should read as a list, not a stack of black bars. Opened, it is a
+ * dark terminal. It scopes the dark token set onto itself with
  * `data-theme="dark"`, so stderr, the badges and the muted prompt keep the
  * contrast they were designed with on a dark ground, in a light console too.
  */
@@ -195,7 +234,7 @@ export const CommandPreview = memo(
             expanded ? "" : "line-clamp-2",
           )}
         >
-          {command}
+          <CommandText command={command} />
         </code>
         <ExitBadge exitCode={output.exitCode} status={status} />
       </>
@@ -203,10 +242,14 @@ export const CommandPreview = memo(
 
     return (
       <div
-        data-theme="dark"
+        data-theme={expanded ? "dark" : undefined}
         data-testid="command-preview"
+        data-expanded={expanded}
         className={cn(
-          "overflow-hidden rounded-[var(--radius-md)] bg-[var(--md3-surface-container-lowest)] font-mono text-xs text-foreground",
+          "overflow-hidden rounded-[var(--radius-md)] font-mono text-xs text-foreground",
+          expanded
+            ? "bg-[var(--md3-surface-container-lowest)]"
+            : "border border-border bg-transparent",
           className,
         )}
       >
@@ -217,7 +260,8 @@ export const CommandPreview = memo(
             aria-expanded={expanded}
             aria-controls={bodyId}
             className={cn(
-              "flex w-full items-start gap-2 px-3 py-2 text-left transition-colors hover:bg-white/5",
+              "flex w-full items-start gap-2 px-3 py-2 text-left transition-colors",
+              expanded ? "hover:bg-white/5" : "hover:bg-muted",
               focusRing,
             )}
           >
