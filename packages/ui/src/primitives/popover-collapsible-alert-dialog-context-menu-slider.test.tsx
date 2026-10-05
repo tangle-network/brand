@@ -11,7 +11,15 @@ import {
   AlertDialogTrigger,
 } from "./alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./collapsible";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "./context-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "./context-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Slider } from "./slider";
 
@@ -102,6 +110,29 @@ describe("ContextMenu", () => {
     fireEvent.click(screen.getByRole("menuitem", { name: "Rename" }));
     expect(onRename).toHaveBeenCalledOnce();
   });
+
+  it("portals submenu content out of the clipped parent menu", async () => {
+    const user = userEvent.setup();
+    render(
+      <ContextMenu>
+        <ContextMenuTrigger>File row</ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>Move to</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuItem>Archive</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        </ContextMenuContent>
+      </ContextMenu>,
+    );
+    fireEvent.contextMenu(screen.getByText("File row"));
+    const parent = await screen.findByRole("menu");
+    await user.hover(screen.getByRole("menuitem", { name: "Move to" }));
+    await user.keyboard("{ArrowRight}");
+    const archive = await screen.findByRole("menuitem", { name: "Archive" });
+    expect(parent.contains(archive)).toBe(false);
+  });
 });
 
 describe("Slider", () => {
@@ -126,6 +157,7 @@ describe("Slider", () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
     render(<Slider aria-label="Budget" defaultValue={[50]} step={10} onValueChange={onValueChange} />);
+    expect(screen.getByRole("slider")).toHaveAccessibleName("Budget");
     screen.getByRole("slider").focus();
     await user.keyboard("{ArrowRight}");
     expect(onValueChange).toHaveBeenLastCalledWith([60]);
