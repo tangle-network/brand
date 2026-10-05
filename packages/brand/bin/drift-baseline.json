@@ -392,96 +392,54 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "232898919b13",
-  "tsx_files": 56,
+  "head": "ff4b70361cf9",
+  "tsx_files": 57,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.53.7"
+    "0.53.9"
    ],
    "brand": [
-    "1.10.0"
+    "1.11.0"
    ],
    "override:agent-app": [
-    "0.53.7"
+    "0.53.9"
    ],
    "override:brand": [
-    "1.10.0"
+    "1.11.0"
    ],
    "override:sandbox-ui": [
-    "0.121.1"
+    "0.122.3"
    ],
    "override:ui": [
-    "11.15.3"
+    "11.17.0"
    ],
    "sandbox-ui": [
-    "0.121.1"
+    "0.122.3"
    ],
    "ui": [
-    "11.15.3"
+    "11.17.0"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 1,
-   "sandbox-ui": 25,
+   "sandbox-ui": 26,
    "agent-app": 94
   },
   "by_file": {
-   "raw_palette": {
-    "apps/web/src/root.tsx": 3,
-    "apps/web/src/routes/_index.tsx": 35,
-    "apps/web/src/routes/app.terminal.tsx": 16,
-    "apps/web/src/routes/privacy.tsx": 66,
-    "apps/web/src/routes/terms.tsx": 13
-   },
-   "hex": {
-    "apps/web/src/components/app-error-state.tsx": 2,
-    "apps/web/src/root.tsx": 2,
-    "apps/web/src/routes/_index.tsx": 3,
-    "apps/web/src/routes/app.reviews.$id.tsx": 1
-   },
-   "arbitrary_color": {
-    "apps/web/src/components/app-error-state.tsx": 2,
-    "apps/web/src/root.tsx": 2,
-    "apps/web/src/routes/_index.tsx": 3
-   },
-   "css_var_defs": {
-    "apps/web/src/globals.css": 8
-   },
+   "raw_palette": {},
+   "hex": {},
+   "arbitrary_color": {},
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
-  "raw_palette": 133,
-  "hex": 8,
-  "arbitrary_color": 7,
-  "css_var_defs": 8,
+  "raw_palette": 0,
+  "hex": 0,
+  "arbitrary_color": 0,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
-  "palette_top": [
-   [
-    "text-slate-900",
-    36
-   ],
-   [
-    "text-stone-600",
-    21
-   ],
-   [
-    "border-stone-200",
-    9
-   ],
-   [
-    "border-slate-200",
-    7
-   ],
-   [
-    "text-purple-600",
-    7
-   ],
-   [
-    "text-slate-950",
-    5
-   ]
-  ],
+  "palette_top": [],
   "local_primitives": {}
  },
  "legal": {
