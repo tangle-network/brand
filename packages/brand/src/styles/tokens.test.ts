@@ -520,3 +520,44 @@ describe("dark status surfaces carry their tone in hue, not weight", () => {
     });
   }
 });
+
+describe("categorical tones are a complete, legible family", () => {
+  // gen-ladders.mjs solves these and refuses to write a failing set; this holds
+  // the written file to the same floors, so a hand edit inside the generated
+  // region fails here before `gen-ladders --check` is even run.
+  const CATEGORIES = ["violet", "orange", "teal", "blue", "pink", "brown", "cyan", "lime"];
+  const ROLES = ["bg", "bg-hover", "bg-selected", "border", "border-selected", "text", "icon"];
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    for (const tone of CATEGORIES) {
+      it(`${theme} ${tone}: text and icon clear their floors on every fill`, () => {
+        for (const role of ROLES) hexIn(spine, `tone-${tone}-${role}`);
+        for (const fill of ["bg", "bg-hover", "bg-selected"]) {
+          const under = hexIn(spine, `tone-${tone}-${fill}`);
+          expect(
+            contrastRatio(hexIn(spine, `tone-${tone}-text`), under),
+            `${theme} --tone-${tone}-text on --tone-${tone}-${fill}`,
+          ).toBeGreaterThanOrEqual(4.5);
+          expect(
+            contrastRatio(hexIn(spine, `tone-${tone}-icon`), under),
+            `${theme} --tone-${tone}-icon on --tone-${tone}-${fill}`,
+          ).toBeGreaterThanOrEqual(3);
+        }
+      });
+    }
+  }
+  it("keeps the shipped --surface-{violet,orange,teal}-* names on the family, with legible text", () => {
+    for (const spine of [DARK, LIGHT]) {
+      for (const tone of ["violet", "orange", "teal"]) {
+        for (const role of ["bg", "border"]) {
+          expect(hexIn(spine, `surface-${tone}-${role}`)).toEqual(hexIn(spine, `tone-${tone}-${role}`));
+        }
+        expect(
+          contrastRatio(hexIn(spine, `surface-${tone}-text`), hexIn(spine, `surface-${tone}-bg`)),
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+});
