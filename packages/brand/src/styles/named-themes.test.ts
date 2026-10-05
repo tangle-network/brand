@@ -284,3 +284,65 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
     }
   });
 });
+
+describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () => {
+  const dark = block('[data-theme="super"]');
+  const light = blocksIn(themes, '[data-theme="super-light"]').find((b) =>
+    b.includes("--hsl-background"),
+  );
+  if (!light) throw new Error('missing theme block: [data-theme="super-light"]');
+
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s clears AA for ink, muted ink, the action fill and the ring", (_name, css) => {
+    const canvas = hslToRgb(hslIn(css, "hsl-background"));
+    const card = hslToRgb(hslIn(css, "hsl-card"));
+    const muted = hslToRgb(hslIn(css, "hsl-muted"));
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    const mutedFg = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(mutedFg, canvas), "muted ink on canvas").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, card), "muted ink on card").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, muted), "muted ink on muted").toBeGreaterThanOrEqual(4.5);
+
+    const primary = hslToRgb(hslIn(css, "hsl-primary"));
+    const onPrimary = hslToRgb(hslIn(css, "hsl-primary-foreground"));
+    expect(contrastRatio(onPrimary, primary), "text on the action fill").toBeGreaterThanOrEqual(4.5);
+
+    const ring = hslToRgb(hslIn(css, "hsl-ring"));
+    expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+
+    for (const tier of ["text-primary", "text-secondary", "text-muted", "text-dim", "accent-text"]) {
+      expect(contrastRatio(hexIn(css, tier), card), `${tier} on card`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, tier), canvas), `${tier} on canvas`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("keeps the forest action in one hue family across modes", () => {
+    for (const token of ["hsl-primary", "hsl-ring"]) {
+      expect(
+        Math.abs(hslIn(dark, token).h - hslIn(light, token).h),
+        `--${token} hue`,
+      ).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("elevates by lightening in dark", () => {
+    const planes = ["depth-1", "depth-2", "depth-3", "depth-4"].map((t) =>
+      hexRelativeLuminanceIn(dark, t),
+    );
+    for (let i = 1; i < planes.length; i++) {
+      expect(planes[i], `depth step ${i}`).toBeGreaterThan(planes[i - 1]);
+    }
+  });
+
+  it("inherits status tones instead of retinting them", () => {
+    for (const css of [dark, light]) {
+      expect(css).not.toMatch(/--surface-(success|warning|danger|info|neutral)-/);
+      expect(css).not.toMatch(/--tone-/);
+    }
+  });
+});

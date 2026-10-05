@@ -37,7 +37,7 @@ For finer control, use the exported filenames:
 | `.dark` or `data-theme="dark"` | Explicit dark, including a nested dark island |
 | `.light` or `data-theme="light"` | Explicit light, including a nested light island |
 | `data-sandbox-theme="vault"` or `"dawn"` | Existing legacy light names; an explicit `.dark` on that same element takes precedence |
-| `aubergine` / `aubergine-light`, `arena` / `arena-light`, `tangle-dark` / `tangle-light` | Existing named dark/light pairs, applied with `data-theme` |
+| `aubergine` / `aubergine-light`, `arena` / `arena-light`, `super` / `super-light`, `tangle-dark` / `tangle-light` | Existing named dark/light pairs, applied with `data-theme` |
 | `.dark[data-theme="intelligence"]` | Existing dark-only product surface; `.light` keeps the identity and uses canonical light |
 
 Set one coherent mode on each boundary; do not author contradictory `.light`/`.dark`/named-mode markers. Named light variants keep their existing palettes; `tangle-light` is not silently retuned to the neutral base light palette. Each known boundary receives a complete baseline before named overrides, so nested scopes do not inherit opposite-mode syntax, status or already-resolved HSL aliases.

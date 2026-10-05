@@ -59,11 +59,11 @@ const lightStatus = blocksIn(themes, '[data-theme="tangle-light"]').join("\n");
 const scopes: Array<{ name: string; sources: string[] }> = [
   { name: "canonical dark", sources: [DARK] },
   { name: "canonical light", sources: [LIGHT] },
-  ...["aubergine", "arena", "tangle-dark"].map((name) => ({
+  ...["aubergine", "arena", "super", "tangle-dark"].map((name) => ({
     name,
     sources: [...blocksIn(themes, `[data-theme="${name}"]`), DARK],
   })),
-  ...["aubergine-light", "arena-light", "tangle-light"].map((name) => ({
+  ...["aubergine-light", "arena-light", "super-light", "tangle-light"].map((name) => ({
     name,
     sources: [...blocksIn(themes, `[data-theme="${name}"]`), lightStatus, LIGHT, DARK],
   })),
