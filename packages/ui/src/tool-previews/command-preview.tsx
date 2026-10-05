@@ -191,7 +191,7 @@ export const CommandPreview = memo(
         </span>
         <code
           className={cn(
-            "min-w-0 flex-1 whitespace-pre-wrap break-all",
+            "min-w-0 flex-1 whitespace-pre-wrap [overflow-wrap:anywhere]",
             expanded ? "" : "line-clamp-2",
           )}
         >
@@ -239,7 +239,7 @@ export const CommandPreview = memo(
                 tabIndex={0}
                 aria-label="stdout"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap break-all px-3 py-2 leading-relaxed",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
                   focusRing,
                 )}
               >
@@ -251,7 +251,7 @@ export const CommandPreview = memo(
                 tabIndex={0}
                 aria-label="stderr"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >
@@ -263,7 +263,7 @@ export const CommandPreview = memo(
                 tabIndex={0}
                 aria-label="error"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >

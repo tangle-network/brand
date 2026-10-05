@@ -252,7 +252,7 @@
     --tool-card-py: 0.5rem;
     --tool-icon-size: 1.75rem;
     --code-header-bg: hsl(var(--hsl-background));
-    --syntax-comment: #8b8fbc;
+    --syntax-comment: #9ea2cc;
     --syntax-keyword: #A78FFF;
     --syntax-string: #10b981;
     --syntax-function: #6D9FFF;
