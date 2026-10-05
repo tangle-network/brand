@@ -596,67 +596,51 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "d25cc6549e33",
+  "head": "663cfedea162",
   "tsx_files": 15,
   "css_files": 8,
   "versions": {
    "agent-app": [
-    "0.53.7"
+    "0.53.13"
    ],
    "brand": [
-    "1.10.1"
+    "1.13.0"
    ],
    "override:brand": [
-    "1.10.1"
+    "1.13.0"
    ],
    "override:sandbox-ui": [
-    "0.122.3"
+    "0.125.3"
    ],
    "override:ui": [
-    "11.16.3"
+    "11.19.0"
    ],
    "sandbox-ui": [
-    "0.122.3"
+    "0.125.3"
    ],
    "ui": [
-    "11.16.3"
+    "11.19.0"
    ]
   },
   "importing_files": {
    "brand": 1,
-   "ui": 0,
+   "ui": 2,
    "sandbox-ui": 5,
    "agent-app": 5
   },
   "by_file": {
    "raw_palette": {},
-   "hex": {
-    "apps/web/src/App.tsx": 2,
-    "apps/web/src/AuthGate.tsx": 2,
-    "apps/web/src/assembly/AssemblyBooklet.tsx": 4,
-    "apps/web/src/canvas/NodeInspector.tsx": 1,
-    "apps/web/src/canvas/SystemDiagramCanvas.tsx": 8,
-    "apps/web/src/main.tsx": 1,
-    "apps/web/src/styles.css": 226,
-    "apps/web/src/styles/assembly.css": 19,
-    "apps/web/src/styles/canvas-nodes.css": 21,
-    "apps/web/src/styles/composer.css": 13,
-    "apps/web/src/styles/fusion.css": 10,
-    "apps/web/src/styles/provenance.css": 21
-   },
+   "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "apps/web/src/styles.css": 95,
-    "apps/web/src/styles/canvas-nodes.css": 2,
-    "apps/web/src/styles/composer.css": 9,
-    "apps/web/src/styles/shell.css": 2
+    "apps/web/src/styles/canvas-nodes.css": 2
    },
    "local_primitive_count": {}
   },
   "raw_palette": 0,
-  "hex": 328,
+  "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 108,
+  "css_var_defs": 2,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
