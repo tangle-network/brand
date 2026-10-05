@@ -56,6 +56,7 @@
  * from the complete canonical light baseline in tokens.css. */
 [data-theme="aubergine-light"],
 [data-theme="arena-light"],
+[data-theme="super-light"],
 [data-theme="tangle-light"] {
   --hsl-secondary-foreground: 0 0% 10%;
   --surface-neutral-text: #4b5563;
@@ -150,6 +151,66 @@
   --border-hover: rgba(6,95,70,0.30); --accent-text: #047857;
   --brand-primary: #059669; --brand-glow: #10b981;
   --text-primary: #06231a; --text-secondary: #285048; --text-muted: #455f52; --text-dim: #4e6d62;
+  --md3-surface: var(--bg-root); --md3-surface-dim: var(--depth-2);
+  --md3-surface-bright: #ffffff; --md3-surface-variant: var(--md3-surface-container-high);
+  --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
+}
+
+/* ───────────────────────── Super — warm neutral / forest accent ─────────────
+ * SUPER, the local logistics app. Warm green-grey planes with a forest action
+ * colour. Light is the product's primary mode; dark keeps the same hue family.
+ * Status and category tones are inherited, never retinted. */
+[data-theme="super"] {
+  --hsl-background: 120 12% 8%;   --hsl-foreground: 86 20% 93%;
+  --hsl-card: 120 11% 12%;        --hsl-card-foreground: 86 20% 93%;
+  --hsl-popover: 120 10% 15%;     --hsl-popover-foreground: 86 20% 93%;
+  --hsl-primary: 139 31% 61%;     --hsl-primary-foreground: 140 35% 8%;
+  --hsl-secondary: 120 9% 17%;    --hsl-secondary-foreground: 86 20% 93%;
+  --hsl-muted: 120 9% 17%;        --hsl-muted-foreground: 95 10% 67%;
+  --hsl-accent: 120 10% 18%;      --hsl-accent-foreground: 86 20% 93%;
+  --hsl-border: 120 9% 25%;       --hsl-input: 120 9% 17%;
+  --hsl-ring: 139 31% 61%;
+  --depth-1: #121712; --depth-2: #1c231c; --depth-3: #232b23; --depth-4: #2b342b;
+  --bg-root: #121712; --bg-card: var(--depth-2); --bg-input: var(--depth-3);
+  --md3-surface-container-lowest: #0d110d; --md3-surface-container-low: #171d17;
+  --md3-surface-container: #1c231c; --md3-surface-container-high: #232b23;
+  --md3-surface-container-highest: #2b342b; --md3-outline-variant: #3a453a;
+  --border-subtle: rgba(190,210,180,0.12); --border-default: rgba(190,210,180,0.20);
+  --border-hover: rgba(190,210,180,0.34); --accent-text: #8fd0a4;
+  --brand-primary: #7dbb91; --brand-glow: #8fd0a4;
+  --text-primary: #eef1ea; --text-secondary: #cbd3c5; --text-muted: #a9b3a2; --text-dim: #959f8f;
+  --md3-primary: #8fd0a4; --bg-hover: rgba(190,210,180,0.06); --bg-selection: rgba(125,187,145,0.28);
+  --accent-surface-soft: rgba(125,187,145,0.08); --accent-surface-strong: rgba(125,187,145,0.24);
+  --border-accent: rgba(125,187,145,0.38); --border-accent-hover: rgba(125,187,145,0.56);
+  --btn-primary-bg: #7dbb91; --btn-primary-hover: #8fcaa1; --btn-primary-text: #0e1d13;
+  --btn-cta-bg: #7dbb91; --btn-cta-text: #0e1d13;
+  --md3-surface: var(--bg-root); --md3-surface-dim: var(--md3-surface-container-lowest);
+  --md3-surface-bright: var(--md3-surface-container-highest); --md3-surface-variant: var(--md3-surface-container-high);
+  --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
+}
+[data-theme="super-light"] {
+  --hsl-background: 75 22% 96%;   --hsl-foreground: 114 13% 15%;
+  --hsl-card: 0 0% 100%;          --hsl-card-foreground: 114 13% 15%;
+  --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 114 13% 15%;
+  --hsl-primary: 148 40% 25%;     --hsl-primary-foreground: 0 0% 100%;
+  --hsl-secondary: 80 18% 93%;    --hsl-muted: 80 18% 93%;
+  --hsl-muted-foreground: 99 9% 37%;
+  --hsl-accent: 80 18% 93%;       --hsl-border: 87 17% 87%;
+  --hsl-input: 92 14% 78%;        --hsl-ring: 144 31% 34%;
+  --depth-1: #f7f8f4; --depth-2: #eff1eb; --depth-3: #ffffff; --depth-4: #ffffff;
+  --bg-root: #f7f8f4; --bg-card: #ffffff; --bg-input: #eff1eb;
+  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #fcfcf9;
+  --md3-surface-container: #f7f8f4; --md3-surface-container-high: #eff1eb;
+  --md3-surface-container-highest: #e6eae1; --md3-outline-variant: #dfe4d9;
+  --border-subtle: rgba(34,43,33,0.10); --border-default: rgba(34,43,33,0.16);
+  --border-hover: rgba(34,43,33,0.30); --accent-text: #275a3f;
+  --brand-primary: #275a3f; --brand-glow: #3b7050;
+  --text-primary: #222b21; --text-secondary: #46523f; --text-muted: #5d6857; --text-dim: #616c5a;
+  --md3-primary: #275a3f; --bg-hover: rgba(34,43,33,0.04); --bg-selection: rgba(39,90,63,0.16);
+  --accent-surface-soft: rgba(39,90,63,0.06); --accent-surface-strong: rgba(39,90,63,0.14);
+  --border-accent: rgba(39,90,63,0.30); --border-accent-hover: rgba(39,90,63,0.45);
+  --btn-primary-bg: #275a3f; --btn-primary-hover: #1e4832; --btn-primary-text: #ffffff;
+  --btn-cta-bg: #275a3f; --btn-cta-text: #ffffff;
   --md3-surface: var(--bg-root); --md3-surface-dim: var(--depth-2);
   --md3-surface-bright: #ffffff; --md3-surface-variant: var(--md3-surface-container-high);
   --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
