@@ -253,20 +253,6 @@ describe("AgentTimeline tool actions", () => {
     expect(classes[4]).toContain("mt-4") // prose → user
   })
 
-  it("softens the streaming cursor to a muted caret", () => {
-    const { container } = render(
-      <AgentTimeline
-        items={[
-          { id: "a-1", kind: "message", role: "assistant", content: "Typing", isStreaming: true },
-        ]}
-      />,
-    )
-    const caret = container.querySelector("[data-streaming-caret]")
-    expect(caret).not.toBeNull()
-    expect(caret!.className).toContain("bg-muted-foreground")
-    expect(caret!.className).not.toContain("bg-primary")
-  })
-
   it("renders the source part's real input in the expanded detail", async () => {
     const user = userEvent.setup()
     const probePart: ToolPart = {

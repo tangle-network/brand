@@ -162,13 +162,29 @@ function spacingBefore(prev: StepKind | undefined, next: StepKind): string {
 // wider than the bleed, so nothing clips.
 const ROW_BLEED = "-mx-3";
 
+// The streaming caret ends the last line of text. It is drawn as the `::after`
+// of the prose's last block (the last item of a trailing list), so it follows
+// the final word instead of starting a line of its own below the paragraph.
+const STREAMING_CARET =
+  "[&>:last-child:not(ul,ol)]:after:ml-0.5 [&>:last-child:not(ul,ol)]:after:inline-block [&>:last-child:not(ul,ol)]:after:h-[1em] [&>:last-child:not(ul,ol)]:after:w-0.5 [&>:last-child:not(ul,ol)]:after:animate-pulse [&>:last-child:not(ul,ol)]:after:rounded-full [&>:last-child:not(ul,ol)]:after:bg-muted-foreground [&>:last-child:not(ul,ol)]:after:align-text-bottom [&>:last-child:not(ul,ol)]:after:content-[''] " +
+  "[&>:is(ul,ol):last-child>li:last-child]:after:ml-0.5 [&>:is(ul,ol):last-child>li:last-child]:after:inline-block [&>:is(ul,ol):last-child>li:last-child]:after:h-[1em] [&>:is(ul,ol):last-child>li:last-child]:after:w-0.5 [&>:is(ul,ol):last-child>li:last-child]:after:animate-pulse [&>:is(ul,ol):last-child>li:last-child]:after:rounded-full [&>:is(ul,ol):last-child>li:last-child]:after:bg-muted-foreground [&>:is(ul,ol):last-child>li:last-child]:after:align-text-bottom [&>:is(ul,ol):last-child>li:last-child]:after:content-['']";
+
 function AssistantMessage({ item }: { item: AgentTimelineMessageItem }) {
   return (
     <div>
       {item.content && (
-        <Markdown className="tangle-prose text-[var(--font-size-base)] leading-[1.5]">{item.content}</Markdown>
+        <Markdown
+          // `length:` types the token: a bare `text-[var(--x)]` compiles to a
+          // color, which left the reading size at the Markdown default.
+          className={cn(
+            "tangle-prose text-[length:var(--font-size-base)] leading-[1.5]",
+            item.isStreaming && STREAMING_CARET,
+          )}
+        >
+          {item.content}
+        </Markdown>
       )}
-      {item.isStreaming && (
+      {item.isStreaming && !item.content && (
         <span
           aria-hidden
           data-streaming-caret=""

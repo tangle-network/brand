@@ -9,7 +9,7 @@ import {
 } from "react";
 import type SyntaxHighlighter from "react-syntax-highlighter";
 import { Check, Copy } from "lucide-react";
-import { focusRing } from "../lib/focus";
+import { focusRing, focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 // Leave variables unresolved: the browser resolves them on each token span,
@@ -118,6 +118,17 @@ export const CodeBlock = memo(
       overflowX: "auto" as const,
     };
     const codeTagProps = { style: { fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)" } };
+    // A long line scrolls the block sideways, which a keyboard reaches only if
+    // the block takes focus (axe scrollable-region-focusable). A label on a bare
+    // <pre> is prohibited ARIA, so the block is a named region, as the terminal
+    // output regions are.
+    const scrollRegion = {
+      tabIndex: 0,
+      role: "region",
+      "aria-label": headerLabel ? `${headerLabel} code` : "Code",
+      // Inset: the rounded, overflow-clipped card would cut an outer ring.
+      className: focusRingInset,
+    } as const;
 
     return (
       <div
@@ -151,11 +162,12 @@ export const CodeBlock = memo(
             customStyle={customStyle}
             codeTagProps={codeTagProps}
             wrapLines={false}
+            {...scrollRegion}
           >
             {code}
           </Highlighter>
         ) : (
-          <pre style={{ ...syntaxTheme.hljs, ...customStyle }}>
+          <pre {...scrollRegion} style={{ ...syntaxTheme.hljs, ...customStyle }}>
             <code style={{ ...codeTagProps.style, whiteSpace: "pre" }}>{code}</code>
           </pre>
         )}
