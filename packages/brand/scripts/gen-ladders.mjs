@@ -3,6 +3,8 @@
 //
 //   node scripts/gen-ladders.mjs [--check] [ramps.json] [out-dir]
 //
+// out-dir must hold the tokens.css whose tone regions are rewritten.
+//
 // It also writes the categorical tone family into the two marked regions of
 // tokens.css, so every consumer of the canonical stylesheet (and the
 // legacy-light projection generated from it) carries the same values. --check
@@ -402,7 +404,7 @@ const TOKENS_FILE = path.join(OUT, 'tokens.css')
 const tokensSource = fs.readFileSync(TOKENS_FILE, 'utf8')
 const cardIn = (nth) => {
   const all = [...tokensSource.matchAll(/--md3-surface-container:\s*(#[0-9a-fA-F]{6})/g)].map((m) => m[1].toLowerCase())
-  if (all.length < 2) throw new Error('tokens.css: expected dark and light --md3-surface-container hex values')
+  if (all.length !== 2) throw new Error(`tokens.css: expected exactly 2 --md3-surface-container hex values (dark, light), found ${all.length}`)
   return all[nth]
 }
 const CARD = { dark: cardIn(0), light: cardIn(1) }
@@ -487,9 +489,16 @@ const toneRegion = (theme) => {
     for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value};`)
   }
   // Literal values rather than var() aliases: tests and consumers read these
-  // as hex, and this generator is the only writer of both.
+  // as hex, and this generator is the only writer of both. The legacy -text
+  // names keep their hue: sandbox-ui colours glyphs with them straight on the
+  // card, so they take step 11, darkened toward step 12 only as far as 4.5:1
+  // on the fill needs (light orange and teal).
   for (const name of LEGACY_SURFACE) {
-    for (const role of ['bg', 'border', 'text']) lines.push(`  --surface-${name}-${role}: ${TONES[theme][name][role]};`)
+    const tone = TONES[theme][name]
+    const ramp = R[CATEGORY[name]][theme]
+    let text = ramp[10]
+    for (let t = 0.01; contrast(text, tone.bg) < 4.5; t += 0.01) text = mix(ramp[11], ramp[10], t)
+    lines.push(`  --surface-${name}-bg: ${tone.bg};`, `  --surface-${name}-border: ${tone.border};`, `  --surface-${name}-text: ${text};`)
   }
   lines.push('  /* tones:end */')
   return lines.join('\n')

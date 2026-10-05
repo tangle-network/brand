@@ -14,6 +14,8 @@ import { TONE_CLASSES, type Tone } from "./tone";
  * `onRemove` adds a native remove button after the label — the removable
  * variant, for a recipient, an applied filter or an attached item. The tag
  * itself stays non-interactive, so the remove button is the only tab stop.
+ * Removing a tag unmounts its focused button; move focus to the next tag or
+ * the input that adds tags, or keyboard focus falls to the page.
  */
 export interface TagProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
   children: React.ReactNode;
@@ -49,7 +51,7 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
       <span
         ref={ref}
         className={cn(
-          "inline-flex min-w-0 max-w-full shrink-0 items-center rounded-md border font-medium leading-none",
+          "inline-flex min-w-0 max-w-full shrink-0 items-center rounded-md border font-medium",
           SIZE[size],
           emphasis === "outline" ? classes.outline : classes.surface,
           onRemove && (size === "sm" ? "pr-0.5" : "pr-1"),

@@ -47,6 +47,13 @@ export function initialsOf(name: string): string {
 const IconTile = React.forwardRef<HTMLSpanElement, IconTileProps>(
   ({ className, tone, size = "md", src, icon, name, label, ...props }, ref) => {
     const [failedSrc, setFailedSrc] = React.useState<string | null>(null);
+    const imgRef = React.useRef<HTMLImageElement>(null);
+    // A server-rendered image that failed before hydration never fires onError
+    // again, so check it once mounted.
+    React.useEffect(() => {
+      const img = imgRef.current;
+      if (img?.complete && img.naturalWidth === 0 && src) setFailedSrc(src);
+    }, [src]);
     const resolvedTone = tone ?? (name ? toneFor(name) : "violet");
     const classes = TONE_CLASSES[resolvedTone];
     const showImage = Boolean(src) && failedSrc !== src;
@@ -58,7 +65,7 @@ const IconTile = React.forwardRef<HTMLSpanElement, IconTileProps>(
         aria-label={label}
         aria-hidden={label ? undefined : true}
         className={cn(
-          "inline-flex shrink-0 select-none items-center justify-center overflow-hidden border font-semibold leading-none",
+          "inline-flex shrink-0 select-none items-center justify-center overflow-hidden border font-semibold",
           SIZE[size],
           showImage ? "border-[var(--border-subtle)] bg-[var(--surface-neutral-bg)]" : classes.surface,
           !showImage && icon ? classes.icon : null,
@@ -68,6 +75,7 @@ const IconTile = React.forwardRef<HTMLSpanElement, IconTileProps>(
       >
         {showImage ? (
           <img
+            ref={imgRef}
             src={src}
             alt=""
             className="size-full object-cover"

@@ -77,10 +77,12 @@ const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(
         className={cn(
           // The pseudo-element widens a small chip's hit area on touch screens
           // without changing its drawn size or the row's layout.
-          "relative inline-flex min-w-0 max-w-full shrink-0 cursor-pointer select-none items-center rounded-md border font-medium leading-none transition-[background-color,border-color,color] duration-150 ease-out before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] pointer-coarse:before:-inset-y-2.5",
+          "relative inline-flex min-w-0 max-w-full shrink-0 cursor-pointer select-none items-center rounded-md border font-medium transition-[background-color,border-color,color] duration-150 ease-out before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] pointer-coarse:before:-inset-y-2.5",
           SIZE[size],
           emphasis === "outline" && !on ? classes.outline : classes.surface,
-          !disabled && classes.hover,
+          // A selected chip keeps its fill under the pointer; the rest-state
+          // hover would read as half-deselecting it.
+          !disabled && !on && classes.hover,
           on && classes.selected,
           disabled && "cursor-not-allowed opacity-50",
           focusRing,

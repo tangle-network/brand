@@ -548,12 +548,15 @@ describe("categorical tones are a complete, legible family", () => {
       });
     }
   }
-  it("keeps the shipped --surface-{violet,orange,teal}-* names on the family", () => {
+  it("keeps the shipped --surface-{violet,orange,teal}-* names on the family, with legible text", () => {
     for (const spine of [DARK, LIGHT]) {
       for (const tone of ["violet", "orange", "teal"]) {
-        for (const role of ["bg", "border", "text"]) {
+        for (const role of ["bg", "border"]) {
           expect(hexIn(spine, `surface-${tone}-${role}`)).toEqual(hexIn(spine, `tone-${tone}-${role}`));
         }
+        expect(
+          contrastRatio(hexIn(spine, `surface-${tone}-text`), hexIn(spine, `surface-${tone}-bg`)),
+        ).toBeGreaterThanOrEqual(4.5);
       }
     }
   });
