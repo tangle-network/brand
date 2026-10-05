@@ -321,6 +321,18 @@ describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () =>
     }
   });
 
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s button tokens follow the action fill, not the Tangle indigo", (_name, css) => {
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-bg"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-hover"))).toBeGreaterThanOrEqual(4.5);
+    const fill = hslToRgb(hslIn(css, "hsl-primary"));
+    hexIn(css, "btn-primary-bg").forEach((channel, i) => {
+      expect(Math.abs(channel - fill[i]), "btn-primary-bg matches --hsl-primary").toBeLessThanOrEqual(4);
+    });
+  });
+
   it("keeps the forest action in one hue family across modes", () => {
     for (const token of ["hsl-primary", "hsl-ring"]) {
       expect(
