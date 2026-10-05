@@ -63,6 +63,24 @@ Avoid:
 - Pages that are only text, chips, and cards.
 - Labeling every internal repo or product at once.
 
+## Color Roles
+
+Product UI uses color for three separate jobs. A component picks one role and never borrows another role's color.
+
+| Role | Job | Source | Rule |
+| --- | --- | --- | --- |
+| Brand | Identity and the primary action | The iris accent tokens | One primary action per view. |
+| Category | Tell kinds of things apart: file types, entities, capabilities, chart series | Categorical tone families | Always paired with a label or icon. A category color never means success, failure, or progress. |
+| Status | Report a state the product observed | Success, warning, danger, info, and neutral tones | Unknown or unrecorded states stay neutral. |
+
+`scripts/gen-ladders.mjs` generates every tone family with matching background, border, text, and icon values in both themes; edit its map, not `system.css`.
+The categorical set today is violet, orange, and teal. Widening it from the existing Radix ramps, so identity tiles and chart series never fall back to a status color, is slice 1 of the design-system program.
+Badge's `running`, `creating`, `stopped`, `warm`, `cold`, and `deleted` variants are sandbox lifecycle states; slice 1 moves them to `sandbox-ui` adapters over status tones.
+
+Products do not paint states or categories with Tailwind palette utilities such as `bg-amber-500` or with hex literals. The consumer drift check counts both, and a consumer's count may only fall.
+
+A customer or co-brand preset is a named theme in `named-themes.css`. It may change the logo, display name, and accent. It may not change what a status or category color means, and it is never a consumer-side stylesheet override.
+
 ## Theme Roles
 
 Use **Dark** for:

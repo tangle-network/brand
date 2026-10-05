@@ -164,3 +164,18 @@ Also inspect at 320/390/1280px in both themes, tab through card actions and tabl
 regions, use Enter/Space on the button and arrow keys in the table, and inspect
 the native accessibility tree. Do not claim screen-reader or browser acceptance
 from an unexecuted story or a successful build.
+
+## Missing Shared Families
+
+Measured on 2026-10-05 across twelve product surfaces and the three shared layers: 74 locally defined Pill, Chip, Badge, Tile, or Swatch components, because `ui` has no Tag, Chip, or IconTile.
+The inventory and the program's slice order are in the company wiki decision `decision-2026-10-05-one-design-system.md`.
+
+| Family | Owner after slice 1 | Local definitions it replaces |
+| --- | --- | --- |
+| `StatusPill` | One implementation in `ui` primitives, re-exported above | `sandbox-ui` StatusPill; `agent-app` StatusPill and StatePill; Audits StatusPill; StatusBadge in Sandbox, Intelligence, and Creative |
+| `Tag` and `Chip` | New `ui` primitive with tone, emphasis, and size. Filter, toggle, and removable chips are native buttons with pressed or selected state that does not rely on color. | FilterChip in Platform and Legal; MetaChip, SubjectChip, MissingFactChip, MentionPill, PostChip, and similar label chips |
+| `IconTile` | New `ui` primitive on categorical tones, with image, glyph, and initials fallbacks | Hand-built colored icon squares in product rows and cards |
+| `Badge` | Kept for compatibility. Status variants map onto `StatusPill`; lifecycle variants move to `sandbox-ui` adapters. | — |
+| Composer profile pill | `agent-app`, beside `ChatComposer` | ComposerProfilePill copies in GTM, Tax, and Creative |
+
+A family moves into `ui` only with at least two consumers that show different content. Domain meaning, such as a risk level or a sandbox lifecycle state, stays in the owning layer as a small adapter over these primitives.
