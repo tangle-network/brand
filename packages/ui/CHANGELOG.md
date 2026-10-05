@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.16.3
+
+### Patch Changes
+
+- 0132f5c: Terminal blocks wrap a long command, stdout and stderr at spaces first and break inside a token only when the token is longer than the line. `break-all` split `factory-playground` and `git` mid-word on a phone.
+- a95c717: Each scrollable terminal output region carries `role="region"`, so its `aria-label` (stdout, stderr, error) names a landmark screen readers announce. A label on a bare `<pre>` is prohibited ARIA, and axe flagged it on the platform run page.
+
 ## 11.16.2
 
 ### Patch Changes
