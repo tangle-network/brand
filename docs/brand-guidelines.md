@@ -78,6 +78,8 @@ The categorical set is violet, orange, teal, blue, pink, brown, cyan, and lime.
 To paint an element with whichever category its data names, set `data-tone="<category>"` on it and read `--tone-bg`, `--tone-bg-hover`, `--tone-bg-selected`, `--tone-border`, `--tone-border-selected`, `--tone-text`, and `--tone-icon`.
 Badge's `running`, `creating`, `stopped`, `warm`, `cold`, and `deleted` variants are sandbox lifecycle states; slice 1 moves them to `sandbox-ui` adapters over status tones.
 
+Dim the page behind a modal or sheet, or a photo under its caption, with `--scrim` (or `--scrim-strong` for a caption gradient), and set text on a photo or scrim in `--on-media`. Both stay the same in every theme; products do not write `black` or `white` for them.
+
 Products do not paint states or categories with Tailwind palette utilities such as `bg-amber-500` or with hex literals. The consumer drift check counts both, and a consumer's count may only fall.
 
 A customer or co-brand preset is a named theme in `named-themes.css`. It may change the logo, display name, and accent. It may not change what a status or category color means, and it is never a consumer-side stylesheet override.
