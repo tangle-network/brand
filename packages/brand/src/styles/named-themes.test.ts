@@ -387,3 +387,25 @@ describe("data-tone scopes", () => {
     }
   });
 });
+
+describe("named themes: the base surface follows the retint", () => {
+  // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome
+  // such as a mobile top bar. A retinted scope that leaves them at the neutral
+  // spine renders a grey bar on a purple or green page.
+  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light"]) {
+    it(`[data-theme="${scope}"] retints the base surface tokens`, () => {
+      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) => /--text-dim:/.test(b));
+      for (const token of [
+        "md3-surface",
+        "md3-surface-dim",
+        "md3-surface-bright",
+        "md3-surface-variant",
+        "md3-on-surface",
+        "md3-on-surface-variant",
+      ]) {
+        expect(css, `${scope} declares --${token}`).toMatch(new RegExp(`--${token}:`));
+      }
+      expect(css).toMatch(/--md3-surface:\s*var\(--bg-root\)/);
+    });
+  }
+});
