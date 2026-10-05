@@ -15,7 +15,7 @@ function part(state: Partial<ToolPart["state"]>): ToolPart {
 describe("CommandPreview", () => {
   it("shows a neutral badge, not a red exit, when a tool errored without an exit code", () => {
     render(<CommandPreview part={part({ status: "error", output: "warning: x" })} />);
-    const badge = screen.getByText("tool error");
+    const badge = screen.getByText("tool reported error");
     expect(badge.className).toContain("surface-neutral");
     expect(badge.className).not.toContain("surface-danger");
     expect(screen.queryByText("error")).toBeNull();
@@ -58,7 +58,7 @@ describe("CommandPreview", () => {
         part={part({ status: "error", output: { stdout: "ok", stderr: "", exitCode: 0 } })}
       />,
     );
-    expect(screen.getByText("exit 0 · tool error").className).toContain("surface-neutral");
+    expect(screen.getByText("exit 0 · tool reported error").className).toContain("surface-neutral");
   });
 
   it("is a quiet row until opened, then a dark terminal", () => {
