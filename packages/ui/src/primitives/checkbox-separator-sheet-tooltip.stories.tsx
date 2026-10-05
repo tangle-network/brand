@@ -25,7 +25,7 @@ export const Checkboxes: Story = {
         { id: 'd', label: 'Disabled until billing is set up', checked: false, disabled: true },
       ].map((row) => (
         <div key={row.id} className="flex items-center gap-2">
-          <Checkbox id={row.id} defaultChecked={row.checked === true} checked={row.checked === 'indeterminate' ? 'indeterminate' : undefined} disabled={row.disabled} />
+          <Checkbox id={row.id} defaultChecked={row.checked} disabled={row.disabled} />
           <Label htmlFor={row.id}>{row.label}</Label>
         </div>
       ))}

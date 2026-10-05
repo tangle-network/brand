@@ -29,6 +29,16 @@ describe("Checkbox", () => {
     );
   });
 
+  it("draws the dash for an uncontrolled indeterminate box too", () => {
+    const { container } = render(<Checkbox aria-label="Some" defaultChecked="indeterminate" />);
+    expect(screen.getByRole("checkbox")).toHaveAttribute("aria-checked", "mixed");
+    const dash = container.querySelector("svg.lucide-minus");
+    const tick = container.querySelector("svg.lucide-check");
+    expect(dash?.getAttribute("class")).toContain("group-data-[state=indeterminate]/checkbox:block");
+    expect(tick?.getAttribute("class")).toContain("group-data-[state=indeterminate]/checkbox:hidden");
+    expect(screen.getByRole("checkbox")).toHaveAttribute("data-state", "indeterminate");
+  });
+
   it("paints with tokens, never palette utilities", () => {
     render(<Checkbox aria-label="Agree" defaultChecked />);
     const cls = screen.getByRole("checkbox").className;
