@@ -179,3 +179,16 @@ The inventory and the program's slice order are in the company wiki decision `de
 | Composer profile pill | `agent-app`, beside `ChatComposer` | ComposerProfilePill copies in GTM, Tax, and Creative |
 
 A family moves into `ui` only with at least two consumers that show different content. Domain meaning, such as a risk level or a sandbox lifecycle state, stays in the owning layer as a small adapter over these primitives.
+
+### Slice 1 result (2026-10-05)
+
+The families above shipped in brand 1.11.0 and ui 11.17.0 (`Tag`, `Chip`, `IconTile`, `toneFor`, eight categorical tones), sandbox-ui 0.124.0 (re-exports, `SandboxStatusPill` lifecycle adapter, `NodeStatusPill` on `StatusPill`) and agent-app 0.53.12 (`ComposerProfilePill`, work-product pills on `StatusPill`). GTM (gtm-agent#1246) and Creative (creative-agent#534) adopted them in production.
+
+Measured with `tangle-drift` on each default branch; the baseline in `packages/brand/bin/drift-baseline.json` now holds these rows, so a consumer's local gate fails if either count rises.
+
+| Surface | Raw palette classes | Hex literals | Arbitrary colours | Local Pill/Chip/Badge/Tile definitions |
+| --- | --- | --- | --- | --- |
+| GTM | 67 → 0 | 99 → 99 | 0 → 0 | 6 → 5 |
+| Creative | 223 → 0 | 307 → 272 | 35 → 0 | 4 → 2 |
+
+The local definitions that remain are thin domain adapters over the shared primitives (GTM's `StatusChip`, `AccountPill`, `MentionPill`, `PostChip`, `MediaDropTile`; Creative's `DecisionPill`, `GenerationTile`), not separate styling. Each `ComposerProfilePill` copy in GTM and Creative is gone; Tax's can move to `placement="mode-strip"`. The other surfaces' counts are unchanged by slice 1.
