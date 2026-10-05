@@ -136,6 +136,18 @@ export type { PageHeaderProps } from "./page-header";
 export { StatusPill } from "./status-pill";
 export type { StatusPillProps, StatusTone } from "./status-pill";
 
+export { Tag } from "./tag";
+export type { TagProps } from "./tag";
+
+export { Chip } from "./chip";
+export type { ChipProps } from "./chip";
+
+export { IconTile, initialsOf } from "./icon-tile";
+export type { IconTileProps } from "./icon-tile";
+
+export { CATEGORY_TONES, TONE_CLASSES, toneFor } from "./tone";
+export type { CategoryTone, Tone, ToneClasses } from "./tone";
+
 export { MetricStrip, Metric } from "./metric-strip";
 export type { MetricStripProps, MetricProps } from "./metric-strip";
 

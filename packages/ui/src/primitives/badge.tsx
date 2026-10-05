@@ -22,15 +22,21 @@ const badgeVariants = cva(
           "border-[var(--surface-info-border)] bg-[var(--surface-info-bg)] text-[var(--surface-info-text)]",
         sandbox:
           "border-border bg-[var(--accent-surface-soft)] text-[var(--accent-text)]",
-        /* Operational status variants */
+        /* Sandbox lifecycle variants: compatibility only, painted with the
+         * status triples. A lifecycle state is domain meaning, so its mapping
+         * lives in sandbox-ui's lifecycle adapter over `StatusPill`; these
+         * stay until consumers move. Running is up and healthy (success);
+         * creating is still in progress (info, as StatusPill's `running`);
+         * stopped and warm can be resumed (warning); cold is archived (info);
+         * deleted is gone (neutral). */
         running:
-          "border-[var(--surface-teal-border)] bg-[var(--surface-teal-bg)] text-[var(--surface-teal-text)]",
+          "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
         creating:
-          "border-[var(--surface-violet-border)] bg-[var(--surface-violet-bg)] text-[var(--surface-violet-text)]",
+          "border-[var(--surface-info-border)] bg-[var(--surface-info-bg)] text-[var(--surface-info-text)]",
         stopped:
           "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)] text-[var(--surface-warning-text)]",
         warm:
-          "border-[var(--surface-orange-border)] bg-[var(--surface-orange-bg)] text-[var(--surface-orange-text)]",
+          "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)] text-[var(--surface-warning-text)]",
         cold:
           "border-[var(--surface-info-border)] bg-[var(--surface-info-bg)] text-[var(--surface-info-text)]",
         deleted:
@@ -43,6 +49,13 @@ const badgeVariants = cva(
   },
 );
 
+/**
+ * `success`, `warning`, `error` and `info` paint the same triples as
+ * `StatusPill`; for a status, prefer `StatusPill`, which adds the glyph that
+ * survives greyscale. The lifecycle variants (`running`, `creating`,
+ * `stopped`, `warm`, `cold`, `deleted`) are deprecated: use sandbox-ui's
+ * lifecycle adapter.
+ */
 export type BadgeVariant =
   | "default"
   | "secondary"

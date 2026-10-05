@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 // Writes ladders.css and system.css from radix-ramps.json.
 //
-//   node scripts/gen-ladders.mjs [ramps.json] [out-dir]
+//   node scripts/gen-ladders.mjs [--check] [ramps.json] [out-dir]
+//
+// out-dir must hold the tokens.css whose tone regions are rewritten.
+//
+// It also writes the categorical tone family into the two marked regions of
+// tokens.css, so every consumer of the canonical stylesheet (and the
+// legacy-light projection generated from it) carries the same values. --check
+// writes nothing and fails when any of the three outputs is stale.
 //
 // radix-ramps.json holds the @radix-ui/colors 3.0.0 values as static data, so
 // the generated CSS has no runtime dependency. Apps that ship ahead of a brand
@@ -12,11 +19,17 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
-const RAMPS_FILE = process.argv[2] ?? path.join(here, 'radix-ramps.json')
-const OUT = process.argv[3] ?? path.join(here, '..', 'src', 'styles')
+const args = process.argv.slice(2)
+const CHECK = args.includes('--check')
+const [rampsArg, outArg] = args.filter((a) => a !== '--check')
+const RAMPS_FILE = rampsArg ?? path.join(here, 'radix-ramps.json')
+const OUT = outArg ?? path.join(here, '..', 'src', 'styles')
 const R = JSON.parse(fs.readFileSync(RAMPS_FILE, 'utf8'))
 
-const RAMPS = ['mauve', 'iris', 'green', 'amber', 'red', 'blue', 'plum', 'orange', 'grass', 'bronze', 'crimson', 'olive']
+const RAMPS = [
+  'mauve', 'iris', 'green', 'amber', 'red', 'blue', 'plum', 'orange', 'grass', 'bronze', 'crimson', 'olive',
+  'purple', 'teal', 'pink', 'brown', 'cyan', 'lime',
+]
 const ROLE = { gray: 'mauve', accent: 'iris', success: 'green', warning: 'amber', danger: 'red', info: 'blue' }
 const DOMAIN = {
   personal: 'plum',
@@ -211,7 +224,9 @@ const MAP = [
   ['accent-surface-strong', 'iris-4', 'iris-4'],
   // Status chip: step 3 fill, step 6 border. Its text is step 12 in light,
   // because step 11 on step 3 measures 4.21-4.25:1 there, and step 11 in dark.
-  ...['success:green', 'warning:amber', 'danger:red', 'info:blue', 'violet:iris', 'orange:orange', 'teal:grass'].flatMap(
+  // The categorical violet / orange / teal chips are the tone family below,
+  // written into tokens.css; this layer does not redefine them.
+  ...['success:green', 'warning:amber', 'danger:red', 'info:blue'].flatMap(
     (p) => {
       const [n, r] = p.split(':')
       return [
@@ -332,7 +347,182 @@ ${`${DARK_SEL},\n${LIGHT_SEL}`.replace(/^/gm, '  ')} {
 }
 `
 
-fs.mkdirSync(OUT, { recursive: true })
-fs.writeFileSync(path.join(OUT, 'ladders.css'), ladders)
-fs.writeFileSync(path.join(OUT, 'system.css'), system)
-console.log(`wrote ladders.css (${ladders.length} B) and system.css (${MAP.length} tokens per theme) to ${OUT}`)
+// ── tones (tokens.css) ─────────────────────────────────────────────────────
+// Categorical tones tell kinds of things apart: entities, file types,
+// capabilities. They never report a state; status keeps its own hand-tuned
+// --surface-{success,warning,danger,info,neutral}-* triples above.
+//
+// The set was chosen by measurement, not taste: of the Radix ramps, these eight
+// keep the widest minimum OKLab distance between every pair on the icon and
+// text steps in both themes, and none sits within
+// 8 of the iris brand accent. Radix violet is 3.1 from iris, so the `violet`
+// category reads from the purple ramp; the name is kept because
+// --surface-violet-* already ships. Append new categories; reordering or
+// renaming one changes what an existing tile means.
+const CATEGORY = {
+  violet: 'purple',
+  orange: 'orange',
+  teal: 'teal',
+  blue: 'blue',
+  pink: 'pink',
+  brown: 'brown',
+  cyan: 'cyan',
+  lime: 'lime',
+}
+// The pre-existing categorical names, kept as aliases of the family.
+const LEGACY_SURFACE = ['violet', 'orange', 'teal']
+
+const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+const channels = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+const lum = (h) => {
+  const [r, g, b] = channels(h).map(lin)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+const contrast = (a, b) => {
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+const oklab = (h) => {
+  const [r, g, b] = channels(h).map(lin)
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675778 * s,
+  ]
+}
+const distance = (a, b) => {
+  const [p, q] = [oklab(a), oklab(b)]
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 100
+}
+
+// The tones sit on the canonical planes in tokens.css, not on the Radix
+// backgrounds, so they are solved against the resting card read from there.
+const TOKENS_FILE = path.join(OUT, 'tokens.css')
+const tokensSource = fs.readFileSync(TOKENS_FILE, 'utf8')
+const cardIn = (nth) => {
+  const all = [...tokensSource.matchAll(/--md3-surface-container:\s*(#[0-9a-fA-F]{6})/g)].map((m) => m[1].toLowerCase())
+  if (all.length !== 2) throw new Error(`tokens.css: expected exactly 2 --md3-surface-container hex values (dark, light), found ${all.length}`)
+  return all[nth]
+}
+const CARD = { dark: cardIn(0), light: cardIn(1) }
+
+// One value per role, solved per ramp and theme. Every rule is a floor the
+// generator enforces; an unsatisfiable ramp fails the build instead of shipping.
+//
+// Light sits on white paper, so it reads Radix steps directly:
+//   bg 3 (a wash at most 1.25:1 from paper; the border separates the chip),
+//   hover 4, selected 5, border 6.
+// Dark cannot: Radix's dark step 3 sits BELOW the #303030 card, and a sunken
+// chip reads as coloured text, while the next steps jump too far to leave room
+// for a hover and a selected fill under step-12 text. So dark fills are the
+// ramp's step 9 mixed into the card, at the least amount that lifts the fill
+// 1.3:1 (bg), 1.45:1 (hover) and 1.6:1 (selected) off it — the same low-chroma
+// raised tint as the hand-tuned status chips. Border is dark step 8.
+// Both themes:
+//   text             step 12, at least 4.5:1 on bg, hover and selected.
+//   icon             the first of steps 9-12 with 3:1 on all three fills.
+//   border-selected  the icon value: a non-text edge at 3:1. Selection also
+//                    shows a check, so it never rests on colour alone.
+const hexOf = (rgb) => `#${rgb.map((c) => Math.round(c * 255).toString(16).padStart(2, '0')).join('')}`
+const mix = (a, b, t) => hexOf(channels(a).map((c, i) => c * t + channels(b)[i] * (1 - t)))
+const lift = (tint, card, target) => {
+  for (let t = 0.01; t <= 1; t += 0.01) {
+    const fill = mix(tint, card, t)
+    if (lum(fill) > lum(card) && contrast(fill, card) >= target) return fill
+  }
+  throw new Error(`${tint} cannot lift ${target}:1 off ${card}`)
+}
+const solve = (name, ramp, theme) => {
+  const at = (step) => R[ramp][theme][step - 1]
+  const card = CARD[theme]
+  const fills =
+    theme === 'light'
+      ? [at(3), at(4), at(5)]
+      : [1.3, 1.45, 1.6].map((target) => lift(at(9), card, target))
+  if (theme === 'light' && contrast(fills[0], card) > 1.25) {
+    throw new Error(`${name} light: step 3 is no longer a wash on the card`)
+  }
+  const text = at(12)
+  const failing = fills.find((f) => contrast(text, f) < 4.5)
+  if (failing) throw new Error(`${name} ${theme}: text ${text} under 4.5:1 on ${failing}`)
+  const iconStep = [9, 10, 11, 12].find((s) => fills.every((f) => contrast(at(s), f) >= 3))
+  if (!iconStep) throw new Error(`${name} ${theme}: no icon step clears 3:1`)
+  return {
+    bg: fills[0],
+    'bg-hover': fills[1],
+    'bg-selected': fills[2],
+    border: theme === 'light' ? at(6) : at(8),
+    'border-selected': at(iconStep),
+    text,
+    icon: at(iconStep),
+  }
+}
+
+const TONES = Object.fromEntries(
+  ['dark', 'light'].map((theme) => [
+    theme,
+    Object.fromEntries(Object.entries(CATEGORY).map(([name, ramp]) => [name, solve(name, ramp, theme)])),
+  ]),
+)
+
+// Distinctness is the reason the set exists: hold it on the icon step, the
+// mark that carries the category (8.1 dark, 7.1 light today; teal/cyan is the
+// closest pair), so a new category that collides with an old one fails here.
+// Text is step 12, ink tinted toward the hue, and light fills are near-white
+// washes; neither is meant to tell categories apart on its own.
+for (const theme of ['dark', 'light']) {
+  const names = Object.keys(CATEGORY)
+  for (let i = 0; i < names.length; i++) {
+    for (let j = i + 1; j < names.length; j++) {
+      const d = distance(TONES[theme][names[i]].icon, TONES[theme][names[j]].icon)
+      if (d < 5.5) throw new Error(`${theme} icon: ${names[i]} and ${names[j]} are ${d.toFixed(1)} apart in OKLab (floor 5.5)`)
+    }
+  }
+}
+
+const toneRegion = (theme) => {
+  const lines = ['  /* tones:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */']
+  for (const [name, roles] of Object.entries(TONES[theme])) {
+    for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value};`)
+  }
+  // Literal values rather than var() aliases: tests and consumers read these
+  // as hex, and this generator is the only writer of both. The legacy -text
+  // names keep their hue: sandbox-ui colours glyphs with them straight on the
+  // card, so they take step 11, darkened toward step 12 only as far as 4.5:1
+  // on the fill needs (light orange and teal).
+  for (const name of LEGACY_SURFACE) {
+    const tone = TONES[theme][name]
+    const ramp = R[CATEGORY[name]][theme]
+    let text = ramp[10]
+    for (let t = 0.01; contrast(text, tone.bg) < 4.5; t += 0.01) text = mix(ramp[11], ramp[10], t)
+    lines.push(`  --surface-${name}-bg: ${tone.bg};`, `  --surface-${name}-border: ${tone.border};`, `  --surface-${name}-text: ${text};`)
+  }
+  lines.push('  /* tones:end */')
+  return lines.join('\n')
+}
+const REGION = /^ {2}\/\* tones:begin[^\n]*\*\/\n(?:.*\n)*? {2}\/\* tones:end \*\//gm
+const regions = tokensSource.match(REGION) ?? []
+if (regions.length !== 2) throw new Error(`tokens.css: expected 2 tone regions (dark, light), found ${regions.length}`)
+let regionIndex = 0
+const tokens = tokensSource.replace(REGION, () => toneRegion(regionIndex++ === 0 ? 'dark' : 'light'))
+
+const outputs = [
+  ['ladders.css', ladders],
+  ['system.css', system],
+  ['tokens.css', tokens],
+]
+if (CHECK) {
+  const stale = outputs.filter(([file, text]) => fs.readFileSync(path.join(OUT, file), 'utf8') !== text).map(([f]) => f)
+  if (stale.length) {
+    console.error(`stale: ${stale.join(', ')}; run pnpm --filter @tangle-network/brand gen:ladders`)
+    process.exit(1)
+  }
+  console.log('ladders.css, system.css and the tokens.css tone regions are current.')
+} else {
+  fs.mkdirSync(OUT, { recursive: true })
+  for (const [file, text] of outputs) fs.writeFileSync(path.join(OUT, file), text)
+  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme) and ${Object.keys(CATEGORY).length} tones in tokens.css to ${OUT}`)
+}
