@@ -62,8 +62,8 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
             {icon}
           </span>
         ) : null}
-        {/* A long label truncates here rather than pushing the remove button out. */}
-        {/* The full text on hover, since a long label truncates. */}
+        {/* A long label truncates here rather than pushing the remove button
+            out; the title gives its full text on hover. */}
         <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
           {children}
         </span>
