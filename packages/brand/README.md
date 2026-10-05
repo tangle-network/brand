@@ -39,6 +39,7 @@ For finer control, use the exported filenames:
 | `data-sandbox-theme="vault"` or `"dawn"` | Existing legacy light names; an explicit `.dark` on that same element takes precedence |
 | `aubergine` / `aubergine-light`, `arena` / `arena-light`, `super` / `super-light`, `tangle-dark` / `tangle-light` | Existing named dark/light pairs, applied with `data-theme` |
 | `.dark[data-theme="intelligence"]` | Existing dark-only product surface; `.light` keeps the identity and uses canonical light |
+| `[data-theme="hospitality"]` + `.dark[data-theme="hospitality"]` | Hospitality's sage-and-forest product theme in both modes. Set it on the document root. Without `.dark` it is a complete light scope, including before hydration; `.dark` selects the dark baseline and its dark ladder. Status tones stay canonical |
 
 Set one coherent mode on each boundary; do not author contradictory `.light`/`.dark`/named-mode markers. Named light variants keep their existing palettes; `tangle-light` is not silently retuned to the neutral base light palette. Each known boundary receives a complete baseline before named overrides, so nested scopes do not inherit opposite-mode syntax, status or already-resolved HSL aliases.
 
