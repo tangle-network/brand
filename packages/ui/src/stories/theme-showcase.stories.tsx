@@ -17,6 +17,8 @@ const THEMES: { name: string; theme?: string }[] = [
   { name: "Aubergine · light", theme: "aubergine-light" },
   { name: "Experimental green", theme: "arena" },
   { name: "Experimental green · light", theme: "arena-light" },
+  { name: "Super (forest)", theme: "super" },
+  { name: "Super · light", theme: "super-light" },
 ];
 
 const NOW = Date.now();

@@ -125,6 +125,25 @@ export { Progress } from "./progress";
 
 export { Switch } from "./switch";
 
+export { Checkbox } from "./checkbox";
+
+export { Separator } from "./separator";
+
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+} from "./sheet";
+
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
+
 export { Skeleton, SkeletonCard, SkeletonTable } from "./skeleton";
 
 export { TextShimmer } from "./text-shimmer";

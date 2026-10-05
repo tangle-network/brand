@@ -32,7 +32,7 @@ Consumer apps own:
 
 Author shared decisions in Brand's `tokens.css`; named product overrides live in `named-themes.css`. `theme.css` registers that contract for Tailwind, including inline variable-dependent utilities and checked font/radius defaults. HSL channel aliases and full-color aliases are distinct public APIs; do not change their value formats or copy their palettes into app globals.
 
-Brand stays dark-default. Explicit `.light` / `.dark` or `data-theme="light"` / `"dark"` boundaries must work on the document and in nested opposite-mode islands. The existing named families retain their palettes and mode names. Intelligence remains dark-only under `.dark[data-theme="intelligence"]`; switching to light keeps its identity and falls back to canonical light. Existing legacy `vault` / `dawn` light markers remain supported, with an explicit `.dark` on the same element taking precedence. Do not author contradictory mode markers on one boundary.
+Brand stays dark-default. Explicit `.light` / `.dark` or `data-theme="light"` / `"dark"` boundaries must work on the document and in nested opposite-mode islands. The existing named families retain their palettes and mode names. Intelligence remains dark-only under `.dark[data-theme="intelligence"]`; switching to light keeps its identity and falls back to canonical light. Hospitality is a two-mode product theme on the document root: `[data-theme="hospitality"]` is its light ladder and `.dark[data-theme="hospitality"]` its dark one, so the shared mode control switches it without a second attribute. Existing legacy `vault` / `dawn` light markers remain supported, with an explicit `.dark` on the same element taking precedence. Do not author contradictory mode markers on one boundary.
 
 The one light-default compatibility projection exists for Agent App's established default contract. Brand owns its generator, export and freshness check. Its values derive from canonical CSS, not from a maintained compatibility palette. It leaves the host's `--radius` alone. Importing it is an explicit consumer migration, not permission to layer it over another global theme system; component-specific consumer CSS still needs reconciliation. See [the package contract](../packages/brand/README.md#existing-light-default-consumers).
 
@@ -74,7 +74,8 @@ Product UI uses color for three separate jobs. A component picks one role and ne
 | Status | Report a state the product observed | Success, warning, danger, info, and neutral tones | Unknown or unrecorded states stay neutral. |
 
 `packages/brand/scripts/gen-ladders.mjs` generates every tone family with matching background, border, text, and icon values in both themes; edit its map, not `system.css`.
-The categorical set today is violet, orange, and teal. Widening it from the existing Radix ramps, so identity tiles and chart series never fall back to a status color, is slice 1 of the design-system program.
+The categorical set is violet, orange, teal, blue, pink, brown, cyan, and lime.
+To paint an element with whichever category its data names, set `data-tone="<category>"` on it and read `--tone-bg`, `--tone-bg-hover`, `--tone-bg-selected`, `--tone-border`, `--tone-border-selected`, `--tone-text`, and `--tone-icon`.
 Badge's `running`, `creating`, `stopped`, `warm`, `cold`, and `deleted` variants are sandbox lifecycle states; slice 1 moves them to `sandbox-ui` adapters over status tones.
 
 Products do not paint states or categories with Tailwind palette utilities such as `bg-amber-500` or with hex literals. The consumer drift check counts both, and a consumer's count may only fall.

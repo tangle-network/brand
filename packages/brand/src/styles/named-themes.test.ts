@@ -15,11 +15,11 @@ import {
 /**
  * The named-theme contract.
  *
- * A named theme re-skins the SURFACE ladder and nothing else — the Tangle accent
- * (primary / ring / accent-text) stays put, so a product carries its identity in
- * its planes, not by inventing a second brand colour. These assertions live here
- * rather than in the consuming app because the palette lives here: an app's job
- * is only to opt in.
+ * A named theme re-skins the surface ladder and may carry a product accent
+ * (primary / ring / accent-text), as Arena, Aubergine and Super do. It never
+ * changes what a status or category tone means. Intelligence is surface-only and
+ * keeps the Tangle accent. These assertions live here rather than in the
+ * consuming app because the palette lives here: an app's job is only to opt in.
  */
 const themes = readFileSync(
   path.resolve(import.meta.dirname, "named-themes.css"),
@@ -295,6 +295,8 @@ describe("named themes: secondary text tiers are readable text", () => {
     "aubergine-light",
     "arena",
     "arena-light",
+    "super",
+    "super-light",
     "tangle-dark",
     "tangle-light",
   ];
@@ -327,12 +329,72 @@ describe("named themes: secondary text tiers are readable text", () => {
     });
   }
 });
+for (const [name, mode] of [
+  ["agents", "dark"],
+  ["agents-light", "light"],
+] as const) {
+  describe(`named theme: [data-theme="${name}"]`, () => {
+    // The generated block, not the shared named-light ink rule that also lists it.
+    const css = blocksIn(themes, `[data-theme="${name}"]`).find((b) => b.includes("--hsl-background:")) ?? "";
+
+    it("retints surfaces, text and borders only", () => {
+      // The accent, status and category tokens stay canonical, so the theme can
+      // never change what the brand colour, a state or a category looks like.
+      expect(css).not.toMatch(
+        /--(hsl-(primary|ring|destructive|success|warning|info)|sidebar-(primary|ring)|md3-(primary|on-primary|error)|btn-|accent-|brand-|surface-|status-|tone-)[a-z0-9-]*:/,
+      );
+    });
+
+    it("declares only canonical spine names", () => {
+      for (const [, token] of css.matchAll(/--([a-z0-9-]+):/g)) {
+        expect(tokens, `--${token} must be a tokens.css token`).toContain(`--${token}:`);
+      }
+    });
+
+    it("keeps ink readable on every plane", () => {
+      for (const plane of ["hsl-background", "hsl-card", "hsl-popover", "hsl-muted"]) {
+        const bg = hslToRgb(hslIn(css, plane));
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-foreground")), bg),
+          `foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(7);
+        expect(
+          contrastRatio(hslToRgb(hslIn(css, "hsl-muted-foreground")), bg),
+          `muted foreground on ${plane}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    if (mode === "light") {
+      it("is a white page whose cards separate by shadow", () => {
+        expect(declIn(css, "hsl-background")).toBe("0 0% 100%");
+        expect(declIn(css, "hsl-card")).toBe("0 0% 100%");
+        expect(declIn(css, "shadow-card")).toMatch(/rgb\(/);
+      });
+    }
+  });
+}
+
+describe("data-tone scopes", () => {
+  it("re-resolve each category alias on every nested mode boundary", () => {
+    for (const name of ["violet", "orange", "teal", "blue", "pink", "brown", "cyan", "lime"]) {
+      const rule = tokens.match(new RegExp(`\\[data-tone="${name}"\\],\\n\\[data-tone="${name}"\\] :is\\(([^)]*)\\) \\{([^}]*)\\}`));
+      expect(rule, `data-tone="${name}" rule`).not.toBeNull();
+      for (const boundary of [".light", ".dark", "[data-theme]", "[data-sandbox-ui]", "[data-sandbox-theme]"]) {
+        expect(rule![1], `${name} boundary list`).toContain(boundary);
+      }
+      for (const role of ["bg", "bg-hover", "bg-selected", "border", "border-selected", "text", "icon"]) {
+        expect(rule![2]).toContain(`--tone-${role}: var(--tone-${name}-${role});`);
+      }
+    }
+  });
+});
 
 describe("named themes: the base surface follows the retint", () => {
   // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome
   // such as a mobile top bar. A retinted scope that leaves them at the neutral
   // spine renders a grey bar on a purple or green page.
-  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light"]) {
+  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light", "super", "super-light"]) {
     it(`[data-theme="${scope}"] retints the base surface tokens`, () => {
       const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) => /--text-dim:/.test(b));
       for (const token of [
@@ -348,4 +410,246 @@ describe("named themes: the base surface follows the retint", () => {
       expect(css).toMatch(/--md3-surface:\s*var\(--bg-root\)/);
     });
   }
+});
+
+describe('named theme: [data-theme="hospitality"]', () => {
+  const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
+  const light = block('[data-theme="hospitality"]:where(:not(.dark))');
+  const dark = block('.dark[data-theme="hospitality"]');
+  const props = (css: string) =>
+    [...css.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]).sort();
+
+  it("takes its dark mode from the .dark class, never from a second attribute", () => {
+    expect(rules).toMatch(/^\[data-theme="hospitality"\]:where\(:not\(\.dark\)\) \{/m);
+    expect(rules).toMatch(/^\.dark\[data-theme="hospitality"\] \{/m);
+    expect(rules).not.toContain('[data-theme="hospitality-light"]');
+    expect(rules).not.toContain('[data-theme="hospitality-dark"]');
+  });
+
+  it("starts from a complete canonical baseline in either mode, before hydration too", () => {
+    // Without the seed, a classless <html data-theme="hospitality"> would keep
+    // the dark-default :root syntax, status and color-scheme under light paper.
+    const header = (anchor: string) => {
+      const end = tokens.indexOf(anchor);
+      return tokens.slice(tokens.lastIndexOf("}", end) + 1, tokens.indexOf("{", end));
+    };
+    expect(header("color-scheme: dark")).toContain('[data-theme="hospitality"],');
+    expect(header("color-scheme: light")).toContain('[data-theme="hospitality"]:where(:not(.dark)),');
+  });
+
+  it("lets nothing from the light identity survive into dark", () => {
+    // `.dark[data-theme]` outranks `[data-theme]`, but only for what it declares;
+    // a property the dark block omits would keep its light value in dark mode.
+    expect(props(dark)).toEqual(props(light));
+  });
+
+  it("never redefines what a status or category color means", () => {
+    for (const css of [light, dark]) {
+      expect(css).not.toMatch(
+        /--(hsl-)?(success|warning|destructive|info|error)\b|--surface-(success|warning|danger|info|neutral)-|--status-|--tone-|--run-mix-|--syntax-/,
+      );
+    }
+  });
+
+  it("keeps the canonical ladder roles: paper cards on a tinted canvas in light, rising planes in dark", () => {
+    expect(hslIn(light, "hsl-card")).toEqual({ h: 0, s: 0, l: 100 });
+    // As in canonical light, the canvas sits BELOW the wells and the paper.
+    for (const plane of ["md3-surface-container-low", "md3-surface-container", "md3-surface-container-high"]) {
+      expect(hexRelativeLuminanceIn(light, "md3-surface"), `canvas below ${plane}`).toBeLessThan(
+        hexRelativeLuminanceIn(light, plane),
+      );
+    }
+    const steps = [
+      "md3-surface-container-lowest",
+      "md3-surface-container-low",
+      "md3-surface-container",
+      "md3-surface-container-high",
+      "md3-surface-container-highest",
+    ].map((token) => hexRelativeLuminanceIn(dark, token));
+    for (let i = 1; i < steps.length; i++) {
+      expect(steps[i], `dark step ${i} must rise`).toBeGreaterThan(steps[i - 1]);
+    }
+  });
+
+  it.each([
+    ["light", light],
+    ["dark", dark],
+  ])("holds AA text and 3:1 focus contrast in %s", (_mode, css) => {
+    const canvas = hslToRgb(hslIn(css, "hsl-background"));
+    const card = hslToRgb(hslIn(css, "hsl-card"));
+    const muted = hslToRgb(hslIn(css, "hsl-muted"));
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
+    const mutedInk = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    const planes = [
+      ["canvas", canvas],
+      ["card", card],
+      ["muted", muted],
+      ["elevated", hexIn(css, "depth-4")],
+      ["highest", hexIn(css, "md3-surface-container-highest")],
+    ] as const;
+    for (const [name, plane] of planes) {
+      expect(contrastRatio(mutedInk, plane), `muted ink on ${name}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, "accent-text"), plane), `accent text on ${name}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, "text-dim"), plane), `text-dim on ${name}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(
+      contrastRatio(hslToRgb(hslIn(css, "hsl-primary-foreground")), hslToRgb(hslIn(css, "hsl-primary"))),
+      "primary label on the primary fill",
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-bg")),
+      "button label on the button fill",
+    ).toBeGreaterThanOrEqual(4.5);
+    const ring = hslToRgb(hslIn(css, "hsl-ring"));
+    expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () => {
+  const dark = block('[data-theme="super"]');
+  const light = blocksIn(themes, '[data-theme="super-light"]').find((b) =>
+    b.includes("--hsl-background"),
+  );
+  if (!light) throw new Error('missing theme block: [data-theme="super-light"]');
+
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s clears AA for ink, muted ink, the action fill and the ring", (_name, css) => {
+    const canvas = hslToRgb(hslIn(css, "hsl-background"));
+    const card = hslToRgb(hslIn(css, "hsl-card"));
+    const muted = hslToRgb(hslIn(css, "hsl-muted"));
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    const mutedFg = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(mutedFg, canvas), "muted ink on canvas").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, card), "muted ink on card").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, muted), "muted ink on muted").toBeGreaterThanOrEqual(4.5);
+
+    const primary = hslToRgb(hslIn(css, "hsl-primary"));
+    const onPrimary = hslToRgb(hslIn(css, "hsl-primary-foreground"));
+    expect(contrastRatio(onPrimary, primary), "text on the action fill").toBeGreaterThanOrEqual(4.5);
+
+    const ring = hslToRgb(hslIn(css, "hsl-ring"));
+    expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+
+    for (const tier of ["text-primary", "text-secondary", "text-muted", "text-dim", "accent-text"]) {
+      expect(contrastRatio(hexIn(css, tier), card), `${tier} on card`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, tier), canvas), `${tier} on canvas`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s button tokens follow the action fill, not the Tangle indigo", (_name, css) => {
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-bg"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-hover"))).toBeGreaterThanOrEqual(4.5);
+    const fill = hslToRgb(hslIn(css, "hsl-primary"));
+    hexIn(css, "btn-primary-bg").forEach((channel, i) => {
+      expect(Math.abs(channel - fill[i]), "btn-primary-bg matches --hsl-primary").toBeLessThanOrEqual(4);
+    });
+  });
+
+  it("keeps the forest action in one hue family across modes", () => {
+    for (const token of ["hsl-primary", "hsl-ring"]) {
+      expect(
+        Math.abs(hslIn(dark, token).h - hslIn(light, token).h),
+        `--${token} hue`,
+      ).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("elevates by lightening in dark", () => {
+    const planes = ["depth-1", "depth-2", "depth-3", "depth-4"].map((t) =>
+      hexRelativeLuminanceIn(dark, t),
+    );
+    for (let i = 1; i < planes.length; i++) {
+      expect(planes[i], `depth step ${i}`).toBeGreaterThan(planes[i - 1]);
+    }
+  });
+
+  it("inherits status tones instead of retinting them", () => {
+    for (const css of [dark, light]) {
+      expect(css).not.toMatch(/--surface-(success|warning|danger|info|neutral)-/);
+      expect(css).not.toMatch(/--tone-/);
+    }
+  });
+});
+
+describe('named theme: [data-theme="website"]', () => {
+  const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
+  const light = block('[data-theme="website"]:where(:not(.dark))');
+  const dark = block('.dark[data-theme="website"]');
+  const props = (css: string) =>
+    [...css.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]).sort();
+
+  it("takes its dark mode from the .dark class, so a light island is the same attribute", () => {
+    expect(rules).toMatch(/^\[data-theme="website"\]:where\(:not\(\.dark\)\) \{/m);
+    expect(rules).toMatch(/^\.dark\[data-theme="website"\] \{/m);
+    expect(rules).not.toContain('[data-theme="website-light"]');
+  });
+
+  it("starts from a complete canonical baseline in either mode", () => {
+    const header = (anchor: string) => {
+      const end = tokens.indexOf(anchor);
+      return tokens.slice(tokens.lastIndexOf("}", end) + 1, tokens.indexOf("{", end));
+    };
+    expect(header("color-scheme: dark")).toContain('[data-theme="website"],');
+    expect(header("color-scheme: light")).toContain('[data-theme="website"]:where(:not(.dark)),');
+  });
+
+  it("declares the same properties in both modes", () => {
+    expect(props(dark)).toEqual(props(light));
+  });
+
+  it("changes planes and ink only: accent, status, category and syntax stay canonical", () => {
+    for (const css of [light, dark]) {
+      expect(css).not.toMatch(
+        /--hsl-(primary|ring)|--accent-text|--brand-|--btn-|--(hsl-)?(success|warning|destructive|info|error)\b|--surface-(success|warning|danger|info|neutral)-|--status-|--tone-|--syntax-/,
+      );
+    }
+  });
+
+  it("keeps the canonical ladder roles: paper cards in light, rising planes in dark", () => {
+    expect(hslIn(light, "hsl-card")).toEqual({ h: 0, s: 0, l: 100 });
+    const steps = [
+      "md3-surface-container-lowest",
+      "md3-surface-container-low",
+      "md3-surface-container",
+      "md3-surface-container-high",
+      "md3-surface-container-highest",
+    ].map((token) => hexRelativeLuminanceIn(dark, token));
+    for (let i = 1; i < steps.length; i++) {
+      expect(steps[i], `dark step ${i} must rise`).toBeGreaterThan(steps[i - 1]);
+    }
+  });
+
+  it.each([
+    ["light", light],
+    ["dark", dark],
+  ])("holds AA ink on every plane in %s", (_mode, css) => {
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    const mutedInk = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    const planes = [
+      ["canvas", hslToRgb(hslIn(css, "hsl-background"))],
+      ["card", hslToRgb(hslIn(css, "hsl-card"))],
+      ["muted", hslToRgb(hslIn(css, "hsl-muted"))],
+      ["popover", hslToRgb(hslIn(css, "hsl-popover"))],
+      ["elevated", hexIn(css, "depth-4")],
+      ["highest", hexIn(css, "md3-surface-container-highest")],
+    ] as const;
+    for (const [name, plane] of planes) {
+      expect(contrastRatio(fg, plane), `ink on ${name}`).toBeGreaterThanOrEqual(7);
+      expect(contrastRatio(mutedInk, plane), `muted ink on ${name}`).toBeGreaterThanOrEqual(4.5);
+      for (const token of ["text-secondary", "text-muted", "text-dim"]) {
+        expect(contrastRatio(hexIn(css, token), plane), `${token} on ${name}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
 });

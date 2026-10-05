@@ -1,5 +1,16 @@
 # @tangle-network/ui
 
+## 11.18.0
+
+### Minor Changes
+
+- a53b246: Add the `super` and `super-light` named themes for SUPER: warm green-grey surfaces with a forest action colour. Button, selection and accent-surface tokens follow the forest fill. Status and category tones are inherited. `ThemeToggle` keeps the pair when it switches modes.
+- a627055: Add `Checkbox`, `Separator`, `Sheet` (with `SheetTrigger`, `SheetContent`, `SheetHeader`, `SheetFooter`, `SheetTitle`, `SheetDescription`, `SheetClose`) and `Tooltip` (with `TooltipProvider`, `TooltipTrigger`, `TooltipContent`) to `@tangle-network/ui/primitives`, on Brand tokens with the shared focus treatment. Apps that kept shadcn CLI copies of these four can import them instead.
+
+### Patch Changes
+
+- e05254d: `useTheme()` and `ThemeToggle` keep Brand's new `agents` / `agents-light` named pair within its family when switching mode.
+
 ## 11.17.0
 
 ### Minor Changes
