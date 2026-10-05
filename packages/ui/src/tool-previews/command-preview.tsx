@@ -227,7 +227,7 @@ function CommandText({ command, all }: { command: string; all: boolean }) {
  * dark terminal. It scopes the dark token set onto itself with
  * `data-theme="dark"`, so stderr, the badges and the muted prompt keep the
  * contrast they were designed with on a dark ground, in a light console too.
-  *
+ *
  * On a phone the output keeps its own lines and scrolls sideways inside the
  * block: wrapped output breaks the columns of a listing and splits hashes
  * and URLs mid-token. The command still wraps between its tokens.
