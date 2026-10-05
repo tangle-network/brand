@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.16.5
+
+### Patch Changes
+
+- 44ce397: Let model tool-schema converters accept the OpenUI node schema: container `children` no longer declares a nonempty minimum, which formed a required recursive loop that opencode rejected for `render_ui`. The persistence gate still rejects an empty stack, grid, or card children list.
+
 ## 11.16.4
 
 ### Patch Changes
