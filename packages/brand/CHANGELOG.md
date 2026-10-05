@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.1
+
+### Patch Changes
+
+- 1170561: Lower the SUPER drift baseline to super-agent main 1a055e7: hex 501 -> 0, CSS variable definitions 104 -> 14.
+
 ## 1.13.0
 
 ### Minor Changes
