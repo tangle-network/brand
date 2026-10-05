@@ -47,6 +47,7 @@
 [data-theme="arena-light"],
 [data-theme="tangle-dark"],
 [data-theme="tangle-light"],
+[data-theme="hospitality"],
 [data-theme="agents"],
 [data-theme="agents-light"],
 .light,
@@ -518,6 +519,7 @@
  * carries both `data-sandbox-ui` (dark) and `data-theme="light"`, light wins. */
 [data-sandbox-theme="vault"]:where(:not(.dark)),
 [data-sandbox-theme="dawn"]:where(:not(.dark)),
+[data-theme="hospitality"]:where(:not(.dark)),
 [data-theme="light"],
 [data-theme="aubergine-light"],
 [data-theme="arena-light"],
@@ -928,6 +930,7 @@
  * themes, which would otherwise inherit the dark ramp from :root. */
 [data-sandbox-theme="vault"]:where(:not(.dark)),
 [data-sandbox-theme="dawn"]:where(:not(.dark)),
+[data-theme="hospitality"]:where(:not(.dark)),
 [data-theme="light"],
 .light,
 [data-theme$="-light"] {
