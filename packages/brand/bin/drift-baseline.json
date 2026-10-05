@@ -1351,12 +1351,15 @@
    "public"
   ],
   "branch": "main",
-  "head": "617315b40791",
-  "tsx_files": 13,
-  "css_files": 6,
+  "head": "1a055e7b73d4",
+  "tsx_files": 14,
+  "css_files": 5,
   "versions": {
    "agent-app": [
     "0.51.12"
+   ],
+   "brand": [
+    "1.13.0"
    ]
   },
   "importing_files": {
@@ -1367,27 +1370,18 @@
   },
   "by_file": {
    "raw_palette": {},
-   "hex": {
-    "public/app.js": 3,
-    "public/design-tokens.css": 33,
-    "public/index.html": 1,
-    "public/invite.html": 1,
-    "public/sandbox-ui.css": 42,
-    "public/style.css": 421
-   },
+   "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "public/design-components.css": 6,
-    "public/design-tokens.css": 95,
-    "public/sandbox-ui.css": 2,
+    "public/design-components.css": 13,
     "public/style.css": 1
    },
    "local_primitive_count": {}
   },
   "raw_palette": 0,
-  "hex": 501,
+  "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 104,
+  "css_var_defs": 14,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
