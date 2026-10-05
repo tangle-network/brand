@@ -349,3 +349,99 @@ describe("named themes: the base surface follows the retint", () => {
     });
   }
 });
+
+describe('named theme: [data-theme="hospitality"]', () => {
+  const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
+  const light = block('[data-theme="hospitality"]:where(:not(.dark))');
+  const dark = block('.dark[data-theme="hospitality"]');
+  const props = (css: string) =>
+    [...css.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]).sort();
+
+  it("takes its dark mode from the .dark class, never from a second attribute", () => {
+    expect(rules).toMatch(/^\[data-theme="hospitality"\]:where\(:not\(\.dark\)\) \{/m);
+    expect(rules).toMatch(/^\.dark\[data-theme="hospitality"\] \{/m);
+    expect(rules).not.toContain('[data-theme="hospitality-light"]');
+    expect(rules).not.toContain('[data-theme="hospitality-dark"]');
+  });
+
+  it("starts from a complete canonical baseline in either mode, before hydration too", () => {
+    // Without the seed, a classless <html data-theme="hospitality"> would keep
+    // the dark-default :root syntax, status and color-scheme under light paper.
+    const header = (anchor: string) => {
+      const end = tokens.indexOf(anchor);
+      return tokens.slice(tokens.lastIndexOf("}", end) + 1, tokens.indexOf("{", end));
+    };
+    expect(header("color-scheme: dark")).toContain('[data-theme="hospitality"],');
+    expect(header("color-scheme: light")).toContain('[data-theme="hospitality"]:where(:not(.dark)),');
+  });
+
+  it("lets nothing from the light identity survive into dark", () => {
+    // `.dark[data-theme]` outranks `[data-theme]`, but only for what it declares;
+    // a property the dark block omits would keep its light value in dark mode.
+    expect(props(dark)).toEqual(props(light));
+  });
+
+  it("never redefines what a status or category color means", () => {
+    for (const css of [light, dark]) {
+      expect(css).not.toMatch(
+        /--(hsl-)?(success|warning|destructive|info|error)\b|--surface-(success|warning|danger|info|neutral)-|--status-|--tone-|--run-mix-|--syntax-/,
+      );
+    }
+  });
+
+  it("keeps the canonical ladder roles: paper cards on a tinted canvas in light, rising planes in dark", () => {
+    expect(hslIn(light, "hsl-card")).toEqual({ h: 0, s: 0, l: 100 });
+    // As in canonical light, the canvas sits BELOW the wells and the paper.
+    for (const plane of ["md3-surface-container-low", "md3-surface-container", "md3-surface-container-high"]) {
+      expect(hexRelativeLuminanceIn(light, "md3-surface"), `canvas below ${plane}`).toBeLessThan(
+        hexRelativeLuminanceIn(light, plane),
+      );
+    }
+    const steps = [
+      "md3-surface-container-lowest",
+      "md3-surface-container-low",
+      "md3-surface-container",
+      "md3-surface-container-high",
+      "md3-surface-container-highest",
+    ].map((token) => hexRelativeLuminanceIn(dark, token));
+    for (let i = 1; i < steps.length; i++) {
+      expect(steps[i], `dark step ${i} must rise`).toBeGreaterThan(steps[i - 1]);
+    }
+  });
+
+  it.each([
+    ["light", light],
+    ["dark", dark],
+  ])("holds AA text and 3:1 focus contrast in %s", (_mode, css) => {
+    const canvas = hslToRgb(hslIn(css, "hsl-background"));
+    const card = hslToRgb(hslIn(css, "hsl-card"));
+    const muted = hslToRgb(hslIn(css, "hsl-muted"));
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
+    const mutedInk = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    const planes = [
+      ["canvas", canvas],
+      ["card", card],
+      ["muted", muted],
+      ["elevated", hexIn(css, "depth-4")],
+      ["highest", hexIn(css, "md3-surface-container-highest")],
+    ] as const;
+    for (const [name, plane] of planes) {
+      expect(contrastRatio(mutedInk, plane), `muted ink on ${name}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, "accent-text"), plane), `accent text on ${name}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, "text-dim"), plane), `text-dim on ${name}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(
+      contrastRatio(hslToRgb(hslIn(css, "hsl-primary-foreground")), hslToRgb(hslIn(css, "hsl-primary"))),
+      "primary label on the primary fill",
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-bg")),
+      "button label on the button fill",
+    ).toBeGreaterThanOrEqual(4.5);
+    const ring = hslToRgb(hslIn(css, "hsl-ring"));
+    expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+  });
+});
