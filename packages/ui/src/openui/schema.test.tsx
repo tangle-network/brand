@@ -24,12 +24,57 @@ const validPage = {
   ],
 };
 
+type JsonSchema = Record<string, unknown>;
+
+/**
+ * Model tool-schema converters accept a recursive `$ref` only when the loop can
+ * terminate: it must pass through an optional property or an array that may be
+ * empty. Return the first `$defs` path that recurses through required,
+ * nonempty values only.
+ */
+function findRequiredRefLoop(defs: Record<string, JsonSchema>): string | null {
+  function visit(schema: JsonSchema, path: string, stack: string[]): string | null {
+    const ref = typeof schema.$ref === "string" ? schema.$ref.replace("#/$defs/", "") : null;
+    if (ref) {
+      if (stack.includes(ref)) return path;
+      return visit(defs[ref]!, `$defs.${ref}`, [...stack, ref]);
+    }
+    for (const key of ["oneOf", "anyOf"] as const) {
+      const options = schema[key];
+      if (Array.isArray(options)) {
+        for (const [index, option] of options.entries()) {
+          const loop = visit(option as JsonSchema, `${path}.${key}.${index}`, stack);
+          if (loop) return loop;
+        }
+      }
+    }
+    if (schema.type === "array" && schema.items && Number(schema.minItems ?? 0) > 0) {
+      return visit(schema.items as JsonSchema, `${path}.items`, stack);
+    }
+    const required = Array.isArray(schema.required) ? schema.required as string[] : [];
+    const properties = (schema.properties ?? {}) as Record<string, JsonSchema>;
+    for (const name of required) {
+      if (!properties[name]) continue;
+      const loop = visit(properties[name], `${path}.properties.${name}`, stack);
+      if (loop) return loop;
+    }
+    return null;
+  }
+  return visit({ $ref: "#/$defs/node" }, "$", []);
+}
+
 describe("OpenUI JSON contract", () => {
   it("advertises every renderer node and accepts nested JSON with primitive cells", () => {
     expect(OPENUI_NODE_TYPES).toHaveLength(13);
     expect(OPENUI_NODE_JSON_SCHEMA.$defs.node.oneOf).toHaveLength(13);
     expect(validateOpenUIJsonNode(validPage)).toMatchObject({ ok: true, value: validPage });
     expect(validateOpenUIJsonArtifact([validPage, { type: "text", text: "Afterword" }])).toMatchObject({ ok: true });
+  });
+
+  it("keeps every recursive node path terminable for model tool-schema converters", () => {
+    expect(findRequiredRefLoop(OPENUI_NODE_JSON_SCHEMA.$defs as unknown as Record<string, JsonSchema>)).toBeNull();
+    expect(validateOpenUIJsonNode({ type: "card", title: "Empty", children: [] }))
+      .toMatchObject({ ok: false, issue: { path: "$.children" } });
   });
 
   it("rejects an unsupported top-level or nested section before it can be dropped", () => {

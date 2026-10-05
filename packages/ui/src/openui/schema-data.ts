@@ -7,7 +7,11 @@ const string = { type: "string" } as const;
 const boolean = { type: "boolean" } as const;
 const gap = { enum: ["sm", "md", "lg"] } as const;
 const primitive = { type: ["string", "number", "boolean", "null"] } as const;
-const children = { type: "array", minItems: 1, items: { $ref: "#/$defs/node" } } as const;
+// No minItems here: stack and grid require `children` and a child can itself be
+// a stack, so a nonempty minimum makes a required recursive loop that model
+// tool-schema converters reject (opencode refused render_ui outright). The
+// persistence gate in schema.ts still rejects an empty container.
+const children = { type: "array", items: { $ref: "#/$defs/node" } } as const;
 const actions = { type: "array", minItems: 1, items: { $ref: "#/$defs/action" } } as const;
 
 function node(type: string, fields: Record<string, unknown>, required: string[] = []) {

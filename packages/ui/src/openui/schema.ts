@@ -40,6 +40,11 @@ export function findUnsupportedOpenUINode(value: unknown): OpenUISchemaIssue | n
       return { path, message: `Unsupported OpenUI node type: ${String(record.type)}.` };
     }
     if (record.type === "stack" || record.type === "grid" || record.type === "card") {
+      // The model-facing schema cannot express this minimum without a required
+      // recursive loop (see schema-data.ts), so the gate enforces it here.
+      if (Array.isArray(record.children) && record.children.length === 0) {
+        return { path: `${path}.children`, message: "OpenUI containers need at least one child." };
+      }
       if (Array.isArray(record.children)) {
         for (const [index, child] of record.children.entries()) {
           const issue = visit(child, `${path}.children[${index}]`, depth + 1);
