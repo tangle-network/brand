@@ -1,4 +1,4 @@
-import { memo, useId, useState } from "react";
+import { memo, useId, useLayoutEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
@@ -206,6 +206,65 @@ function CommandText({ command }: { command: string }) {
 }
 
 /**
+ * One output stream, capped at a readable height. When the cap hides lines,
+ * a control says so and shows the rest in place: a region that ends flush
+ * with its frame gave no sign that more output was there.
+ */
+function OutputRegion({
+  label,
+  text,
+  className,
+}: {
+  label: string;
+  text: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLPreElement>(null);
+  const [clipped, setClipped] = useState(false);
+  const [full, setFull] = useState(false);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || full) return;
+    const check = () => setClipped(el.scrollHeight > el.clientHeight + 1);
+    check();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [full]);
+  const lines = text.replace(/\n$/, "").split("\n").length;
+  return (
+    <div className={className}>
+      <pre
+        ref={ref}
+        tabIndex={0}
+        role="region"
+        aria-label={label}
+        className={cn(
+          "overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
+          full ? "" : "max-h-80",
+          focusRing,
+        )}
+      >
+        {text}
+      </pre>
+      {clipped && !full ? (
+        <button
+          type="button"
+          onClick={() => setFull(true)}
+          className={cn(
+            "w-full border-t border-white/10 px-3 py-1.5 text-left font-sans text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground",
+            focusRing,
+          )}
+        >
+          Show all {label} ({lines} lines)
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+/**
  * One shell command as a terminal block: a `$ command` prompt line with its
  * exit status, and stdout and stderr in separate regions below it.
  *
@@ -305,43 +364,25 @@ export const CommandPreview = memo(
         {expanded && hasBody ? (
           <div id={bodyId} className="border-t border-white/10">
             {output.stdout ? (
-              <pre
-                tabIndex={0}
-                role="region"
-                aria-label="stdout"
-                className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
-                  focusRing,
-                )}
-              >
-                {output.stdout}
-              </pre>
+              <OutputRegion
+                label="stdout"
+                text={output.stdout}
+                className=""
+              />
             ) : null}
             {output.stderr ? (
-              <pre
-                tabIndex={0}
-                role="region"
-                aria-label="stderr"
-                className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
-                  focusRing,
-                )}
-              >
-                {output.stderr}
-              </pre>
+              <OutputRegion
+                label="stderr"
+                text={output.stderr}
+                className="border-t border-white/10 text-[var(--surface-danger-text)]"
+              />
             ) : null}
             {errorText ? (
-              <pre
-                tabIndex={0}
-                role="region"
-                aria-label="error"
-                className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
-                  focusRing,
-                )}
-              >
-                {errorText}
-              </pre>
+              <OutputRegion
+                label="error"
+                text={errorText}
+                className="border-t border-white/10 text-[var(--surface-danger-text)]"
+              />
             ) : null}
           </div>
         ) : null}

@@ -80,3 +80,21 @@ describe("CommandPreview", () => {
     expect(screen.getByRole("region", { name: "stdout" })).toHaveTextContent("M a");
   });
 });
+
+describe("CommandPreview output", () => {
+  it("offers the rest of an output its height cap hides", () => {
+    const scroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollHeight");
+    const client = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientHeight");
+    Object.defineProperty(HTMLElement.prototype, "scrollHeight", { configurable: true, get: () => 900 });
+    Object.defineProperty(HTMLElement.prototype, "clientHeight", { configurable: true, get: () => 320 });
+    try {
+      render(<CommandPreview part={part({ output: "a\nb\nc" })} defaultExpanded />);
+      fireEvent.click(screen.getByRole("button", { name: "Show all stdout (3 lines)" }));
+      expect(screen.getByRole("region", { name: "stdout" }).className).not.toContain("max-h-80");
+      expect(screen.queryByRole("button", { name: /Show all stdout/ })).toBeNull();
+    } finally {
+      if (scroll) Object.defineProperty(HTMLElement.prototype, "scrollHeight", scroll);
+      if (client) Object.defineProperty(HTMLElement.prototype, "clientHeight", client);
+    }
+  });
+});
