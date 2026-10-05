@@ -167,12 +167,12 @@ from an unexecuted story or a successful build.
 
 ## Missing Shared Families
 
-Measured on 2026-10-05 across twelve product surfaces and the three shared layers: 74 locally defined Pill, Chip, Badge, Tile, or Swatch components, because `ui` has no Tag, Chip, or IconTile.
+Measured on 2026-10-05 across fifteen product surfaces and the three shared layers: 100 locally defined Pill, Chip, Badge, Tile, or Swatch components, because `ui` has no Tag, Chip, or IconTile. Blueprint Agent alone defines 24.
 The inventory and the program's slice order are in the company wiki decision `decision-2026-10-05-one-design-system.md`.
 
 | Family | Owner after slice 1 | Local definitions it replaces |
 | --- | --- | --- |
-| `StatusPill` | One implementation in `ui` primitives, re-exported above | `sandbox-ui` StatusPill; `agent-app` StatusPill and StatePill; Audits StatusPill; StatusBadge in Sandbox, Intelligence, and Creative |
+| `StatusPill` | One implementation in `ui` primitives, re-exported above | `sandbox-ui` StatusPill; `agent-app` StatusPill and StatePill; Audits StatusPill; StatusBadge in Sandbox, Intelligence, Creative, Agent Builder, and Blueprint Agent |
 | `Tag` and `Chip` | New `ui` primitive with tone, emphasis, and size. Filter, toggle, and removable chips are native buttons with pressed or selected state that does not rely on color. | FilterChip in Platform and Legal; MetaChip, SubjectChip, MissingFactChip, MentionPill, PostChip, and similar label chips |
 | `IconTile` | New `ui` primitive on categorical tones, with image, glyph, and initials fallbacks | Hand-built colored icon squares in product rows and cards |
 | `Badge` | Kept for compatibility. Status variants map onto `StatusPill`; lifecycle variants move to `sandbox-ui` adapters. | — |
