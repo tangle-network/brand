@@ -45,6 +45,8 @@
 [data-theme="aubergine-light"],
 [data-theme="arena"],
 [data-theme="arena-light"],
+[data-theme="super"],
+[data-theme="super-light"],
 [data-theme="tangle-dark"],
 [data-theme="tangle-light"],
 [data-theme="hospitality"],
@@ -523,6 +525,7 @@
 [data-theme="light"],
 [data-theme="aubergine-light"],
 [data-theme="arena-light"],
+[data-theme="super-light"],
 [data-theme="tangle-light"],
 [data-theme="agents-light"],
 .light {

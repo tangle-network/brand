@@ -15,11 +15,11 @@ import {
 /**
  * The named-theme contract.
  *
- * A named theme re-skins the SURFACE ladder and nothing else — the Tangle accent
- * (primary / ring / accent-text) stays put, so a product carries its identity in
- * its planes, not by inventing a second brand colour. These assertions live here
- * rather than in the consuming app because the palette lives here: an app's job
- * is only to opt in.
+ * A named theme re-skins the surface ladder and may carry a product accent
+ * (primary / ring / accent-text), as Arena, Aubergine and Super do. It never
+ * changes what a status or category tone means. Intelligence is surface-only and
+ * keeps the Tangle accent. These assertions live here rather than in the
+ * consuming app because the palette lives here: an app's job is only to opt in.
  */
 const themes = readFileSync(
   path.resolve(import.meta.dirname, "named-themes.css"),
@@ -295,6 +295,8 @@ describe("named themes: secondary text tiers are readable text", () => {
     "aubergine-light",
     "arena",
     "arena-light",
+    "super",
+    "super-light",
     "tangle-dark",
     "tangle-light",
   ];
@@ -392,7 +394,7 @@ describe("named themes: the base surface follows the retint", () => {
   // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome
   // such as a mobile top bar. A retinted scope that leaves them at the neutral
   // spine renders a grey bar on a purple or green page.
-  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light"]) {
+  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light", "super", "super-light"]) {
     it(`[data-theme="${scope}"] retints the base surface tokens`, () => {
       const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) => /--text-dim:/.test(b));
       for (const token of [
@@ -503,5 +505,79 @@ describe('named theme: [data-theme="hospitality"]', () => {
     const ring = hslToRgb(hslIn(css, "hsl-ring"));
     expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
     expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () => {
+  const dark = block('[data-theme="super"]');
+  const light = blocksIn(themes, '[data-theme="super-light"]').find((b) =>
+    b.includes("--hsl-background"),
+  );
+  if (!light) throw new Error('missing theme block: [data-theme="super-light"]');
+
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s clears AA for ink, muted ink, the action fill and the ring", (_name, css) => {
+    const canvas = hslToRgb(hslIn(css, "hsl-background"));
+    const card = hslToRgb(hslIn(css, "hsl-card"));
+    const muted = hslToRgb(hslIn(css, "hsl-muted"));
+    const fg = hslToRgb(hslIn(css, "hsl-foreground"));
+    const mutedFg = hslToRgb(hslIn(css, "hsl-muted-foreground"));
+    expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(mutedFg, canvas), "muted ink on canvas").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, card), "muted ink on card").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(mutedFg, muted), "muted ink on muted").toBeGreaterThanOrEqual(4.5);
+
+    const primary = hslToRgb(hslIn(css, "hsl-primary"));
+    const onPrimary = hslToRgb(hslIn(css, "hsl-primary-foreground"));
+    expect(contrastRatio(onPrimary, primary), "text on the action fill").toBeGreaterThanOrEqual(4.5);
+
+    const ring = hslToRgb(hslIn(css, "hsl-ring"));
+    expect(contrastRatio(ring, canvas), "ring on canvas").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(ring, card), "ring on card").toBeGreaterThanOrEqual(3);
+
+    for (const tier of ["text-primary", "text-secondary", "text-muted", "text-dim", "accent-text"]) {
+      expect(contrastRatio(hexIn(css, tier), card), `${tier} on card`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(hexIn(css, tier), canvas), `${tier} on canvas`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it.each([
+    ["super", dark],
+    ["super-light", light],
+  ])("%s button tokens follow the action fill, not the Tangle indigo", (_name, css) => {
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-bg"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(hexIn(css, "btn-primary-text"), hexIn(css, "btn-primary-hover"))).toBeGreaterThanOrEqual(4.5);
+    const fill = hslToRgb(hslIn(css, "hsl-primary"));
+    hexIn(css, "btn-primary-bg").forEach((channel, i) => {
+      expect(Math.abs(channel - fill[i]), "btn-primary-bg matches --hsl-primary").toBeLessThanOrEqual(4);
+    });
+  });
+
+  it("keeps the forest action in one hue family across modes", () => {
+    for (const token of ["hsl-primary", "hsl-ring"]) {
+      expect(
+        Math.abs(hslIn(dark, token).h - hslIn(light, token).h),
+        `--${token} hue`,
+      ).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("elevates by lightening in dark", () => {
+    const planes = ["depth-1", "depth-2", "depth-3", "depth-4"].map((t) =>
+      hexRelativeLuminanceIn(dark, t),
+    );
+    for (let i = 1; i < planes.length; i++) {
+      expect(planes[i], `depth step ${i}`).toBeGreaterThan(planes[i - 1]);
+    }
+  });
+
+  it("inherits status tones instead of retinting them", () => {
+    for (const css of [dark, light]) {
+      expect(css).not.toMatch(/--surface-(success|warning|danger|info|neutral)-/);
+      expect(css).not.toMatch(/--tone-/);
+    }
   });
 });

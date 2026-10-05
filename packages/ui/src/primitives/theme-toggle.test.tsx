@@ -101,7 +101,7 @@ describe("root mode preference", () => {
   });
 
   it.each([
-    ["aubergine", "aubergine-light"], ["arena", "arena-light"], ["tangle-dark", "tangle-light"],
+    ["aubergine", "aubergine-light"], ["arena", "arena-light"], ["super", "super-light"], ["tangle-dark", "tangle-light"],
     ["agents", "agents-light"],
   ])("keeps the %s named family in both directions", (name, lightName) => {
     document.documentElement.dataset.theme = name;
