@@ -187,23 +187,11 @@ function ExitBadge({
   );
 }
 
-/** A closed row shows two lines, so only its first tokens need their own
- *  box; a long script renders the rest as plain text. */
-const BOXED_TOKENS = 64;
-
-/**
- * A command split at its whitespace, each token in an inline box. Browsers
- * break after a hyphen, which split `--short` into `--` and `short` on a
- * phone. A box moves to the next line whole, and breaks inside only when it
- * is wider than the line (a full SHA). The text is unchanged, so a copy still
- * pastes the exact command.
- */
-function CommandText({ command, all }: { command: string; all: boolean }) {
+function CommandText({ command }: { command: string }) {
   const tokens = command.split(/(\s+)/);
-  const limit = all ? tokens.length : BOXED_TOKENS * 2;
   return (
     <>
-      {tokens.slice(0, limit).map((token, i) =>
+      {tokens.map((token, i) =>
         token.length > 0 && !/\s/.test(token) ? (
           // Tokens repeat (two spaces, two "&&"), so position is the key.
           <span key={i} className="inline-block max-w-full [overflow-wrap:anywhere]">
@@ -213,7 +201,6 @@ function CommandText({ command, all }: { command: string; all: boolean }) {
           token
         ),
       )}
-      {limit < tokens.length ? tokens.slice(limit).join("") : null}
     </>
   );
 }
@@ -227,10 +214,6 @@ function CommandText({ command, all }: { command: string; all: boolean }) {
  * dark terminal. It scopes the dark token set onto itself with
  * `data-theme="dark"`, so stderr, the badges and the muted prompt keep the
  * contrast they were designed with on a dark ground, in a light console too.
- *
- * On a phone the output keeps its own lines and scrolls sideways inside the
- * block: wrapped output breaks the columns of a listing and splits hashes
- * and URLs mid-token. The command still wraps between its tokens.
  */
 export const CommandPreview = memo(
   ({ part, defaultExpanded = false, className }: CommandPreviewProps) => {
@@ -260,15 +243,16 @@ export const CommandPreview = memo(
           $
         </span>
         <code
+          title={expanded ? undefined : command}
           className={cn(
             "min-w-0 flex-1 whitespace-pre-wrap [overflow-wrap:anywhere]",
-            // Closed, two lines of the command. A height cap, not
-            // line-clamp: each token is an inline box, which line-clamp
-            // does not count, so a phone showed three lines and more.
-            expanded ? "" : "max-h-8 overflow-hidden",
+            // Closed, two lines of plain text that end in an ellipsis when
+            // cut, with the whole command in the title. Opened, each token
+            // is a box that wraps whole (line-clamp does not count boxes).
+            expanded ? "" : "line-clamp-2",
           )}
         >
-          <CommandText command={command} all={expanded} />
+          {expanded ? <CommandText command={command} /> : command}
         </code>
         {/* On a phone the badge takes its own line under the command, so the
             command keeps the row's width. */}
@@ -326,7 +310,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="stdout"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] px-3 py-2 leading-relaxed",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
                   focusRing,
                 )}
               >
@@ -339,7 +323,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="stderr"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >
@@ -352,7 +336,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="error"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >

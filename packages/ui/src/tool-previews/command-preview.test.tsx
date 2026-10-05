@@ -30,8 +30,9 @@ describe("CommandPreview", () => {
     expect(screen.getByText("exit 2").className).toContain("surface-danger");
   });
 
-  it("boxes each token so a phone wraps between flags", () => {
+  it("boxes each token of an opened command so a phone wraps between flags", () => {
     render(<CommandPreview part={part({ output: "M a" })} />);
+    fireEvent.click(screen.getByRole("button"));
     const flag = screen.getByText("--short");
     expect(flag.tagName).toBe("SPAN");
     expect(flag.className).toContain("inline-block");
@@ -59,6 +60,14 @@ describe("CommandPreview", () => {
       />,
     );
     expect(screen.getByText("exit 0 · tool reported error").className).toContain("surface-warning");
+  });
+
+  it("shows a closed command as plain text that ends in an ellipsis, whole in its title", () => {
+    render(<CommandPreview part={part({ output: "M a" })} />);
+    const code = screen.getByTestId("command-preview").querySelector("code");
+    expect(code?.className).toContain("line-clamp-2");
+    expect(code).toHaveAttribute("title", "git status --short");
+    expect(code?.querySelector("span")).toBeNull();
   });
 
   it("is a quiet row until opened, then a dark terminal", () => {
