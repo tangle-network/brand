@@ -36,6 +36,10 @@ export interface CommandOutput {
   stderr: string;
   /** Undefined when the producer persisted plain text and never reported one. */
   exitCode: number | undefined;
+  /** The command ran past its time limit. */
+  timedOut?: boolean;
+  /** The signal that ended the command, such as `SIGKILL`. */
+  signal?: string;
 }
 
 function finiteNumber(value: unknown): number | undefined {
@@ -72,10 +76,14 @@ export function extractCommandOutput(output: unknown): CommandOutput {
 function fromObject(obj: Record<string, unknown>): CommandOutput {
   const text = (value: unknown) =>
     value === undefined || value === null ? "" : String(value);
+  const timedOut = obj.timedOut ?? obj.timed_out;
+  const signal = obj.signal;
   return {
     stdout: text(obj.stdout ?? obj.output),
     stderr: text(obj.stderr),
     exitCode: finiteNumber(obj.exitCode ?? obj.exit_code ?? obj.code),
+    ...(timedOut === true ? { timedOut: true } : {}),
+    ...(typeof signal === "string" && signal.length > 0 ? { signal } : {}),
   };
 }
 
@@ -117,16 +125,16 @@ function parseStructured(text: string): CommandOutput | undefined {
   }
 }
 
-/** Exit status as a badge: the code when one is known, else the tool's status.
- *  Red only for a recorded nonzero exit. A tool that reported an error with no
- *  exit code gets a neutral badge: nothing recorded says the command itself
- *  failed, and its error text still prints below. A clean run stays quiet
- *  green. */
+/** Exit status as a badge. Red only where the command itself is known to have
+ *  failed: a nonzero exit, a timeout, or a signal. A tool that reported an
+ *  error with nothing recorded about the command (no exit code, or exit 0
+ *  from a runner that failed afterwards) gets a neutral badge; its error text
+ *  prints below. A clean run stays quiet green. */
 function ExitBadge({
-  exitCode,
+  output,
   status,
 }: {
-  exitCode: number | undefined;
+  output: CommandOutput;
   status: ToolPart["state"]["status"];
 }) {
   if (status === "running" || status === "pending") {
@@ -137,56 +145,71 @@ function ExitBadge({
       </span>
     );
   }
-  // The tool's own error status wins: a runner can fail after the shell exited
-  // 0, and a green "exit 0" beside that error would contradict it.
-  if (exitCode === undefined) {
-    if (status !== "error") return null;
-    return (
-      <span className="inline-flex shrink-0 items-center rounded-full border border-[var(--surface-neutral-border)] bg-[var(--surface-neutral-bg)] px-1.5 py-px text-[11px] font-medium text-[var(--surface-neutral-text)]">
-        tool error
-      </span>
-    );
+  const { exitCode, timedOut, signal } = output;
+  let label: string | null;
+  let tone: "danger" | "success" | "neutral";
+  if (timedOut) {
+    label = "timed out";
+    tone = "danger";
+  } else if (signal) {
+    label = signal;
+    tone = "danger";
+  } else if (exitCode !== undefined && exitCode !== 0) {
+    label = `exit ${exitCode}`;
+    tone = "danger";
+  } else if (status === "error") {
+    label = exitCode === 0 ? "exit 0 · tool error" : "tool error";
+    tone = "neutral";
+  } else {
+    label = exitCode === 0 ? "exit 0" : null;
+    tone = "success";
   }
-  const failed = status === "error" || exitCode !== 0;
+  if (label === null) return null;
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center rounded-full px-1.5 py-px text-[11px] font-medium tabular-nums",
-        failed
-          ? "bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]"
-          : "bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
+        // Every badge has a border, so mixed rows keep one height.
+        "inline-flex shrink-0 items-center rounded-full border px-1.5 py-px text-[11px] font-medium tabular-nums",
+        tone === "danger" &&
+          "border-transparent bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
+        tone === "success" &&
+          "border-transparent bg-[var(--surface-success-bg)] text-[var(--surface-success-text)]",
+        tone === "neutral" &&
+          "border-[var(--surface-neutral-border)] bg-[var(--surface-neutral-bg)] text-[var(--surface-neutral-text)]",
       )}
     >
-      exit {exitCode}
+      {label}
     </span>
   );
 }
 
-/** A token no longer than this never breaks: a flag (`--short`) or a path
- *  segment wraps whole to the next line. A longer token (a full SHA, a long
- *  URL) would overflow a phone, so it may still break anywhere. */
-const UNBROKEN_TOKEN = 32;
+/** A closed row shows two lines, so only its first tokens need their own
+ *  box; a long script renders the rest as plain text. */
+const BOXED_TOKENS = 64;
 
 /**
- * A command split at its spaces, each short token kept whole. Browsers break
- * after a hyphen, which split `--short` into `--` and `short` on a phone.
- * The text is unchanged, so a copy still pastes the exact command.
+ * A command split at its whitespace, each token in an inline box. Browsers
+ * break after a hyphen, which split `--short` into `--` and `short` on a
+ * phone. A box moves to the next line whole, and breaks inside only when it
+ * is wider than the line (a full SHA). The text is unchanged, so a copy still
+ * pastes the exact command.
  */
-function CommandText({ command }: { command: string }) {
+function CommandText({ command, all }: { command: string; all: boolean }) {
+  const tokens = command.split(/(\s+)/);
+  const limit = all ? tokens.length : BOXED_TOKENS * 2;
   return (
     <>
-      {command.split(/(\s+)/).map((token, i) =>
-        token.length > 0 &&
-        token.length <= UNBROKEN_TOKEN &&
-        !/\s/.test(token) ? (
+      {tokens.slice(0, limit).map((token, i) =>
+        token.length > 0 && !/\s/.test(token) ? (
           // Tokens repeat (two spaces, two "&&"), so position is the key.
-          <span key={i} className="whitespace-nowrap">
+          <span key={i} className="inline-block max-w-full [overflow-wrap:anywhere]">
             {token}
           </span>
         ) : (
           token
         ),
       )}
+      {limit < tokens.length ? tokens.slice(limit).join("") : null}
     </>
   );
 }
@@ -234,9 +257,9 @@ export const CommandPreview = memo(
             expanded ? "" : "line-clamp-2",
           )}
         >
-          <CommandText command={command} />
+          <CommandText command={command} all={expanded} />
         </code>
-        <ExitBadge exitCode={output.exitCode} status={status} />
+        <ExitBadge output={output} status={status} />
       </>
     );
 
@@ -246,10 +269,12 @@ export const CommandPreview = memo(
         data-testid="command-preview"
         data-expanded={expanded}
         className={cn(
-          "overflow-hidden rounded-[var(--radius-md)] font-mono text-xs text-foreground",
+          // One border in both states, so opening a row does not shift the
+          // list; the terminal's is its own fill colour.
+          "overflow-hidden rounded-[var(--radius-md)] border font-mono text-xs text-foreground",
           expanded
-            ? "bg-[var(--md3-surface-container-lowest)]"
-            : "border border-border bg-transparent",
+            ? "border-[var(--md3-surface-container-lowest)] bg-[var(--md3-surface-container-lowest)]"
+            : "border-border bg-transparent",
           className,
         )}
       >

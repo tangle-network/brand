@@ -508,6 +508,10 @@ describe("dark status surfaces carry their tone in hue, not weight", () => {
       expect(saturation(hexIn(DARK, `surface-${tone}-bg`))).toBeLessThanOrEqual(0.25);
     });
   }
+  it("violet: the dark fill lifts off the card like the status chips", () => {
+    const card = hslToRgb(hslIn(DARK, "hsl-card"));
+    expect(contrastRatio(hexIn(DARK, "surface-violet-bg"), card)).toBeGreaterThanOrEqual(1.3);
+  });
   for (const tone of ["warning", "danger", "violet"]) {
     it(`${tone}: its text clears AA on its own dark fill`, () => {
       expect(

@@ -30,21 +30,35 @@ describe("CommandPreview", () => {
     expect(screen.getByText("exit 2").className).toContain("surface-danger");
   });
 
-  it("keeps each short token whole so a phone wraps between flags", () => {
+  it("boxes each token so a phone wraps between flags", () => {
     render(<CommandPreview part={part({ output: "M a" })} />);
     const flag = screen.getByText("--short");
     expect(flag.tagName).toBe("SPAN");
-    expect(flag.className).toContain("whitespace-nowrap");
+    expect(flag.className).toContain("inline-block");
+    // A box wider than the line still breaks, so no token overflows.
+    expect(flag.className).toContain("[overflow-wrap:anywhere]");
     // The text is unchanged, so a copy pastes the exact command.
     expect(screen.getByTestId("command-preview").querySelector("code")?.textContent).toBe(
       "git status --short",
     );
   });
 
-  it("lets a token longer than a phone line break", () => {
-    const sha = "e006b2aad5a5f72227f0eea058213149798853d2";
-    render(<CommandPreview part={part({ input: { command: `git diff ${sha}` }, output: "x" })} />);
-    expect(screen.queryByText(sha, { selector: "span" })).toBeNull();
+  it("treats a timeout or a signal as a failure even without an exit code", () => {
+    render(
+      <CommandPreview
+        part={part({ status: "error", output: { stdout: "", stderr: "", timedOut: true } })}
+      />,
+    );
+    expect(screen.getByText("timed out").className).toContain("surface-danger");
+  });
+
+  it("keeps a runner error after a clean exit neutral", () => {
+    render(
+      <CommandPreview
+        part={part({ status: "error", output: { stdout: "ok", stderr: "", exitCode: 0 } })}
+      />,
+    );
+    expect(screen.getByText("exit 0 · tool error").className).toContain("surface-neutral");
   });
 
   it("is a quiet row until opened, then a dark terminal", () => {
