@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.15.0
+
+### Minor Changes
+
+- bb8e620: `tokens.css` now defines the role radii (`--radius-tag`, `--radius-chip`, `--radius-field`, `--radius-panel`, `--radius-cover`, `--radius-sheet`), so apps that load tokens.css without system.css can use them instead of declaring their own. Values match system.css.
+
+### Patch Changes
+
+- 8feb230: Lower the Physim row in the drift baseline to physim main 663cfed: hex 328 -> 0, redeclared tokens 108 -> 2.
+- 922bf6f: Lower the GTM and Creative rows in the shipped drift baseline to their default branches after design-system slice 1: GTM gtm-agent 905258f, raw palette 67 → 0; Creative creative-agent 4e1768d, raw palette 223 → 0, hex 307 → 272, arbitrary colours 35 → 0. Their local gates now fail on any new raw palette class.
+
 ## 1.14.3
 
 ### Patch Changes
