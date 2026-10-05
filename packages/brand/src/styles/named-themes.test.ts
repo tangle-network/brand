@@ -15,11 +15,11 @@ import {
 /**
  * The named-theme contract.
  *
- * A named theme re-skins the SURFACE ladder and nothing else — the Tangle accent
- * (primary / ring / accent-text) stays put, so a product carries its identity in
- * its planes, not by inventing a second brand colour. These assertions live here
- * rather than in the consuming app because the palette lives here: an app's job
- * is only to opt in.
+ * A named theme re-skins the surface ladder and may carry a product accent
+ * (primary / ring / accent-text), as Arena, Aubergine and Super do. It never
+ * changes what a status or category tone means. Intelligence is surface-only and
+ * keeps the Tangle accent. These assertions live here rather than in the
+ * consuming app because the palette lives here: an app's job is only to opt in.
  */
 const themes = readFileSync(
   path.resolve(import.meta.dirname, "named-themes.css"),
