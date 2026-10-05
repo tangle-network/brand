@@ -285,6 +285,73 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
   });
 });
 
+describe("named themes: secondary text tiers are readable text", () => {
+  // --text-muted and --text-dim carry hints, subtitles and timestamps. They are
+  // still TEXT, so each clears the AA body floor on every plane text renders on
+  // (canvas, card, panel, elevated and highest container), and muted stays
+  // stronger than dim.
+  const scopes = [
+    "aubergine",
+    "aubergine-light",
+    "arena",
+    "arena-light",
+    "super",
+    "super-light",
+    "tangle-dark",
+    "tangle-light",
+  ];
+  for (const scope of scopes) {
+    it(`[data-theme="${scope}"] holds AA for --text-muted and --text-dim`, () => {
+      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) =>
+        /--text-dim:/.test(b),
+      );
+      expect(css, `${scope} declares its text ladder`).toBeDefined();
+      const resolve = (token: string): ReturnType<typeof hexIn> => {
+        const ref = css!.match(new RegExp(`--${token}:\\s*var\\(--([a-z0-9-]+)\\)`));
+        return ref ? resolve(ref[1]) : hexIn(css!, token);
+      };
+      const planes = {
+        canvas: resolve("bg-root"),
+        card: resolve("bg-card"),
+        panel: resolve("depth-2"),
+        elevated: resolve("depth-4"),
+        highest: resolve("md3-surface-container-highest"),
+      };
+      const muted = resolve("text-muted");
+      const dim = resolve("text-dim");
+      for (const [plane, rgb] of Object.entries(planes)) {
+        expect(contrastRatio(muted, rgb), `text-muted on ${plane}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(dim, rgb), `text-dim on ${plane}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(muted, rgb), `muted outranks dim on ${plane}`).toBeGreaterThan(
+          contrastRatio(dim, rgb),
+        );
+      }
+    });
+  }
+});
+
+describe("named themes: the base surface follows the retint", () => {
+  // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome
+  // such as a mobile top bar. A retinted scope that leaves them at the neutral
+  // spine renders a grey bar on a purple or green page.
+  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light", "super", "super-light"]) {
+    it(`[data-theme="${scope}"] retints the base surface tokens`, () => {
+      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) => /--text-dim:/.test(b));
+      for (const token of [
+        "md3-surface",
+        "md3-surface-dim",
+        "md3-surface-bright",
+        "md3-surface-variant",
+        "md3-on-surface",
+        "md3-on-surface-variant",
+      ]) {
+        expect(css, `${scope} declares --${token}`).toMatch(new RegExp(`--${token}:`));
+      }
+      expect(css).toMatch(/--md3-surface:\s*var\(--bg-root\)/);
+    });
+  }
+});
+
 describe('named theme: [data-theme="super"] / [data-theme="super-light"]', () => {
   const dark = block('[data-theme="super"]');
   const light = blocksIn(themes, '[data-theme="super-light"]').find((b) =>
