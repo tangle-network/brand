@@ -285,18 +285,94 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
   });
 });
 
+describe("named themes: secondary text tiers are readable text", () => {
+  // --text-muted and --text-dim carry hints, subtitles and timestamps. They are
+  // still TEXT, so each clears the AA body floor on every plane text renders on
+  // (canvas, card, panel, elevated and highest container), and muted stays
+  // stronger than dim.
+  const scopes = [
+    "aubergine",
+    "aubergine-light",
+    "arena",
+    "arena-light",
+    "tangle-dark",
+    "tangle-light",
+  ];
+  for (const scope of scopes) {
+    it(`[data-theme="${scope}"] holds AA for --text-muted and --text-dim`, () => {
+      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) =>
+        /--text-dim:/.test(b),
+      );
+      expect(css, `${scope} declares its text ladder`).toBeDefined();
+      const resolve = (token: string): ReturnType<typeof hexIn> => {
+        const ref = css!.match(new RegExp(`--${token}:\\s*var\\(--([a-z0-9-]+)\\)`));
+        return ref ? resolve(ref[1]) : hexIn(css!, token);
+      };
+      const planes = {
+        canvas: resolve("bg-root"),
+        card: resolve("bg-card"),
+        panel: resolve("depth-2"),
+        elevated: resolve("depth-4"),
+        highest: resolve("md3-surface-container-highest"),
+      };
+      const muted = resolve("text-muted");
+      const dim = resolve("text-dim");
+      for (const [plane, rgb] of Object.entries(planes)) {
+        expect(contrastRatio(muted, rgb), `text-muted on ${plane}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(dim, rgb), `text-dim on ${plane}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(muted, rgb), `muted outranks dim on ${plane}`).toBeGreaterThan(
+          contrastRatio(dim, rgb),
+        );
+      }
+    });
+  }
+});
+
+describe("named themes: the base surface follows the retint", () => {
+  // `bg-surface` (and `--md3-surface-*`/`--md3-on-surface*`) paint page chrome
+  // such as a mobile top bar. A retinted scope that leaves them at the neutral
+  // spine renders a grey bar on a purple or green page.
+  for (const scope of ["aubergine", "aubergine-light", "arena", "arena-light"]) {
+    it(`[data-theme="${scope}"] retints the base surface tokens`, () => {
+      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) => /--text-dim:/.test(b));
+      for (const token of [
+        "md3-surface",
+        "md3-surface-dim",
+        "md3-surface-bright",
+        "md3-surface-variant",
+        "md3-on-surface",
+        "md3-on-surface-variant",
+      ]) {
+        expect(css, `${scope} declares --${token}`).toMatch(new RegExp(`--${token}:`));
+      }
+      expect(css).toMatch(/--md3-surface:\s*var\(--bg-root\)/);
+    });
+  }
+});
+
 describe('named theme: [data-theme="hospitality"]', () => {
   const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
-  const light = block('[data-theme="hospitality"]');
+  const light = block('[data-theme="hospitality"]:where(:not(.dark))');
   const dark = block('.dark[data-theme="hospitality"]');
   const props = (css: string) =>
     [...css.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]).sort();
 
   it("takes its dark mode from the .dark class, never from a second attribute", () => {
-    expect(rules).toMatch(/^\[data-theme="hospitality"\] \{/m);
+    expect(rules).toMatch(/^\[data-theme="hospitality"\]:where\(:not\(\.dark\)\) \{/m);
     expect(rules).toMatch(/^\.dark\[data-theme="hospitality"\] \{/m);
     expect(rules).not.toContain('[data-theme="hospitality-light"]');
     expect(rules).not.toContain('[data-theme="hospitality-dark"]');
+  });
+
+  it("starts from a complete canonical baseline in either mode, before hydration too", () => {
+    // Without the seed, a classless <html data-theme="hospitality"> would keep
+    // the dark-default :root syntax, status and color-scheme under light paper.
+    const header = (anchor: string) => {
+      const end = tokens.indexOf(anchor);
+      return tokens.slice(tokens.lastIndexOf("}", end) + 1, tokens.indexOf("{", end));
+    };
+    expect(header("color-scheme: dark")).toContain('[data-theme="hospitality"],');
+    expect(header("color-scheme: light")).toContain('[data-theme="hospitality"]:where(:not(.dark)),');
   });
 
   it("lets nothing from the light identity survive into dark", () => {
@@ -315,7 +391,12 @@ describe('named theme: [data-theme="hospitality"]', () => {
 
   it("keeps the canonical ladder roles: paper cards on a tinted canvas in light, rising planes in dark", () => {
     expect(hslIn(light, "hsl-card")).toEqual({ h: 0, s: 0, l: 100 });
-    expect(hexRelativeLuminanceIn(light, "md3-surface")).toBeLessThan(hexRelativeLuminanceIn(light, "md3-surface-container"));
+    // As in canonical light, the canvas sits BELOW the wells and the paper.
+    for (const plane of ["md3-surface-container-low", "md3-surface-container", "md3-surface-container-high"]) {
+      expect(hexRelativeLuminanceIn(light, "md3-surface"), `canvas below ${plane}`).toBeLessThan(
+        hexRelativeLuminanceIn(light, plane),
+      );
+    }
     const steps = [
       "md3-surface-container-lowest",
       "md3-surface-container-low",
@@ -339,7 +420,14 @@ describe('named theme: [data-theme="hospitality"]', () => {
     expect(contrastRatio(fg, canvas), "ink on canvas").toBeGreaterThanOrEqual(7);
     expect(contrastRatio(fg, card), "ink on card").toBeGreaterThanOrEqual(7);
     const mutedInk = hslToRgb(hslIn(css, "hsl-muted-foreground"));
-    for (const [name, plane] of [["canvas", canvas], ["card", card], ["muted", muted]] as const) {
+    const planes = [
+      ["canvas", canvas],
+      ["card", card],
+      ["muted", muted],
+      ["elevated", hexIn(css, "depth-4")],
+      ["highest", hexIn(css, "md3-surface-container-highest")],
+    ] as const;
+    for (const [name, plane] of planes) {
       expect(contrastRatio(mutedInk, plane), `muted ink on ${name}`).toBeGreaterThanOrEqual(4.5);
       expect(contrastRatio(hexIn(css, "accent-text"), plane), `accent text on ${name}`).toBeGreaterThanOrEqual(4.5);
       expect(contrastRatio(hexIn(css, "text-dim"), plane), `text-dim on ${name}`).toBeGreaterThanOrEqual(4.5);
