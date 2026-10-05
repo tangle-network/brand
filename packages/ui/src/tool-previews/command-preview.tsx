@@ -158,7 +158,9 @@ function ExitBadge({
     label = `exit ${exitCode}`;
     tone = "danger";
   } else if (status === "error") {
-    label = exitCode === 0 ? "exit 0 · tool error" : "tool error";
+    // Say what is known: the tool reported an error. Nothing recorded says
+    // the command itself failed.
+    label = exitCode === 0 ? "exit 0 · tool reported error" : "tool reported error";
     tone = "neutral";
   } else {
     label = exitCode === 0 ? "exit 0" : null;
@@ -259,7 +261,11 @@ export const CommandPreview = memo(
         >
           <CommandText command={command} all={expanded} />
         </code>
-        <ExitBadge output={output} status={status} />
+        {/* On a phone the badge takes its own line under the command, so the
+            command keeps the row's width. */}
+        <span className="flex shrink-0 max-sm:order-last max-sm:basis-full max-sm:pl-4">
+          <ExitBadge output={output} status={status} />
+        </span>
       </>
     );
 
@@ -274,7 +280,7 @@ export const CommandPreview = memo(
           "overflow-hidden rounded-[var(--radius-md)] border font-mono text-xs text-foreground",
           expanded
             ? "border-[var(--md3-surface-container-lowest)] bg-[var(--md3-surface-container-lowest)]"
-            : "border-border bg-transparent",
+            : "border-transparent bg-transparent",
           className,
         )}
       >
@@ -285,7 +291,7 @@ export const CommandPreview = memo(
             aria-expanded={expanded}
             aria-controls={bodyId}
             className={cn(
-              "flex w-full items-start gap-2 px-3 py-2 text-left transition-colors",
+              "flex w-full flex-wrap items-start gap-x-2 gap-y-1 px-3 py-2 text-left transition-colors sm:flex-nowrap",
               expanded ? "hover:bg-white/5" : "hover:bg-muted",
               focusRing,
             )}
@@ -298,7 +304,9 @@ export const CommandPreview = memo(
             )}
           </button>
         ) : (
-          <div className="flex w-full items-start gap-2 px-3 py-2">{promptLine}</div>
+          <div className="flex w-full flex-wrap items-start gap-x-2 gap-y-1 px-3 py-2 sm:flex-nowrap">
+            {promptLine}
+          </div>
         )}
 
         {expanded && hasBody ? (
