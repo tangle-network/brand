@@ -227,6 +227,10 @@ function CommandText({ command, all }: { command: string; all: boolean }) {
  * dark terminal. It scopes the dark token set onto itself with
  * `data-theme="dark"`, so stderr, the badges and the muted prompt keep the
  * contrast they were designed with on a dark ground, in a light console too.
+  *
+ * On a phone the output keeps its own lines and scrolls sideways inside the
+ * block: wrapped output breaks the columns of a listing and splits hashes
+ * and URLs mid-token. The command still wraps between its tokens.
  */
 export const CommandPreview = memo(
   ({ part, defaultExpanded = false, className }: CommandPreviewProps) => {
@@ -258,7 +262,10 @@ export const CommandPreview = memo(
         <code
           className={cn(
             "min-w-0 flex-1 whitespace-pre-wrap [overflow-wrap:anywhere]",
-            expanded ? "" : "line-clamp-2",
+            // Closed, two lines of the command. A height cap, not
+            // line-clamp: each token is an inline box, which line-clamp
+            // does not count, so a phone showed three lines and more.
+            expanded ? "" : "max-h-8 overflow-hidden",
           )}
         >
           <CommandText command={command} all={expanded} />
@@ -319,7 +326,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="stdout"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-3 py-2 leading-relaxed",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] px-3 py-2 leading-relaxed",
                   focusRing,
                 )}
               >
@@ -332,7 +339,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="stderr"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >
@@ -345,7 +352,7 @@ export const CommandPreview = memo(
                 role="region"
                 aria-label="error"
                 className={cn(
-                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
+                  "max-h-80 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] max-sm:whitespace-pre max-sm:[overflow-wrap:normal] border-t border-white/10 px-3 py-2 leading-relaxed text-[var(--surface-danger-text)]",
                   focusRing,
                 )}
               >
