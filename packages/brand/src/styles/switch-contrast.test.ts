@@ -98,7 +98,7 @@ type Rgb = [number, number, number];
  */
 function resolve(sources: string[], token: string): Rgb {
   const raw = sources
-    .map((css) => css.match(new RegExp(`--${token}:\\s*([^;]+);`))?.[1]?.trim())
+    .map((css) => css.match(new RegExp(`(?<![\\w-])--${token}:\\s*([^;]+);`))?.[1]?.trim())
     .find((value) => value !== undefined);
   if (raw === undefined) throw new Error(`--${token} resolves to nothing`);
 
@@ -117,9 +117,10 @@ describe("the Switch's token pairs clear 3:1 in every theme scope", () => {
   it("covers every named theme", () => {
     const rules = themes.replace(/\/\*[\s\S]*?\*\//g, "");
     const declared = new Set([...rules.matchAll(/\[data-theme="([a-z-]+)"\]/g)].map((m) => m[1]));
-    const covered = scopes.map((s) => s.name).join(" ");
+    // Hospitality and website take their mode from .dark, so one name covers two scopes.
+    const covered = new Set(scopes.map((s) => s.name.replace(/ (light|dark)$/, "")));
     for (const name of declared) {
-      expect(covered, `[data-theme="${name}"] needs a scope here`).toContain(name);
+      expect(covered.has(name), `[data-theme="${name}"] needs a scope here`).toBe(true);
     }
   });
 
