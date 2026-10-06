@@ -1,7 +1,7 @@
 {
   "name": "@tangle-network/brand",
   "version": "1.16.0",
-  "description": "Tangle brand system — design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
+  "description": "Tangle brand system \u2014 design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -47,12 +47,13 @@
     "./styles/legacy-light.css": "./src/styles/legacy-light.css"
   },
   "scripts": {
-    "build": "node scripts/gen-ladders.mjs --check && node scripts/gen-compat.mjs --check && tsdown",
+    "build": "node scripts/gen-ladders.mjs --check && node scripts/gen-compat.mjs --check && node scripts/gen-palette.mjs --check && tsdown",
     "gen:ladders": "node scripts/gen-ladders.mjs",
     "gen:compat": "node scripts/gen-compat.mjs",
     "check:compat": "node scripts/gen-ladders.mjs --check && node scripts/gen-compat.mjs --check && node --test scripts/gen-compat.test.mjs",
     "check:drift": "node --test scripts/tangle-drift.test.mjs",
-    "dev": "tsdown --watch"
+    "dev": "tsdown --watch",
+    "gen:palette": "node scripts/gen-palette.mjs"
   },
   "peerDependencies": {
     "react": ">=18"

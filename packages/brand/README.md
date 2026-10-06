@@ -101,6 +101,8 @@ import { Logo, TangleKnot } from "@tangle-network/brand";
 
 ## Palette and typography
 
+Renderers that cannot read CSS variables (PDF, canvas, WebGL, email, the `theme-color` meta) import `palettes` from `@tangle-network/brand`: resolved hex values for `light`, `dark`, `websiteLight` and `websiteDark`, generated from the stylesheets by `pnpm gen:palette`. Pages styled with CSS keep using the variables.
+
 The base surface ladder is the one GTM proved out: dark is indigo-lifted `#0a0a14` / `#191826` / `#221f33` / `#2c2942`; light is a cool `#eceef3` canvas, white paper cards and overlays, and `#f1f2f7` nested wells. The cast stays below 0.1 chroma and ink stays achromatic, so indigo still reads as the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
 
 Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
