@@ -507,12 +507,12 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "663cfedea162",
-  "tsx_files": 15,
+  "head": "84ad0ac21a00",
+  "tsx_files": 16,
   "css_files": 8,
   "versions": {
    "agent-app": [
-    "0.53.13"
+    "0.54.1"
    ],
    "brand": [
     "1.13.0"
@@ -537,21 +537,21 @@
    "brand": 1,
    "ui": 2,
    "sandbox-ui": 5,
-   "agent-app": 5
+   "agent-app": 6
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "apps/web/src/styles/canvas-nodes.css": 2
+    "apps/web/src/styles/canvas-nodes.css": 1
    },
    "local_primitive_count": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 2,
+  "css_var_defs": 1,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
