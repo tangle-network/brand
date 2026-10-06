@@ -180,6 +180,9 @@ CodeBlock.displayName = "CodeBlock";
 /** Copy-to-clipboard button for use inside CodeBlock. */
 export const CopyButton = memo(({ text }: { text: string }) => {
   const [copied, setCopied] = useState(false);
+  // Status text for the live region. Cleared before each attempt so a repeat
+  // copy or a failure is announced again.
+  const [status, setStatus] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -187,14 +190,21 @@ export const CopyButton = memo(({ text }: { text: string }) => {
   }, []);
 
   const handleCopy = useCallback(async () => {
+    setStatus("");
+    if (timerRef.current) clearTimeout(timerRef.current);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setCopied(false), 2000);
+      setStatus("Copied to clipboard");
     } catch (err) {
       console.warn("Clipboard write failed:", err);
+      setCopied(false);
+      setStatus("Copy failed");
     }
+    timerRef.current = setTimeout(() => {
+      setCopied(false);
+      setStatus("");
+    }, 2000);
   }, [text]);
 
   const label = copied ? "Copied" : "Copy to clipboard";
@@ -216,9 +226,9 @@ export const CopyButton = memo(({ text }: { text: string }) => {
           <Copy aria-hidden="true" className="w-3.5 h-3.5 text-muted-foreground" />
         )}
       </button>
-      {/* Announce the result once; the icon swap alone is silent to screen readers. */}
+      {/* Announce the result; the icon swap alone is silent to screen readers. */}
       <span className="sr-only" role="status" aria-live="polite">
-        {copied ? "Copied to clipboard" : ""}
+        {status}
       </span>
     </>
   );

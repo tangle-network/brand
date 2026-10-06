@@ -45,7 +45,8 @@ export interface MetricProps extends React.HTMLAttributes<HTMLDivElement> {
   hint?: React.ReactNode;
   /** Attention is a caller-owned action requirement, never inferred from zero. */
   attention?: { tone: StatusTone; label: string };
-  /** Decorative glyph before the label; the label carries the meaning. */
+  /** Decorative glyph before the label; the label carries the meaning. A
+   * direct svg child is sized to 16px; wrap other content to size it yourself. */
   icon?: React.ReactNode;
 }
 
@@ -58,7 +59,7 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
       {...props}
     >
       <dt className="flex min-w-0 flex-wrap items-center gap-2 text-muted-foreground text-sm">
-        {icon && (
+        {icon != null && icon !== false && (
           <span
             aria-hidden="true"
             className="inline-flex shrink-0 text-muted-foreground [&>svg]:h-4 [&>svg]:w-4"

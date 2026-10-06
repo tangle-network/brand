@@ -145,6 +145,7 @@ describe("CodeBlock", () => {
     const button = screen.getByRole("button", { name: "Copy to clipboard" });
     expect(button.getAttribute("type")).toBe("button");
     const status = screen.getByRole("status");
+    expect(status.getAttribute("aria-live")).toBe("polite");
     expect(status.textContent).toBe("");
     fireEvent.click(button);
     await waitFor(() => expect(status.textContent).toBe("Copied to clipboard"));
@@ -156,5 +157,16 @@ describe("CodeBlock", () => {
     const { getByText } = render(<CodeBlock code={"x"} label="YAML" />);
     expect(getByText("YAML").className).toContain("text-xs");
     expect(getByText("YAML").className).not.toContain("calc(");
+  });
+
+  it("announces a failed copy", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<CopyButton text="secret" />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy to clipboard" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Copy failed"));
+    expect(screen.getByRole("button", { name: "Copy to clipboard" })).toBeTruthy();
+    warn.mockRestore();
   });
 });
