@@ -131,6 +131,28 @@ A TypeScript consumer resolves these entries through the emitted declarations, a
 
 Because the peers now resolve at first render rather than at build time, a missing one surfaces as a thrown error while React renders. Wrap the editors in an error boundary, so the install list reaches a surface you control instead of unmounting the tree.
 
+### PDF pages
+
+`pdfjs-dist` backs `PdfViewer` in `./files`, which `FilePreview` and `FileArtifactPane` use for PDFs. It follows the editor's rule: the entry reaches it only through a caught dynamic `import()`, so a consumer without it builds under Vite and esbuild. Without it, `PdfViewer` says so and shows the browser's own viewer through `<object>`, which Android Chrome does not have, so a reader there gets a download card instead of pages.
+
+```sh
+pnpm add pdfjs-dist
+```
+
+`PdfViewer` imports pdf.js's legacy build, which carries the polyfills that phone browsers a year or two old need. Two settings are page-wide, because pdf.js's own worker setting is. Set them once, before the first viewer renders:
+
+```ts
+import { configurePdfViewer } from "@tangle-network/ui/files";
+import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url"; // Vite
+
+configurePdfViewer({ workerSrc, assetsUrl: "/pdfjs/" });
+```
+
+- `workerSrc` moves parsing into a worker. Without it, the viewer runs pdf.js's worker code on the main thread, which needs no bundler setup and no CDN, at the cost of scrolling while a large file parses.
+- `assetsUrl` is where the app serves the installed pdfjs-dist's `wasm/`, `cmaps/`, `standard_fonts/` and `iccs/` directories. pdf.js 6 decodes JBIG2, CCITT fax and JPEG 2000 images with the wasm modules, and black-and-white scans use the first two, so without it a scanned page renders blank. The viewer warns once in the console when it is missing. Copy the directories at build time; they must come from the same pdfjs-dist version as the worker.
+
+An http(s) `src` on another origin needs CORS, as any `fetch` does. When it fails, the viewer falls back to `<object>`, which does not.
+
 `nanostores` and `@nanostores/react` back `./stores`, and `react-router` backs `./nav`.
 Those entries create values at module scope, so consumers must install their peers before importing them.
 The package root also re-exports `./stores`, so a root import requires both nanostores peers.

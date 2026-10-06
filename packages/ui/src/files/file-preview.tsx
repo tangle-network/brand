@@ -2,7 +2,7 @@
  * FilePreview — universal file renderer.
  *
  * Renders any file type:
- * - PDF: embedded viewer at full pane height
+ * - PDF: PdfViewer's rendered pages at full pane height
  * - Images: fit to the pane on a checker ground; click toggles natural size
  * - Video / audio: native players
  * - CSV: sticky-header table, capped at CSV_PREVIEW_ROW_LIMIT rows
@@ -14,21 +14,13 @@
  */
 
 import { useState } from "react";
-import {
-  Download,
-  FileSpreadsheet,
-  FileText,
-  Music,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { Download, Music, X } from "lucide-react";
 import type { UrlTransform } from "react-markdown";
 import { focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
-import { Button } from "../primitives/button";
 import { Markdown } from "../markdown/markdown";
 import { CodeBlock, CopyButton } from "../markdown/code-block";
-import { formatBytes } from "../utils/format";
+import { FileCard } from "./file-card";
 import {
   fileExtension,
   getCodeLanguage,
@@ -36,6 +28,7 @@ import {
   resolveFilePreviewKind,
   type FilePreviewKind,
 } from "./file-format";
+import { PdfViewer } from "./pdf-viewer";
 
 export interface FilePreviewProps {
   filename: string;
@@ -239,38 +232,6 @@ function ImagePreview({ src, filename }: { src: string; filename: string }) {
   );
 }
 
-function PdfPreview({
-  blobUrl,
-  filename,
-  size,
-  onDownload,
-}: {
-  blobUrl: string;
-  filename: string;
-  size?: number;
-  onDownload?: () => void;
-}) {
-  // <object> lets a browser without an inline PDF viewer render the fallback
-  // card instead of a blank frame. The viewer draws its own chrome, so the
-  // object has no border; the card brings its own and fills the same height.
-  return (
-    <object
-      data={blobUrl}
-      type="application/pdf"
-      title={filename}
-      className="min-h-[24rem] w-full flex-1 rounded-[var(--radius-md)]"
-    >
-      <DownloadCard
-        filename={filename}
-        size={size}
-        sentence="This browser does not show PDFs inline."
-        onDownload={onDownload}
-        className="h-full"
-      />
-    </object>
-  );
-}
-
 function VideoPreview({ src, filename }: { src: string; filename: string }) {
   return (
     <div className="flex min-h-[12rem] flex-1 items-center justify-center overflow-hidden rounded-[var(--radius-md)] border border-border bg-background">
@@ -318,52 +279,10 @@ function MarkdownPreview({
   );
 }
 
-/**
- * One muted sentence plus the filename, its size when known, and a Download
- * button when the host wires `onDownload`. Serves spreadsheets, binaries, and
- * every kind whose source (blob or text) is missing.
- */
-function DownloadCard({
-  filename,
-  size,
-  sentence,
-  icon: Icon = FileText,
-  onDownload,
-  className,
-}: {
-  filename: string;
-  size?: number;
-  sentence: string;
-  icon?: LucideIcon;
-  onDownload?: () => void;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center rounded-[var(--radius-md)] border border-dashed border-border bg-background px-6 py-16 text-center",
-        className,
-      )}
-    >
-      <Icon className="mb-3 h-12 w-12 text-muted-foreground opacity-40" />
-      <p className="max-w-full truncate text-sm font-medium text-foreground">{filename}</p>
-      {size !== undefined && (
-        <p className="mt-1 text-xs text-muted-foreground">{formatBytes(size)}</p>
-      )}
-      <p className="mt-3 max-w-md text-sm text-muted-foreground">{sentence}</p>
-      {onDownload && (
-        <Button type="button" variant="outline" size="sm" className="mt-5" onClick={onDownload}>
-          <Download />
-          Download
-        </Button>
-      )}
-    </div>
-  );
-}
-
 function PreviewBody({
   kind,
   filename,
+  mimeType,
   content,
   blobUrl,
   size,
@@ -372,6 +291,7 @@ function PreviewBody({
 }: {
   kind: FilePreviewKind;
   filename: string;
+  mimeType?: string;
   content?: string;
   blobUrl?: string;
   size?: number;
@@ -379,12 +299,14 @@ function PreviewBody({
   onDownload?: () => void;
 }) {
   const hasText = typeof content === "string";
-  const card = (sentence: string, icon?: LucideIcon) => (
-    <DownloadCard
+  // The card takes its icon from the kind, so a spreadsheet or a recording
+  // reads as one even when it cannot be shown.
+  const card = (sentence: string) => (
+    <FileCard
       filename={filename}
+      mimeType={mimeType}
       size={size}
-      sentence={sentence}
-      icon={icon}
+      description={sentence}
       onDownload={onDownload}
     />
   );
@@ -392,7 +314,15 @@ function PreviewBody({
   switch (kind) {
     case "pdf":
       if (blobUrl) {
-        return <PdfPreview blobUrl={blobUrl} filename={filename} size={size} onDownload={onDownload} />;
+        return (
+          <PdfViewer
+            src={blobUrl}
+            filename={filename}
+            size={size}
+            onDownload={onDownload}
+            className="min-h-[24rem] flex-1"
+          />
+        );
       }
       return card(NEEDS_DOWNLOAD_LINK);
     case "image":
@@ -405,10 +335,10 @@ function PreviewBody({
       return card(NEEDS_DOWNLOAD_LINK);
     case "audio":
       if (blobUrl) return <AudioPreview src={blobUrl} filename={filename} />;
-      return card(NEEDS_DOWNLOAD_LINK, Music);
+      return card(NEEDS_DOWNLOAD_LINK);
     case "csv":
       if (hasText) return <CsvPreview content={content} />;
-      return card(NO_INLINE_CONTENT, FileSpreadsheet);
+      return card(NO_INLINE_CONTENT);
     case "code":
     case "json":
     case "yaml":
@@ -421,7 +351,7 @@ function PreviewBody({
       if (hasText) return <TextPreview content={content} />;
       return card(NO_INLINE_CONTENT);
     case "spreadsheet":
-      return card("Download to open this workbook in a spreadsheet app.", FileSpreadsheet);
+      return card("Download to open this workbook in a spreadsheet app.");
     case "binary":
       if (hasText) return <TextPreview content={content} />;
       return card(blobUrl ? NO_INLINE_PREVIEW : NEEDS_DOWNLOAD_LINK);
@@ -482,6 +412,7 @@ export function FilePreview({
         <PreviewBody
           kind={kind}
           filename={filename}
+          mimeType={mimeType}
           content={content}
           blobUrl={blobUrl}
           size={size}

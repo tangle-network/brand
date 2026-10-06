@@ -2,6 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { FileArtifactPane } from "./file-artifact-pane";
 import { CSV_PREVIEW_ROW_LIMIT, parseCsv } from "./file-preview";
+import { MissingPdfjsError, loadPdfjs } from "./pdf-loader";
+
+vi.mock("./pdf-loader", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./pdf-loader")>()),
+  loadPdfjs: vi.fn(),
+}));
 
 const BLOB_URL = "blob:https://app.tangle.tools/1f2e3d4c";
 
@@ -32,16 +38,20 @@ describe("FileArtifactPane previews", () => {
     expect(container.querySelector("img")).toHaveClass("max-w-none");
   });
 
-  it("renders a PDF as an <object> of the blobUrl", () => {
+  it("renders a PDF in PdfViewer, and in an <object> of the blobUrl without pdfjs-dist", async () => {
+    vi.mocked(loadPdfjs).mockRejectedValue(new MissingPdfjsError());
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const { container } = render(
       <FileArtifactPane filename="report.pdf" blobUrl={BLOB_URL} mimeType="application/pdf" />,
     );
 
+    expect(screen.getByRole("status")).toHaveTextContent("Loading report.pdf");
+    expect(await screen.findByText(/does not include the page viewer/)).toBeInTheDocument();
     const viewer = container.querySelector("object");
-    expect(viewer).not.toBeNull();
     expect(viewer).toHaveAttribute("data", BLOB_URL);
     expect(viewer).toHaveAttribute("type", "application/pdf");
     expect(viewer).toHaveAttribute("title", "report.pdf");
+    consoleError.mockRestore();
   });
 
   it("renders video and audio with native controls", () => {

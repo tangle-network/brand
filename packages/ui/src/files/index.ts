@@ -18,6 +18,15 @@ export {
   parseCsv,
   type FilePreviewProps,
 } from "./file-preview";
+export { PdfViewer, type PdfViewerProps } from "./pdf-viewer";
+export { configurePdfViewer, type PdfViewerConfig } from "./pdf-loader";
+export {
+  FileCard,
+  type FileCardProps,
+  type FileDetails,
+  type FileUploader,
+} from "./file-card";
+export { FileList, type FileListProps, type FileListItem } from "./file-list";
 export { FileTabs, type FileTabsProps, type FileTabData } from "./file-tabs";
 export { FileArtifactPane, type FileArtifactPaneProps } from "./file-artifact-pane";
 export {
