@@ -174,7 +174,7 @@ const TerminalInput = React.forwardRef<HTMLInputElement, TerminalInputProps>(
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
+          className="flex-1 bg-transparent text-foreground outline-none placeholder:text-[var(--text-dim)]"
           {...props}
         />
         <TerminalCursor />

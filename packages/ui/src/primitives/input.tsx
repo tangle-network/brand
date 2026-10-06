@@ -10,7 +10,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 const inputVariants = cva(
   cn(
-    "flex w-full rounded-lg border px-4 py-2 text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-sm",
+    "flex w-full rounded-lg border px-4 py-2 text-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-sm",
     fieldPresentation,
   ),
   {
@@ -117,7 +117,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         id={textareaId}
         className={cn(
           "flex min-h-[120px] w-full resize-y rounded-lg border px-4 py-3 text-sm",
-          "placeholder:text-muted-foreground",
+          "placeholder:text-[var(--text-dim)]",
           "disabled:cursor-not-allowed disabled:opacity-50",
           fieldPresentation,
           error && focusFieldInvalid,
