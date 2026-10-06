@@ -46,11 +46,13 @@ const SIZE = {
   md: "gap-1.5 px-2.5 text-sm [&_svg]:size-3.5",
 } as const;
 
-// A truncating tag keeps one fixed height; a wrapping one grows from that
-// height so a two-line label still lines up with its single-line siblings.
-const HEIGHT = {
-  sm: { fixed: "h-6", wrap: "min-h-6 py-0.5" },
-  md: { fixed: "h-7", wrap: "min-h-7 py-1" },
+// A truncating tag has one fixed height. A wrapping tag carries its vertical
+// padding on the label instead, sized so one line is exactly that height
+// (sm: 16px line + 6 + 2px border = 24; md: 20 + 6 + 2 = 28), and aligns the
+// icon and remove button to the first line rather than the middle.
+const WRAP = {
+  sm: { box: "items-start", label: "py-[3px]", icon: "h-[22px] items-center" },
+  md: { box: "items-start", label: "py-[3px]", icon: "h-[26px] items-center" },
 } as const;
 
 const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
@@ -64,9 +66,9 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
       <span
         ref={ref}
         className={cn(
-          "inline-flex min-w-0 max-w-full shrink-0 items-center rounded-md border font-medium",
+          "inline-flex min-w-0 max-w-full shrink-0 rounded-md border font-medium",
           SIZE[size],
-          wrap ? HEIGHT[size].wrap : HEIGHT[size].fixed,
+          wrap ? WRAP[size].box : ["items-center", size === "sm" ? "h-6" : "h-7"],
           emphasis === "outline" ? classes.outline : classes.surface,
           onRemove && (size === "sm" ? "pr-0.5" : "pr-1"),
           className,
@@ -74,7 +76,7 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
         {...props}
       >
         {icon ? (
-          <span aria-hidden="true" className={cn("inline-flex shrink-0", classes.icon)}>
+          <span aria-hidden="true" className={cn("inline-flex shrink-0", wrap && WRAP[size].icon, classes.icon)}>
             {icon}
           </span>
         ) : null}
@@ -82,7 +84,7 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
             remove button out, and the title gives its full text on hover.
             `wrap` breaks it across lines instead, even inside one long token. */}
         {wrap ? (
-          <span className="min-w-0 [overflow-wrap:anywhere]">{children}</span>
+          <span className={cn("min-w-0 [overflow-wrap:anywhere]", WRAP[size].label)}>{children}</span>
         ) : (
           <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
             {children}
@@ -98,6 +100,8 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
               // the hit area without moving the tag's layout.
               "relative inline-flex shrink-0 items-center justify-center rounded-sm opacity-70 transition-[opacity,background-color] duration-150 ease-out hover:bg-[color-mix(in_srgb,currentColor_14%,transparent)] hover:opacity-100 before:absolute before:-inset-1.5 before:content-['']",
               size === "sm" ? "size-5" : "size-6",
+              // Centred on the first line box (22px sm, 26px md) when wrapping.
+              wrap && "mt-px",
               focusRing,
             )}
           >

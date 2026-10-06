@@ -135,12 +135,13 @@ describe("Tag wrap", () => {
     expect(label.parentElement?.className).toContain("h-6");
   });
 
-  it("wraps a long label across lines when asked, growing from the same height", () => {
+  it("wraps a long label across lines when asked, aligned to its first line", () => {
     render(<Tag wrap size="md">{LONG}</Tag>);
     const label = screen.getByText(LONG);
     expect(label.className).not.toContain("truncate");
     expect(label.className).toContain("[overflow-wrap:anywhere]");
-    expect(label.parentElement?.className).toContain("min-h-7");
+    expect(label.className).toContain("py-[3px]");
+    expect(label.parentElement?.className).toContain("items-start");
     expect(label.parentElement?.className).not.toMatch(/(^|\s)h-7(\s|$)/);
   });
 });
