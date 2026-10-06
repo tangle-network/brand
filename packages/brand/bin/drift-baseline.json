@@ -856,108 +856,33 @@
    "apps/web"
   ],
   "branch": "develop",
-  "head": "517650bcac5a",
-  "tsx_files": 365,
+  "head": "92ab705d1313",
+  "tsx_files": 357,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.53.9"
+    "0.53.17"
    ],
    "brand": [
-    "^1.13.0"
+    "^1.15.2"
    ],
    "sandbox-ui": [
-    "0.122.3"
+    "0.125.3"
    ],
    "ui": [
-    "^11.19.0"
+    "^11.21.0"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 174,
+   "ui": 184,
    "sandbox-ui": 3,
    "agent-app": 3
   },
   "by_file": {
-   "raw_palette": {
-    "apps/web/src/components/@settings/tabs/connections/components/PullFromGitHubDialog.tsx": 13,
-    "apps/web/src/components/@settings/tabs/connections/components/PushToGitHubDialog.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerAnalyticsTab.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerDashboardTab.tsx": 3,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerProjectsTab.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerQuestsTab.tsx": 6,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/DomainManagementSection.tsx": 4,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/FaucetTransactionHistory.tsx": 11,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/InviteCodesSection.tsx": 2,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/PoolBreakdownTooltip.tsx": 3,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/ProjectDetailModal.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/SeatsTable.tsx": 13,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/UnlinkDomainModal.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/dialogs/InviteDialog.tsx": 6,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/dialogs/RemovalPolicyDialog.tsx": 4,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/partner-quests/EditQuestDialog.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/partner-quests/QuestDetailModal.tsx": 1,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/partner-quests/faucet-status.ts": 9,
-    "apps/web/src/components/batch/ExecutionCardPrimitives.tsx": 2,
-    "apps/web/src/components/chat/Messages.client.tsx": 4,
-    "apps/web/src/components/chat/extensions/StarterTemplates.tsx": 3,
-    "apps/web/src/components/chat/run/InlineToolItem.tsx": 2,
-    "apps/web/src/components/chat/sections/ProjectHistoryShowcase.tsx": 3,
-    "apps/web/src/components/chat/toolExtras/GrepResultsPreview.tsx": 6,
-    "apps/web/src/components/header/ProfileDropdown.tsx": 3,
-    "apps/web/src/components/judge/ScoringForm.tsx": 1,
-    "apps/web/src/components/leaderboard/ChampionHero.tsx": 1,
-    "apps/web/src/components/leaderboard/PodiumRow.tsx": 6,
-    "apps/web/src/components/quests/CompletedQuestsHistory.tsx": 3,
-    "apps/web/src/components/quests/EventCard.tsx": 4,
-    "apps/web/src/components/quests/QuestCard.tsx": 2,
-    "apps/web/src/components/quests/QuestDetailModal.tsx": 2,
-    "apps/web/src/components/quests/QuestGrid.tsx": 2,
-    "apps/web/src/components/quests/RankingsTable.tsx": 1,
-    "apps/web/src/components/quests/competition/CompetitionHero.tsx": 10,
-    "apps/web/src/components/quests/competition/CompetitionLeaderboard.tsx": 2,
-    "apps/web/src/components/quests/competition/CompetitionResults.tsx": 4,
-    "apps/web/src/components/sidebar/Menu.client.tsx": 2,
-    "apps/web/src/data/pricing.tsx": 14,
-    "apps/web/src/routes/judge.tsx": 1,
-    "apps/web/src/routes/leaderboard._index.tsx": 1,
-    "apps/web/src/routes/partner-onboarding.tsx": 17,
-    "apps/web/src/routes/partner.invite.$code.tsx": 14,
-    "apps/web/src/routes/partner_.$partnerId.events.tsx": 11,
-    "apps/web/src/routes/quests.tsx": 2
-   },
-   "hex": {
-    "apps/web/src/components/@settings/tabs/connections/NetlifyConnection.tsx": 3,
-    "apps/web/src/components/@settings/tabs/partner-dashboard/components/DomainManagementSection.tsx": 1,
-    "apps/web/src/components/batch/BatchInput.tsx": 6,
-    "apps/web/src/components/batch/analytics/ProfileLeaderboard.tsx": 2,
-    "apps/web/src/components/batch/analytics/TokenBreakdownChart.tsx": 5,
-    "apps/web/src/components/charts/RealnessHeatmap.tsx": 2,
-    "apps/web/src/components/chat/CodeBlock.tsx": 4,
-    "apps/web/src/components/chat/extensions/StarterTemplates.tsx": 2,
-    "apps/web/src/components/chat/sections/ChatInput.tsx": 6,
-    "apps/web/src/components/deployments/tabs/LogsTab.tsx": 1,
-    "apps/web/src/components/emails/BaseEmailTemplate.tsx": 6,
-    "apps/web/src/components/emails/EventPhaseEmail.tsx": 9,
-    "apps/web/src/components/emails/InactiveProjectWarningEmail.tsx": 1,
-    "apps/web/src/components/emails/PartnerApplicationReceivedEmail.tsx": 4,
-    "apps/web/src/components/emails/PartnerApprovedEmail.tsx": 4,
-    "apps/web/src/components/emails/PartnerPaymentFailedEmail.tsx": 6,
-    "apps/web/src/components/emails/PaymentFailedEmail.tsx": 8,
-    "apps/web/src/components/emails/PrizeWonEmail.tsx": 8,
-    "apps/web/src/components/emails/QuestCompletedEmail.tsx": 4,
-    "apps/web/src/components/layout/Logo.tsx": 4,
-    "apps/web/src/components/leaderboard/CostFrontier.tsx": 2,
-    "apps/web/src/components/leaderboard/RowSparkline.tsx": 2,
-    "apps/web/src/components/profiles/ProfileEditorModal.tsx": 10,
-    "apps/web/src/components/quests/RewardCelebration.tsx": 10,
-    "apps/web/src/components/quests/competition/CompetitionAnalytics.tsx": 3,
-    "apps/web/src/components/ui/marble-avatar.tsx": 5
-   },
+   "raw_palette": {},
+   "hex": {},
    "arbitrary_color": {
-    "apps/web/src/components/@settings/tabs/connections/NetlifyConnection.tsx": 3,
-    "apps/web/src/components/deployments/tabs/LogsTab.tsx": 1,
     "apps/web/src/config/partners/data-balancer.ts": 8,
     "apps/web/src/config/partners/data-coinbase.ts": 8,
     "apps/web/src/config/partners/data-dspy.ts": 9,
@@ -967,46 +892,15 @@
    "css_var_defs": {
     "apps/web/src/components/blur-fade/fade.module.css": 2
    },
-   "local_primitive_count": {
-    "apps/web/src/components/leaderboard/primitives.tsx": 1,
-    "apps/web/src/components/sidebar/Menu.client.tsx": 1
-   }
+   "local_primitive_count": {}
   },
-  "raw_palette": 204,
-  "hex": 118,
-  "arbitrary_color": 49,
+  "raw_palette": 0,
+  "hex": 0,
+  "arbitrary_color": 45,
   "css_var_defs": 2,
-  "local_primitive_count": 2,
-  "palette_top": [
-   [
-    "text-amber-500",
-    14
-   ],
-   [
-    "bg-amber-500",
-    10
-   ],
-   [
-    "border-red-500",
-    7
-   ],
-   [
-    "bg-amber-400",
-    6
-   ],
-   [
-    "bg-red-500",
-    6
-   ],
-   [
-    "border-amber-500",
-    6
-   ]
-  ],
-  "local_primitives": {
-   "Menu": 1,
-   "StatusBadge": 1
-  }
+  "local_primitive_count": 0,
+  "palette_top": [],
+  "local_primitives": {}
  },
  "super": {
   "repo": "tangle-network/super-agent",
