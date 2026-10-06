@@ -18,7 +18,12 @@ import { type CategoryTone, TONE_CLASSES, toneFor } from "./tone";
 export interface IconTileProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
   /** Defaults to a tone derived from `name`, or violet when there is no name. */
   tone?: CategoryTone;
-  size?: "xs" | "sm" | "md" | "lg";
+  /**
+   * `xs` to `lg` (20 to 40px) sit in rows and cards. `xl` (64px) and `2xl`
+   * (80px) are for a page or profile header, where the tile is the thing's
+   * face rather than a list marker.
+   */
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
   src?: string;
   icon?: React.ReactNode;
   /** The thing's name. Supplies the initials and the derived tone. */
@@ -32,6 +37,8 @@ const SIZE = {
   sm: "size-6 rounded-md text-[11px] [&_svg]:size-3.5",
   md: "size-8 rounded-md text-xs [&_svg]:size-4",
   lg: "size-10 rounded-lg text-sm [&_svg]:size-5",
+  xl: "size-16 rounded-2xl text-xl [&_svg]:size-8",
+  "2xl": "size-20 rounded-2xl text-2xl [&_svg]:size-10",
 } as const;
 
 /** Up to two initials: the first letters of the first two words, or of the one word. */

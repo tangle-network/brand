@@ -62,10 +62,10 @@ export const Sizes: Story = {
   render: () => (
     <BothThemes>
       <div className="flex items-end gap-3">
-        {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
           <IconTile key={size} size={size} name="Tangle Network" />
         ))}
-        {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
           <IconTile key={`g-${size}`} size={size} tone="cyan" icon={<Globe />} />
         ))}
       </div>
