@@ -59,7 +59,7 @@ export function compressedBytes(files) {
 }
 
 const heavy = [
-  /(?:^|\/)(?:react-syntax-highlighter|highlight\.js|lowlight|refractor|prismjs|shiki|monaco-editor|codemirror|prosemirror-[^/]+|yjs|y-prosemirror)(?:\/|$)/,
+  /(?:^|\/)(?:react-syntax-highlighter|highlight\.js|lowlight|refractor|prismjs|shiki|monaco-editor|codemirror|prosemirror-[^/]+|yjs|y-prosemirror|pdfjs-dist)(?:\/|$)/,
   /(?:^|\/)(?:@tiptap|@hocuspocus|@monaco-editor|@codemirror|@shikijs|@openuidev|@openui)(?:\/|$)/,
   /(?:^|\/)@tangle-network\/(?:agent(?:-[^/]+)?|sandbox(?:-[^/]+)?|hub-sdk|runtime)(?:\/|$)/,
   /(?:^|\/)@tangle-network\/ui\/dist\/(?:markdown|editor|openui(?:-schema)?|run|auth|chat|files|stores|sdk-hooks|tool-previews)(?:[/.]|$)/,
