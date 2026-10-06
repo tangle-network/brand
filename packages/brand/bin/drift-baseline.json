@@ -2,93 +2,46 @@
  "website": {
   "repo": "tangle-network/tangle-website",
   "roots": [
-   ""
+   "src"
   ],
   "branch": "master",
-  "head": "68e009e4579e",
-  "tsx_files": 35,
-  "css_files": 8,
+  "head": "7c991b524e52",
+  "tsx_files": 33,
+  "css_files": 5,
   "versions": {
    "brand": [
-    "file:../brand/packages/brand"
+    "1.15.7"
    ],
    "ui": [
-    "11.15.1"
+    "11.24.0"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 2,
+   "ui": 6,
    "sandbox-ui": 0,
    "agent-app": 0
   },
   "by_file": {
-   "raw_palette": {
-    "src/pages/releases.astro": 2,
-    "src/pages/security.astro": 1,
-    "src/pages/status.astro": 4
-   },
+   "raw_palette": {},
    "hex": {
-    ".evolve/multi-pursue/variants/linear_tier.astro": 32,
-    ".evolve/multi-pursue/variants/overview_lifecycle.astro": 40,
-    ".evolve/multi-pursue/variants/stripe_tier.astro": 87,
-    "docs/delivery/2026-10-03/rejected-prototypes/style.css": 154,
-    "docs/delivery/2026-10-03/rejected-prototypes/v2/fleet-stage.css": 30,
-    "docs/delivery/2026-10-03/rejected-prototypes/v2/style.css": 217,
-    "src/components/BenchmarkExplorer.astro": 1,
-    "src/components/BlogCover.astro": 20,
-    "src/components/Footer.astro": 24,
-    "src/components/RunActions.astro": 28,
-    "src/components/RunStory.astro": 24,
-    "src/components/SandboxQuickstart.astro": 6,
-    "src/components/quickstart-code.css": 33,
-    "src/components/recorded-run-waterfall.css": 11,
     "src/layouts/BaseLayout.astro": 1,
-    "src/layouts/BlogLayout.astro": 27,
-    "src/pages/404.astro": 1,
-    "src/pages/blog/index.astro": 7,
-    "src/pages/blog/series/[series].astro": 9,
-    "src/pages/brand-kit.astro": 38,
-    "src/pages/index.astro": 59,
-    "src/pages/what-is-tangle.astro": 24,
-    "src/styles/global.css": 237
+    "src/pages/brand-kit.astro": 28
    },
    "arbitrary_color": {},
    "css_var_defs": {
-    "src/components/quickstart-code.css": 27,
-    "src/components/recorded-agent-timeline.css": 5,
-    "src/components/recorded-run-waterfall.css": 9,
-    "src/styles/global.css": 65
+    "src/components/quickstart-code.css": 4,
+    "src/components/recorded-agent-timeline.css": 4,
+    "src/components/recorded-run-waterfall.css": 9
    },
    "local_primitive_count": {}
   },
-  "raw_palette": 7,
-  "hex": 1110,
+  "raw_palette": 0,
+  "hex": 29,
   "arbitrary_color": 0,
-  "css_var_defs": 106,
+  "css_var_defs": 17,
   "local_primitive_count": 0,
-  "palette_top": [
-   [
-    "text-indigo-300",
-    3
-   ],
-   [
-    "bg-indigo-300",
-    1
-   ],
-   [
-    "text-emerald-300",
-    1
-   ],
-   [
-    "text-indigo-200",
-    1
-   ],
-   [
-    "text-red-300",
-    1
-   ]
-  ],
+  "palette_top": [],
   "local_primitives": {}
  },
  "sandbox": {
@@ -97,27 +50,27 @@
    "products/sandbox/web"
   ],
   "branch": "develop",
-  "head": "014fd01e843e",
-  "tsx_files": 129,
+  "head": "cd01e4f79f6a",
+  "tsx_files": 132,
   "css_files": 3,
   "versions": {
    "agent-app": [
     "0.53.4"
    ],
    "brand": [
-    "1.10.1"
+    "1.10.3"
    ],
    "sandbox-ui": [
-    "0.122.3"
+    "0.123.2"
    ],
    "ui": [
-    "11.16.4"
+    "11.16.11"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 86,
-   "sandbox-ui": 62,
+   "ui": 89,
+   "sandbox-ui": 63,
    "agent-app": 16
   },
   "by_file": {
@@ -125,32 +78,26 @@
    "hex": {
     "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 4,
     "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 7,
-    "products/sandbox/web/src/globals.css": 62,
-    "products/sandbox/web/src/pages/Landing.tsx": 1,
+    "products/sandbox/web/src/globals.css": 11,
     "products/sandbox/web/src/pages/dashboard/SandboxSession.tsx": 1,
     "products/sandbox/web/src/pages/dashboard/sandbox-session/TerminalTab.tsx": 9
    },
    "arbitrary_color": {
-    "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 1,
-    "products/sandbox/web/src/pages/Landing.tsx": 1
+    "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 1
    },
    "css_var_defs": {
-    "products/sandbox/web/src/globals.css": 83,
+    "products/sandbox/web/src/globals.css": 61,
     "products/sandbox/web/src/pages/ApiReferencePage.css": 11
    },
-   "local_primitive_count": {
-    "products/sandbox/web/src/pages/dashboard/sandbox-session/session-chrome.tsx": 1
-   }
+   "local_primitive_count": {}
   },
   "raw_palette": 0,
-  "hex": 84,
-  "arbitrary_color": 2,
-  "css_var_defs": 94,
-  "local_primitive_count": 1,
+  "hex": 32,
+  "arbitrary_color": 1,
+  "css_var_defs": 72,
+  "local_primitive_count": 0,
   "palette_top": [],
-  "local_primitives": {
-   "StatusBadge": 1
-  }
+  "local_primitives": {}
  },
  "platform": {
   "repo": "tangle-network/agent-dev-container",
@@ -223,7 +170,7 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "014fd01e843e",
+  "head": "cd01e4f79f6a",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
@@ -242,61 +189,26 @@
   },
   "importing_files": {
    "brand": 0,
-   "ui": 45,
-   "sandbox-ui": 66,
+   "ui": 46,
+   "sandbox-ui": 65,
    "agent-app": 4
   },
   "by_file": {
-   "raw_palette": {
-    "products/intelligence/web/src/components/ConnectData.tsx": 5,
-    "products/intelligence/web/src/components/DashboardLayout.tsx": 5,
-    "products/intelligence/web/src/components/TraceTree.tsx": 4
-   },
-   "hex": {
-    "products/intelligence/web/src/components/ConfidenceBar.tsx": 2,
-    "products/intelligence/web/src/components/OptimizationLineage.tsx": 2,
-    "products/intelligence/web/src/components/provider-identity.tsx": 96,
-    "products/intelligence/web/src/components/ui.tsx": 1,
-    "products/intelligence/web/src/globals.css": 15
-   },
+   "raw_palette": {},
+   "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "products/intelligence/web/src/globals.css": 35
+    "products/intelligence/web/src/globals.css": 12
    },
-   "local_primitive_count": {
-    "products/intelligence/web/src/components/ui.tsx": 1
-   }
+   "local_primitive_count": {}
   },
-  "raw_palette": 14,
-  "hex": 116,
+  "raw_palette": 0,
+  "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 35,
-  "local_primitive_count": 1,
-  "palette_top": [
-   [
-    "bg-amber-500",
-    5
-   ],
-   [
-    "border-amber-500",
-    3
-   ],
-   [
-    "text-amber-400",
-    3
-   ],
-   [
-    "text-amber-600",
-    2
-   ],
-   [
-    "text-amber-700",
-    1
-   ]
-  ],
-  "local_primitives": {
-   "StatusBadge": 1
-  }
+  "css_var_defs": 12,
+  "local_primitive_count": 0,
+  "palette_top": [],
+  "local_primitives": {}
  },
  "gtm": {
   "repo": "tangle-network/gtm-agent",
@@ -304,18 +216,18 @@
    ""
   ],
   "branch": "master",
-  "head": "905258f9e5ea",
+  "head": "f60a3f527cbe",
   "tsx_files": 121,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.53.12"
+    "0.56.2"
    ],
    "brand": [
-    "1.11.0"
+    "1.13.0"
    ],
    "sandbox-ui": [
-    "0.124.0"
+    "0.125.3"
    ],
    "ui": [
     "11.17.0"
@@ -325,7 +237,7 @@
    "brand": 0,
    "ui": 5,
    "sandbox-ui": 93,
-   "agent-app": 176
+   "agent-app": 178
   },
   "by_file": {
    "raw_palette": {},
@@ -338,14 +250,14 @@
    },
    "arbitrary_color": {},
    "css_var_defs": {
-    "src/app.css": 177
+    "src/app.css": 154
    },
    "local_primitive_count": {}
   },
   "raw_palette": 0,
   "hex": 99,
   "arbitrary_color": 0,
-  "css_var_defs": 177,
+  "css_var_defs": 154,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
@@ -456,45 +368,40 @@
    ""
   ],
   "branch": "master",
-  "head": "4e1768d988bd",
+  "head": "42eb8446e1e9",
   "tsx_files": 54,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.53.12"
+    "0.56.2"
    ],
    "brand": [
-    "1.11.0"
+    "1.15.7"
    ],
    "sandbox-ui": [
-    "0.124.0"
+    "0.127.4"
    ],
    "ui": [
-    "11.17.0"
+    "11.24.0"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 0,
    "sandbox-ui": 33,
-   "agent-app": 116
+   "agent-app": 119
   },
   "by_file": {
    "raw_palette": {},
-   "hex": {
-    "src/app.css": 268,
-    "src/root.tsx": 4
-   },
+   "hex": {},
    "arbitrary_color": {},
-   "css_var_defs": {
-    "src/app.css": 337
-   },
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
   "raw_palette": 0,
-  "hex": 272,
+  "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 337,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
@@ -604,99 +511,41 @@
    "packages/website"
   ],
   "branch": "main",
-  "head": "4c65033a1a89",
-  "tsx_files": 29,
-  "css_files": 2,
+  "head": "f68c963317e8",
+  "tsx_files": 26,
+  "css_files": 1,
   "versions": {
+   "brand": [
+    "1.14.1"
+   ],
    "sandbox-ui": [
-    "0.113.3"
+    "0.125.3"
+   ],
+   "ui": [
+    "11.19.0"
    ]
   },
   "importing_files": {
    "brand": 0,
    "ui": 0,
-   "sandbox-ui": 15,
+   "sandbox-ui": 19,
    "agent-app": 0
   },
   "by_file": {
-   "raw_palette": {
-    "packages/website/src/components/AuditProgress.tsx": 50,
-    "packages/website/src/components/AuditReportsList.tsx": 10,
-    "packages/website/src/components/CodeEditor.tsx": 14,
-    "packages/website/src/components/ui/AnimatedTerminal.tsx": 2,
-    "packages/website/src/components/ui/SectionHeader.tsx": 1,
-    "packages/website/src/components/ui/terminalDemos.ts": 11,
-    "packages/website/src/pages/AuditReport.tsx": 18,
-    "packages/website/src/pages/Dashboard.tsx": 3,
-    "packages/website/src/pages/GitHubSetup.tsx": 2,
-    "packages/website/src/pages/NewAudit.tsx": 1,
-    "packages/website/src/pages/SampleAuditReport.tsx": 14
-   },
+   "raw_palette": {},
    "hex": {
-    "packages/website/src/WebsiteRoutes.tsx": 1,
-    "packages/website/src/components/AuditPDF.tsx": 58,
-    "packages/website/src/components/AuditProgress.tsx": 13,
-    "packages/website/src/components/CodeEditor.tsx": 6,
-    "packages/website/src/components/ui/AnimatedTerminal.tsx": 5,
-    "packages/website/src/components/ui/SectionHeader.tsx": 1,
-    "packages/website/src/components/ui/SpotlightCard.tsx": 2,
-    "packages/website/src/index.css": 14,
-    "packages/website/src/pages/SampleAuditReport.tsx": 11
+    "packages/website/src/components/AuditPDF.tsx": 20
    },
-   "arbitrary_color": {
-    "packages/website/src/WebsiteRoutes.tsx": 1,
-    "packages/website/src/components/AuditProgress.tsx": 13,
-    "packages/website/src/components/AuditReportsList.tsx": 4,
-    "packages/website/src/components/CodeEditor.tsx": 6,
-    "packages/website/src/components/RedteamDashboardLayout.tsx": 5,
-    "packages/website/src/components/ui/AnimatedTerminal.tsx": 5,
-    "packages/website/src/components/ui/SectionHeader.tsx": 1,
-    "packages/website/src/components/ui/SpotlightCard.tsx": 2,
-    "packages/website/src/components/ui/terminalDemos.ts": 15,
-    "packages/website/src/pages/AuditReport.tsx": 10,
-    "packages/website/src/pages/AuthCallback.tsx": 3,
-    "packages/website/src/pages/Dashboard.tsx": 4,
-    "packages/website/src/pages/GitHubSetup.tsx": 1,
-    "packages/website/src/pages/NewAudit.tsx": 8,
-    "packages/website/src/pages/SampleAuditReport.tsx": 10,
-    "packages/website/src/pages/_Preview.tsx": 1
-   },
-   "css_var_defs": {
-    "packages/website/src/index.css": 11
-   },
+   "arbitrary_color": {},
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
-  "raw_palette": 126,
-  "hex": 111,
-  "arbitrary_color": 89,
-  "css_var_defs": 11,
+  "raw_palette": 0,
+  "hex": 20,
+  "arbitrary_color": 0,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
-  "palette_top": [
-   [
-    "bg-red-500",
-    10
-   ],
-   [
-    "text-neutral-400",
-    9
-   ],
-   [
-    "text-neutral-500",
-    9
-   ],
-   [
-    "bg-emerald-500",
-    8
-   ],
-   [
-    "bg-neutral-800",
-    6
-   ],
-   [
-    "border-red-500",
-    6
-   ]
-  ],
+  "palette_top": [],
   "local_primitives": {}
  },
  "browser": {
@@ -705,91 +554,44 @@
    ""
   ],
   "branch": "main",
-  "head": "2ed27c21fdd1",
-  "tsx_files": 63,
+  "head": "dd7f9dfefa53",
+  "tsx_files": 43,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "^0.45.26"
+    "^0.55.5"
    ],
    "brand": [
-    "^1.1.0"
+    "^1.15.6"
    ],
    "sandbox-ui": [
-    "^0.85.1"
+    "^0.127.4"
    ],
    "ui": [
-    "^11.0.0"
+    "^11.24.0"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 0,
-   "sandbox-ui": 4,
+   "ui": 41,
+   "sandbox-ui": 0,
    "agent-app": 0
   },
   "by_file": {
-   "raw_palette": {
-    "src/components/terminal-snippet.tsx": 18,
-    "src/components/ui/device-frame.tsx": 10,
-    "src/pages/analytics.tsx": 15
-   },
-   "hex": {
-    "src/index.css": 14,
-    "src/pages/analytics.tsx": 26
-   },
-   "arbitrary_color": {
-    "src/components/chat/chat-panel.tsx": 3,
-    "src/components/runs/run-list.tsx": 1,
-    "src/components/ui/badge.tsx": 7,
-    "src/components/visual-diff-viewer.tsx": 4,
-    "src/pages/billing.tsx": 3,
-    "src/pages/ci-cd.tsx": 2,
-    "src/pages/dashboard.tsx": 1,
-    "src/pages/login.tsx": 1,
-    "src/pages/run-detail.tsx": 1,
-    "src/pages/settings.tsx": 3,
-    "src/pages/test-suites.tsx": 3,
-    "src/pages/walkthrough-new.tsx": 1,
-    "src/pages/walkthroughs.tsx": 7,
-    "src/pages/workflows.tsx": 6
-   },
+   "raw_palette": {},
+   "hex": {},
+   "arbitrary_color": {},
    "css_var_defs": {
-    "src/index.css": 45
+    "src/index.css": 1
    },
    "local_primitive_count": {}
   },
-  "raw_palette": 43,
-  "hex": 40,
-  "arbitrary_color": 43,
-  "css_var_defs": 45,
+  "raw_palette": 0,
+  "hex": 0,
+  "arbitrary_color": 0,
+  "css_var_defs": 1,
   "local_primitive_count": 0,
-  "palette_top": [
-   [
-    "text-green-400",
-    7
-   ],
-   [
-    "text-neutral-300",
-    3
-   ],
-   [
-    "text-red-400",
-    3
-   ],
-   [
-    "bg-zinc-600",
-    2
-   ],
-   [
-    "border-zinc-500",
-    2
-   ],
-   [
-    "border-zinc-700",
-    2
-   ]
-  ],
+  "palette_top": [],
   "local_primitives": {}
  },
  "builder": {
@@ -856,48 +658,40 @@
    "apps/web"
   ],
   "branch": "develop",
-  "head": "92ab705d1313",
-  "tsx_files": 357,
-  "css_files": 2,
+  "head": "0c8c52fcfb7f",
+  "tsx_files": 356,
+  "css_files": 9,
   "versions": {
    "agent-app": [
-    "0.53.17"
+    "0.56.2"
    ],
    "brand": [
-    "^1.15.2"
+    "^1.15.7"
    ],
    "sandbox-ui": [
-    "0.125.3"
+    "0.127.4"
    ],
    "ui": [
-    "^11.21.0"
+    "^11.24.0"
    ]
   },
   "importing_files": {
    "brand": 0,
    "ui": 184,
    "sandbox-ui": 3,
-   "agent-app": 3
+   "agent-app": 4
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
-   "arbitrary_color": {
-    "apps/web/src/config/partners/data-balancer.ts": 8,
-    "apps/web/src/config/partners/data-coinbase.ts": 8,
-    "apps/web/src/config/partners/data-dspy.ts": 9,
-    "apps/web/src/config/partners/data-injective.ts": 9,
-    "apps/web/src/config/partners/data-starknet.ts": 11
-   },
-   "css_var_defs": {
-    "apps/web/src/components/blur-fade/fade.module.css": 2
-   },
+   "arbitrary_color": {},
+   "css_var_defs": {},
    "local_primitive_count": {}
   },
   "raw_palette": 0,
   "hex": 0,
-  "arbitrary_color": 45,
-  "css_var_defs": 2,
+  "arbitrary_color": 0,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
   "palette_top": [],
   "local_primitives": {}
