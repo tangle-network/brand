@@ -33,16 +33,29 @@ export interface TagProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "c
    * the label is a string; pass it when the label is not plain text.
    */
   removeLabel?: string;
+  /**
+   * Wraps a long label onto more lines instead of truncating it. Use it where
+   * the full text matters and no hover is available to read a `title`, such
+   * as model-written part names read on a phone or on paper.
+   */
+  wrap?: boolean;
 }
 
 const SIZE = {
-  sm: "h-6 gap-1 px-2 text-xs [&_svg]:size-3",
-  md: "h-7 gap-1.5 px-2.5 text-sm [&_svg]:size-3.5",
+  sm: "gap-1 px-2 text-xs [&_svg]:size-3",
+  md: "gap-1.5 px-2.5 text-sm [&_svg]:size-3.5",
+} as const;
+
+// A truncating tag keeps one fixed height; a wrapping one grows from that
+// height so a two-line label still lines up with its single-line siblings.
+const HEIGHT = {
+  sm: { fixed: "h-6", wrap: "min-h-6 py-0.5" },
+  md: { fixed: "h-7", wrap: "min-h-7 py-1" },
 } as const;
 
 const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
   (
-    { className, children, tone = "neutral", emphasis = "soft", size = "sm", icon, onRemove, removeLabel, ...props },
+    { className, children, tone = "neutral", emphasis = "soft", size = "sm", icon, onRemove, removeLabel, wrap = false, ...props },
     ref,
   ) => {
     const classes = TONE_CLASSES[tone];
@@ -53,6 +66,7 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
         className={cn(
           "inline-flex min-w-0 max-w-full shrink-0 items-center rounded-md border font-medium",
           SIZE[size],
+          wrap ? HEIGHT[size].wrap : HEIGHT[size].fixed,
           emphasis === "outline" ? classes.outline : classes.surface,
           onRemove && (size === "sm" ? "pr-0.5" : "pr-1"),
           className,
@@ -64,11 +78,16 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
             {icon}
           </span>
         ) : null}
-        {/* A long label truncates here rather than pushing the remove button
-            out; the title gives its full text on hover. */}
-        <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
-          {children}
-        </span>
+        {/* By default a long label truncates here rather than pushing the
+            remove button out, and the title gives its full text on hover.
+            `wrap` breaks it across lines instead, even inside one long token. */}
+        {wrap ? (
+          <span className="min-w-0 [overflow-wrap:anywhere]">{children}</span>
+        ) : (
+          <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
+            {children}
+          </span>
+        )}
         {onRemove ? (
           <button
             type="button"
