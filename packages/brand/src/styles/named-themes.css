@@ -106,7 +106,7 @@
   --md3-surface-container: #f4f1fc; --md3-surface-container-high: #ece6f8;
   --md3-surface-container-highest: #e4dcf4; --md3-outline-variant: #e0d8f0;
   --border-subtle: rgba(60,32,110,0.10); --border-default: rgba(60,32,110,0.16);
-  --border-hover: rgba(60,32,110,0.30); --accent-text: #6d28d9;
+  --border-hover: rgba(60,32,110,0.30); --accent-text: #6423c8;
   --brand-primary: #6d28d9; --brand-glow: #8b5cf6;
   --text-primary: #160f22; --text-secondary: #3f3460; --text-muted: #585070; --text-dim: #655d82;
   --md3-surface: var(--bg-root); --md3-surface-dim: var(--depth-2);
@@ -152,7 +152,7 @@
   --md3-surface-container: #f0f6f2; --md3-surface-container-high: #e6f0ea;
   --md3-surface-container-highest: #dcebe2; --md3-outline-variant: #d7e8de;
   --border-subtle: rgba(6,95,70,0.10); --border-default: rgba(6,95,70,0.16);
-  --border-hover: rgba(6,95,70,0.30); --accent-text: #047857;
+  --border-hover: rgba(6,95,70,0.30); --accent-text: #03674b;
   --brand-primary: #059669; --brand-glow: #10b981;
   --text-primary: #06231a; --text-secondary: #285048; --text-muted: #455f52; --text-dim: #4e6d62;
   --md3-surface: var(--bg-root); --md3-surface-dim: var(--depth-2);
@@ -263,7 +263,7 @@
   --md3-surface-container: #f4f4f9; --md3-surface-container-high: #edecf4;
   --md3-surface-container-highest: #e5e4ee; --md3-outline-variant: #e2e1ec;
   --border-subtle: rgba(20,20,40,0.08); --border-default: rgba(20,20,40,0.14);
-  --border-hover: rgba(20,20,40,0.26); --accent-text: #4f46e5;
+  --border-hover: rgba(20,20,40,0.26); --accent-text: #453be3;
   --brand-primary: #6366f1; --brand-glow: #818cf8;
   --text-primary: #15131f; --text-secondary: #3f3a52; --text-muted: #59556b; --text-dim: #67627b;
 }
@@ -402,7 +402,7 @@
   --border-subtle: rgba(227, 233, 229, 0.10); --border-default: rgba(227, 233, 229, 0.16);
   --border-hover: rgba(227, 233, 229, 0.28);
   --border-accent: rgba(118, 183, 145, 0.35); --border-accent-hover: rgba(118, 183, 145, 0.50);
-  --accent-text: #76b791;
+  --accent-text: #99caad;
   --accent-surface-soft: rgba(118, 183, 145, 0.07); --accent-surface-strong: rgba(57, 106, 82, 0.40);
   --accent-gradient-strong: linear-gradient(135deg, #396a52, #76b791);
   --brand-primary: #529873; --brand-cool: #76b791; --brand-glow: #94c7a9; --brand-vibrant: #529873;

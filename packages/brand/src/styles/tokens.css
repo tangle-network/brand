@@ -852,7 +852,7 @@
   --accent-gradient-strong: linear-gradient(135deg, #4F46E5, #5B4ED4);
   --accent-surface-soft: rgba(76, 63, 198, 0.05);
   --accent-surface-strong: rgba(76, 63, 198, 0.13);
-  --accent-text: #5047eb;
+  --accent-text: #3c32e9;
 
   /* Typography — unified on Inter */
   --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
