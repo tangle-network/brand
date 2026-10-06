@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.26.0
+
+### Minor Changes
+
+- 950b7ca: `./files` gains document primitives. `PdfViewer` renders a PDF's pages to canvas with pdf.js, so a file reads the same on Android Chrome and iOS Safari as on a desktop: a scrolling column of pages with page navigation, zoom, fit-to-width and Download, one toolbar row at 360px, and only the pages near the screen holding a canvas. `FilePreview` and `FileArtifactPane` now show PDFs through it. `pdfjs-dist` (6.x) is a new optional peer, reached only through a caught dynamic import; without it, or when a file will not open, the viewer says why and falls back to the browser's `<object>` viewer and then a download card. `configurePdfViewer({ workerSrc, assetsUrl })` sets the page-wide worker and the decoder assets that scanned pages need; with neither, pdf.js runs on the main thread and no CDN is contacted. `FileCard` describes one file with its kind, size, date, uploader and actions, and replaces FilePreview's private download card. `FileList` is a flat document list whose rows open, download or delete a file and hand the host's own record back.
+
 ## 11.25.0
 
 ### Minor Changes
