@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.1
+
+### Patch Changes
+
+- 61331a4: Lower the SUPER drift baseline to CSS variable definitions 9 (super-agent main 315daed); hex, palette, arbitrary colors and local primitives stay 0.
+
 ## 1.15.0
 
 ### Minor Changes
