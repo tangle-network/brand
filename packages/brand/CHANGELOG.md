@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.5
+
+### Patch Changes
+
+- 8c1dbf1: `.tangle-prose` lists show their markers again (Tailwind's preflight removed them), in the muted text colour, and long URLs, emails and identifiers wrap inside the column instead of running past its edge. Matches the same fix in sandbox-ui's prose rules.
+
 ## 1.15.4
 
 ### Patch Changes
