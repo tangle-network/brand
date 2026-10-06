@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.22.1
+
+### Patch Changes
+
+- eb11ddd: Switch: draw the off state as an outlined track with a filled thumb in `muted-foreground`, which clears 3:1 against the card and the canvas. The old filled `bg-input` track and `bg-background` thumb looked like one flat shape in both themes, so an unchecked switch could not be seen.
+
 ## 11.22.0
 
 ### Minor Changes
