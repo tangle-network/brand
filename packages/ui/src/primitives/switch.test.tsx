@@ -24,12 +24,16 @@ describe("Switch", () => {
     expect(stateClasses(thumb, "unchecked")).not.toContain("bg-background");
   });
 
-  it("fills the track with primary once it is on", () => {
+  it("draws its on state as an accent-text track with a card thumb, so a checked switch clears 3:1 in every theme", () => {
     render(<Switch aria-label="Reminders" />);
     const track = screen.getByRole("switch", { name: "Reminders" });
     fireEvent.click(track);
     expect(track).toHaveAttribute("data-state", "checked");
-    expect(stateClasses(track, "checked")).toContain("bg-primary");
-    expect(stateClasses(track.firstElementChild as Element, "checked")).toContain("bg-background");
+    const thumb = track.firstElementChild as Element;
+    expect(stateClasses(track, "checked")).toContain("bg-[var(--accent-text)]");
+    expect(stateClasses(track, "checked")).toContain("border-transparent");
+    expect(stateClasses(track, "checked")).not.toContain("bg-primary");
+    expect(stateClasses(thumb, "checked")).toContain("bg-card");
+    expect(stateClasses(thumb, "checked")).not.toContain("bg-background");
   });
 });
