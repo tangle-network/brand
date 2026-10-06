@@ -116,4 +116,19 @@ describe("MetricStrip", () => {
     expect(strip.current!.className).not.toContain("sm:grid-cols-4");
     expect(Array.from(strip.current!.querySelectorAll("dt")).map((node) => node.textContent)).toEqual(["Spend", "Calls", "Average"]);
   });
+
+  it("renders an optional icon before the label without naming the term", () => {
+    render(
+      <MetricStrip>
+        <Metric label="Steps" value="4/5" icon={<svg data-testid="steps-icon" />} />
+        <Metric label="Cost" value="$0.12" />
+      </MetricStrip>,
+    );
+    const icon = screen.getByTestId("steps-icon");
+    const dt = screen.getByText("Steps").closest("dt")!;
+    expect(dt.contains(icon)).toBe(true);
+    expect(icon.parentElement!.getAttribute("aria-hidden")).toBe("true");
+    expect(dt.firstElementChild).toBe(icon.parentElement);
+    expect(screen.getByText("Cost").closest("dt")!.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
 });

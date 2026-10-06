@@ -138,7 +138,7 @@ export const CodeBlock = memo(
       >
         {headerLabel && (
           <div className="flex items-center justify-between border-b border-border px-3 py-1 bg-[var(--code-header-bg,hsl(var(--background)))]">
-            <span className="text-[calc(var(--font-size-xs)-1px)] font-mono font-medium uppercase tracking-widest text-muted-foreground">
+            <span className="text-xs font-mono font-medium uppercase tracking-widest text-muted-foreground">
               {headerLabel}
             </span>
             {children}
@@ -180,6 +180,9 @@ CodeBlock.displayName = "CodeBlock";
 /** Copy-to-clipboard button for use inside CodeBlock. */
 export const CopyButton = memo(({ text }: { text: string }) => {
   const [copied, setCopied] = useState(false);
+  // Status text for the live region. Cleared before each attempt so a repeat
+  // copy or a failure is announced again.
+  const [status, setStatus] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -187,31 +190,47 @@ export const CopyButton = memo(({ text }: { text: string }) => {
   }, []);
 
   const handleCopy = useCallback(async () => {
+    setStatus("");
+    if (timerRef.current) clearTimeout(timerRef.current);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setCopied(false), 2000);
+      setStatus("Copied to clipboard");
     } catch (err) {
       console.warn("Clipboard write failed:", err);
+      setCopied(false);
+      setStatus("Copy failed");
     }
+    timerRef.current = setTimeout(() => {
+      setCopied(false);
+      setStatus("");
+    }, 2000);
   }, [text]);
 
+  const label = copied ? "Copied" : "Copy to clipboard";
   return (
-    <button
-      onClick={handleCopy}
-      className={cn(
-        "flex items-center justify-center w-6 h-6 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
-        focusRing,
-      )}
-      title="Copy to clipboard"
-    >
-      {copied ? (
-        <Check className="w-3.5 h-3.5 text-emerald-500" />
-      ) : (
-        <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-      )}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className={cn(
+          "flex items-center justify-center w-6 h-6 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
+          focusRing,
+        )}
+        aria-label={label}
+        title={label}
+      >
+        {copied ? (
+          <Check aria-hidden="true" className="w-3.5 h-3.5 text-[var(--surface-success-text)]" />
+        ) : (
+          <Copy aria-hidden="true" className="w-3.5 h-3.5 text-muted-foreground" />
+        )}
+      </button>
+      {/* Announce the result; the icon swap alone is silent to screen readers. */}
+      <span className="sr-only" role="status" aria-live="polite">
+        {status}
+      </span>
+    </>
   );
 });
 CopyButton.displayName = "CopyButton";

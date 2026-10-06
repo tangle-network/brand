@@ -1,10 +1,17 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { CodeBlock, CopyButton } from "./code-block";
 
-afterEach(cleanup);
+const originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  if (originalClipboard) Object.defineProperty(navigator, "clipboard", originalClipboard);
+  else delete (navigator as { clipboard?: unknown }).clipboard;
+});
 
 describe("CodeBlock scoped semantic colors", () => {
   it("keeps code readable before the renderer loads, then applies live semantic colors and line numbers", async () => {
@@ -136,5 +143,37 @@ describe("CodeBlock", () => {
     expect(copyButton).not.toBeNull();
     expect(copyButton?.closest(".absolute")).not.toBeNull();
     expect(copyButton?.closest(".border-b")).toBeNull();
+  });
+
+  it("names the copy button, keeps it out of forms, and announces the copy", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<CopyButton text="secret" />);
+    const button = screen.getByRole("button", { name: "Copy to clipboard" });
+    expect(button.getAttribute("type")).toBe("button");
+    const status = screen.getByRole("status");
+    expect(status.getAttribute("aria-live")).toBe("polite");
+    expect(status.textContent).toBe("");
+    fireEvent.click(button);
+    await waitFor(() => expect(status.textContent).toBe("Copied to clipboard"));
+    expect(writeText).toHaveBeenCalledWith("secret");
+    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+  });
+
+  it("renders the header label at the 12px text-xs step", () => {
+    const { getByText } = render(<CodeBlock code={"x"} label="YAML" />);
+    expect(getByText("YAML").className).toContain("text-xs");
+    expect(getByText("YAML").className).not.toContain("calc(");
+  });
+
+  it("announces a failed copy", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<CopyButton text="secret" />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy to clipboard" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Copy failed"));
+    expect(screen.getByRole("button", { name: "Copy to clipboard" })).toBeTruthy();
+    warn.mockRestore();
   });
 });

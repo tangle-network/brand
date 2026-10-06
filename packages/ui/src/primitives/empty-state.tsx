@@ -6,10 +6,13 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
   action?: React.ReactNode;
+  /** Heading element for the title. Pick the level that follows the page's
+   * outline, e.g. h2 directly under a page h1. Defaults to h3. */
+  titleAs?: "h2" | "h3" | "h4";
 }
 
 const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
-  ({ className, icon, title, description, action, ...props }, ref) => {
+  ({ className, icon, title, description, action, titleAs: Title = "h3", ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -24,7 +27,7 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
             {icon}
           </div>
         )}
-        <h3 className="font-semibold text-lg">{title}</h3>
+        <Title className="font-semibold text-lg">{title}</Title>
         {description && (
           <p className="mt-2 max-w-sm text-muted-foreground text-sm">
             {description}
