@@ -9,11 +9,13 @@ import {
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { type MessageRole } from "./chat-message";
+import { MessageAuthor } from "./message-author";
 import { UserMessage } from "./user-message";
 import { Markdown } from "../markdown/markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
 import { ToolCallGroup, ToolCallStep } from "../run/tool-call-step";
+import type { ChatAuthor } from "../types/message";
 import type { ToolPart } from "../types/parts";
 
 export type AgentTimelineTone = "default" | "info" | "success" | "warning" | "error";
@@ -29,6 +31,12 @@ export interface AgentTimelineMessageItem {
    *  timestamp of its own — the turn's user message dates the exchange. */
   timestamp?: Date;
   after?: ReactNode;
+  /**
+   * Who wrote the message, when more than one person shares the transcript.
+   * A person's message is compared with the timeline's `viewerId`; an agent's
+   * author line opens its turn and is not repeated after each tool row.
+   */
+  author?: ChatAuthor;
 }
 
 export interface AgentTimelineToolItem {
@@ -99,6 +107,11 @@ export interface AgentTimelineProps {
    *  except user messages) behind a "Show N more steps" toggle. Omit to always
    *  show every row. */
   collapseAfter?: number;
+  /**
+   * The reader's participant id. A user message whose `author` has another
+   * id is someone else's: it sits at the start, on a card, under its author.
+   */
+  viewerId?: string;
 }
 
 const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; supportingText: string; icon: typeof Info }> = {
@@ -169,9 +182,10 @@ const STREAMING_CARET =
   "[&>:last-child:not(ul,ol)]:after:ml-0.5 [&>:last-child:not(ul,ol)]:after:inline-block [&>:last-child:not(ul,ol)]:after:h-[1em] [&>:last-child:not(ul,ol)]:after:w-0.5 [&>:last-child:not(ul,ol)]:after:animate-pulse [&>:last-child:not(ul,ol)]:after:rounded-full [&>:last-child:not(ul,ol)]:after:bg-muted-foreground [&>:last-child:not(ul,ol)]:after:align-text-bottom [&>:last-child:not(ul,ol)]:after:content-[''] " +
   "[&>:is(ul,ol):last-child>li:last-child]:after:ml-0.5 [&>:is(ul,ol):last-child>li:last-child]:after:inline-block [&>:is(ul,ol):last-child>li:last-child]:after:h-[1em] [&>:is(ul,ol):last-child>li:last-child]:after:w-0.5 [&>:is(ul,ol):last-child>li:last-child]:after:animate-pulse [&>:is(ul,ol):last-child>li:last-child]:after:rounded-full [&>:is(ul,ol):last-child>li:last-child]:after:bg-muted-foreground [&>:is(ul,ol):last-child>li:last-child]:after:align-text-bottom [&>:is(ul,ol):last-child>li:last-child]:after:content-['']";
 
-function AssistantMessage({ item }: { item: AgentTimelineMessageItem }) {
+function AssistantMessage({ item, author }: { item: AgentTimelineMessageItem; author?: ChatAuthor }) {
   return (
     <div>
+      {author && <MessageAuthor author={author} className="mb-1.5" />}
       {item.content && (
         <Markdown
           // `length:` types the token: a bare `text-[var(--x)]` compiles to a
@@ -281,6 +295,7 @@ export function AgentTimeline({
   className,
   renderToolActions,
   collapseAfter,
+  viewerId,
 }: AgentTimelineProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -322,12 +337,27 @@ export function AgentTimeline({
     hiddenCount = stepItems.length - limit;
   }
 
+  // An agent's turn is often several prose items split by tool rows. Its
+  // author line goes on the first of them, and again only when a person
+  // speaks or a different agent takes over.
+  const headedAgentMessages = new Set<string>();
+  let speakingAgent: string | undefined;
+  for (const item of renderList) {
+    if (item.kind !== "message") continue;
+    if (item.role === "user") {
+      speakingAgent = undefined;
+      continue;
+    }
+    if (item.author && item.author.id !== speakingAgent) headedAgentMessages.add(item.id);
+    speakingAgent = item.author?.id;
+  }
+
   const renderItem = (item: AgentTimelineItem): ReactNode => {
     if (item.kind === "message") {
       return item.role === "user" ? (
-        <UserMessage content={item.content} timestamp={item.timestamp} />
+        <UserMessage content={item.content} timestamp={item.timestamp} author={item.author} viewerId={viewerId} />
       ) : (
-        <AssistantMessage item={item} />
+        <AssistantMessage item={item} author={headedAgentMessages.has(item.id) ? item.author : undefined} />
       );
     }
 
