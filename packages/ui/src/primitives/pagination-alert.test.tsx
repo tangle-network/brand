@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Alert, AlertDescription, AlertTitle } from "./alert";
 import { Pagination, pageSlots } from "./pagination";
@@ -60,6 +61,66 @@ describe("Pagination", () => {
     render(<Pagination page={1} pageCount={3} onPageChange={onPageChange} />);
     await user.click(screen.getByRole("button", { name: "Page 2" }));
     expect(onPageChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("Pagination link mode", () => {
+  const hrefFor = (page: number) => `?page=${page + 1}`;
+
+  it("renders links to one-based URLs from zero-based pages", () => {
+    render(<Pagination page={4} pageCount={12} hrefFor={hrefFor} />);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Previous page" })).toHaveAttribute("href", "?page=4");
+    expect(screen.getByRole("link", { name: "Next page" })).toHaveAttribute("href", "?page=6");
+    expect(screen.getByRole("link", { name: "Page 1" })).toHaveAttribute("href", "?page=1");
+    expect(screen.getByRole("link", { name: "Page 12" })).toHaveAttribute("href", "?page=12");
+
+    const current = screen.getByRole("link", { name: "Page 5" });
+    expect(current.tagName).toBe("A");
+    expect(current).toHaveAttribute("href", "?page=5");
+    expect(current).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Page 4" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("renders a disabled previous or next as a span without an href", () => {
+    const { rerender } = render(<Pagination page={0} pageCount={3} hrefFor={hrefFor} />);
+    const previous = screen.getByRole("link", { name: "Previous page" });
+    expect(previous.tagName).toBe("SPAN");
+    expect(previous).toHaveAttribute("aria-disabled", "true");
+    expect(previous).not.toHaveAttribute("href");
+    expect(previous.className).toContain("aria-disabled:opacity-50");
+    expect(screen.getByRole("link", { name: "Next page" })).toHaveAttribute("href", "?page=2");
+
+    rerender(<Pagination page={2} pageCount={3} hrefFor={hrefFor} />);
+    const next = screen.getByRole("link", { name: "Next page" });
+    expect(next.tagName).toBe("SPAN");
+    expect(next).toHaveAttribute("aria-disabled", "true");
+    expect(next).not.toHaveAttribute("href");
+  });
+
+  it("renders each enabled control with a custom link component", () => {
+    const received: string[] = [];
+    const RouterLink = ({ href, ...props }: React.ComponentProps<"a">) => {
+      received.push(href ?? "");
+      return <a data-router-link="" href={href} {...props} />;
+    };
+    render(<Pagination page={1} pageCount={3} hrefFor={hrefFor} linkComponent={RouterLink} />);
+
+    expect(received).toEqual(["?page=1", "?page=1", "?page=2", "?page=3", "?page=3"]);
+    const current = screen.getByRole("link", { name: "Page 2" });
+    expect(current).toHaveAttribute("data-router-link");
+    expect(current).toHaveAttribute("aria-current", "page");
+  });
+
+  it("requires onPageChange or hrefFor, and a link component only with hrefFor", () => {
+    const rejected = [
+      // @ts-expect-error neither onPageChange nor hrefFor
+      () => <Pagination page={0} pageCount={2} />,
+      // @ts-expect-error linkComponent without hrefFor
+      () => <Pagination page={0} pageCount={2} onPageChange={vi.fn()} linkComponent="a" />,
+    ];
+    expect(rejected).toHaveLength(2);
   });
 });
 
