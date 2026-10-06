@@ -124,6 +124,28 @@ describe("Tag", () => {
   });
 });
 
+describe("Tag wrap", () => {
+  const LONG = "Adafruit-BME680-Temperature-Humidity-Pressure-Gas-Sensor-Breakout";
+
+  it("truncates a long label by default and names it in a title", () => {
+    render(<Tag>{LONG}</Tag>);
+    const label = screen.getByText(LONG);
+    expect(label.className).toContain("truncate");
+    expect(label.getAttribute("title")).toBe(LONG);
+    expect(label.parentElement?.className).toContain("h-6");
+  });
+
+  it("wraps a long label across lines when asked, aligned to its first line", () => {
+    render(<Tag wrap size="md">{LONG}</Tag>);
+    const label = screen.getByText(LONG);
+    expect(label.className).not.toContain("truncate");
+    expect(label.className).toContain("[overflow-wrap:anywhere]");
+    expect(label.className).toContain("py-[3px]");
+    expect(label.parentElement?.className).toContain("items-start");
+    expect(label.parentElement?.className).not.toMatch(/(^|\s)h-7(\s|$)/);
+  });
+});
+
 describe("IconTile", () => {
   it("falls back from a broken image to the glyph, then to initials", () => {
     const { container, rerender } = render(<IconTile src="https://example.invalid/logo.png" name="Acme Robotics" />);

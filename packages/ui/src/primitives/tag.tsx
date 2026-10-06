@@ -33,16 +33,31 @@ export interface TagProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "c
    * the label is a string; pass it when the label is not plain text.
    */
   removeLabel?: string;
+  /**
+   * Wraps a long label onto more lines instead of truncating it. Use it where
+   * the full text matters and no hover is available to read a `title`, such
+   * as model-written part names read on a phone or on paper.
+   */
+  wrap?: boolean;
 }
 
 const SIZE = {
-  sm: "h-6 gap-1 px-2 text-xs [&_svg]:size-3",
-  md: "h-7 gap-1.5 px-2.5 text-sm [&_svg]:size-3.5",
+  sm: "gap-1 px-2 text-xs [&_svg]:size-3",
+  md: "gap-1.5 px-2.5 text-sm [&_svg]:size-3.5",
+} as const;
+
+// A truncating tag has one fixed height. A wrapping tag carries its vertical
+// padding on the label instead, sized so one line is exactly that height
+// (sm: 16px line + 6 + 2px border = 24; md: 20 + 6 + 2 = 28), and aligns the
+// icon and remove button to the first line rather than the middle.
+const WRAP = {
+  sm: { box: "items-start", label: "py-[3px]", icon: "h-[22px] items-center" },
+  md: { box: "items-start", label: "py-[3px]", icon: "h-[26px] items-center" },
 } as const;
 
 const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
   (
-    { className, children, tone = "neutral", emphasis = "soft", size = "sm", icon, onRemove, removeLabel, ...props },
+    { className, children, tone = "neutral", emphasis = "soft", size = "sm", icon, onRemove, removeLabel, wrap = false, ...props },
     ref,
   ) => {
     const classes = TONE_CLASSES[tone];
@@ -51,8 +66,9 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
       <span
         ref={ref}
         className={cn(
-          "inline-flex min-w-0 max-w-full shrink-0 items-center rounded-md border font-medium",
+          "inline-flex min-w-0 max-w-full shrink-0 rounded-md border font-medium",
           SIZE[size],
+          wrap ? WRAP[size].box : ["items-center", size === "sm" ? "h-6" : "h-7"],
           emphasis === "outline" ? classes.outline : classes.surface,
           onRemove && (size === "sm" ? "pr-0.5" : "pr-1"),
           className,
@@ -60,15 +76,20 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
         {...props}
       >
         {icon ? (
-          <span aria-hidden="true" className={cn("inline-flex shrink-0", classes.icon)}>
+          <span aria-hidden="true" className={cn("inline-flex shrink-0", wrap && WRAP[size].icon, classes.icon)}>
             {icon}
           </span>
         ) : null}
-        {/* A long label truncates here rather than pushing the remove button
-            out; the title gives its full text on hover. */}
-        <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
-          {children}
-        </span>
+        {/* By default a long label truncates here rather than pushing the
+            remove button out, and the title gives its full text on hover.
+            `wrap` breaks it across lines instead, even inside one long token. */}
+        {wrap ? (
+          <span className={cn("min-w-0 [overflow-wrap:anywhere]", WRAP[size].label)}>{children}</span>
+        ) : (
+          <span className="min-w-0 truncate" title={typeof children === "string" ? children : undefined}>
+            {children}
+          </span>
+        )}
         {onRemove ? (
           <button
             type="button"
@@ -79,6 +100,8 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
               // the hit area without moving the tag's layout.
               "relative inline-flex shrink-0 items-center justify-center rounded-sm opacity-70 transition-[opacity,background-color] duration-150 ease-out hover:bg-[color-mix(in_srgb,currentColor_14%,transparent)] hover:opacity-100 before:absolute before:-inset-1.5 before:content-['']",
               size === "sm" ? "size-5" : "size-6",
+              // Centred on the first line box (22px sm, 26px md) when wrapping.
+              wrap && "mt-px",
               focusRing,
             )}
           >

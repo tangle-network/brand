@@ -224,3 +224,27 @@ export const WorstCase: Story = {
     </BothThemes>
   ),
 };
+
+const PART = "Adafruit-BME680-Temperature-Humidity-Pressure-Gas-Sensor-Breakout";
+
+/** `wrap` keeps the whole label readable: one line matches a fixed tag's height; more lines grow it, with the icon and remove button on the first line. */
+export const Wrap: Story = {
+  render: () => (
+    <BothThemes>
+      <div className="flex w-full max-w-[220px] flex-col items-start gap-2" data-testid="wrap-column">
+        {(["sm", "md"] as const).map((size) => (
+          <div key={size} className="flex flex-col items-start gap-2">
+            <div className="flex items-start gap-2">
+              <Tag size={size} data-probe={`fixed-${size}`}>Short</Tag>
+              <Tag size={size} wrap data-probe={`wrap-one-${size}`}>Short</Tag>
+              <Tag size={size} wrap onRemove={() => {}} data-probe={`wrap-remove-${size}`}>Short</Tag>
+            </div>
+            <Tag size={size} wrap tone="teal" icon={<FileText />} onRemove={() => {}} data-probe={`wrap-long-${size}`}>
+              {PART}
+            </Tag>
+          </div>
+        ))}
+      </div>
+    </BothThemes>
+  ),
+};
