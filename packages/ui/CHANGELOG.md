@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.23.0
+
+### Minor Changes
+
+- 57f4e3d: `Tag` takes `wrap` to break a long label across lines instead of truncating it, for text that must be read in full without a hover (model-written part names on a phone or on paper).
+
 ## 11.22.3
 
 ### Patch Changes
