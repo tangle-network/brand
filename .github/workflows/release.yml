@@ -7,21 +7,86 @@ on:
 
 permissions:
   contents: write
-  id-token: write
-  packages: write
   pull-requests: write
 
 jobs:
-  release:
+  # Runs on every push. Pending changesets open or update the release PR here.
+  # Without pending changesets, a package version missing from npm means the
+  # release PR merged and this push publishes.
+  plan:
+    runs-on: [self-hosted, ci-public]
+    timeout-minutes: 20
+    concurrency:
+      group: release-plan
+      cancel-in-progress: false
+    outputs:
+      changesets: ${{ steps.plan.outputs.changesets }}
+      publish: ${{ steps.plan.outputs.publish }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.23.3
+          cache: pnpm
+
+      - name: Decide whether this push versions or publishes
+        id: plan
+        run: |
+          set -euo pipefail
+          if find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | grep -q .; then
+            echo "Changesets are pending; this push updates the release PR"
+            echo "changesets=true" >> "$GITHUB_OUTPUT"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changesets=false" >> "$GITHUB_OUTPUT"
+          publish=false
+          for manifest in packages/*/package.json; do
+            [ "$(jq -r '.private // false' "$manifest")" = true ] && continue
+            name="$(jq -r '.name' "$manifest")"
+            version="$(jq -r '.version' "$manifest")"
+            if ! npm view "$name@$version" version --registry=https://registry.npmjs.org 2>/dev/null | grep -qx "$version"; then
+              echo "$name@$version is not on npm"
+              publish=true
+            fi
+          done
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+
+      - name: Install
+        if: steps.plan.outputs.changesets == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Open or update the release PR
+        if: steps.plan.outputs.changesets == 'true'
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version-script: pnpm version-packages
+          commit-message: "chore(release): publish packages"
+          pr-title: "chore(release): publish packages"
+          push-with-git-cli: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # npm accepts trusted publishing only from GitHub-hosted runners, so this job
+  # starts only when plan found an unpublished version.
+  publish:
+    needs: plan
+    if: needs.plan.outputs.publish == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: release-publish
       cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
 
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
@@ -57,32 +122,49 @@ jobs:
             fi
           done
 
-      - name: Create release PR or publish
-        id: changesets
-        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
-        with:
-          publish-script: pnpm release
-          version-script: pnpm version-packages
-          commit-message: "chore(release): publish packages"
-          pr-title: "chore(release): publish packages"
-          push-with-git-cli: true
-        # No NODE_AUTH_TOKEN: with `id-token: write` and configured npm trusted
-        # publishers for @tangle-network/brand, @tangle-network/ui, and
-        # @tangle-network/charts, npm authenticates the publish via OIDC.
-        # A token here forces token auth,
-        # which 404s on this scope (see sandbox-ui's release.yml note).
+      # `pnpm release` builds and runs `changeset publish`, which publishes only
+      # versions npm does not have yet. No NODE_AUTH_TOKEN: with `id-token: write`
+      # and configured npm trusted publishers for @tangle-network/brand,
+      # @tangle-network/ui, and @tangle-network/charts, npm authenticates the
+      # publish via OIDC. A token here forces token auth, which 404s on this
+      # scope (see sandbox-ui's release.yml note).
+      - name: Publish
+        run: pnpm release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+  # Mirrors the npm artifacts to GitHub Packages and Releases. It also runs when
+  # nothing was published, so a retry repairs a mirror that failed after npm.
+  # When changesets are pending, the checkout holds the release PR's unpublished
+  # versions, so the mirror waits for the run that merges it.
+  mirror:
+    needs: [plan, publish]
+    if: >-
+      always() &&
+      needs.plan.result == 'success' &&
+      needs.plan.outputs.changesets == 'false' &&
+      (needs.publish.result == 'success' || needs.publish.result == 'skipped')
+    runs-on: [self-hosted, ci-public]
+    timeout-minutes: 20
+    concurrency:
+      group: release-mirror
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.23.3
 
       # Changesets reports only versions published in this run. On a retry after
       # npm succeeded, that list is empty. Rebuild the mirror plan from the
       # versioned package manifests and fetch npm's immutable tarballs instead.
-      # When changesets are pending, the action opened or updated the release PR
-      # and published nothing: the checkout holds that PR's unpublished versions,
-      # so every reconcile step waits for the run that merges it.
       - name: Fetch and verify npm release artifacts
-        if: steps.changesets.outputs['has-changesets'] == 'false'
         run: |
           set -euo pipefail
           mirror="$RUNNER_TEMP/release-mirror"
@@ -142,7 +224,6 @@ jobs:
           npm install --prefix "$consumer" --package-lock=false --ignore-scripts --no-audit --no-fund "${tarballs[@]}"
 
       - name: Configure npm for GitHub Packages
-        if: steps.changesets.outputs['has-changesets'] == 'false'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.23.3
@@ -150,7 +231,6 @@ jobs:
           scope: "@tangle-network"
 
       - name: Reconcile GitHub Packages from the npm artifacts
-        if: steps.changesets.outputs['has-changesets'] == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -193,7 +273,6 @@ jobs:
           done < "$RUNNER_TEMP/release-mirror/artifacts.ndjson"
 
       - name: Reconcile GitHub Releases
-        if: steps.changesets.outputs['has-changesets'] == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
