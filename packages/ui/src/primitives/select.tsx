@@ -22,9 +22,9 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border px-3 py-2 text-sm shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       fieldPresentation,
-      "data-[placeholder]:text-muted-foreground [&>span]:min-w-0 [&>span]:text-left",
+      "data-[placeholder]:text-[var(--text-dim)] [&>span]:min-w-0 [&>span]:text-left",
       // The designed open state: accent border and surface while the menu is up.
       "data-[state=open]:border-primary data-[state=open]:bg-[var(--accent-surface-strong)] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform",
       size !== "default" && controlSizes[size],
