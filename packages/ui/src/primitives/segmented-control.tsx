@@ -29,6 +29,8 @@ export interface SegmentedControlOption<T extends string = string> {
   label: React.ReactNode
   /** Rendered right of the label, typically a count or status pill. */
   adornment?: React.ReactNode
+  /** Rendered as the option button's `data-testid`, for end-to-end selectors. */
+  testId?: string
 }
 
 export interface SegmentedControlProps<T extends string = string>
@@ -43,6 +45,8 @@ export interface SegmentedControlProps<T extends string = string>
    *              reads as a classic tab (used on the Team page)
    */
   variant?: "row" | "tabs"
+  /** Rendered as the group's `data-testid`. */
+  "data-testid"?: string
 }
 
 export function SegmentedControl<T extends string = string>({
@@ -93,6 +97,7 @@ export function SegmentedControl<T extends string = string>({
       id={rest.id}
       aria-label={rest["aria-label"]}
       aria-labelledby={rest["aria-labelledby"]}
+      data-testid={rest["data-testid"]}
       onKeyDown={handleKeyDown}
       className={cn(
         "flex gap-1",
@@ -116,6 +121,7 @@ export function SegmentedControl<T extends string = string>({
             type="button"
             role="radio"
             aria-checked={active}
+            data-testid={option.testId}
             tabIndex={focusable ? 0 : -1}
             onClick={() => {
               if (!active) onValueChange(option.value)
