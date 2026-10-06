@@ -91,6 +91,5 @@ A consumer runs both.
 
 ## Known limits
 
-The website's hex count of 1110 is mostly `.evolve/multi-pursue/variants/*.astro` and rejected prototypes under `docs/delivery/`, which `drift.py` also counted.
-The exclusions match `drift.py` so the counts stay comparable; excluding those paths is a documented break from parity left for a later change.
+The website surface reads `src` only. Its other scanned files were `.evolve/multi-pursue/variants/*.astro` and the archived rejected prototypes under `docs/delivery/`, which no route ships; `drift.py` counted them (560 of the 1110 hex literals in the first baseline).
 The hex pattern counts `#rgb` and `#rrggbb` only, as `drift.py` did; `#rgba` and `#rrggbbaa` literals are not counted.
