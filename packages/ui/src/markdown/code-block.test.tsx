@@ -17,7 +17,8 @@ describe("CodeBlock scoped semantic colors", () => {
   it("keeps code readable before the renderer loads, then applies live semantic colors and line numbers", async () => {
     const { container } = render(<CodeBlock code={'const message = "hello";'} language="javascript" showLineNumbers />);
     expect(container.querySelector("pre code")?.textContent).toBe('const message = "hello";');
-    await waitFor(() => expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)"));
+    // The highlighter loads asynchronously; under a full parallel run it can take longer than waitFor's 1s default.
+    await waitFor(() => expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)"), { timeout: 10_000 });
     expect(container.innerHTML).toContain("var(--syntax-string, currentColor)");
     expect(container.innerHTML).toContain("var(--syntax-comment, currentColor)");
     expect(container.querySelector(".react-syntax-highlighter-line-number")).not.toBeNull();

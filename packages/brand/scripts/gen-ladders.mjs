@@ -137,7 +137,9 @@ const MAP = [
   ['on-ink', W, 'mauve-1'],
   ['accent-solid', 'iris-9', 'iris-9'],
   ['accent-solid-hover', 'iris-10', 'iris-10'],
-  ['accent-text', 'iris-11', 'iris-11'],
+  // Light sits between iris 11 and 12: selected items set accent text on a primary tint,
+  // where step 11 falls to 4.4:1 (accent-on-tint.test.ts), and step 12 is body ink.
+  ['accent-text', '#4e4ac3', 'iris-11'],
   ['accent-soft', 'iris-3', 'iris-3'],
   ['accent-soft-hover', 'iris-4', 'iris-4'],
   ['accent-line', 'iris-7', 'iris-7'],
