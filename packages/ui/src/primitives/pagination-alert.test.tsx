@@ -113,6 +113,35 @@ describe("Pagination link mode", () => {
     expect(current).toHaveAttribute("aria-current", "page");
   });
 
+  it("reports a plain click on another page and ignores the current page and new-tab clicks", async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+    render(
+      <Pagination
+        page={1}
+        pageCount={3}
+        hrefFor={hrefFor}
+        linkComponent={({ onClick, ...props }: React.ComponentProps<"a">) => (
+          <a
+            {...props}
+            onClick={(event) => {
+              onClick?.(event);
+              event.preventDefault();
+            }}
+          />
+        )}
+        onPageChange={onPageChange}
+      />,
+    );
+
+    await user.click(screen.getByRole("link", { name: "Next page" }));
+    await user.click(screen.getByRole("link", { name: "Page 2" }));
+    await user.keyboard("{Meta>}");
+    await user.click(screen.getByRole("link", { name: "Page 1" }));
+    await user.keyboard("{/Meta}");
+    expect(onPageChange.mock.calls).toEqual([[2]]);
+  });
+
   it("requires onPageChange or hrefFor, and a link component only with hrefFor", () => {
     const rejected = [
       // @ts-expect-error neither onPageChange nor hrefFor

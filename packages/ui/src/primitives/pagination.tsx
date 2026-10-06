@@ -23,7 +23,10 @@ export interface PaginationLinkProps extends PaginationBaseProps {
   hrefFor: (page: number) => string;
   /** Renders each enabled control. Receives `href`; defaults to `"a"`. */
   linkComponent?: React.ElementType;
-  /** Called with the target page when a link to another page is clicked. */
+  /**
+   * Called with the target page when a link to another page is clicked, unless
+   * the click opens it in another tab or window.
+   */
   onPageChange?: (page: number) => void;
 }
 
@@ -80,6 +83,11 @@ export function pageSlots(page: number, pageCount: number, siblings = 1): PageSl
 }
 
 const pageButton = cn(buttonVariants({ variant: "ghost", size: "sm" }), "min-w-8 px-2 tabular-nums");
+
+/** A click that opens the link in another tab or window leaves this page where it is. */
+function opensElsewhere(event: React.MouseEvent) {
+  return event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+}
 
 interface ControlProps {
   target: number;
@@ -138,7 +146,13 @@ export function Pagination({
         href={hrefFor(target)}
         aria-label={label}
         aria-current={ariaCurrent}
-        onClick={onPageChange ? () => go(target) : undefined}
+        onClick={
+          onPageChange
+            ? (event: React.MouseEvent) => {
+                if (!opensElsewhere(event)) go(target);
+              }
+            : undefined
+        }
         className={controlClass}
       >
         {children}
