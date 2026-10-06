@@ -4,7 +4,14 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CodeBlock, CopyButton } from "./code-block";
 
-afterEach(cleanup);
+const originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  if (originalClipboard) Object.defineProperty(navigator, "clipboard", originalClipboard);
+  else delete (navigator as { clipboard?: unknown }).clipboard;
+});
 
 describe("CodeBlock scoped semantic colors", () => {
   it("keeps code readable before the renderer loads, then applies live semantic colors and line numbers", async () => {
