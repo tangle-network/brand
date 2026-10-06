@@ -173,6 +173,8 @@
 .tangle-prose {
   color: var(--text-primary);
   line-height: 1.7;
+  /* Long URLs, emails and identifiers wrap inside the column. */
+  overflow-wrap: break-word;
 }
 .tangle-prose > * + * { margin-top: 0.85em; }
 .tangle-prose h1, .tangle-prose h2, .tangle-prose h3, .tangle-prose h4 {
@@ -187,6 +189,11 @@
 .tangle-prose h3 { font-size: 1.1em; }
 .tangle-prose p, .tangle-prose ul, .tangle-prose ol { margin: 0; }
 .tangle-prose ul, .tangle-prose ol { padding-left: 1.4em; }
+/* Tailwind's preflight sets `list-style: none`; prose lists keep their markers. */
+.tangle-prose ul { list-style-type: disc; }
+.tangle-prose ol { list-style-type: decimal; }
+.tangle-prose ul ul { list-style-type: circle; }
+.tangle-prose li::marker { color: var(--text-muted); }
 .tangle-prose li { margin: 0.25em 0; }
 .tangle-prose li > ul, .tangle-prose li > ol { margin-top: 0.25em; }
 .tangle-prose a {
