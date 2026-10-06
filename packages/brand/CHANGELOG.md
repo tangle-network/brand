@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.4
+
+### Patch Changes
+
+- dbc7691: Lower Legal's drift baseline to legal-agent main b0a7c49: hex 1 -> 0, every count 0.
+
 ## 1.15.3
 
 ### Patch Changes
