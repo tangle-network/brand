@@ -3,22 +3,63 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import { buttonVariants } from "./button";
 
+interface PaginationBaseProps
+  extends Omit<React.HTMLAttributes<HTMLElement>, "onChange" | "children"> {
+  /** The current page, zero-based. */
+  page: number;
+  pageCount: number;
+  /** Pages shown on each side of the current one before an ellipsis. */
+  siblings?: number;
+}
+
+export interface PaginationButtonProps extends PaginationBaseProps {
+  onPageChange: (page: number) => void;
+  hrefFor?: never;
+  linkComponent?: never;
+}
+
+export interface PaginationLinkProps extends PaginationBaseProps {
+  /** The URL of a page, given the zero-based page. */
+  hrefFor: (page: number) => string;
+  /** Renders each enabled control. Receives `href`; defaults to `"a"`. */
+  linkComponent?: React.ElementType;
+  /**
+   * Called with the target page when a link to another page is clicked, unless
+   * the click opens it in another tab or window.
+   */
+  onPageChange?: (page: number) => void;
+}
+
 /**
  * Page controls for a paged list or table: previous, the page numbers around
  * the current one with the first and last always reachable, and next.
  *
  * Pages are zero-based in the API and one-based on screen. With one page or
  * none there is nothing to choose, so it renders nothing.
+ *
+ * Give `onPageChange` to render buttons, or `hrefFor` to render links for a
+ * list paged by URL. In link mode each enabled control is rendered by
+ * `linkComponent` (an `<a>` by default) with `href`, `className`,
+ * `aria-label`, `aria-current` and children; a disabled previous or next is a
+ * `<span aria-disabled="true">` with no `href`. A router whose link takes `to`
+ * instead of `href` needs a small adapter:
+ *
+ * ```tsx
+ * import { Link } from "react-router";
+ *
+ * const RouterLink = ({ href, ...props }: React.ComponentProps<"a">) => (
+ *   <Link to={href ?? ""} {...props} />
+ * );
+ *
+ * <Pagination
+ *   page={page}
+ *   pageCount={pageCount}
+ *   hrefFor={(p) => `?page=${p + 1}`}
+ *   linkComponent={RouterLink}
+ * />
+ * ```
  */
-export interface PaginationProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, "onChange" | "children"> {
-  /** The current page, zero-based. */
-  page: number;
-  pageCount: number;
-  onPageChange: (page: number) => void;
-  /** Pages shown on each side of the current one before an ellipsis. */
-  siblings?: number;
-}
+export type PaginationProps = PaginationButtonProps | PaginationLinkProps;
 
 type PageSlot = number | "gap-start" | "gap-end";
 
@@ -43,10 +84,26 @@ export function pageSlots(page: number, pageCount: number, siblings = 1): PageSl
 
 const pageButton = cn(buttonVariants({ variant: "ghost", size: "sm" }), "min-w-8 px-2 tabular-nums");
 
+/** A click that opens the link in another tab or window leaves this page where it is. */
+function opensElsewhere(event: React.MouseEvent) {
+  return event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+}
+
+interface ControlProps {
+  target: number;
+  label: string;
+  className: string;
+  disabled?: boolean;
+  current?: boolean;
+  children: React.ReactNode;
+}
+
 export function Pagination({
   page,
   pageCount,
   onPageChange,
+  hrefFor,
+  linkComponent: LinkComponent = "a",
   siblings = 1,
   className,
   "aria-label": ariaLabel = "Pagination",
@@ -58,40 +115,82 @@ export function Pagination({
   const current = Math.min(Math.max(page, 0), last);
   const go = (next: number) => {
     const target = Math.min(Math.max(next, 0), last);
-    if (target !== current) onPageChange(target);
+    if (target !== current) onPageChange?.(target);
+  };
+
+  const control = ({ target, label, className: controlClass, disabled, current: isCurrent, children }: ControlProps) => {
+    const ariaCurrent = isCurrent ? ("page" as const) : undefined;
+    if (!hrefFor) {
+      return (
+        <button
+          type="button"
+          aria-label={label}
+          aria-current={ariaCurrent}
+          disabled={disabled}
+          onClick={() => go(target)}
+          className={controlClass}
+        >
+          {children}
+        </button>
+      );
+    }
+    if (disabled) {
+      return (
+        <span role="link" aria-label={label} aria-disabled="true" className={cn(controlClass, "pointer-events-none")}>
+          {children}
+        </span>
+      );
+    }
+    return (
+      <LinkComponent
+        href={hrefFor(target)}
+        aria-label={label}
+        aria-current={ariaCurrent}
+        onClick={
+          onPageChange
+            ? (event: React.MouseEvent) => {
+                if (!opensElsewhere(event)) go(target);
+              }
+            : undefined
+        }
+        className={controlClass}
+      >
+        {children}
+      </LinkComponent>
+    );
   };
 
   return (
     <nav aria-label={ariaLabel} className={cn("flex items-center", className)} {...rest}>
       <ul className="flex flex-wrap items-center gap-1">
         <li>
-          <button
-            type="button"
-            aria-label="Previous page"
-            disabled={current === 0}
-            onClick={() => go(current - 1)}
-            className={cn(pageButton, "gap-1 pl-1.5")}
-          >
-            <ChevronLeft aria-hidden="true" />
-            <span className="hidden sm:inline">Previous</span>
-          </button>
+          {control({
+            target: current - 1,
+            label: "Previous page",
+            disabled: current === 0,
+            className: cn(pageButton, "gap-1 pl-1.5"),
+            children: (
+              <>
+                <ChevronLeft aria-hidden="true" />
+                <span className="hidden sm:inline">Previous</span>
+              </>
+            ),
+          })}
         </li>
         {pageSlots(current, pageCount, siblings).map((slot) =>
           typeof slot === "number" ? (
             <li key={slot}>
-              <button
-                type="button"
-                aria-label={`Page ${slot + 1}`}
-                aria-current={slot === current ? "page" : undefined}
-                onClick={() => go(slot)}
-                className={cn(
+              {control({
+                target: slot,
+                label: `Page ${slot + 1}`,
+                current: slot === current,
+                className: cn(
                   pageButton,
                   slot === current &&
                     "border-border bg-card font-semibold text-foreground hover:bg-card",
-                )}
-              >
-                {slot + 1}
-              </button>
+                ),
+                children: slot + 1,
+              })}
             </li>
           ) : (
             <li key={slot} aria-hidden="true" className="flex min-w-8 justify-center text-sm text-muted-foreground">
@@ -100,16 +199,18 @@ export function Pagination({
           ),
         )}
         <li>
-          <button
-            type="button"
-            aria-label="Next page"
-            disabled={current === last}
-            onClick={() => go(current + 1)}
-            className={cn(pageButton, "gap-1 pr-1.5")}
-          >
-            <span className="hidden sm:inline">Next</span>
-            <ChevronRight aria-hidden="true" />
-          </button>
+          {control({
+            target: current + 1,
+            label: "Next page",
+            disabled: current === last,
+            className: cn(pageButton, "gap-1 pr-1.5"),
+            children: (
+              <>
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight aria-hidden="true" />
+              </>
+            ),
+          })}
         </li>
       </ul>
     </nav>

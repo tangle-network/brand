@@ -25,6 +25,41 @@ export const PaginationLengths: StoryObj = {
   ),
 }
 
+/** Keeps the story in place; a real app passes its router's link. */
+function StoryLink({ onClick, ...props }: React.ComponentProps<'a'>) {
+  return (
+    <a
+      {...props}
+      onClick={(event) => {
+        event.preventDefault()
+        onClick?.(event)
+      }}
+    />
+  )
+}
+
+function LinkedTable({ pageCount }: { pageCount: number }) {
+  const [page, setPage] = React.useState(0)
+  return (
+    <Pagination
+      page={page}
+      pageCount={pageCount}
+      hrefFor={(p) => `?page=${p + 1}`}
+      linkComponent={StoryLink}
+      onPageChange={setPage}
+    />
+  )
+}
+
+export const PaginationLinks: StoryObj = {
+  render: () => (
+    <div className="flex flex-col gap-6 bg-background p-6 text-foreground">
+      <LinkedTable pageCount={4} />
+      <LinkedTable pageCount={48} />
+    </div>
+  ),
+}
+
 export const AlertTones: StoryObj = {
   render: () => (
     <div className="flex max-w-xl flex-col gap-3 bg-background p-6 text-foreground">
