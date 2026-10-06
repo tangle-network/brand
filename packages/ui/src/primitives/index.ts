@@ -190,6 +190,12 @@ export type { PageShellProps } from "./page-shell";
 export { PageHeader } from "./page-header";
 export type { PageHeaderProps } from "./page-header";
 
+export { Alert, AlertDescription, AlertTitle } from "./alert";
+export type { AlertProps, AlertTone } from "./alert";
+
+export { Pagination } from "./pagination";
+export type { PaginationProps } from "./pagination";
+
 export { StatusPill } from "./status-pill";
 export type { StatusPillProps, StatusTone } from "./status-pill";
 

@@ -326,3 +326,23 @@ describe("SegmentedControl", () => {
     expect(screen.getByRole("radiogroup")).toHaveAttribute("id", "scope-control")
   })
 })
+
+describe("SegmentedControl test ids", () => {
+  it("renders option and group test ids for end-to-end selectors", () => {
+    render(
+      <SegmentedControl
+        aria-label="Workbench view"
+        data-testid="workbench-tabs"
+        value="code"
+        onValueChange={vi.fn()}
+        options={[
+          { value: "code", label: "Code", testId: "workbench-tab-code" },
+          { value: "preview", label: "Preview", testId: "workbench-tab-preview" },
+        ]}
+      />,
+    )
+    expect(screen.getByTestId("workbench-tabs")).toHaveAttribute("role", "radiogroup")
+    expect(screen.getByTestId("workbench-tab-preview")).toHaveAttribute("aria-checked", "false")
+    expect(screen.getByTestId("workbench-tab-code")).toHaveAttribute("aria-checked", "true")
+  })
+})
