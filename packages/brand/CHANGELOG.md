@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.0
+
+### Minor Changes
+
+- ffd18ec: `palettes` exports Brand's resolved colors (light, dark, websiteLight, websiteDark) for renderers that cannot read CSS variables, such as PDF, canvas, WebGL, email and the theme-color meta. `scripts/gen-palette.mjs` generates them from tokens.css and named-themes.css, and the build fails when they are stale.
+
 ## 1.16.0
 
 ### Minor Changes
