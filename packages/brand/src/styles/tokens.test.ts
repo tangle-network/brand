@@ -14,7 +14,9 @@ import {
 /**
  * The canonical spine's structural contract.
  *
- * The canonical surface and ink spine is neutral so purple can signal interaction.
+ * The canonical ink is neutral and the surfaces carry one faint indigo cast (the
+ * ladder GTM proved out), kept low in chroma so the saturated accent still
+ * signals interaction.
  * Each surface remains distinct by fill and elevation. These assertions pin that
  * structure without fixing every shade, so the ladder can be retuned safely.
  */
@@ -29,29 +31,31 @@ const tokens = readFileSync(
 const DARK = blockIn(tokens, ".dark");
 const LIGHT = blockIn(tokens, ".light");
 
-describe("canonical surfaces, ink, and chrome are neutral", () => {
-  const neutralHslRoles = [
-    "hsl-background",
+describe("canonical ink is neutral; surfaces share one faint indigo cast", () => {
+  const inkHslRoles = [
     "hsl-foreground",
-    "hsl-card",
     "hsl-card-foreground",
-    "hsl-popover",
     "hsl-popover-foreground",
-    "hsl-secondary",
     "hsl-secondary-foreground",
+    "hsl-accent-foreground",
+    "sidebar-foreground",
+    "sidebar-accent-foreground",
+  ];
+  const surfaceHslRoles = [
+    "hsl-background",
+    "hsl-card",
+    "hsl-popover",
+    "hsl-secondary",
     "hsl-muted",
     "hsl-muted-foreground",
     "hsl-accent",
-    "hsl-accent-foreground",
     "hsl-border",
     "hsl-input",
     "sidebar-background",
-    "sidebar-foreground",
     "sidebar-accent",
-    "sidebar-accent-foreground",
     "sidebar-border",
   ];
-  const neutralHexRoles = [
+  const surfaceHexRoles = [
     "md3-surface",
     "md3-surface-dim",
     "md3-surface-bright",
@@ -61,8 +65,6 @@ describe("canonical surfaces, ink, and chrome are neutral", () => {
     "md3-surface-container-high",
     "md3-surface-container-highest",
     "md3-surface-variant",
-    "md3-on-surface",
-    "md3-on-surface-variant",
     "md3-outline",
     "md3-outline-variant",
     "depth-1",
@@ -70,26 +72,48 @@ describe("canonical surfaces, ink, and chrome are neutral", () => {
     "depth-3",
     "depth-4",
   ];
+  const inkHexRoles = ["md3-on-surface", "md3-on-surface-variant"];
+  // A tinted plane stays in the indigo band and below 0.1 chroma (0..1), so it
+  // reads as a cool neutral beside the accent rather than as a coloured fill.
+  const MAX_CHROMA = 0.1;
+  const inIndigoBand = (h: number) => h >= 220 && h <= 255;
+  const hexHueChroma = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const max = Math.max(r, g, b);
+    const c = max - Math.min(r, g, b);
+    if (c === 0) return { h: 0, c };
+    const h = max === r ? ((g - b) / c) % 6 : max === g ? (b - r) / c + 2 : (r - g) / c + 4;
+    return { h: (h * 60 + 360) % 360, c };
+  };
 
   for (const [theme, spine] of [
     ["dark", DARK],
     ["light", LIGHT],
   ] as const) {
-    it(`${theme}: shared surface and ink roles are achromatic`, () => {
-      for (const token of neutralHslRoles) {
+    it(`${theme}: ink roles are achromatic`, () => {
+      for (const token of inkHslRoles) {
         expect(hslIn(spine, token).s, `--${token}`).toBe(0);
       }
-      for (const token of neutralHexRoles) {
-        const hex = spine.match(
-          new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`),
-        )?.[1];
+      for (const token of inkHexRoles) {
+        const hex = spine.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
         expect(hex, `--${token} must be defined`).toBeDefined();
-        expect(hex?.slice(1, 3), `--${token} red equals green`).toBe(
-          hex?.slice(3, 5),
-        );
-        expect(hex?.slice(3, 5), `--${token} green equals blue`).toBe(
-          hex?.slice(5, 7),
-        );
+        expect(hexHueChroma(hex!).c, `--${token} is achromatic`).toBe(0);
+      }
+    });
+
+    it(`${theme}: surface roles are neutral or a faint indigo`, () => {
+      for (const token of surfaceHslRoles) {
+        const { h, s: sat, l } = hslIn(spine, token);
+        const chroma = (sat / 100) * (1 - Math.abs((2 * l) / 100 - 1));
+        expect(chroma, `--${token} chroma`).toBeLessThanOrEqual(MAX_CHROMA);
+        if (sat > 0) expect(inIndigoBand(h), `--${token} hue ${h}`).toBe(true);
+      }
+      for (const token of surfaceHexRoles) {
+        const hex = spine.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
+        expect(hex, `--${token} must be defined`).toBeDefined();
+        const { h, c } = hexHueChroma(hex!);
+        expect(c, `--${token} chroma`).toBeLessThanOrEqual(MAX_CHROMA);
+        if (c > 0.02) expect(inIndigoBand(h), `--${token} hue ${h}`).toBe(true);
       }
     });
   }
@@ -432,7 +456,7 @@ describe("input tokens carry two DIFFERENT roles and must not be conflated", () 
 });
 
 describe("canonical light spine", () => {
-  it("is white paper on a neutral canvas, never white-on-white", () => {
+  it("is white paper on a cool canvas, never white-on-white", () => {
     const canvas = hslIn(LIGHT, "hsl-background");
     const card = hslIn(LIGHT, "hsl-card");
     expect(card.l, "the card is paper").toBe(100);

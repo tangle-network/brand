@@ -42,11 +42,11 @@ The optional `ladders.css` / `system.css` remain opt-in. This contract does not 
 
 ## Visual Direction
 
-Indigo/purple is the interaction and brand accent. The canonical product surface ladder is neutral grey, with a dark canvas above pure black and light paper cards on a grey canvas. Named product themes may intentionally retint their surfaces; they are explicit opt-ins, not copies of a second global palette.
+Indigo/purple is the interaction and brand accent. The canonical product surface ladder carries a faint indigo cast, with an indigo-lifted dark canvas above pure black and light paper cards on a cool grey canvas; GTM set this standard. Named product themes may intentionally retint their surfaces; they are explicit opt-ins, not copies of a second global palette.
 
 Use:
 
-- Indigo, periwinkle, neutral surfaces, paper, and ink as the main brand range.
+- Indigo, periwinkle, cool surfaces, paper, and ink as the main brand range.
 - Distinct surface planes with visible fill and border relationships.
 - Smooth wave assets for hero, launch, and brand-system work.
 - Light wave and paper assets for research pages and editorial graphics.
