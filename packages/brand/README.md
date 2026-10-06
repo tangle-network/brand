@@ -101,7 +101,7 @@ import { Logo, TangleKnot } from "@tangle-network/brand";
 
 ## Palette and typography
 
-The base dark surface ladder is neutral `#161616` / `#303030` / `#353535` / `#3b3b3b`. Light uses a neutral `#eaeaea` canvas, white paper cards and overlays, and `#f2f2f2` nested wells. Indigo is the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
+The base surface ladder is the one GTM proved out: dark is indigo-lifted `#0a0a14` / `#191826` / `#221f33` / `#2c2942`; light is a cool `#eceef3` canvas, white paper cards and overlays, and `#f1f2f7` nested wells. The cast stays below 0.1 chroma and ink stays achromatic, so indigo still reads as the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
 
 Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
 

@@ -220,28 +220,28 @@
   --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
 }
 
-/* ───────────────────────── Tangle — neutral dark spine ─────────────────────
+/* ───────────────────────── Tangle — canonical dark spine ───────────────────
  * tangle-dark names the default :root/.dark spine explicitly. The named block
- * repeats its neutral surfaces and ink so a dark island remains self-sufficient
+ * repeats its surfaces and ink so a dark island remains self-sufficient
  * inside a light-named wrapper. Indigo stays in the accent; status tokens inherit
  * the dark-tuned root palette.
  */
 [data-theme="tangle-dark"] {
-  --hsl-background: 0 0% 8.6275%;       --hsl-foreground: 0 0% 90.1961%;
-  --hsl-card: 0 0% 18.8235%;             --hsl-card-foreground: 0 0% 90.1961%;
-  --hsl-popover: 0 0% 20.7843%;          --hsl-popover-foreground: 0 0% 90.1961%;
+  --hsl-background: 240 33% 6%;       --hsl-foreground: 0 0% 90.1961%;
+  --hsl-card: 244 23% 12%;             --hsl-card-foreground: 0 0% 90.1961%;
+  --hsl-popover: 247 23% 21%;          --hsl-popover-foreground: 0 0% 90.1961%;
   --hsl-primary: 246 54% 51%;            --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 0 0% 20.7843%;        --hsl-secondary-foreground: 0 0% 90.1961%;
-  --hsl-muted: 0 0% 20.7843%;            --hsl-muted-foreground: 0 0% 70.9804%;
-  --hsl-accent: 0 0% 20.7843%;           --hsl-accent-foreground: 0 0% 90.1961%;
+  --hsl-secondary: 249 24% 16%;        --hsl-secondary-foreground: 0 0% 90.1961%;
+  --hsl-muted: 249 24% 16%;            --hsl-muted-foreground: 240 5% 68%;
+  --hsl-accent: 249 24% 16%;           --hsl-accent-foreground: 0 0% 90.1961%;
   --hsl-destructive: 348 74% 48%;        --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 0 0% 29.8039%;           --hsl-input: 0 0% 12.1569%;
+  --hsl-border: 243 20% 20%;           --hsl-input: 244 29% 9%;
   --hsl-ring: 233 100% 87%;
-  --depth-1: #161616; --depth-2: #303030; --depth-3: #353535; --depth-4: #3b3b3b;
-  --bg-root: #161616; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
-  --md3-surface-container-lowest: #101010; --md3-surface-container-low: #242424;
-  --md3-surface-container: #303030; --md3-surface-container-high: #353535;
-  --md3-surface-container-highest: #3b3b3b; --md3-outline-variant: #4c4c4c;
+  --depth-1: #0a0a14; --depth-2: #191826; --depth-3: #221f33; --depth-4: #2c2942;
+  --bg-root: #0a0a14; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
+  --md3-surface-container-lowest: #050509; --md3-surface-container-low: #12111f;
+  --md3-surface-container: #191826; --md3-surface-container-high: #221f33;
+  --md3-surface-container-highest: #2c2942; --md3-outline-variant: #2a293d;
   --border-subtle: rgba(255, 255, 255, 0.10); --border-default: rgba(255, 255, 255, 0.16);
   --border-hover: rgba(255, 255, 255, 0.28); --accent-text: #A5B4FC;
   --brand-primary: #7C6CF6; --brand-glow: #A5AAFC;
