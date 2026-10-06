@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.6
+
+### Patch Changes
+
+- fc13212: Lower the Blueprint drift baseline to its develop head 92ab705d1: raw palette 204 -> 0, hex 118 -> 0, arbitrary color 49 -> 45, local primitives 2 -> 0.
+
 ## 1.15.5
 
 ### Patch Changes
