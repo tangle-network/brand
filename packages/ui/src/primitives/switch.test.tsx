@@ -13,14 +13,14 @@ function stateClasses(el: Element, state: "checked" | "unchecked"): string[] {
 }
 
 describe("Switch", () => {
-  it("draws its off state on --border-strong, so an unchecked switch is visible on any field", () => {
+  it("draws its off state in muted-foreground, so an unchecked switch is visible on a card or the canvas", () => {
     render(<Switch aria-label="Reminders" />);
     const track = screen.getByRole("switch", { name: "Reminders" });
     const thumb = track.firstElementChild as Element;
     expect(track).toHaveAttribute("data-state", "unchecked");
-    expect(stateClasses(track, "unchecked")).toContain("border-[var(--border-strong)]");
+    expect(stateClasses(track, "unchecked")).toContain("border-muted-foreground");
     expect(stateClasses(track, "unchecked")).not.toContain("bg-input");
-    expect(stateClasses(thumb, "unchecked")).toContain("bg-[var(--border-strong)]");
+    expect(stateClasses(thumb, "unchecked")).toContain("bg-muted-foreground");
     expect(stateClasses(thumb, "unchecked")).not.toContain("bg-background");
   });
 
