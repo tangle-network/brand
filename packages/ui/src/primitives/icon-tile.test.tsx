@@ -22,9 +22,9 @@ describe("IconTile", () => {
   });
 
   it("shows initials and is decorative without a label", () => {
-    const { container } = render(<IconTile size="xl" name="Front-desk concierge" />);
+    const { container } = render(<IconTile size="xl" name="Acme Robotics" />);
     const tile = container.firstElementChild;
-    expect(tile).toHaveTextContent("FC");
+    expect(tile).toHaveTextContent("AR");
     expect(tile).toHaveAttribute("aria-hidden", "true");
   });
 
