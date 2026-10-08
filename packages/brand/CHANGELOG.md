@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.19.2
+
+### Patch Changes
+
+- 1cc87f0: `tangle-drift`'s `native_control` no longer counts `<input type="hidden">` form data, and the baseline is refreshed from each default branch.
+
 ## 1.19.1
 
 ### Patch Changes
