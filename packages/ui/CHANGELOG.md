@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.27.0
+
+### Minor Changes
+
+- 3ceb5fc: Markdown images open full size in a new tab, and an image that is unsafe or fails to load renders a labelled "Image unavailable" placeholder instead of the browser's broken-image icon. Images already wrapped in a Markdown link keep that link.
+
 ## 11.26.0
 
 ### Minor Changes
