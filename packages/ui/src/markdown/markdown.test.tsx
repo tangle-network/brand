@@ -114,6 +114,12 @@ describe("Markdown", () => {
     expect(ad.closest("a")).toHaveAttribute("target", "_blank");
     expect(ad.closest("a")).toHaveAttribute("rel", "noopener noreferrer");
 
+    render(<Markdown>{"![](https://example.com/decorative.png)"}</Markdown>);
+    expect(screen.getByRole("link", { name: "Open image full size" })).toHaveAttribute(
+      "href",
+      "https://example.com/decorative.png",
+    );
+
     const badge = screen.getByRole("img", { name: "Badge" });
     expect(badge.closest("a")).toHaveAttribute("href", "https://example.com/docs");
     expect(badge.closest("a")?.parentElement?.closest("a")).toBeNull();
