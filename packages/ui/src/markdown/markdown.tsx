@@ -113,7 +113,14 @@ function MarkdownImage({ node: _node, src, alt, className, ...props }: Component
   );
   if (insideLink) return image;
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block max-w-full">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      // An image without alt text would otherwise leave the link unnamed.
+      aria-label={alt ? undefined : "Open image full size"}
+      className="inline-block max-w-full"
+    >
       {image}
     </a>
   );
