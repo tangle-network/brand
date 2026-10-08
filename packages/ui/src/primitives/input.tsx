@@ -13,7 +13,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 // and a Button at the same size share a height, text size and corner.
 const inputVariants = cva(
   cn(
-    "flex w-full border py-1 placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-sm",
+    "flex w-full border py-1 placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium",
     fieldPresentation,
     fieldTouchText,
   ),

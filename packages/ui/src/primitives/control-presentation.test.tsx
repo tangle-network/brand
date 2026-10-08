@@ -63,6 +63,13 @@ describe("shared control presentation", () => {
     }
   });
 
+  it("lets a file input's selector button take the field's text size", () => {
+    render(<Input type="file" size="lg" aria-label="Upload" />);
+    const classes = screen.getByLabelText("Upload").className.split(" ");
+    expect(classes).toContain("text-[length:var(--control-text-lg,1rem)]");
+    expect(classes.filter((name) => name.startsWith("file:text-"))).toEqual([]);
+  });
+
   it("gives icon buttons squares on the same heights", () => {
     render(<><Button size="icon-sm" aria-label="Small" /><Button size="icon" aria-label="Medium" /><Button size="icon-lg" aria-label="Large" /></>);
     expect(screen.getByLabelText("Small").className).toContain("size-[var(--control-height-sm,2rem)]");
