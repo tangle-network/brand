@@ -43,6 +43,8 @@ transitions every property. Color, border, shadow, transform and the individual
 retains the existing spinner/active-scale reductions. Link buttons use accent
 **ink**, while filled buttons retain their existing foregrounds.
 
+The defaults in this table were superseded on 2026-10-08 by one [control scale](control-scale.md): every control now defaults to 36px.
+
 | Control | Existing default retained | Explicit compact | Explicit touch |
 | --- | --- | --- | --- |
 | Input | 44px; sm 36px, lg 48px unchanged | `--control-height`, 36px by default | At least 44px, 16px text |

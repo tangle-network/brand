@@ -13,6 +13,7 @@ Tangle design-system foundation: brand tokens + generic UI components.
 
 - [Brand guidelines](docs/brand-guidelines.md)
 - [Component audit](docs/component-audit.md)
+- [Control and type scale](docs/control-scale.md)
 - [Drift ratchet](docs/drift-ratchet.md)
 
 ## Versioning

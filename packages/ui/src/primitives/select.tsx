@@ -3,7 +3,7 @@
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
-import { controlSizes, fieldPresentation } from "../lib/control-presentation";
+import { controlSizes, fieldPresentation, fieldSizes, fieldTouchText } from "../lib/control-presentation";
 import { cn } from "../lib/utils";
 
 const Select = SelectPrimitive.Root;
@@ -15,19 +15,20 @@ const SelectValue = SelectPrimitive.Value;
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
-    /** Default remains 36px; compact follows density, touch is at least 44px. */
-    size?: "default" | "compact" | "touch";
+    /** The shared control scale: sm 32px, default/md 36px, lg 44px. compact follows density, touch is at least 44px. */
+    size?: "default" | "sm" | "md" | "lg" | "compact" | "touch";
   }
 >(({ className, children, size = "default", ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border px-3 py-2 text-sm shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex w-full items-center justify-between whitespace-nowrap border py-1 shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       fieldPresentation,
+      fieldTouchText,
       "data-[placeholder]:text-[var(--text-dim)] [&>span]:min-w-0 [&>span]:text-left",
       // The designed open state: accent border and surface while the menu is up.
       "data-[state=open]:border-primary data-[state=open]:bg-[var(--accent-surface-strong)] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform",
-      size !== "default" && controlSizes[size],
+      size === "compact" || size === "touch" ? cn(fieldSizes.md, controlSizes[size]) : fieldSizes[size === "default" ? "md" : size],
       className,
     )}
     {...props}

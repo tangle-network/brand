@@ -16,6 +16,13 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `arbitrary_color` | `-[#…]`, `-[rgb(…)]`, `-[hsl(…)]`, `-[oklch(…)]` | `.tsx .jsx .astro .ts` |
 | `css_var_defs` | `--name:` definitions | `.css` |
 | `local_primitive_count` | `export function/const Button` and the other primitive names the shared packages own | `.tsx .jsx` |
+| `font_size_literal` | Literal font sizes: `text-[13px]`, inline `fontSize: 13`, CSS `font-size: 13px` | `.tsx .jsx .astro .ts .css` |
+| `size_literal` | Literal heights and squares: `h-[34px]`, `min-h-[2.5rem]`, `size-[30px]` | `.tsx .jsx .astro .ts` |
+| `native_control` | `<button>`, `<input>`, `<select>`, `<textarea>` elements | `.tsx .jsx .astro` |
+| `control_override` | `Button`, `Input`, `Textarea` or `SelectTrigger` with a `className` height, padding, text size, corner or weight on the tag's line | `.tsx .jsx` |
+
+The last four measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
+`control_override` reads one line, so a `className` on a later line of the tag is not counted.
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
 Tests, stories, fixtures, `dist`, `node_modules`, `.d.ts`, generated, proof and evidence paths are excluded.
@@ -33,6 +40,7 @@ It reads the checkout's `HEAD` by default; `--rev <tree-ish>` reads another comm
 A surface whose repository does not depend on brand runs it with `pnpm dlx --package @tangle-network/brand tangle-drift check …`.
 It exits 1 when any gated count is above the baseline, naming the metric, the files whose count rose above their own baseline count, and the matching lines.
 It exits 0 when every count is equal or lower; when one is lower it prints the command that lowers the baseline.
+A metric the baseline row has not recorded yet (one added after that row was written, or missing from a consumer's own `--baseline` file) is printed as not yet gated and does not fail; it gates from the first baseline that records it.
 
 ## Lowering and refreshing the baseline
 
@@ -44,10 +52,36 @@ node packages/brand/bin/tangle-drift.mjs check --all --remote --update-baseline
 ```
 
 `--remote` shallow-fetches each repository's default branch (resolved from the remote) into `~/.cache/tangle-drift` as a partial clone that leaves blobs over 256 KiB on the server.
-The first run of all fifteen surfaces took about seven minutes on GTR; a warm run takes under a minute.
+The first run of all fifteen surfaces (now sixteen, with insurance) took about seven minutes on GTR; a warm run takes under a minute.
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
-`--update-baseline` refuses any row with a rise and exits 1; `--allow-rise` accepts it, and belongs only in a reviewed brand change that explains the rise.
+`--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
+
+## Sizing and type baseline, 2026-10-08
+
+Recorded from each default branch when the sizing metrics were added. Insurance joined as a surface in the same change.
+Platform's row kept its earlier counts and head because its `arbitrary_color` rose from 21 to 22 since that row was written; its sizing counts were read at develop `b22b58f29`.
+
+| Surface | Head | Font size literal | Size literal | Native control | Control override |
+| --- | --- | ---: | ---: | ---: | ---: |
+| website | `88fa36301` | 155 | 1 | 9 | 0 |
+| sandbox | `b22b58f29` | 27 | 12 | 56 | 0 |
+| platform | `b22b58f29` | 32 | 8 | 444 | 0 |
+| intelligence | `b22b58f29` | 14 | 3 | 50 | 0 |
+| gtm | `626313ec7` | 55 | 6 | 74 | 10 |
+| tax | `d8cecba36` | 25 | 4 | 30 | 8 |
+| legal | `3dda84fd4` | 19 | 1 | 38 | 4 |
+| insurance | `8ab1851d5` | 65 | 0 | 35 | 0 |
+| creative | `459b7f342` | 84 | 3 | 67 | 5 |
+| physim | `d5fdb4760` | 302 | 0 | 52 | 0 |
+| hospitality | `871f7e62b` | 116 | 0 | 83 | 0 |
+| audits | `af6c5106a` | 103 | 8 | 16 | 12 |
+| browser | `e2de2b85e` | 26 | 3 | 16 | 10 |
+| builder | `031de7609` | 55 | 4 | 80 | 1 |
+| blueprint | `1ac4236f8` | 50 | 28 | 404 | 18 |
+| super | `30e0cd527` | 427 | 0 | 0 | 0 |
+
+Insurance's first row also records raw palette 73, hex 162 and CSS variable definitions 183.
 
 ## Baseline, 2026-10-05
 

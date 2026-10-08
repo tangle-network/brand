@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
-import { UsageError, compare, DEFAULT_BASELINE, localSource, main, measure, readBaseline, remoteSource, risenFiles, updateBaseline } from "../bin/tangle-drift.mjs";
+import { GATED, UsageError, compare, DEFAULT_BASELINE, localSource, main, measure, readBaseline, remoteSource, risenFiles, updateBaseline } from "../bin/tangle-drift.mjs";
 
 const tmp = mkdtempSync(join(tmpdir(), "tangle-drift-"));
 after(() => rmSync(tmp, { recursive: true, force: true }));
@@ -64,12 +64,55 @@ test("counts each metric with drift.py's patterns and pathspecs", () => {
   assert.equal(row.css_files, 1);
 });
 
+test("counts sizing and type deviations, not token references", () => {
+  const dir = join(tmp, "sizing");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  write(dir, {
+    "src/Form.tsx": [
+      'export const a = <p className="text-[13px] sm:text-[0.8rem] text-[var(--text-control)] text-[length:var(--x)]" />;', // 2 literal font sizes
+      'export const b = <div style={{ fontSize: 13, lineHeight: 1 }} />;', // 1 inline font size
+      'export const c = <div className="h-[34px] min-h-[2.5rem] sm:size-[30px] max-h-[400px] h-[var(--control-height-md)] w-[12px]" />;', // 3 literal sizes
+      'export const d = <><button type="button" /><input /><select /><textarea /><Button /><label /></>;', // 4 native controls
+      'export const e = <Button className="h-8 px-3 text-xs">Save</Button>;', // 1 override
+      'export const f = <Button size="sm" className="w-full gap-2">Save</Button>;', // layout only: not an override
+      'export const g = <Input className="max-sm:text-base" />;', // a variant-prefixed retype is still an override
+    ].join("\n"),
+    "src/app.css": ".a { font-size: 13px; }\n.b { font-size: var(--text-control); }\n.c { font-size: 0.75rem; }\n", // 2 literal font sizes
+  });
+  commit(dir, "sizing");
+  const { row } = measure("gtm", localSource(dir));
+  assert.equal(row.font_size_literal, 5);
+  assert.deepEqual(row.by_file.font_size_literal, { "src/Form.tsx": 3, "src/app.css": 2 });
+  assert.equal(row.size_literal, 3);
+  assert.equal(row.native_control, 4);
+  assert.equal(row.control_override, 2);
+});
+
 test("compare reports rises and falls on gated metrics only", () => {
-  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, importing_files: { ui: 9 } };
-  assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [] });
+  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, importing_files: { ui: 9 } };
+  assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
   const { rises, falls } = compare(base, { ...base, raw_palette: 4, hex: 1 });
   assert.deepEqual(rises, [{ metric: "raw_palette", base: 3, now: 4 }]);
   assert.deepEqual(falls, [{ metric: "hex", base: 4, now: 1 }]);
+});
+
+test("a metric the baseline row has not recorded is reported, not gated, and is recorded on update", () => {
+  const old = { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0, by_file: { raw_palette: { "a.tsx": 3 } } };
+  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1,
+    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 } } };
+  const { rises, unrecorded } = compare(old, now);
+  assert.deepEqual(rises, []);
+  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override"]);
+  assert.deepEqual(updateBaseline({ gtm: old }, { gtm: now }).next.gtm, now);
+  // A row refused for a rise keeps its old counts but still records the new metrics.
+  const risen = { ...now, raw_palette: 9 };
+  const { next, refused } = updateBaseline({ gtm: old }, { gtm: risen });
+  assert.equal(refused[0].surface, "gtm");
+  assert.equal(next.gtm.raw_palette, 3);
+  assert.equal(next.gtm.font_size_literal, 7);
+  assert.deepEqual(next.gtm.by_file.font_size_literal, { "a.tsx": 7 });
+  assert.deepEqual(next.gtm.by_file.raw_palette, { "a.tsx": 3 });
 });
 
 test("risenFiles names the files above their own baseline count", () => {
@@ -82,7 +125,8 @@ test("risenFiles names the files above their own baseline count", () => {
 });
 
 test("updateBaseline lowers freely and refuses a rise without allowRise", () => {
-  const base = { gtm: { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0 } };
+  const base = { gtm: Object.fromEntries(GATED.map((m) => [m, 0])) };
+  Object.assign(base.gtm, { raw_palette: 3, hex: 4 });
   const lower = { ...base.gtm, hex: 2 };
   assert.deepEqual(updateBaseline(base, { gtm: lower }).next.gtm, lower);
   const higher = { ...base.gtm, raw_palette: 5 };
@@ -189,9 +233,9 @@ test("contradictory or unsafe arguments are refused", () => {
 
 test("the shipped baseline has a row with every gated count for each surface", () => {
   const baseline = readBaseline(DEFAULT_BASELINE);
-  assert.deepEqual(Object.keys(baseline), ["website", "sandbox", "platform", "intelligence", "gtm", "tax", "legal", "creative", "physim", "hospitality", "audits", "browser", "builder", "blueprint", "super"]);
+  assert.deepEqual(Object.keys(baseline), ["website", "sandbox", "platform", "intelligence", "gtm", "tax", "legal", "insurance", "creative", "physim", "hospitality", "audits", "browser", "builder", "blueprint", "super"]);
   for (const row of Object.values(baseline)) {
-    for (const metric of ["raw_palette", "hex", "arbitrary_color", "css_var_defs", "local_primitive_count"]) assert.equal(typeof row[metric], "number");
+    for (const metric of GATED) assert.equal(typeof row[metric], "number", metric);
     assert.match(row.head, /^[0-9a-f]{12}$/);
   }
 });

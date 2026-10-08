@@ -19,6 +19,14 @@
   --text-page: var(--font-size-3xl);
   --text-section: var(--font-size-xl);
   --text-eyebrow: var(--font-size-sm);
+  --text-control-sm: var(--control-text-sm);
+  --text-control-md: var(--control-text-md);
+  --text-control-lg: var(--control-text-lg);
+  --text-label: var(--font-size-label);
+  --text-help: var(--font-size-help);
+  --spacing-control-sm: var(--control-height-sm);
+  --spacing-control-md: var(--control-height);
+  --spacing-control-lg: var(--control-height-lg);
   --color-scrim: var(--scrim);
   --color-scrim-strong: var(--scrim-strong);
   --color-on-media: var(--on-media);

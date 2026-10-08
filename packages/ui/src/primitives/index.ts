@@ -65,6 +65,9 @@ export { Slider } from "./slider";
 export { Input, Textarea } from "./input";
 export type { InputProps, TextareaProps } from "./input";
 
+export { HelpText } from "./help-text";
+export type { HelpTextProps } from "./help-text";
+
 export { Badge, badgeVariants } from "./badge";
 export type { BadgeProps } from "./badge";
 

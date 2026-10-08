@@ -5,7 +5,7 @@
    "src"
   ],
   "branch": "master",
-  "head": "7c991b524e52",
+  "head": "88fa36301970",
   "tsx_files": 33,
   "css_files": 5,
   "versions": {
@@ -34,13 +34,53 @@
     "src/components/recorded-agent-timeline.css": 4,
     "src/components/recorded-run-waterfall.css": 9
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/components/BenchmarkExplorer.astro": 2,
+    "src/components/BenchmarkReport.astro": 27,
+    "src/components/BenchmarkTaskPrompts.astro": 5,
+    "src/components/BlogCover.astro": 2,
+    "src/components/Footer.astro": 7,
+    "src/components/RunActions.astro": 6,
+    "src/components/RunStory.astro": 7,
+    "src/components/SandboxQuickstart.astro": 2,
+    "src/components/quickstart-code.css": 6,
+    "src/components/recorded-agent-timeline.css": 1,
+    "src/components/recorded-run-waterfall.css": 1,
+    "src/layouts/BlogLayout.astro": 13,
+    "src/pages/404.astro": 4,
+    "src/pages/benchmarks/[id].astro": 2,
+    "src/pages/benchmarks/index.astro": 8,
+    "src/pages/blog/index.astro": 6,
+    "src/pages/blog/series/[series].astro": 2,
+    "src/pages/brand-kit.astro": 9,
+    "src/pages/index.astro": 29,
+    "src/pages/privacy-policy.astro": 1,
+    "src/pages/security.astro": 1,
+    "src/pages/sub-processors.astro": 1,
+    "src/pages/terms-of-service.astro": 1,
+    "src/pages/what-is-tangle.astro": 5,
+    "src/styles/global.css": 7
+   },
+   "size_literal": {
+    "src/pages/releases.astro": 1
+   },
+   "native_control": {
+    "src/components/BenchmarkExplorer.astro": 1,
+    "src/components/Header.astro": 3,
+    "src/components/QuickstartCode.tsx": 5
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 29,
   "arbitrary_color": 0,
   "css_var_defs": 17,
   "local_primitive_count": 0,
+  "font_size_literal": 155,
+  "size_literal": 1,
+  "native_control": 9,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -50,25 +90,25 @@
    "products/sandbox/web"
   ],
   "branch": "develop",
-  "head": "cd01e4f79f6a",
+  "head": "b22b58f2936f",
   "tsx_files": 132,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.53.4"
+    "0.53.17"
    ],
    "brand": [
-    "1.10.3"
+    "1.17.0"
    ],
    "sandbox-ui": [
-    "0.123.2"
+    "0.125.3"
    ],
    "ui": [
-    "11.16.11"
+    "11.20.0"
    ]
   },
   "importing_files": {
-   "brand": 0,
+   "brand": 2,
    "ui": 89,
    "sandbox-ui": 63,
    "agent-app": 16
@@ -77,25 +117,73 @@
    "raw_palette": {},
    "hex": {
     "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 4,
-    "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 7,
-    "products/sandbox/web/src/globals.css": 11,
+    "products/sandbox/web/src/globals.css": 10,
     "products/sandbox/web/src/pages/dashboard/SandboxSession.tsx": 1,
-    "products/sandbox/web/src/pages/dashboard/sandbox-session/TerminalTab.tsx": 9
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/TerminalTab.tsx": 6
    },
-   "arbitrary_color": {
-    "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 1
-   },
+   "arbitrary_color": {},
    "css_var_defs": {
-    "products/sandbox/web/src/globals.css": 61,
+    "products/sandbox/web/src/globals.css": 57,
     "products/sandbox/web/src/pages/ApiReferencePage.css": 11
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 4,
+    "products/sandbox/web/src/components/landing/HeroTerminal.tsx": 1,
+    "products/sandbox/web/src/components/ui/Heading.tsx": 5,
+    "products/sandbox/web/src/globals.css": 13,
+    "products/sandbox/web/src/main.tsx": 1,
+    "products/sandbox/web/src/pages/Landing.tsx": 3
+   },
+   "size_literal": {
+    "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 2,
+    "products/sandbox/web/src/pages/Landing.tsx": 4,
+    "products/sandbox/web/src/pages/dashboard/SandboxSession.tsx": 2,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/DesktopTab.tsx": 2,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/MetricsTab.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/session-layout.tsx": 1
+   },
+   "native_control": {
+    "products/sandbox/web/src/components/DevSwitchUser.tsx": 1,
+    "products/sandbox/web/src/components/ErrorBoundary.tsx": 1,
+    "products/sandbox/web/src/components/InlineErrorBanner.tsx": 1,
+    "products/sandbox/web/src/components/InlineSuccessBanner.tsx": 1,
+    "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 2,
+    "products/sandbox/web/src/components/landing/HeroWorkspace.tsx": 2,
+    "products/sandbox/web/src/layouts/PublicNav.tsx": 1,
+    "products/sandbox/web/src/pages/CliDeviceAuth.tsx": 2,
+    "products/sandbox/web/src/pages/DemoWorkbench.tsx": 1,
+    "products/sandbox/web/src/pages/Landing.tsx": 3,
+    "products/sandbox/web/src/pages/dashboard/Billing.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/BillingResourceRates.tsx": 2,
+    "products/sandbox/web/src/pages/dashboard/NewSandboxEnvironmentControls.tsx": 3,
+    "products/sandbox/web/src/pages/dashboard/NewTeam.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-provisioning/ResourceControl.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-provisioning/ResourcesStep.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-provisioning/SshAccessSection.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-provisioning/StartupScriptsSection.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/AgentWorkspace.tsx": 3,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/EgressPolicySection.tsx": 2,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/SettingsBackendCard.tsx": 8,
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/overview-sections.tsx": 5,
+    "products/sandbox/web/src/pages/dashboard/team/SharedSandboxesTable.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/team/TeamEgressSection.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/templates/FeaturedTemplateTags.tsx": 2,
+    "products/sandbox/web/src/pages/dashboard/templates/PublicTemplateRow.tsx": 3,
+    "products/sandbox/web/src/pages/dashboard/templates/PublicTemplatesHeader.tsx": 4,
+    "products/sandbox/web/src/pages/dashboard/templates/SavedTemplatesTab.tsx": 1
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
-  "hex": 32,
-  "arbitrary_color": 1,
-  "css_var_defs": 72,
+  "hex": 21,
+  "arbitrary_color": 0,
+  "css_var_defs": 68,
   "local_primitive_count": 0,
+  "font_size_literal": 27,
+  "size_literal": 12,
+  "native_control": 56,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -147,7 +235,151 @@
     "products/platform/web/src/client/components/ui.tsx": 3,
     "products/platform/web/src/client/components/workflow/run-output/primitives.tsx": 1,
     "products/platform/web/src/client/components/workflow/run-shell/status.tsx": 1
-   }
+   },
+   "font_size_literal": {
+    "products/platform/web/src/client/components/workflow/run-output/messaging.tsx": 3,
+    "products/platform/web/src/client/components/workflow/run-output/primitives.tsx": 1,
+    "products/platform/web/src/client/styles.css": 9,
+    "products/platform/web/src/client/vault.css": 19
+   },
+   "size_literal": {
+    "products/platform/web/src/client/components/NavigationFrame.tsx": 1,
+    "products/platform/web/src/client/components/dashboard/DashboardStats.tsx": 1,
+    "products/platform/web/src/client/components/workflow/WorkflowFieldControls.tsx": 2,
+    "products/platform/web/src/client/components/workflow/in-place-field.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowDetailMainColumn.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowGraphPanel.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowGraphGallery.tsx": 1
+   },
+   "native_control": {
+    "products/platform/web/src/client/components/ApiKeyConnectModal.tsx": 12,
+    "products/platform/web/src/client/components/AuthForm.tsx": 5,
+    "products/platform/web/src/client/components/CheckYourEmailPanel.tsx": 1,
+    "products/platform/web/src/client/components/ConfirmDialog.tsx": 5,
+    "products/platform/web/src/client/components/CopyRow.tsx": 1,
+    "products/platform/web/src/client/components/DataTable.tsx": 9,
+    "products/platform/web/src/client/components/EmailAddressRow.tsx": 4,
+    "products/platform/web/src/client/components/EmailVerificationBanner.tsx": 2,
+    "products/platform/web/src/client/components/GithubAppInstallations.tsx": 4,
+    "products/platform/web/src/client/components/IntegrationsCatalog.tsx": 9,
+    "products/platform/web/src/client/components/Layout.tsx": 2,
+    "products/platform/web/src/client/components/NavigationFrame.tsx": 2,
+    "products/platform/web/src/client/components/OAuthConnectionParameterModal.tsx": 4,
+    "products/platform/web/src/client/components/ProductSwitcher.tsx": 1,
+    "products/platform/web/src/client/components/ProtectedRoute.tsx": 1,
+    "products/platform/web/src/client/components/RequestIntegrationModal.tsx": 7,
+    "products/platform/web/src/client/components/SecretCopyField.tsx": 2,
+    "products/platform/web/src/client/components/SignupFields.tsx": 3,
+    "products/platform/web/src/client/components/SocialAuthButtons.tsx": 3,
+    "products/platform/web/src/client/components/UsageChartSvg.tsx": 1,
+    "products/platform/web/src/client/components/UsageControls.tsx": 4,
+    "products/platform/web/src/client/components/UserMenu.tsx": 1,
+    "products/platform/web/src/client/components/assistant/confirmed-result-renderer.tsx": 2,
+    "products/platform/web/src/client/components/dashboard/FirstSandboxCommand.tsx": 1,
+    "products/platform/web/src/client/components/dashboard/FirstSandboxSetupCard.tsx": 1,
+    "products/platform/web/src/client/components/profile-channels/ProfileChannels.tsx": 6,
+    "products/platform/web/src/client/components/profile-channels/attach.tsx": 8,
+    "products/platform/web/src/client/components/profile-channels/connect.tsx": 8,
+    "products/platform/web/src/client/components/profile-channels/history.tsx": 4,
+    "products/platform/web/src/client/components/workflow/AddTriggerDialog.tsx": 10,
+    "products/platform/web/src/client/components/workflow/DuplicateWorkflowDialog.tsx": 5,
+    "products/platform/web/src/client/components/workflow/InteractiveTerminalPanel.tsx": 2,
+    "products/platform/web/src/client/components/workflow/ModelField.tsx": 1,
+    "products/platform/web/src/client/components/workflow/OutstandingWorkBanner.tsx": 1,
+    "products/platform/web/src/client/components/workflow/RunEntityPicker.tsx": 6,
+    "products/platform/web/src/client/components/workflow/RunNowDialog.tsx": 7,
+    "products/platform/web/src/client/components/workflow/TriggerScopeDialog.tsx": 10,
+    "products/platform/web/src/client/components/workflow/WebhookTriggerPanel.tsx": 1,
+    "products/platform/web/src/client/components/workflow/WorkflowActionPicker.tsx": 4,
+    "products/platform/web/src/client/components/workflow/WorkflowAddStep.tsx": 2,
+    "products/platform/web/src/client/components/workflow/WorkflowConnectRequirements.tsx": 1,
+    "products/platform/web/src/client/components/workflow/WorkflowCreateStart.tsx": 5,
+    "products/platform/web/src/client/components/workflow/WorkflowDefinitionEditor.tsx": 10,
+    "products/platform/web/src/client/components/workflow/WorkflowFieldControls.tsx": 16,
+    "products/platform/web/src/client/components/workflow/WorkflowHealthCard.tsx": 1,
+    "products/platform/web/src/client/components/workflow/WorkflowListTable.tsx": 2,
+    "products/platform/web/src/client/components/workflow/WorkflowListToolbar.tsx": 2,
+    "products/platform/web/src/client/components/workflow/WorkflowStepList.tsx": 8,
+    "products/platform/web/src/client/components/workflow/WorkflowTriggerStep.tsx": 15,
+    "products/platform/web/src/client/components/workflow/WorkflowVersionsPanel.tsx": 6,
+    "products/platform/web/src/client/components/workflow/WorkflowYamlTextView.tsx": 1,
+    "products/platform/web/src/client/components/workflow/agent-conversation.tsx": 3,
+    "products/platform/web/src/client/components/workflow/in-place-field.tsx": 3,
+    "products/platform/web/src/client/components/workflow/run-output/primitives.tsx": 1,
+    "products/platform/web/src/client/components/workflow/run-shell/run-step-card.tsx": 5,
+    "products/platform/web/src/client/components/workflow/run-shell/run-steps.tsx": 1,
+    "products/platform/web/src/client/components/workflow/run-shell/run-summary.tsx": 3,
+    "products/platform/web/src/client/components/workflow/run-shell/step-output.tsx": 1,
+    "products/platform/web/src/client/components/workflow/step-fields.tsx": 2,
+    "products/platform/web/src/client/components/workflow/step-graph-identity.tsx": 10,
+    "products/platform/web/src/client/pages/AccessRequired.tsx": 3,
+    "products/platform/web/src/client/pages/Account.tsx": 5,
+    "products/platform/web/src/client/pages/AgentProfileDetail.tsx": 3,
+    "products/platform/web/src/client/pages/AgentProfiles.tsx": 4,
+    "products/platform/web/src/client/pages/Alerts.tsx": 14,
+    "products/platform/web/src/client/pages/Billing.tsx": 1,
+    "products/platform/web/src/client/pages/BillingProductCosts.tsx": 1,
+    "products/platform/web/src/client/pages/BillingTopup.tsx": 4,
+    "products/platform/web/src/client/pages/BillingTransactions.tsx": 4,
+    "products/platform/web/src/client/pages/BillingWallets.tsx": 2,
+    "products/platform/web/src/client/pages/ConnectorDetail.tsx": 3,
+    "products/platform/web/src/client/pages/Connectors.tsx": 1,
+    "products/platform/web/src/client/pages/Consent.tsx": 2,
+    "products/platform/web/src/client/pages/CreateKey.tsx": 2,
+    "products/platform/web/src/client/pages/CreditOffer.tsx": 4,
+    "products/platform/web/src/client/pages/DeviceLogin.tsx": 1,
+    "products/platform/web/src/client/pages/ForgotPassword.tsx": 3,
+    "products/platform/web/src/client/pages/GithubApp.tsx": 1,
+    "products/platform/web/src/client/pages/IntegrationPermissions.tsx": 5,
+    "products/platform/web/src/client/pages/Integrations.tsx": 1,
+    "products/platform/web/src/client/pages/KeyCreatedView.tsx": 3,
+    "products/platform/web/src/client/pages/KeyDetail.tsx": 2,
+    "products/platform/web/src/client/pages/KeyLimitsFields.tsx": 5,
+    "products/platform/web/src/client/pages/KeyScopeFields.tsx": 1,
+    "products/platform/web/src/client/pages/Keys.tsx": 1,
+    "products/platform/web/src/client/pages/KeysTable.tsx": 6,
+    "products/platform/web/src/client/pages/KeysToolbar.tsx": 5,
+    "products/platform/web/src/client/pages/Login.tsx": 3,
+    "products/platform/web/src/client/pages/MasterKeyWarning.tsx": 1,
+    "products/platform/web/src/client/pages/NotifySigningKeys.tsx": 10,
+    "products/platform/web/src/client/pages/Plans.tsx": 5,
+    "products/platform/web/src/client/pages/ResetPassword.tsx": 4,
+    "products/platform/web/src/client/pages/RotatedKeyModal.tsx": 2,
+    "products/platform/web/src/client/pages/SeatCheckout.tsx": 1,
+    "products/platform/web/src/client/pages/SkillDetail.tsx": 2,
+    "products/platform/web/src/client/pages/Skills.tsx": 4,
+    "products/platform/web/src/client/pages/SupportIntelligence.tsx": 3,
+    "products/platform/web/src/client/pages/TransactionDetail.tsx": 1,
+    "products/platform/web/src/client/pages/Usage.tsx": 3,
+    "products/platform/web/src/client/pages/UsageProduct.tsx": 2,
+    "products/platform/web/src/client/pages/VerifyEmail.tsx": 2,
+    "products/platform/web/src/client/pages/WorkflowCreate.tsx": 7,
+    "products/platform/web/src/client/pages/WorkflowDetailHeader.tsx": 2,
+    "products/platform/web/src/client/pages/WorkflowDetailMainColumn.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowDetailNameHeading.tsx": 4,
+    "products/platform/web/src/client/pages/WorkflowDetailPage.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowDetailRunHistory.tsx": 4,
+    "products/platform/web/src/client/pages/WorkflowDetailSidebar.tsx": 2,
+    "products/platform/web/src/client/pages/WorkflowDetailTriggers.tsx": 3,
+    "products/platform/web/src/client/pages/WorkflowNodeDetailPanel.tsx": 2,
+    "products/platform/web/src/client/pages/WorkflowRunDetail.tsx": 4,
+    "products/platform/web/src/client/pages/WorkflowTemplates.tsx": 3,
+    "products/platform/web/src/client/pages/Workflows.tsx": 3,
+    "products/platform/web/src/client/pages/dev/AccountMenuGallery.tsx": 2,
+    "products/platform/web/src/client/pages/dev/DashboardGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/NodeOutputGallery.tsx": 2,
+    "products/platform/web/src/client/pages/dev/RunOutputGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/RunTriggerGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/TriggerScopeGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowGraphGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowInPlaceEditGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowListGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowTriggerRailGallery.tsx": 1,
+    "products/platform/web/src/client/pages/developer-apps/AppEditor.tsx": 4,
+    "products/platform/web/src/client/pages/developer-apps/ResourceAccess.tsx": 3,
+    "products/platform/web/src/client/pages/developer-apps/components.tsx": 1
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 24,
@@ -162,7 +394,11 @@
    "StatusDot": 1,
    "Switch": 1,
    "Tabs": 1
-  }
+  },
+  "font_size_literal": 32,
+  "size_literal": 8,
+  "native_control": 444,
+  "control_override": 0
  },
  "intelligence": {
   "repo": "tangle-network/agent-dev-container",
@@ -170,21 +406,21 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "cd01e4f79f6a",
+  "head": "b22b58f2936f",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.53.4"
+    "0.53.17"
    ],
    "brand": [
-    "1.10.0"
+    "1.17.0"
    ],
    "sandbox-ui": [
-    "0.117.1"
+    "0.125.3"
    ],
    "ui": [
-    "11.13.1"
+    "11.20.0"
    ]
   },
   "importing_files": {
@@ -198,15 +434,58 @@
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "products/intelligence/web/src/globals.css": 12
+    "products/intelligence/web/src/globals.css": 10
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "products/intelligence/web/src/components/CommandPalette.tsx": 3,
+    "products/intelligence/web/src/components/DashboardLayout.tsx": 1,
+    "products/intelligence/web/src/components/TraceSpanIO.tsx": 1,
+    "products/intelligence/web/src/components/TraceTree.tsx": 5,
+    "products/intelligence/web/src/components/provider-identity.tsx": 1,
+    "products/intelligence/web/src/globals.css": 2,
+    "products/intelligence/web/src/pages/Landing.tsx": 1
+   },
+   "size_literal": {
+    "products/intelligence/web/src/components/DashboardLayout.tsx": 2,
+    "products/intelligence/web/src/pages/Chat.tsx": 1
+   },
+   "native_control": {
+    "products/intelligence/web/src/components/CommandPalette.tsx": 2,
+    "products/intelligence/web/src/components/CopilotPanel.tsx": 1,
+    "products/intelligence/web/src/components/DashboardLayout.tsx": 5,
+    "products/intelligence/web/src/components/TraceSpanIO.tsx": 1,
+    "products/intelligence/web/src/components/TraceTree.tsx": 5,
+    "products/intelligence/web/src/components/search/SearchPanels.tsx": 2,
+    "products/intelligence/web/src/components/search/SearchTree.tsx": 2,
+    "products/intelligence/web/src/components/sortable.tsx": 1,
+    "products/intelligence/web/src/components/ui.tsx": 2,
+    "products/intelligence/web/src/pages/Alerts.tsx": 1,
+    "products/intelligence/web/src/pages/Artifacts.tsx": 1,
+    "products/intelligence/web/src/pages/Chat.tsx": 3,
+    "products/intelligence/web/src/pages/DatasetDetail.tsx": 1,
+    "products/intelligence/web/src/pages/Datasets.tsx": 1,
+    "products/intelligence/web/src/pages/Drift.tsx": 1,
+    "products/intelligence/web/src/pages/Improvements.tsx": 1,
+    "products/intelligence/web/src/pages/Insights.tsx": 1,
+    "products/intelligence/web/src/pages/Reports.tsx": 4,
+    "products/intelligence/web/src/pages/Runs.tsx": 1,
+    "products/intelligence/web/src/pages/SearchDetail.tsx": 9,
+    "products/intelligence/web/src/pages/SearchLineage.tsx": 2,
+    "products/intelligence/web/src/pages/Webhooks.tsx": 1,
+    "products/intelligence/web/src/pages/spine/improvement.tsx": 2
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 12,
+  "css_var_defs": 10,
   "local_primitive_count": 0,
+  "font_size_literal": 14,
+  "size_literal": 3,
+  "native_control": 50,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -216,28 +495,28 @@
    ""
   ],
   "branch": "master",
-  "head": "4d747cd68720",
-  "tsx_files": 121,
+  "head": "626313ec7787",
+  "tsx_files": 123,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.57.0"
+    "0.58.11"
    ],
    "brand": [
     "1.17.0"
    ],
    "sandbox-ui": [
-    "0.127.4"
+    "0.128.2"
    ],
    "ui": [
-    "11.24.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 3,
    "ui": 5,
-   "sandbox-ui": 93,
-   "agent-app": 178
+   "sandbox-ui": 97,
+   "agent-app": 195
   },
   "by_file": {
    "raw_palette": {},
@@ -246,13 +525,96 @@
    "css_var_defs": {
     "src/app.css": 58
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/app.css": 2,
+    "src/components/board/item-attachments-section.tsx": 3,
+    "src/components/board/item-editor-dialog.tsx": 1,
+    "src/components/board/vault-media-picker.tsx": 1,
+    "src/components/chat-activity-row.tsx": 1,
+    "src/components/chat-message-body.tsx": 1,
+    "src/components/chat-transcript.tsx": 1,
+    "src/components/composer-agent-menu.tsx": 2,
+    "src/components/designs/design-agent-panel.tsx": 3,
+    "src/components/designs/design-card.tsx": 2,
+    "src/components/empty-thread-composer.tsx": 1,
+    "src/components/generated-media-footer.tsx": 3,
+    "src/components/html-vault-preview.tsx": 1,
+    "src/components/publishing/calendar-month.tsx": 3,
+    "src/components/publishing/calendar-week.tsx": 1,
+    "src/components/publishing/channel-slots.tsx": 1,
+    "src/components/publishing/post-chip.tsx": 4,
+    "src/components/publishing/post-composer.tsx": 5,
+    "src/components/publishing/post-list-row.tsx": 1,
+    "src/components/publishing/schedule-popover.tsx": 4,
+    "src/components/sequences/gtm-sequence-agent-panel.tsx": 3,
+    "src/components/workspace-chat-surface.tsx": 2,
+    "src/routes/admin.integrations.tsx": 3,
+    "src/routes/app.workspace.lines.tsx": 1,
+    "src/routes/app.workspace.sequences.$sequenceId.tsx": 2,
+    "src/routes/app.workspace.sequences.tsx": 2,
+    "src/routes/app.workspace.studio.tsx": 1
+   },
+   "size_literal": {
+    "src/components/integration-logo.tsx": 1,
+    "src/components/publishing/calendar-month.tsx": 1,
+    "src/components/publishing/calendar-week.tsx": 1,
+    "src/components/publishing/post-composer.tsx": 3
+   },
+   "native_control": {
+    "src/components/auth-shell.tsx": 1,
+    "src/components/board/item-attachments-section.tsx": 2,
+    "src/components/board/item-editor-dialog.tsx": 5,
+    "src/components/board/media-lightbox.tsx": 2,
+    "src/components/board/vault-media-picker.tsx": 1,
+    "src/components/chat-activity-row.tsx": 2,
+    "src/components/chat-mention-parts.tsx": 1,
+    "src/components/chat-transcript.tsx": 1,
+    "src/components/chat-turn-failure-notice.tsx": 1,
+    "src/components/composer-agent-menu.tsx": 1,
+    "src/components/designs/design-agent-panel.tsx": 2,
+    "src/components/designs/design-card.tsx": 1,
+    "src/components/live-plan-strip.tsx": 1,
+    "src/components/model-availability-notice.tsx": 1,
+    "src/components/opencode-question-tool-card.tsx": 2,
+    "src/components/publishing/calendar-month.tsx": 1,
+    "src/components/publishing/channel-slots.tsx": 1,
+    "src/components/publishing/post-badges.tsx": 1,
+    "src/components/publishing/post-chip.tsx": 1,
+    "src/components/publishing/post-composer.tsx": 2,
+    "src/components/publishing/publish-list.tsx": 1,
+    "src/components/publishing/schedule-popover.tsx": 4,
+    "src/components/question-option-list.tsx": 1,
+    "src/components/sequences/gtm-sequence-agent-panel.tsx": 2,
+    "src/components/session-artifact-list.tsx": 1,
+    "src/components/ui/info-tooltip.tsx": 1,
+    "src/components/vault-chat-rail.tsx": 2,
+    "src/components/workspace-chat-surface.tsx": 1,
+    "src/root.tsx": 1,
+    "src/routes/_index.tsx": 2,
+    "src/routes/admin.acquisition.tsx": 7,
+    "src/routes/agents.consent.tsx": 2,
+    "src/routes/app.workspace.designs.tsx": 9,
+    "src/routes/app.workspace.settings.tsx": 3,
+    "src/routes/app.workspace.studio.tsx": 1,
+    "src/routes/app.workspace.vault.tsx": 6
+   },
+   "control_override": {
+    "src/components/board/item-editor-dialog.tsx": 2,
+    "src/components/board/selection-action-bar.tsx": 2,
+    "src/components/workspace-terminal-panel.tsx": 1,
+    "src/routes/app.workspace.onboarding.tsx": 5
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 58,
   "local_primitive_count": 0,
+  "font_size_literal": 55,
+  "size_literal": 6,
+  "native_control": 74,
+  "control_override": 10,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -262,53 +624,91 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "ff4b70361cf9",
+  "head": "d8cecba368ab",
   "tsx_files": 57,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.53.9"
+    "0.57.12"
    ],
    "brand": [
-    "1.11.0"
+    "1.17.0"
    ],
    "override:agent-app": [
-    "0.53.9"
+    "0.57.12"
    ],
    "override:brand": [
-    "1.11.0"
+    "1.17.0"
    ],
    "override:sandbox-ui": [
-    "0.122.3"
+    "0.128.2"
    ],
    "override:ui": [
-    "11.17.0"
+    "11.26.0"
    ],
    "sandbox-ui": [
-    "0.122.3"
+    "0.128.2"
    ],
    "ui": [
-    "11.17.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 1,
-   "sandbox-ui": 26,
-   "agent-app": 94
+   "sandbox-ui": 36,
+   "agent-app": 100
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "apps/web/src/components/overview/planning-panel.tsx": 8,
+    "apps/web/src/components/overview/workspace-panels.tsx": 1,
+    "apps/web/src/components/vault-ui/completeness-tracker.tsx": 4,
+    "apps/web/src/components/vault-ui/session-summary.tsx": 10,
+    "apps/web/src/components/vault-ui/vault-chat.tsx": 2
+   },
+   "size_literal": {
+    "apps/web/src/components/signatures-panel.tsx": 4
+   },
+   "native_control": {
+    "apps/web/src/components/document-upload.tsx": 1,
+    "apps/web/src/components/overview/planning-panel.tsx": 4,
+    "apps/web/src/components/overview/return-sections.tsx": 3,
+    "apps/web/src/components/overview/workspace-panels.tsx": 9,
+    "apps/web/src/components/plan-card.tsx": 1,
+    "apps/web/src/components/section-nav.tsx": 1,
+    "apps/web/src/components/vault-ui/integration-approval-card.tsx": 1,
+    "apps/web/src/components/vault-ui/proposed-form-card.tsx": 1,
+    "apps/web/src/components/vault-ui/session-summary.tsx": 2,
+    "apps/web/src/routes/app._index.tsx": 3,
+    "apps/web/src/routes/app.documents.tsx": 1,
+    "apps/web/src/routes/app.return.tsx": 1,
+    "apps/web/src/routes/app.settings.tsx": 1,
+    "apps/web/src/routes/app.welcome.tsx": 1
+   },
+   "control_override": {
+    "apps/web/src/components/document-upload.tsx": 1,
+    "apps/web/src/components/overview/fact-chips.tsx": 1,
+    "apps/web/src/components/overview/fact-review.tsx": 2,
+    "apps/web/src/components/overview/planning-panel.tsx": 2,
+    "apps/web/src/components/overview/workspace-panels.tsx": 1,
+    "apps/web/src/routes/app.settings.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 25,
+  "size_literal": 4,
+  "native_control": 30,
+  "control_override": 8,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -318,42 +718,207 @@
    ""
   ],
   "branch": "main",
-  "head": "b0a7c4911a66",
-  "tsx_files": 62,
+  "head": "3dda84fd4897",
+  "tsx_files": 64,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.55.1"
+    "0.57.17"
    ],
    "brand": [
-    "1.14.1"
+    "1.17.0"
    ],
    "sandbox-ui": [
-    "0.125.3"
+    "0.128.2"
    ],
    "ui": [
-    "11.17.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 2,
-   "ui": 16,
+   "ui": 29,
    "sandbox-ui": 18,
-   "agent-app": 117
+   "agent-app": 121
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/components/filing-confirmation.tsx": 4,
+    "src/components/legal-entry-composer.tsx": 1,
+    "src/lib/.server/notifications.ts": 8,
+    "src/routes/_index.tsx": 1,
+    "src/routes/app.workspace.captable.tsx": 2,
+    "src/routes/app.workspace.chat.$threadId.tsx": 2,
+    "src/routes/app.workspace.templates.tsx": 1
+   },
+   "size_literal": {
+    "src/routes/app.workspace.filings.tsx": 1
+   },
+   "native_control": {
+    "src/components/contract-drop-zone.tsx": 1,
+    "src/components/contract-risk-strip.tsx": 1,
+    "src/components/legal-entry-composer.tsx": 1,
+    "src/components/plan-card.tsx": 1,
+    "src/components/vault-review-dock.tsx": 2,
+    "src/components/vault-tree.tsx": 2,
+    "src/components/vault-upload-action.tsx": 3,
+    "src/routes/app.workspace.calendar.tsx": 1,
+    "src/routes/app.workspace.captable.tsx": 1,
+    "src/routes/app.workspace.chat.$threadId.tsx": 15,
+    "src/routes/app.workspace.contracts.redline.tsx": 1,
+    "src/routes/app.workspace.deals.tsx": 1,
+    "src/routes/app.workspace.filings.tsx": 2,
+    "src/routes/app.workspace.onboarding.business.tsx": 2,
+    "src/routes/app.workspace.onboarding.tsx": 1,
+    "src/routes/app.workspace.reviews.$id.tsx": 1,
+    "src/routes/app.workspace.templates.tsx": 2
+   },
+   "control_override": {
+    "src/routes/app.workspace.calendar.tsx": 2,
+    "src/routes/app.workspace.captable.tsx": 1,
+    "src/routes/app.workspace.deals.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 19,
+  "size_literal": 1,
+  "native_control": 38,
+  "control_override": 4,
   "palette_top": [],
+  "local_primitives": {}
+ },
+ "insurance": {
+  "repo": "tangle-network/insurance-agent",
+  "roots": [
+   ""
+  ],
+  "branch": "main",
+  "head": "8ab1851d5874",
+  "tsx_files": 38,
+  "css_files": 1,
+  "versions": {
+   "agent-app": [
+    "0.53.7"
+   ],
+   "brand": [
+    "1.10.1"
+   ],
+   "sandbox-ui": [
+    "0.117.0"
+   ],
+   "ui": [
+    "11.16.5"
+   ]
+  },
+  "importing_files": {
+   "brand": 1,
+   "ui": 1,
+   "sandbox-ui": 20,
+   "agent-app": 65
+  },
+  "by_file": {
+   "raw_palette": {
+    "src/components/judges/JudgeComparison.tsx": 13,
+    "src/components/judges/JudgeEditor.tsx": 4,
+    "src/components/judges/ScoreCard.tsx": 22,
+    "src/components/vault-tree.tsx": 2,
+    "src/routes/app.workspace.approvals.tsx": 2,
+    "src/routes/app.workspace.audit-log.tsx": 16,
+    "src/routes/app.workspace.chat.$threadId.tsx": 12,
+    "src/routes/app.workspace.vault.tsx": 2
+   },
+   "hex": {
+    "src/app.css": 110,
+    "src/root.tsx": 2,
+    "src/routes/_index.tsx": 6,
+    "src/routes/app.workspace._index.tsx": 2,
+    "src/routes/app.workspace.approvals.tsx": 4,
+    "src/routes/app.workspace.integrations.tsx": 1,
+    "src/routes/app.workspace.onboarding.tsx": 1,
+    "src/routes/app.workspace.swaps.tsx": 2,
+    "src/routes/app.workspace.vault.tsx": 2,
+    "src/routes/login.tsx": 16,
+    "src/routes/signup.tsx": 16
+   },
+   "arbitrary_color": {},
+   "css_var_defs": {
+    "src/app.css": 183
+   },
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/app.css": 18,
+    "src/components/approval-confirmation.tsx": 5,
+    "src/components/judges/JudgeEditor.tsx": 2,
+    "src/components/judges/ScoreCard.tsx": 3,
+    "src/lib/.server/notifications.ts": 8,
+    "src/routes/_index.tsx": 14,
+    "src/routes/app.workspace.approvals.tsx": 1,
+    "src/routes/app.workspace.chat.$threadId.tsx": 2,
+    "src/routes/app.workspace.integrations.tsx": 1,
+    "src/routes/login.tsx": 5,
+    "src/routes/signup.tsx": 6
+   },
+   "size_literal": {},
+   "native_control": {
+    "src/components/approval-confirmation.tsx": 1,
+    "src/components/judges/JudgeEditor.tsx": 3,
+    "src/components/suggestion-pills.tsx": 1,
+    "src/components/vault-tree.tsx": 2,
+    "src/routes/app.workspace.approvals.tsx": 2,
+    "src/routes/app.workspace.chat.$threadId.tsx": 6,
+    "src/routes/app.workspace.chat.new.tsx": 2,
+    "src/routes/app.workspace.onboarding.tsx": 2,
+    "src/routes/app.workspace.settings.tsx": 2,
+    "src/routes/app.workspace.vault.tsx": 5,
+    "src/routes/login.tsx": 4,
+    "src/routes/signup.tsx": 5
+   },
+   "control_override": {}
+  },
+  "raw_palette": 73,
+  "hex": 162,
+  "arbitrary_color": 0,
+  "css_var_defs": 183,
+  "local_primitive_count": 0,
+  "font_size_literal": 65,
+  "size_literal": 0,
+  "native_control": 35,
+  "control_override": 0,
+  "palette_top": [
+   [
+    "text-amber-600",
+    8
+   ],
+   [
+    "bg-red-50",
+    6
+   ],
+   [
+    "text-green-600",
+    6
+   ],
+   [
+    "text-amber-700",
+    5
+   ],
+   [
+    "text-red-600",
+    5
+   ],
+   [
+    "bg-amber-50",
+    4
+   ]
+  ],
   "local_primitives": {}
  },
  "creative": {
@@ -362,41 +927,97 @@
    ""
   ],
   "branch": "master",
-  "head": "42eb8446e1e9",
+  "head": "459b7f342d16",
   "tsx_files": 54,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.56.2"
+    "0.58.0"
    ],
    "brand": [
-    "1.15.7"
+    "1.17.0"
    ],
    "sandbox-ui": [
-    "0.127.4"
+    "0.128.1"
    ],
    "ui": [
-    "11.24.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 0,
-   "sandbox-ui": 33,
-   "agent-app": 119
+   "sandbox-ui": 32,
+   "agent-app": 128
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "eval/build-gist.ts": 11,
+    "eval/digest-media.ts": 1,
+    "src/app.css": 12,
+    "src/components/artifact-agent-dock.tsx": 1,
+    "src/components/generations/GenerationCard.tsx": 15,
+    "src/components/missions/MissionCard.tsx": 8,
+    "src/components/sequences/SequenceAssetShelf.tsx": 4,
+    "src/components/vault-artifact.tsx": 4,
+    "src/routes/app.workspace.activity.tsx": 1,
+    "src/routes/app.workspace.assets.tsx": 4,
+    "src/routes/app.workspace.calendar.tsx": 1,
+    "src/routes/app.workspace.chat.tsx": 6,
+    "src/routes/app.workspace.designs.tsx": 2,
+    "src/routes/app.workspace.experiments.tsx": 1,
+    "src/routes/app.workspace.proposals.tsx": 3,
+    "src/routes/app.workspace.sequences.tsx": 2,
+    "src/routes/app.workspace.settings.tsx": 2,
+    "src/routes/app.workspace.studio.tsx": 1,
+    "src/routes/app.workspace.tasks.tsx": 5
+   },
+   "size_literal": {
+    "src/components/artifact-agent-dock.tsx": 1,
+    "src/routes/app.workspace.tasks.tsx": 2
+   },
+   "native_control": {
+    "src/components/agent-instruction-panel.tsx": 1,
+    "src/components/artifact-agent-dock.tsx": 1,
+    "src/components/generations/GenerationCard.tsx": 9,
+    "src/components/missions/MissionCard.tsx": 8,
+    "src/components/new-workspace-dialog.tsx": 1,
+    "src/components/sequences/SequenceAssetShelf.tsx": 6,
+    "src/components/sequences/SequenceExportMenu.tsx": 4,
+    "src/components/ui/info-tooltip.tsx": 1,
+    "src/components/vault-artifact.tsx": 1,
+    "src/routes/agents.consent.tsx": 2,
+    "src/routes/app.workspace.assets.tsx": 1,
+    "src/routes/app.workspace.calendar.tsx": 4,
+    "src/routes/app.workspace.chat.tsx": 9,
+    "src/routes/app.workspace.designs.tsx": 4,
+    "src/routes/app.workspace.sequences.tsx": 2,
+    "src/routes/app.workspace.settings.tsx": 3,
+    "src/routes/app.workspace.studio.tsx": 1,
+    "src/routes/app.workspace.tasks.tsx": 9
+   },
+   "control_override": {
+    "src/components/agent-instruction-panel.tsx": 1,
+    "src/components/artifact-agent-dock.tsx": 1,
+    "src/routes/app.workspace.chat.tsx": 1,
+    "src/routes/app.workspace.designs.tsx": 1,
+    "src/routes/app.workspace.tasks.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 84,
+  "size_literal": 3,
+  "native_control": 67,
+  "control_override": 5,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -406,36 +1027,36 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "84ad0ac21a00",
-  "tsx_files": 16,
+  "head": "d5fdb47606d1",
+  "tsx_files": 17,
   "css_files": 8,
   "versions": {
    "agent-app": [
-    "0.54.1"
+    "0.57.17"
    ],
    "brand": [
-    "1.13.0"
+    "1.17.0"
    ],
    "override:brand": [
-    "1.13.0"
+    "1.17.0"
    ],
    "override:sandbox-ui": [
-    "0.125.3"
+    "0.128.2"
    ],
    "override:ui": [
-    "11.19.0"
+    "11.26.0"
    ],
    "sandbox-ui": [
-    "0.125.3"
+    "0.128.2"
    ],
    "ui": [
-    "11.19.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 1,
-   "ui": 2,
-   "sandbox-ui": 5,
+   "ui": 8,
+   "sandbox-ui": 6,
    "agent-app": 6
   },
   "by_file": {
@@ -445,13 +1066,46 @@
    "css_var_defs": {
     "apps/web/src/styles/canvas-nodes.css": 1
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "apps/web/src/App.tsx": 4,
+    "apps/web/src/AuthGate.tsx": 1,
+    "apps/web/src/assembly/AssemblyBooklet.tsx": 9,
+    "apps/web/src/canvas/NodeInspector.tsx": 8,
+    "apps/web/src/canvas/SystemDiagramCanvas.tsx": 1,
+    "apps/web/src/styles.css": 199,
+    "apps/web/src/styles/assembly.css": 21,
+    "apps/web/src/styles/canvas-nodes.css": 8,
+    "apps/web/src/styles/composer.css": 13,
+    "apps/web/src/styles/fusion.css": 30,
+    "apps/web/src/styles/provenance.css": 8
+   },
+   "size_literal": {},
+   "native_control": {
+    "apps/web/src/AgentChat.tsx": 6,
+    "apps/web/src/ApiKeysPanel.tsx": 5,
+    "apps/web/src/App.tsx": 6,
+    "apps/web/src/CaptureWorkspace.tsx": 7,
+    "apps/web/src/ErrorBoundary.tsx": 1,
+    "apps/web/src/Markdown.tsx": 1,
+    "apps/web/src/PreparedActions.tsx": 10,
+    "apps/web/src/assembly/AssemblyBooklet.tsx": 3,
+    "apps/web/src/assembly/AssemblyBookletLazy.tsx": 1,
+    "apps/web/src/canvas/SystemDiagramCanvas.tsx": 3,
+    "apps/web/src/canvas/SystemDiagramCanvasLazy.tsx": 1,
+    "apps/web/src/components/ChatComposer.tsx": 8
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 1,
   "local_primitive_count": 0,
+  "font_size_literal": 302,
+  "size_literal": 0,
+  "native_control": 52,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -461,41 +1115,76 @@
    ""
   ],
   "branch": "main",
-  "head": "1626db333b09",
-  "tsx_files": 26,
-  "css_files": 12,
+  "head": "871f7e62b41f",
+  "tsx_files": 28,
+  "css_files": 13,
   "versions": {
    "agent-app": [
-    "0.53.13"
+    "0.57.17"
    ],
    "brand": [
-    "1.13.0"
+    "1.17.0"
    ],
    "sandbox-ui": [
-    "0.125.2"
+    "0.128.1"
    ],
    "ui": [
-    "11.19.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 0,
-   "sandbox-ui": 21,
-   "agent-app": 40
+   "ui": 1,
+   "sandbox-ui": 23,
+   "agent-app": 52
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/resetos/demo/preview.css": 2,
+    "src/resetos/resetos.css": 43,
+    "src/ui/operator-dashboard.css": 33,
+    "src/web/agent-profile-settings.css": 3,
+    "src/web/build-apps-workspace.css": 1,
+    "src/web/message-approvals.css": 2,
+    "src/web/people-view.css": 1,
+    "src/web/workspace-apps.css": 2,
+    "src/web/workspace-files-view.css": 5,
+    "src/web/workspace.css": 24
+   },
+   "size_literal": {},
+   "native_control": {
+    "src/resetos/GuestHub.tsx": 6,
+    "src/resetos/demo/main.tsx": 3,
+    "src/ui/OperatorDashboard.tsx": 10,
+    "src/web/AgentProfileSettings.tsx": 9,
+    "src/web/BuildAppsWorkspace.tsx": 4,
+    "src/web/CustomerWorkspace.tsx": 30,
+    "src/web/InternalLineSetup.tsx": 1,
+    "src/web/MessageApprovals.tsx": 1,
+    "src/web/OperationsCoordination.tsx": 2,
+    "src/web/OwnerViews.tsx": 2,
+    "src/web/PaymentsView.tsx": 3,
+    "src/web/PeopleView.tsx": 5,
+    "src/web/PhoneMessages.tsx": 2,
+    "src/web/WorkspaceAppsView.tsx": 3,
+    "src/web/WorkspaceFilesView.tsx": 2
+   },
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 116,
+  "size_literal": 0,
+  "native_control": 83,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -530,13 +1219,53 @@
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "packages/website/src/components/AuditPDF.tsx": 21,
+    "packages/website/src/components/AuditReportsList.tsx": 5,
+    "packages/website/src/components/RedteamDashboardLayout.tsx": 1,
+    "packages/website/src/components/TraceTimeline.tsx": 1,
+    "packages/website/src/index.css": 1,
+    "packages/website/src/pages/AuditReport.tsx": 42,
+    "packages/website/src/pages/AuthCallback.tsx": 2,
+    "packages/website/src/pages/Dashboard.tsx": 5,
+    "packages/website/src/pages/Docs.tsx": 7,
+    "packages/website/src/pages/GitHubSetup.tsx": 2,
+    "packages/website/src/pages/NewAudit.tsx": 4,
+    "packages/website/src/pages/SampleAuditReport.tsx": 12
+   },
+   "size_literal": {
+    "packages/website/src/components/AuditReportsList.tsx": 1,
+    "packages/website/src/pages/AuditReport.tsx": 2,
+    "packages/website/src/pages/Dashboard.tsx": 2,
+    "packages/website/src/pages/NewAudit.tsx": 3
+   },
+   "native_control": {
+    "packages/website/src/components/PublicNav.tsx": 2,
+    "packages/website/src/components/RedteamDashboardLayout.tsx": 2,
+    "packages/website/src/components/TraceTimeline.tsx": 1,
+    "packages/website/src/pages/AuditReport.tsx": 5,
+    "packages/website/src/pages/NewAudit.tsx": 4,
+    "packages/website/src/pages/SampleAuditReport.tsx": 2
+   },
+   "control_override": {
+    "packages/website/src/App.tsx": 1,
+    "packages/website/src/components/PublicNav.tsx": 1,
+    "packages/website/src/pages/AuthCallback.tsx": 1,
+    "packages/website/src/pages/GitHubSetup.tsx": 3,
+    "packages/website/src/pages/NewAudit.tsx": 4,
+    "packages/website/src/pages/SampleAuditReport.tsx": 2
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 103,
+  "size_literal": 8,
+  "native_control": 16,
+  "control_override": 12,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -546,15 +1275,15 @@
    ""
   ],
   "branch": "main",
-  "head": "dd7f9dfefa53",
+  "head": "e2de2b85ee7c",
   "tsx_files": 43,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "^0.55.5"
+    "^0.57.2"
    ],
    "brand": [
-    "^1.15.6"
+    "^1.17.0"
    ],
    "sandbox-ui": [
     "^0.127.4"
@@ -576,13 +1305,52 @@
    "css_var_defs": {
     "src/index.css": 1
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/components/chat/chat-panel.tsx": 2,
+    "src/components/logo.tsx": 1,
+    "src/components/run-replay.tsx": 1,
+    "src/components/runs/run-list.tsx": 1,
+    "src/components/visual-diff-viewer.tsx": 2,
+    "src/index.css": 8,
+    "src/pages/experiments.tsx": 1,
+    "src/pages/run-detail.tsx": 1,
+    "src/pages/shared-report.tsx": 2,
+    "widget/src/styles.ts": 6,
+    "worker/src/lib/resend.ts": 1
+   },
+   "size_literal": {
+    "src/components/chat/chat-panel.tsx": 1,
+    "src/pages/run-detail.tsx": 1,
+    "src/pages/settings.tsx": 1
+   },
+   "native_control": {
+    "src/components/chat/chat-panel.tsx": 3,
+    "src/components/layout/app-layout.tsx": 3,
+    "src/components/layout/workspace-switcher.tsx": 3,
+    "src/components/run-replay.tsx": 4,
+    "src/components/runs/run-list.tsx": 1,
+    "src/components/visual-diff-viewer.tsx": 1,
+    "src/error-boundary.tsx": 1
+   },
+   "control_override": {
+    "src/components/chat/chat-panel.tsx": 4,
+    "src/components/onboarding-wizard.tsx": 2,
+    "src/pages/experiments.tsx": 1,
+    "src/pages/run-detail.tsx": 1,
+    "src/pages/walkthroughs.tsx": 1,
+    "src/pages/workspace-detail.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 1,
   "local_primitive_count": 0,
+  "font_size_literal": 26,
+  "size_literal": 3,
+  "native_control": 16,
+  "control_override": 10,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -592,53 +1360,104 @@
    ""
   ],
   "branch": "main",
-  "head": "37adcfb5478f",
-  "tsx_files": 97,
+  "head": "031de7609895",
+  "tsx_files": 104,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.57.2"
+    "0.58.11"
    ],
    "brand": [
     "1.17.0"
    ],
    "override:agent-app": [
-    "0.57.2"
+    "0.58.11"
    ],
    "override:brand": [
     "1.17.0"
    ],
    "override:sandbox-ui": [
-    "0.127.4"
+    "0.128.3"
    ],
    "override:ui": [
-    "11.24.0"
+    "11.26.0"
    ],
    "sandbox-ui": [
-    "0.127.4"
+    "0.128.3"
    ],
    "ui": [
-    "11.24.0"
+    "11.26.0"
    ]
   },
   "importing_files": {
    "brand": 2,
    "ui": 7,
-   "sandbox-ui": 51,
-   "agent-app": 51
+   "sandbox-ui": 63,
+   "agent-app": 56
   },
   "by_file": {
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "src/app.css": 1,
+    "src/components/agent-rune.tsx": 1,
+    "src/components/listing/host-band.tsx": 1,
+    "src/components/listing/listing-card.tsx": 1,
+    "src/components/listing/site-header.tsx": 1,
+    "src/routes/_index.tsx": 2,
+    "src/routes/app.launch.$agentId.tsx": 2,
+    "src/styles/listing.css": 46
+   },
+   "size_literal": {
+    "src/components/SlotRenderer.tsx": 1,
+    "src/routes/app.$agentId.vault.tsx": 1,
+    "src/routes/app.trade.$slug.tsx": 1,
+    "src/routes/app.use.$slug.tsx": 1
+   },
+   "native_control": {
+    "src/components/ForkUpdateBanner.tsx": 2,
+    "src/components/SlotRenderer.tsx": 1,
+    "src/components/agent-lines.tsx": 5,
+    "src/components/chat-composer.tsx": 1,
+    "src/components/command-palette.tsx": 2,
+    "src/components/feedback-pill.tsx": 5,
+    "src/components/improve-button.tsx": 1,
+    "src/components/launch-number-panel.tsx": 3,
+    "src/components/listing/booking-card.tsx": 4,
+    "src/components/listing/listing-editor.tsx": 1,
+    "src/components/listing/listing-page.tsx": 2,
+    "src/components/onboarding.tsx": 2,
+    "src/components/private-agent-connections.tsx": 1,
+    "src/components/telegram-groups.tsx": 3,
+    "src/components/trading/BuySellPanel.tsx": 7,
+    "src/components/trading/TokenInfoCard.tsx": 1,
+    "src/routes/app.$agentId.billing.tsx": 2,
+    "src/routes/app.$agentId.eval.tsx": 1,
+    "src/routes/app.$agentId.profile.tsx": 1,
+    "src/routes/app.$agentId.settings.tsx": 5,
+    "src/routes/app.admin.calibrate.tsx": 6,
+    "src/routes/app.admin.findings.tsx": 6,
+    "src/routes/app.admin.proposals.tsx": 4,
+    "src/routes/app.use.$slug.tsx": 3,
+    "src/routes/assistants.$slug.tsx": 10,
+    "src/routes/pay.$token.tsx": 1
+   },
+   "control_override": {
+    "src/components/listing/browse.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 55,
+  "size_literal": 4,
+  "native_control": 80,
+  "control_override": 1,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -648,15 +1467,15 @@
    "apps/web"
   ],
   "branch": "develop",
-  "head": "0c8c52fcfb7f",
+  "head": "1ac4236f87c8",
   "tsx_files": 356,
   "css_files": 9,
   "versions": {
    "agent-app": [
-    "0.56.2"
+    "0.57.2"
    ],
    "brand": [
-    "^1.15.7"
+    "^1.17.0"
    ],
    "sandbox-ui": [
     "0.127.4"
@@ -676,13 +1495,226 @@
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {},
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "apps/web/src/components/chat/CodeBlock.tsx": 1,
+    "apps/web/src/components/editor/codemirror/cm-theme.ts": 4,
+    "apps/web/src/components/emails/BaseEmailTemplate.tsx": 5,
+    "apps/web/src/components/emails/EventPhaseEmail.tsx": 2,
+    "apps/web/src/components/emails/PartnerApplicationReceivedEmail.tsx": 2,
+    "apps/web/src/components/emails/PartnerApprovedEmail.tsx": 2,
+    "apps/web/src/components/emails/PartnerPaymentFailedEmail.tsx": 2,
+    "apps/web/src/components/emails/PaymentFailedEmail.tsx": 2,
+    "apps/web/src/components/emails/PrizeWonEmail.tsx": 4,
+    "apps/web/src/components/emails/QuestCompletedEmail.tsx": 2,
+    "apps/web/src/components/quests/QuestCard.tsx": 4,
+    "apps/web/src/components/quests/QuestDetailModal.tsx": 1,
+    "apps/web/src/components/quests/QuestFilters.tsx": 2,
+    "apps/web/src/components/quests/QuestStatsCards.tsx": 1,
+    "apps/web/src/components/quests/competition/CompetitionHero.tsx": 1,
+    "apps/web/src/components/quests/competition/CompetitionOverview.tsx": 4,
+    "apps/web/src/components/reports/ReportOverviewSections.tsx": 3,
+    "apps/web/src/components/workbench/Workbench.client.tsx": 1,
+    "apps/web/src/components/workbench/terminal/Terminal.tsx": 1,
+    "apps/web/src/routes/judge.tsx": 2,
+    "apps/web/src/routes/quests.tsx": 4
+   },
+   "size_literal": {
+    "apps/web/src/components/@settings/tabs/connections/ConnectionDiagnostics.tsx": 3,
+    "apps/web/src/components/batch/BatchInput.tsx": 1,
+    "apps/web/src/components/batch/ExecutionCardPrimitives.tsx": 1,
+    "apps/web/src/components/batch/analytics/BatchAnalyticsDashboard.tsx": 6,
+    "apps/web/src/components/billing/shared/BillingErrorBoundary.tsx": 1,
+    "apps/web/src/components/chat/sections/ChatInput.tsx": 1,
+    "apps/web/src/components/editor/LazyCodeMirror.tsx": 1,
+    "apps/web/src/components/errors/ErrorBoundary.tsx": 1,
+    "apps/web/src/components/layout/gradient-hero.tsx": 1,
+    "apps/web/src/components/notifications/NotificationsBell.tsx": 1,
+    "apps/web/src/components/quests/QuestFilters.tsx": 2,
+    "apps/web/src/components/reports/ReportAnalysisSections.tsx": 1,
+    "apps/web/src/components/reports/ReportOverviewSections.tsx": 2,
+    "apps/web/src/components/workbench/PanelHeader.tsx": 1,
+    "apps/web/src/routes/leaderboard.$slug.tsx": 1,
+    "apps/web/src/routes/leaderboard._index.tsx": 4
+   },
+   "native_control": {
+    "apps/web/src/components/@settings/core/ControlPanel.tsx": 4,
+    "apps/web/src/components/@settings/shared/components/TabManagement.tsx": 1,
+    "apps/web/src/components/@settings/tabs/agents/ToolTogglesEditor.tsx": 2,
+    "apps/web/src/components/@settings/tabs/batch-runs/BatchRunsTab.tsx": 5,
+    "apps/web/src/components/@settings/tabs/connections/CoolifyConnection.tsx": 1,
+    "apps/web/src/components/@settings/tabs/connections/GithubConnection.tsx": 3,
+    "apps/web/src/components/@settings/tabs/connections/NetlifyConnection.tsx": 3,
+    "apps/web/src/components/@settings/tabs/connections/components/PullFromGitHubDialog.tsx": 3,
+    "apps/web/src/components/@settings/tabs/connections/components/PushToGitHubDialog.tsx": 3,
+    "apps/web/src/components/@settings/tabs/data/DataTab.tsx": 2,
+    "apps/web/src/components/@settings/tabs/hosting/HostingTab.tsx": 1,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerAnalyticsTab.tsx": 1,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerDashboardTab.tsx": 2,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerProjectsTab.tsx": 2,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerQuestsTab.tsx": 4,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerSettingsTab.tsx": 1,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/components/PoolBreakdownTooltip.tsx": 1,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/components/dialogs/InviteDialog.tsx": 2,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/components/dialogs/RemovalPolicyDialog.tsx": 2,
+    "apps/web/src/components/@settings/tabs/plugins/PluginsTab.tsx": 1,
+    "apps/web/src/components/@settings/tabs/projects/ProjectsTab.client.tsx": 8,
+    "apps/web/src/components/@settings/tabs/settings/SettingsTab.tsx": 3,
+    "apps/web/src/components/admin/AdminPartnersTab.tsx": 7,
+    "apps/web/src/components/admin/AdminUsersTab.tsx": 3,
+    "apps/web/src/components/admin/PartnerDetailModal.tsx": 2,
+    "apps/web/src/components/admin/QuestsAdminTab.tsx": 4,
+    "apps/web/src/components/admin/events/BenchmarkTasksTab.tsx": 4,
+    "apps/web/src/components/admin/events/CreateEventDialog.tsx": 13,
+    "apps/web/src/components/admin/events/EventDetailModal.tsx": 12,
+    "apps/web/src/components/admin/events/EventListShell.tsx": 4,
+    "apps/web/src/components/admin/events/JudgesTab.tsx": 1,
+    "apps/web/src/components/admin/events/PrizesTab.tsx": 6,
+    "apps/web/src/components/admin/quests/QuestDetailModal.tsx": 1,
+    "apps/web/src/components/admin/verification-config/CompositeBuilder.tsx": 1,
+    "apps/web/src/components/admin/verification-config/GitHubFields.tsx": 1,
+    "apps/web/src/components/admin/verification-config/QuestCompletedFields.tsx": 1,
+    "apps/web/src/components/admin/verification-config/WebhookFields.tsx": 1,
+    "apps/web/src/components/admin/verification-config/shared.tsx": 1,
+    "apps/web/src/components/batch/BatchComparisonView.tsx": 3,
+    "apps/web/src/components/batch/BatchHistoryShowcase.tsx": 2,
+    "apps/web/src/components/batch/BatchInput.tsx": 15,
+    "apps/web/src/components/batch/BatchTemplateSelector.tsx": 3,
+    "apps/web/src/components/batch/ExtendTimeoutButton.tsx": 1,
+    "apps/web/src/components/batch/RunBatchDialog.tsx": 1,
+    "apps/web/src/components/batch/SaveTemplateDialog.tsx": 3,
+    "apps/web/src/components/batch/VariantDiffViewer.tsx": 1,
+    "apps/web/src/components/batch/VariantPromotionPanel.tsx": 2,
+    "apps/web/src/components/batch/analytics/ProfileLeaderboard.tsx": 2,
+    "apps/web/src/components/billing/UpgradeDialog.tsx": 1,
+    "apps/web/src/components/billing/shared/BillingErrorBoundary.tsx": 1,
+    "apps/web/src/components/chat/ChatAlert.tsx": 2,
+    "apps/web/src/components/chat/InlineProvisioning.tsx": 2,
+    "apps/web/src/components/chat/MessageToolPart.tsx": 1,
+    "apps/web/src/components/chat/Messages.client.tsx": 1,
+    "apps/web/src/components/chat/SendButton.client.tsx": 1,
+    "apps/web/src/components/chat/StreamErrorAlert.tsx": 5,
+    "apps/web/src/components/chat/StreamingData.tsx": 1,
+    "apps/web/src/components/chat/ToolDiffDisplay.tsx": 1,
+    "apps/web/src/components/chat/extensions/AgentProfileControl.tsx": 2,
+    "apps/web/src/components/chat/extensions/ChatDomainSelector.tsx": 1,
+    "apps/web/src/components/chat/extensions/DisabledControlButton.tsx": 1,
+    "apps/web/src/components/chat/extensions/FilePreview.tsx": 2,
+    "apps/web/src/components/chat/extensions/HarnessControl.tsx": 1,
+    "apps/web/src/components/chat/extensions/PendingPermissionRequests.tsx": 2,
+    "apps/web/src/components/chat/extensions/PermissionModeControl.tsx": 1,
+    "apps/web/src/components/chat/extensions/ProfilePresetList.tsx": 3,
+    "apps/web/src/components/chat/extensions/StarterTemplates.tsx": 2,
+    "apps/web/src/components/chat/extensions/ThinkingControl.tsx": 1,
+    "apps/web/src/components/chat/run/InlineThinkingItem.tsx": 1,
+    "apps/web/src/components/chat/run/InlineToolItem.tsx": 1,
+    "apps/web/src/components/chat/run/RunGroup.tsx": 1,
+    "apps/web/src/components/chat/sections/ChatInput.tsx": 3,
+    "apps/web/src/components/chat/sections/LandingPricingSection.tsx": 2,
+    "apps/web/src/components/chat/sections/ProjectHistoryShowcase.tsx": 5,
+    "apps/web/src/components/chat/sections/PromptTextarea.tsx": 1,
+    "apps/web/src/components/chat/sections/ScrollToBottomFab.tsx": 1,
+    "apps/web/src/components/chat/toolExtras/CommandPreview.tsx": 1,
+    "apps/web/src/components/chat/toolExtras/GlobResultsPreview.tsx": 2,
+    "apps/web/src/components/chat/toolExtras/GrepResultsPreview.tsx": 3,
+    "apps/web/src/components/chat/toolExtras/QuestionToolPreview.tsx": 3,
+    "apps/web/src/components/deploy/DeployAlert.tsx": 2,
+    "apps/web/src/components/deployments/DeploymentDetailPage.tsx": 2,
+    "apps/web/src/components/deployments/DeploymentsPage.tsx": 3,
+    "apps/web/src/components/deployments/tabs/HealthTab.tsx": 1,
+    "apps/web/src/components/deployments/tabs/LogsTab.tsx": 2,
+    "apps/web/src/components/dev-dashboard/DevDashboard.tsx": 2,
+    "apps/web/src/components/dev-dashboard/tabs/ConfigTab.tsx": 8,
+    "apps/web/src/components/dev-dashboard/tabs/ConsoleTab.tsx": 5,
+    "apps/web/src/components/dev-dashboard/tabs/NetworkTab.tsx": 8,
+    "apps/web/src/components/dev-dashboard/tabs/PerformanceTab.tsx": 1,
+    "apps/web/src/components/dev-dashboard/tabs/StateTab.tsx": 5,
+    "apps/web/src/components/dev-dashboard/tabs/StorageTab.tsx": 12,
+    "apps/web/src/components/dev-dashboard/tabs/TechnicalDebtTab.tsx": 4,
+    "apps/web/src/components/devcontainer/DevContainerStatusIndicator.tsx": 2,
+    "apps/web/src/components/devcontainer/DevInfraStatusIndicator.tsx": 2,
+    "apps/web/src/components/editor/DiffViewer.tsx": 1,
+    "apps/web/src/components/errors/ErrorBoundary.tsx": 1,
+    "apps/web/src/components/feedback/FeedbackDialog.tsx": 3,
+    "apps/web/src/components/feedback/FeedbackModal.tsx": 1,
+    "apps/web/src/components/header/Header.tsx": 2,
+    "apps/web/src/components/header/HeaderActionButtons.client.tsx": 1,
+    "apps/web/src/components/header/LandingHeader.tsx": 1,
+    "apps/web/src/components/header/ProjectChatSwitcher.tsx": 1,
+    "apps/web/src/components/judge/ScoringForm.tsx": 1,
+    "apps/web/src/components/leaderboard/LeaderboardTable.tsx": 1,
+    "apps/web/src/components/notifications/NotificationsBell.tsx": 2,
+    "apps/web/src/components/plugins/surfaces/WorkbenchTab.tsx": 1,
+    "apps/web/src/components/pricing/PricingToggle.tsx": 2,
+    "apps/web/src/components/profiles/ProfileEditorModal.tsx": 3,
+    "apps/web/src/components/quests/CompletedQuestsHistory.tsx": 3,
+    "apps/web/src/components/quests/EventCard.tsx": 1,
+    "apps/web/src/components/quests/EventDetailModal.tsx": 4,
+    "apps/web/src/components/quests/QuestCard.tsx": 3,
+    "apps/web/src/components/quests/QuestDetailModal.tsx": 4,
+    "apps/web/src/components/quests/QuestFilters.tsx": 6,
+    "apps/web/src/components/quests/QuestsPageTabs.tsx": 1,
+    "apps/web/src/components/quests/RankingsTable.tsx": 2,
+    "apps/web/src/components/quests/SubmitRunDialog.tsx": 4,
+    "apps/web/src/components/quests/competition/CompetitionAnalytics.tsx": 1,
+    "apps/web/src/components/quests/competition/CompetitionHero.tsx": 2,
+    "apps/web/src/components/quests/competition/CompetitionLeaderboard.tsx": 6,
+    "apps/web/src/components/quests/competition/CompetitionOverview.tsx": 3,
+    "apps/web/src/components/quests/competition/CompetitionResults.tsx": 1,
+    "apps/web/src/components/quests/competition/shared.tsx": 1,
+    "apps/web/src/components/quests/emoji-picker-input.tsx": 2,
+    "apps/web/src/components/reports/ReportDetailView.tsx": 2,
+    "apps/web/src/components/reports/ReportOverviewSections.tsx": 1,
+    "apps/web/src/components/reports/ReportsPage.tsx": 18,
+    "apps/web/src/components/sidebar/HistoryItem.tsx": 3,
+    "apps/web/src/components/sidebar/Menu.client.tsx": 1,
+    "apps/web/src/components/sidebar/ProjectSidebarItem.tsx": 2,
+    "apps/web/src/components/sidebar/modes/BatchesPanel.tsx": 1,
+    "apps/web/src/components/sidebar/rail-menu.tsx": 3,
+    "apps/web/src/components/workbench/DiffView.tsx": 1,
+    "apps/web/src/components/workbench/EditorPanel.tsx": 1,
+    "apps/web/src/components/workbench/FileBreadcrumb.tsx": 1,
+    "apps/web/src/components/workbench/FileTree.tsx": 1,
+    "apps/web/src/components/workbench/FileTreeContextMenu.tsx": 1,
+    "apps/web/src/components/workbench/PanelHeaderButton.tsx": 1,
+    "apps/web/src/components/workbench/PortDropdown.tsx": 1,
+    "apps/web/src/components/workbench/PortsPane.tsx": 1,
+    "apps/web/src/components/workbench/Preview.tsx": 2,
+    "apps/web/src/components/workbench/Workbench.client.tsx": 9,
+    "apps/web/src/components/workbench/WorkspaceStatusIndicator.tsx": 2,
+    "apps/web/src/components/workbench/terminal/Terminal.tsx": 1,
+    "apps/web/src/components/workbench/terminal/TerminalTabs.tsx": 2,
+    "apps/web/src/root.tsx": 2,
+    "apps/web/src/routes/admin._index.tsx": 1,
+    "apps/web/src/routes/competitions.$slug.tsx": 2,
+    "apps/web/src/routes/judge.tsx": 2,
+    "apps/web/src/routes/partner-onboarding.tsx": 3,
+    "apps/web/src/routes/partner.invite.$code.tsx": 2,
+    "apps/web/src/routes/quests.tsx": 7
+   },
+   "control_override": {
+    "apps/web/src/components/@settings/tabs/agents/AgentsTab.tsx": 3,
+    "apps/web/src/components/@settings/tabs/agents/McpServerEditor.tsx": 1,
+    "apps/web/src/components/@settings/tabs/agents/PermissionsEditor.tsx": 1,
+    "apps/web/src/components/@settings/tabs/agents/ResourceCategoryEditors.tsx": 1,
+    "apps/web/src/components/@settings/tabs/partner-dashboard/components/InviteCodesSection.tsx": 1,
+    "apps/web/src/components/admin/AdminAuditTab.tsx": 1,
+    "apps/web/src/components/admin/AdminFeatureFlagsTab.tsx": 1,
+    "apps/web/src/components/deployments/tabs/LogsTab.tsx": 2,
+    "apps/web/src/components/quests/QuestFilters.tsx": 1,
+    "apps/web/src/components/reports/ReportsPage.tsx": 1,
+    "apps/web/src/routes/partner.invite.$code.tsx": 5
+   }
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
+  "font_size_literal": 50,
+  "size_literal": 28,
+  "native_control": 404,
+  "control_override": 18,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -692,15 +1724,15 @@
    "public"
   ],
   "branch": "main",
-  "head": "315daedca370",
-  "tsx_files": 14,
+  "head": "30e0cd52710f",
+  "tsx_files": 16,
   "css_files": 5,
   "versions": {
    "agent-app": [
     "0.51.12"
    ],
    "brand": [
-    "1.15.0"
+    "1.15.1"
    ]
   },
   "importing_files": {
@@ -717,13 +1749,26 @@
     "public/design-components.css": 8,
     "public/style.css": 1
    },
-   "local_primitive_count": {}
+   "local_primitive_count": {},
+   "font_size_literal": {
+    "public/design-components.css": 4,
+    "public/invite.css": 4,
+    "public/style.css": 386,
+    "public/timeline.css": 33
+   },
+   "size_literal": {},
+   "native_control": {},
+   "control_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
   "css_var_defs": 9,
   "local_primitive_count": 0,
+  "font_size_literal": 427,
+  "size_literal": 0,
+  "native_control": 0,
+  "control_override": 0,
   "palette_top": [],
   "local_primitives": {}
  }

@@ -442,6 +442,17 @@
 
   /* Density */
   --control-height: 2.25rem;
+  /* Control scale: Button, IconButton sizes, Input, Textarea and SelectTrigger
+     share one height and text size per size, so a row of mixed controls aligns.
+     md is --control-height, the density knob a subtree may override. */
+  --control-height-sm: 2rem;      /* 32px */
+  --control-height-lg: 2.75rem;   /* 44px — touch target */
+  --control-text-sm: 0.75rem;     /* 12px */
+  --control-text-md: 0.875rem;    /* 14px */
+  --control-text-lg: 1rem;        /* 16px — fields never zoom on iOS */
+  /* Form text: labels name a field; help text describes or reports on it. */
+  --font-size-label: 0.875rem;    /* 14px */
+  --font-size-help: 0.75rem;      /* 12px */
   --panel-padding: 1rem;
   --content-max-width: 80rem;
 
