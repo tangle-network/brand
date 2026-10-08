@@ -1,9 +1,18 @@
-import { memo } from "react";
-import ReactMarkdown, { defaultUrlTransform, type UrlTransform } from "react-markdown";
+import {
+  createContext,
+  memo,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
+import ReactMarkdown, { defaultUrlTransform, type ExtraProps, type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import GithubSlugger from "github-slugger";
+import { ImageOff } from "lucide-react";
 import { CodeBlock, CopyButton } from "./code-block";
 import { cn } from "../lib/utils";
 
@@ -41,6 +50,75 @@ function transformMarkdownUrl(
   return safeUrl(transformed);
 }
 
+// An image already wrapped in a Markdown link keeps that link: anchors cannot nest.
+const MarkdownLinkContext = createContext(false);
+
+function MarkdownLink({ node: _node, ...props }: ComponentProps<"a"> & ExtraProps) {
+  return (
+    <MarkdownLinkContext.Provider value>
+      <a {...props} />
+    </MarkdownLinkContext.Provider>
+  );
+}
+
+/**
+ * Renders a Markdown image that opens full size in a new tab, or a labelled
+ * placeholder when its URL is unsafe or fails to load, instead of the
+ * browser's broken-image icon.
+ */
+function MarkdownImage({ node: _node, src, alt, className, ...props }: ComponentProps<"img"> & ExtraProps) {
+  const insideLink = useContext(MarkdownLinkContext);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const url = typeof src === "string" && src ? src : undefined;
+  const [failedUrl, setFailedUrl] = useState<string>();
+
+  // A server-rendered image can fail before hydration attaches onError.
+  useEffect(() => {
+    const image = imageRef.current;
+    if (!url || !image?.complete || typeof image.decode !== "function") return;
+    let current = true;
+    image.decode().catch(() => {
+      if (current) setFailedUrl(url);
+    });
+    return () => {
+      current = false;
+    };
+  }, [url]);
+
+  if (!url || failedUrl === url) {
+    const label = alt ? `Image unavailable: ${alt}` : "Image unavailable";
+    return (
+      <span
+        role="img"
+        aria-label={label}
+        className="inline-flex max-w-full items-center gap-2 rounded-md border border-dashed border-border bg-muted px-3 py-2 text-sm text-muted-foreground"
+      >
+        <ImageOff aria-hidden className="size-4 shrink-0" />
+        <span className="min-w-0 truncate">{label}</span>
+      </span>
+    );
+  }
+
+  const image = (
+    <img
+      {...props}
+      ref={imageRef}
+      src={url}
+      alt={alt ?? ""}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailedUrl(url)}
+      className={cn("h-auto max-w-full rounded-md", className)}
+    />
+  );
+  if (insideLink) return image;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block max-w-full">
+      {image}
+    </a>
+  );
+}
+
 export interface MarkdownProps {
   children: string;
   className?: string;
@@ -49,8 +127,9 @@ export interface MarkdownProps {
 }
 
 /**
- * Renders Markdown content with GFM support, XSS sanitisation, and
- * custom code block rendering via our CodeBlock component.
+ * Renders Markdown content with GFM support, XSS sanitisation, custom code
+ * block rendering via our CodeBlock component, and images that open full size
+ * or show a labelled placeholder when unavailable.
  */
 export const Markdown = memo(({ children, className, urlTransform }: MarkdownProps) => {
   return (
@@ -62,6 +141,8 @@ export const Markdown = memo(({ children, className, urlTransform }: MarkdownPro
         rehypePlugins={[rehypeSlug, rehypeSanitize]}
         urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform)}
         components={{
+          a: MarkdownLink,
+          img: MarkdownImage,
           pre({ children: preChildren }) {
             return <>{preChildren}</>;
           },

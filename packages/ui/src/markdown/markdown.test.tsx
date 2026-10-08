@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { getSanitizedMarkdownHeadingIdFromRawFragment, Markdown } from "./markdown";
 
 describe("Markdown", () => {
@@ -60,7 +60,7 @@ describe("Markdown", () => {
       "src",
       "https://example.com/image.png",
     );
-    expect(screen.getByRole("img", { name: "Unsafe" })).not.toHaveAttribute("src");
+    expect(screen.getByRole("img", { name: "Image unavailable: Unsafe" })).not.toHaveAttribute("src");
     expect(urlTransform).toHaveBeenCalledWith(
       "https://example.com/image.png",
       "src",
@@ -100,5 +100,34 @@ describe("Markdown", () => {
       expect.objectContaining({ tagName: "a" }),
     );
   });
-});
 
+  it("links an image to its full-size source unless a Markdown link already wraps it", () => {
+    render(
+      <Markdown>
+        {"![Ad](https://example.com/ad.png)\n\n[![Badge](https://example.com/badge.svg)](https://example.com/docs)"}
+      </Markdown>,
+    );
+
+    const ad = screen.getByRole("img", { name: "Ad" });
+    expect(ad).toHaveAttribute("src", "https://example.com/ad.png");
+    expect(ad.closest("a")).toHaveAttribute("href", "https://example.com/ad.png");
+    expect(ad.closest("a")).toHaveAttribute("target", "_blank");
+    expect(ad.closest("a")).toHaveAttribute("rel", "noopener noreferrer");
+
+    const badge = screen.getByRole("img", { name: "Badge" });
+    expect(badge.closest("a")).toHaveAttribute("href", "https://example.com/docs");
+    expect(badge.closest("a")?.parentElement?.closest("a")).toBeNull();
+  });
+
+  it("replaces an image that fails to load with a labelled placeholder", () => {
+    render(<Markdown>{"![Final ad](campaigns/missing.png)"}</Markdown>);
+
+    fireEvent.error(screen.getByRole("img", { name: "Final ad" }));
+
+    expect(screen.queryByRole("img", { name: "Final ad" })).toBeNull();
+    expect(screen.getByRole("img", { name: "Image unavailable: Final ad" })).toHaveTextContent(
+      "Image unavailable: Final ad",
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+});
