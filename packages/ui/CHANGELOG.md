@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.28.2
+
+### Patch Changes
+
+- 9f4d5b8: A file `Input`'s selector button inherits the field's text size, so `sm`, `lg` and coarse-pointer file inputs no longer keep a 14px button.
+
 ## 11.28.1
 
 ### Patch Changes
