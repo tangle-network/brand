@@ -109,7 +109,7 @@
    "products/sandbox/web"
   ],
   "branch": "develop",
-  "head": "b5c219b1ee14",
+  "head": "1890a990ca42",
   "tsx_files": 132,
   "css_files": 3,
   "versions": {
@@ -474,7 +474,7 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "b5c219b1ee14",
+  "head": "1890a990ca42",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
@@ -573,28 +573,28 @@
    ""
   ],
   "branch": "master",
-  "head": "04d7fbd6a59d",
-  "tsx_files": 123,
+  "head": "9125d4bfdb47",
+  "tsx_files": 124,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.58.11"
+    "0.58.19"
    ],
    "brand": [
-    "1.17.1"
+    "1.19.0"
    ],
    "sandbox-ui": [
-    "0.128.2"
+    "0.129.2"
    ],
    "ui": [
-    "11.27.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
    "brand": 3,
    "ui": 5,
-   "sandbox-ui": 97,
-   "agent-app": 195
+   "sandbox-ui": 101,
+   "agent-app": 202
   },
   "by_file": {
    "raw_palette": {},
@@ -606,38 +606,10 @@
    "local_primitive_count": {},
    "font_size_literal": {
     "src/app.css": 2,
-    "src/components/board/item-attachments-section.tsx": 3,
-    "src/components/board/item-editor-dialog.tsx": 1,
-    "src/components/board/vault-media-picker.tsx": 1,
-    "src/components/chat-activity-row.tsx": 1,
-    "src/components/chat-message-body.tsx": 1,
-    "src/components/chat-transcript.tsx": 1,
-    "src/components/composer-agent-menu.tsx": 2,
-    "src/components/designs/design-agent-panel.tsx": 3,
-    "src/components/designs/design-card.tsx": 2,
-    "src/components/empty-thread-composer.tsx": 1,
-    "src/components/generated-media-footer.tsx": 3,
-    "src/components/html-vault-preview.tsx": 1,
-    "src/components/publishing/calendar-month.tsx": 3,
-    "src/components/publishing/calendar-week.tsx": 1,
-    "src/components/publishing/channel-slots.tsx": 1,
-    "src/components/publishing/post-chip.tsx": 4,
-    "src/components/publishing/post-composer.tsx": 5,
-    "src/components/publishing/post-list-row.tsx": 1,
-    "src/components/publishing/schedule-popover.tsx": 4,
-    "src/components/sequences/gtm-sequence-agent-panel.tsx": 3,
-    "src/components/workspace-chat-surface.tsx": 2,
-    "src/routes/admin.integrations.tsx": 3,
-    "src/routes/app.workspace.lines.tsx": 1,
-    "src/routes/app.workspace.sequences.$sequenceId.tsx": 2,
-    "src/routes/app.workspace.sequences.tsx": 2,
-    "src/routes/app.workspace.studio.tsx": 1
+    "src/components/empty-thread-composer.tsx": 1
    },
    "size_literal": {
-    "src/components/integration-logo.tsx": 1,
-    "src/components/publishing/calendar-month.tsx": 1,
-    "src/components/publishing/calendar-week.tsx": 1,
-    "src/components/publishing/post-composer.tsx": 3
+    "src/components/publishing/post-composer.tsx": 1
    },
    "native_control": {
     "src/components/auth-shell.tsx": 1,
@@ -678,34 +650,22 @@
     "src/routes/app.workspace.vault.tsx": 6
    },
    "control_override": {
-    "src/components/board/item-editor-dialog.tsx": 2,
-    "src/components/board/selection-action-bar.tsx": 2,
-    "src/components/workspace-terminal-panel.tsx": 1,
-    "src/routes/app.workspace.onboarding.tsx": 5
+    "src/routes/app.workspace.onboarding.tsx": 4
    },
    "page_heading": {
-    "src/components/content-pipeline-board.tsx": 1,
-    "src/components/publishing/publish-header.tsx": 1,
     "src/components/workspace-terminal-panel.tsx": 2,
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
     "src/routes/admin.integrations.tsx": 1,
     "src/routes/agents.consent.tsx": 1,
-    "src/routes/app.account.tsx": 1,
     "src/routes/app.workspace.agents.tsx": 1,
-    "src/routes/app.workspace.assets.tsx": 1,
     "src/routes/app.workspace.designs.$documentId.tsx": 1,
-    "src/routes/app.workspace.designs.tsx": 1,
-    "src/routes/app.workspace.lines.tsx": 1,
-    "src/routes/app.workspace.onboarding.tsx": 1,
     "src/routes/app.workspace.review.tsx": 1,
     "src/routes/app.workspace.sequences.$sequenceId.tsx": 1,
-    "src/routes/app.workspace.sequences.tsx": 1,
     "src/routes/app.workspace.settings.tsx": 1,
     "src/routes/app.workspace.studio.tsx": 1,
     "src/routes/app.workspace.vault.tsx": 1,
     "src/routes/forgot-password.tsx": 2,
-    "src/routes/help.tsx": 1,
     "src/routes/reset-password.tsx": 3
    }
   },
@@ -714,11 +674,11 @@
   "arbitrary_color": 0,
   "css_var_defs": 58,
   "local_primitive_count": 0,
-  "font_size_literal": 55,
-  "size_literal": 6,
+  "font_size_literal": 3,
+  "size_literal": 1,
   "native_control": 74,
-  "control_override": 10,
-  "page_heading": 27,
+  "control_override": 4,
+  "page_heading": 18,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -728,39 +688,39 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "d8cecba368ab",
+  "head": "0578b64b086f",
   "tsx_files": 57,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.57.12"
+    "0.58.18"
    ],
    "brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "override:agent-app": [
-    "0.57.12"
+    "0.58.18"
    ],
    "override:brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "override:sandbox-ui": [
-    "0.128.2"
+    "0.129.1"
    ],
    "override:ui": [
-    "11.26.0"
+    "11.28.2"
    ],
    "sandbox-ui": [
-    "0.128.2"
+    "0.129.1"
    ],
    "ui": [
-    "11.26.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 1,
-   "sandbox-ui": 36,
+   "sandbox-ui": 35,
    "agent-app": 100
   },
   "by_file": {
@@ -769,16 +729,8 @@
    "arbitrary_color": {},
    "css_var_defs": {},
    "local_primitive_count": {},
-   "font_size_literal": {
-    "apps/web/src/components/overview/planning-panel.tsx": 8,
-    "apps/web/src/components/overview/workspace-panels.tsx": 1,
-    "apps/web/src/components/vault-ui/completeness-tracker.tsx": 4,
-    "apps/web/src/components/vault-ui/session-summary.tsx": 10,
-    "apps/web/src/components/vault-ui/vault-chat.tsx": 2
-   },
-   "size_literal": {
-    "apps/web/src/components/signatures-panel.tsx": 4
-   },
+   "font_size_literal": {},
+   "size_literal": {},
    "native_control": {
     "apps/web/src/components/document-upload.tsx": 1,
     "apps/web/src/components/overview/planning-panel.tsx": 4,
@@ -796,25 +748,15 @@
     "apps/web/src/routes/app.welcome.tsx": 1
    },
    "control_override": {
-    "apps/web/src/components/document-upload.tsx": 1,
     "apps/web/src/components/overview/fact-chips.tsx": 1,
-    "apps/web/src/components/overview/fact-review.tsx": 2,
-    "apps/web/src/components/overview/planning-panel.tsx": 2,
-    "apps/web/src/components/overview/workspace-panels.tsx": 1,
-    "apps/web/src/routes/app.settings.tsx": 1
+    "apps/web/src/components/overview/fact-review.tsx": 2
    },
    "page_heading": {
     "apps/web/src/components/app-error-state.tsx": 1,
     "apps/web/src/components/legal-page.tsx": 1,
     "apps/web/src/routes/_index.tsx": 1,
     "apps/web/src/routes/app.$sessionId.tsx": 1,
-    "apps/web/src/routes/app.billing.tsx": 2,
-    "apps/web/src/routes/app.documents.tsx": 1,
-    "apps/web/src/routes/app.integrations.tsx": 1,
-    "apps/web/src/routes/app.members.tsx": 1,
-    "apps/web/src/routes/app.plan.tsx": 1,
-    "apps/web/src/routes/app.return.tsx": 1,
-    "apps/web/src/routes/app.welcome.tsx": 1
+    "apps/web/src/routes/app.billing.tsx": 2
    }
   },
   "raw_palette": 0,
@@ -822,11 +764,11 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 25,
-  "size_literal": 4,
+  "font_size_literal": 0,
+  "size_literal": 0,
   "native_control": 30,
-  "control_override": 8,
-  "page_heading": 12,
+  "control_override": 3,
+  "page_heading": 6,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -836,28 +778,28 @@
    ""
   ],
   "branch": "main",
-  "head": "3dda84fd4897",
-  "tsx_files": 64,
+  "head": "43fecf8dcd38",
+  "tsx_files": 63,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.57.17"
+    "0.58.18"
    ],
    "brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "sandbox-ui": [
-    "0.128.2"
+    "0.129.2"
    ],
    "ui": [
-    "11.26.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
    "brand": 2,
-   "ui": 29,
+   "ui": 33,
    "sandbox-ui": 18,
-   "agent-app": 121
+   "agent-app": 120
   },
   "by_file": {
    "raw_palette": {},
@@ -866,24 +808,16 @@
    "css_var_defs": {},
    "local_primitive_count": {},
    "font_size_literal": {
-    "src/components/filing-confirmation.tsx": 4,
-    "src/components/legal-entry-composer.tsx": 1,
-    "src/lib/.server/notifications.ts": 8,
-    "src/routes/_index.tsx": 1,
-    "src/routes/app.workspace.captable.tsx": 2,
-    "src/routes/app.workspace.chat.$threadId.tsx": 2,
-    "src/routes/app.workspace.templates.tsx": 1
+    "src/components/filing-confirmation.tsx": 3,
+    "src/lib/.server/notifications.ts": 8
    },
-   "size_literal": {
-    "src/routes/app.workspace.filings.tsx": 1
-   },
+   "size_literal": {},
    "native_control": {
     "src/components/contract-drop-zone.tsx": 1,
     "src/components/contract-risk-strip.tsx": 1,
     "src/components/legal-entry-composer.tsx": 1,
     "src/components/plan-card.tsx": 1,
     "src/components/vault-review-dock.tsx": 2,
-    "src/components/vault-tree.tsx": 2,
     "src/components/vault-upload-action.tsx": 3,
     "src/routes/app.workspace.calendar.tsx": 1,
     "src/routes/app.workspace.captable.tsx": 1,
@@ -896,24 +830,13 @@
     "src/routes/app.workspace.reviews.$id.tsx": 1,
     "src/routes/app.workspace.templates.tsx": 2
    },
-   "control_override": {
-    "src/routes/app.workspace.calendar.tsx": 2,
-    "src/routes/app.workspace.captable.tsx": 1,
-    "src/routes/app.workspace.deals.tsx": 1
-   },
+   "control_override": {},
    "page_heading": {
-    "src/components/destination-shell.tsx": 1,
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
-    "src/routes/app.workspace.audit-log.tsx": 1,
-    "src/routes/app.workspace.billing.tsx": 1,
     "src/routes/app.workspace.chat.$threadId.tsx": 1,
     "src/routes/app.workspace.contracts.$id.tsx": 1,
     "src/routes/app.workspace.contracts.redline.tsx": 1,
-    "src/routes/app.workspace.integrations.tsx": 1,
-    "src/routes/app.workspace.members.tsx": 1,
-    "src/routes/app.workspace.onboarding.tsx": 1,
-    "src/routes/app.workspace.settings.tsx": 1,
     "src/routes/app.workspace.templates.tsx": 1
    }
   },
@@ -922,11 +845,11 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 19,
-  "size_literal": 1,
-  "native_control": 38,
-  "control_override": 4,
-  "page_heading": 13,
+  "font_size_literal": 11,
+  "size_literal": 0,
+  "native_control": 36,
+  "control_override": 0,
+  "page_heading": 6,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -936,27 +859,27 @@
    ""
   ],
   "branch": "main",
-  "head": "8ab1851d5874",
+  "head": "ac24abd12974",
   "tsx_files": 38,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.53.7"
+    "0.58.18"
    ],
    "brand": [
-    "1.10.1"
+    "1.19.0"
    ],
    "sandbox-ui": [
-    "0.117.0"
+    "0.129.1"
    ],
    "ui": [
-    "11.16.5"
+    "11.28.2"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 1,
-   "sandbox-ui": 20,
+   "sandbox-ui": 24,
    "agent-app": 65
   },
   "by_file": {
@@ -966,7 +889,7 @@
     "src/components/judges/ScoreCard.tsx": 22,
     "src/components/vault-tree.tsx": 2,
     "src/routes/app.workspace.approvals.tsx": 2,
-    "src/routes/app.workspace.audit-log.tsx": 16,
+    "src/routes/app.workspace.audit-log.tsx": 15,
     "src/routes/app.workspace.chat.$threadId.tsx": 12,
     "src/routes/app.workspace.vault.tsx": 2
    },
@@ -991,15 +914,10 @@
    "font_size_literal": {
     "src/app.css": 18,
     "src/components/approval-confirmation.tsx": 5,
-    "src/components/judges/JudgeEditor.tsx": 2,
-    "src/components/judges/ScoreCard.tsx": 3,
     "src/lib/.server/notifications.ts": 8,
-    "src/routes/_index.tsx": 14,
-    "src/routes/app.workspace.approvals.tsx": 1,
-    "src/routes/app.workspace.chat.$threadId.tsx": 2,
-    "src/routes/app.workspace.integrations.tsx": 1,
-    "src/routes/login.tsx": 5,
-    "src/routes/signup.tsx": 6
+    "src/routes/_index.tsx": 2,
+    "src/routes/login.tsx": 3,
+    "src/routes/signup.tsx": 2
    },
    "size_literal": {},
    "native_control": {
@@ -1020,31 +938,19 @@
    "page_heading": {
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
-    "src/routes/app.integrations.tsx": 1,
-    "src/routes/app.workspace._index.tsx": 1,
-    "src/routes/app.workspace.approvals.tsx": 1,
-    "src/routes/app.workspace.audit-log.tsx": 1,
-    "src/routes/app.workspace.b2b.tsx": 1,
-    "src/routes/app.workspace.calendar.tsx": 1,
-    "src/routes/app.workspace.chat.$threadId.tsx": 1,
-    "src/routes/app.workspace.clients.tsx": 1,
-    "src/routes/app.workspace.integrations.tsx": 1,
-    "src/routes/app.workspace.leads.tsx": 1,
-    "src/routes/app.workspace.onboarding.tsx": 1,
-    "src/routes/app.workspace.settings.tsx": 1,
-    "src/routes/app.workspace.swaps.tsx": 1
+    "src/routes/app.workspace.chat.$threadId.tsx": 1
    }
   },
-  "raw_palette": 73,
+  "raw_palette": 72,
   "hex": 162,
   "arbitrary_color": 0,
   "css_var_defs": 183,
   "local_primitive_count": 0,
-  "font_size_literal": 65,
+  "font_size_literal": 38,
   "size_literal": 0,
   "native_control": 35,
   "control_override": 0,
-  "page_heading": 15,
+  "page_heading": 3,
   "palette_top": [
    [
     "text-amber-600",
@@ -1079,21 +985,21 @@
    ""
   ],
   "branch": "master",
-  "head": "459b7f342d16",
+  "head": "58b53631f2f6",
   "tsx_files": 54,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.58.0"
+    "0.58.18"
    ],
    "brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "sandbox-ui": [
-    "0.128.1"
+    "0.129.1"
    ],
    "ui": [
-    "11.26.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
@@ -1111,27 +1017,10 @@
    "font_size_literal": {
     "eval/build-gist.ts": 11,
     "eval/digest-media.ts": 1,
-    "src/app.css": 12,
-    "src/components/artifact-agent-dock.tsx": 1,
-    "src/components/generations/GenerationCard.tsx": 15,
-    "src/components/missions/MissionCard.tsx": 8,
-    "src/components/sequences/SequenceAssetShelf.tsx": 4,
-    "src/components/vault-artifact.tsx": 4,
-    "src/routes/app.workspace.activity.tsx": 1,
-    "src/routes/app.workspace.assets.tsx": 4,
-    "src/routes/app.workspace.calendar.tsx": 1,
-    "src/routes/app.workspace.chat.tsx": 6,
-    "src/routes/app.workspace.designs.tsx": 2,
-    "src/routes/app.workspace.experiments.tsx": 1,
-    "src/routes/app.workspace.proposals.tsx": 3,
-    "src/routes/app.workspace.sequences.tsx": 2,
-    "src/routes/app.workspace.settings.tsx": 2,
-    "src/routes/app.workspace.studio.tsx": 1,
-    "src/routes/app.workspace.tasks.tsx": 5
+    "src/app.css": 8
    },
    "size_literal": {
-    "src/components/artifact-agent-dock.tsx": 1,
-    "src/routes/app.workspace.tasks.tsx": 2
+    "src/routes/app.workspace.tasks.tsx": 1
    },
    "native_control": {
     "src/components/agent-instruction-panel.tsx": 1,
@@ -1150,22 +1039,12 @@
     "src/routes/app.workspace.designs.tsx": 4,
     "src/routes/app.workspace.sequences.tsx": 2,
     "src/routes/app.workspace.settings.tsx": 3,
-    "src/routes/app.workspace.studio.tsx": 1,
     "src/routes/app.workspace.tasks.tsx": 9
    },
-   "control_override": {
-    "src/components/agent-instruction-panel.tsx": 1,
-    "src/components/artifact-agent-dock.tsx": 1,
-    "src/routes/app.workspace.chat.tsx": 1,
-    "src/routes/app.workspace.designs.tsx": 1,
-    "src/routes/app.workspace.tasks.tsx": 1
-   },
+   "control_override": {},
    "page_heading": {
     "src/root.tsx": 1,
     "src/routes/agents.consent.tsx": 1,
-    "src/routes/app.workspace.assets.tsx": 1,
-    "src/routes/app.workspace.experiments.tsx": 1,
-    "src/routes/app.workspace.studio.tsx": 1,
     "src/routes/app.workspace.tsx": 1,
     "src/routes/invite.$token.tsx": 1
    }
@@ -1175,11 +1054,11 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 84,
-  "size_literal": 3,
-  "native_control": 67,
-  "control_override": 5,
-  "page_heading": 7,
+  "font_size_literal": 20,
+  "size_literal": 1,
+  "native_control": 66,
+  "control_override": 0,
+  "page_heading": 4,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1282,21 +1161,21 @@
    ""
   ],
   "branch": "main",
-  "head": "444d554b2349",
+  "head": "17951ecdcfff",
   "tsx_files": 28,
   "css_files": 13,
   "versions": {
    "agent-app": [
-    "0.57.17"
+    "0.58.18"
    ],
    "brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "sandbox-ui": [
-    "0.128.1"
+    "0.129.2"
    ],
    "ui": [
-    "11.26.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
@@ -1316,12 +1195,7 @@
     "src/resetos/resetos.css": 43,
     "src/ui/operator-dashboard.css": 33,
     "src/web/agent-profile-settings.css": 3,
-    "src/web/build-apps-workspace.css": 1,
-    "src/web/message-approvals.css": 2,
-    "src/web/people-view.css": 1,
-    "src/web/workspace-apps.css": 2,
-    "src/web/workspace-files-view.css": 5,
-    "src/web/workspace.css": 24
+    "src/web/workspace.css": 1
    },
    "size_literal": {},
    "native_control": {
@@ -1356,7 +1230,7 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 116,
+  "font_size_literal": 82,
   "size_literal": 0,
   "native_control": 83,
   "control_override": 0,
@@ -1553,40 +1427,40 @@
    ""
   ],
   "branch": "main",
-  "head": "7b8014524312",
-  "tsx_files": 104,
+  "head": "8410cd0e5e9d",
+  "tsx_files": 108,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.58.12"
+    "0.58.18"
    ],
    "brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "override:agent-app": [
-    "0.58.12"
+    "0.58.18"
    ],
    "override:brand": [
-    "1.17.0"
+    "1.19.0"
    ],
    "override:sandbox-ui": [
-    "0.128.3"
+    "0.129.1"
    ],
    "override:ui": [
-    "11.26.0"
+    "11.28.2"
    ],
    "sandbox-ui": [
-    "0.128.3"
+    "0.129.1"
    ],
    "ui": [
-    "11.26.0"
+    "11.28.2"
    ]
   },
   "importing_files": {
    "brand": 2,
-   "ui": 7,
-   "sandbox-ui": 63,
-   "agent-app": 56
+   "ui": 6,
+   "sandbox-ui": 67,
+   "agent-app": 59
   },
   "by_file": {
    "raw_palette": {},
@@ -1597,24 +1471,15 @@
    "font_size_literal": {
     "src/app.css": 1,
     "src/components/agent-rune.tsx": 1,
-    "src/components/listing/host-band.tsx": 1,
-    "src/components/listing/listing-card.tsx": 1,
-    "src/components/listing/site-header.tsx": 1,
-    "src/routes/_index.tsx": 2,
+    "src/components/chat-launch.tsx": 1,
     "src/routes/app.launch.$agentId.tsx": 2,
     "src/styles/listing.css": 46
    },
-   "size_literal": {
-    "src/components/SlotRenderer.tsx": 1,
-    "src/routes/app.$agentId.vault.tsx": 1,
-    "src/routes/app.trade.$slug.tsx": 1,
-    "src/routes/app.use.$slug.tsx": 1
-   },
+   "size_literal": {},
    "native_control": {
     "src/components/ForkUpdateBanner.tsx": 2,
     "src/components/SlotRenderer.tsx": 1,
     "src/components/agent-lines.tsx": 5,
-    "src/components/chat-composer.tsx": 1,
     "src/components/command-palette.tsx": 2,
     "src/components/feedback-pill.tsx": 5,
     "src/components/improve-button.tsx": 1,
@@ -1642,17 +1507,13 @@
     "src/components/listing/browse.tsx": 1
    },
    "page_heading": {
+    "src/components/chat-launch.tsx": 1,
     "src/components/listing/listing-page.tsx": 1,
     "src/components/research-cycle-detail.tsx": 1,
     "src/components/trading/TradingPage.tsx": 2,
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
     "src/routes/agents.$slug.tsx": 1,
-    "src/routes/app.admin.auto-research.tsx": 1,
-    "src/routes/app.admin.calibrate.tsx": 1,
-    "src/routes/app.admin.findings.tsx": 1,
-    "src/routes/app.admin.proposals.tsx": 1,
-    "src/routes/app.admin.rl-bridge.tsx": 1,
     "src/routes/app.use.$slug.tsx": 1,
     "src/routes/creators.$handle.tsx": 1,
     "src/routes/login.tsx": 1,
@@ -1664,11 +1525,11 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 55,
-  "size_literal": 4,
-  "native_control": 80,
+  "font_size_literal": 51,
+  "size_literal": 0,
+  "native_control": 79,
   "control_override": 1,
-  "page_heading": 16,
+  "page_heading": 12,
   "palette_top": [],
   "local_primitives": {}
  },
