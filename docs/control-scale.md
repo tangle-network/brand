@@ -21,6 +21,16 @@ A product picks a size name, never a pixel value.
 - `compact` and `touch` remain for existing callers: `compact` is `md` with tighter padding; `touch` is at least 44px with 16px text. `Button` keeps `xl` (52px) for a display call to action outside the scale.
 - A `Textarea` keeps its 120px minimum height; its size sets text, padding and corner.
 
+## Dates, times and pressables
+
+- `DatePicker` replaces `<input type="date">`: a trigger on the scale that opens `Calendar` (a keyboard-navigable month grid) and reports `YYYY-MM-DD`; it shows the date in the viewer's locale, never a `mm/dd/yyyy` mask. `Calendar` stands alone for inline pickers.
+- `TimeSelect` replaces `<input type="time">`: a Select of `step`-minute slots (default 15) that reports `HH:MM`.
+- `Button variant="bare"` is for rows, tiles and pills that draw their own layout: it keeps the shared focus ring and disabled behavior and adds no surface or size. Anything that reads as a button uses a styled variant.
+
+## Field surfaces
+
+Fields sit in a recessed well (`--bg-input`) inside cards. On the page canvas that well barely differs from the page, so `Toolbar` sets `--field-surface` to the card surface and every field inside it (Input, SelectTrigger, DatePicker, TimeSelect) reads as a raised control with its border and focus ring. Filter rows belong in `Toolbar` with `FilterField` labels.
+
 ## Form text
 
 | Role | Primitive | Size | Token | Utility |
@@ -51,7 +61,7 @@ Body and supporting text use Tailwind's steps: `text-xs` 12px, `text-sm` 14px, `
 | --- | --- |
 | `font_size_literal` | `text-[13px]`, inline `fontSize: 13`, CSS `font-size: 13px` |
 | `size_literal` | `h-[34px]`, `min-h-[2.5rem]`, `size-[30px]` |
-| `native_control` | `<button>`, `<input>`, `<select>`, `<textarea>` in product code |
+| `native_control` | `<button>`, `<input>` (not `type="hidden"`), `<select>`, `<textarea>` in product code |
 | `control_override` | `<Button className="h-8 px-3 text-xs">` and the same on `Input`, `Textarea`, `SelectTrigger` |
 | `page_heading` | a hand-written `<h1>` instead of `PageHeader` |
 

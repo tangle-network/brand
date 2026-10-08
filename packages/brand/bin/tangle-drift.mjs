@@ -65,8 +65,9 @@ export const PATTERNS = {
   font_size_literal: String.raw`\btext-\[(?:[0-9.]+(?:px|rem|em)\b|calc\(|clamp\()|\bfontSize:\s*["'\x60]?[0-9.]+|font-size:\s*[0-9.]+(?:px|rem|em)\b`,
   // A literal height or square size (`h-[34px]`, `min-h-[2.4rem]`, `size-[30px]`).
   size_literal: String.raw`(?<![\w-])(?:h|min-h|size)-\[[0-9.]+(?:px|rem)\]`,
-  // A native control element in product code; Button, Input, Textarea and Select own them.
-  native_control: String.raw`<(?:button|input|select|textarea)\b`,
+  // A native control element in product code; Button, Input, Textarea, Select, DatePicker and
+  // TimeSelect own them. A `type="hidden"` input carries form data and is not a control.
+  native_control: String.raw`<(?:button|select|textarea)\b|<input\b(?![^>]*\btype=["']hidden["'])`,
   // A shared control resized or retyped in place. Line-based: a className on its own line
   // after the tag is not seen, so this undercounts and only ratchets what it can see.
   control_override: String.raw`<(?:Button|Input|Textarea|SelectTrigger)\b[^>]*?\bclassName=[^>]*?(?<![\w-])(?:h-|min-h-|size-|px-|py-|text-(?:xs|sm|base|lg|\[)|rounded-|font-(?:normal|medium|semibold|bold)\b)`,

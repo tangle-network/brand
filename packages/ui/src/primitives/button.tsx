@@ -46,9 +46,15 @@ const buttonVariants = cva(
   },
 );
 
+// `bare` keeps the shared focus ring, disabled and loading behavior and drops
+// every surface, size and type class. It is for pressable rows, tiles and pills
+// that draw their own layout; anything that reads as a button uses a styled
+// variant and a size.
+const bareButton = `${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`;
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | null;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | "bare" | null;
   /** sm 32px, default/md 36px (`--control-height`), lg 44px; icon sizes are squares on the same heights. */
   size?: "default" | "md" | "sm" | "lg" | "xl" | "icon" | "icon-sm" | "icon-lg" | "compact" | "touch" | null;
   asChild?: boolean;
@@ -109,7 +115,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Keep slotted content intact: its action name must survive loading too.
       return (
         <Slot
-          className={cn(buttonVariants({ variant, size, className }))}
+          className={variant === "bare" ? cn(bareButton, className) : cn(buttonVariants({ variant, size, className }))}
           ref={ref}
           {...props}
           {...(isDisabled ? disabledHandlers(props) : {})}
@@ -134,7 +140,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={variant === "bare" ? cn(bareButton, className) : cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
         disabled={disabled || loading}
