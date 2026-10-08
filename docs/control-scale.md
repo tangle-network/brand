@@ -25,6 +25,7 @@ A product picks a size name, never a pixel value.
 
 - `DatePicker` replaces `<input type="date">`: a trigger on the scale that opens `Calendar` (a keyboard-navigable month grid) and reports `YYYY-MM-DD`; it shows the date in the viewer's locale, never a `mm/dd/yyyy` mask. `Calendar` stands alone for inline pickers.
 - `TimeSelect` replaces `<input type="time">`: a Select of `step`-minute slots (default 15) that reports `HH:MM`.
+- `Checkbox` and `RadioGroup` replace native checkbox and radio inputs.
 - `Button variant="bare"` is for rows, tiles and pills that draw their own layout: it keeps the shared focus ring and disabled behavior and adds no surface or size. Anything that reads as a button uses a styled variant.
 
 ## Field surfaces
