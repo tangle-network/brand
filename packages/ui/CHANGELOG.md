@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.30.0
+
+### Minor Changes
+
+- e53977b: Add `RadioGroup` and `RadioGroupItem` (Radix), drawn like `Checkbox` so single- and multiple-choice lists read as one family, to replace native radio inputs.
+
 ## 11.29.0
 
 ### Minor Changes
