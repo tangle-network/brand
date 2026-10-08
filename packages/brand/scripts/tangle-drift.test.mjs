@@ -73,7 +73,7 @@ test("counts sizing and type deviations, not token references", () => {
       'export const a = <p className="text-[13px] sm:text-[0.8rem] text-[var(--text-control)] text-[length:var(--x)]" />;', // 2 literal font sizes
       'export const b = <div style={{ fontSize: 13, lineHeight: 1 }} />;', // 1 inline font size
       'export const c = <div className="h-[34px] min-h-[2.5rem] sm:size-[30px] max-h-[400px] h-[var(--control-height-md)] w-[12px]" />;', // 3 literal sizes
-      'export const d = <><button type="button" /><input /><select /><textarea /><Button /><label /></>;', // 4 native controls
+      'export const d = <><button type="button" /><input /><select /><textarea /><Button /><label /><input type="hidden" name="intent" /></>;', // 4 native controls; hidden form data is not one
       'export const e = <Button className="h-8 px-3 text-xs">Save</Button>;', // 1 override
       'export const f = <Button size="sm" className="w-full gap-2">Save</Button>;', // layout only: not an override
       'export const g = <Input className="max-sm:text-base" />;', // a variant-prefixed retype is still an override

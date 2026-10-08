@@ -12,7 +12,7 @@ afterEach(cleanup);
 
 describe("shared control presentation", () => {
   it("uses the field well, not the border/track alias, with scoped foreground and time-only motion", () => {
-    expect(fieldPresentation).toContain("bg-[var(--bg-input)]");
+    expect(fieldPresentation).toContain("bg-[var(--field-surface,var(--bg-input))]");
     expect(fieldPresentation.split(" ")).not.toContain("bg-input");
     expect(fieldPresentation.split(" ")).not.toContain("bg-card");
     expect(fieldPresentation).toContain("border-border");
@@ -100,7 +100,7 @@ describe("shared control presentation", () => {
     expect(input.current).toHaveAttribute("aria-invalid", "true");
     expect(input.current!.className).toContain("autofill:shadow-");
     expect(input.current!.className.split(" ")).toContain("bg-card");
-    expect(input.current!.className).not.toContain("bg-[var(--bg-input)]");
+    expect(input.current!.className).not.toContain("bg-[var(--field-surface,var(--bg-input))]");
     expect(textarea.current).toBeDisabled();
     expect(trigger.current).toBe(screen.getByLabelText("Choice"));
     expect(trigger.current).toBeDisabled();

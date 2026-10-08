@@ -47,7 +47,9 @@ const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
     <div
       ref={ref}
       className={cn(
-        "mb-4 flex flex-col gap-3 lg:flex-row lg:items-center",
+        // Filters sit on the page canvas, where the recessed field well barely
+        // differs from the page. Raise every field inside onto the card surface.
+        "mb-4 flex flex-col gap-3 lg:flex-row lg:items-center [--field-surface:hsl(var(--card))]",
         className,
       )}
       {...props}

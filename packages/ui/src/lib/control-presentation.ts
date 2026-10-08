@@ -64,10 +64,12 @@ export const controlSizes = {
 // resolves the recessed well inside every canonical/named light/dark scope.
 // An autofill inset shadow coexists with the Tailwind focus ring; never hide
 // autofill with a seconds-long background transition or clear the focus halo.
+// --field-surface lets a context raise its fields: Toolbar sets it to the card
+// surface so filters on the page canvas read as controls, not as holes in it.
 export const fieldPresentation = cn(
   focusField,
   controlMotion,
-  "min-w-0 bg-[var(--bg-input)] text-foreground",
+  "min-w-0 bg-[var(--field-surface,var(--bg-input))] text-foreground",
   "aria-invalid:border-[var(--surface-danger-border)] aria-invalid:hover:border-[var(--surface-danger-border)] aria-invalid:focus:border-[var(--focus-border-danger)] aria-invalid:focus:ring-[var(--focus-halo-danger)]",
   "autofill:shadow-[inset_0_0_0_1000px_var(--bg-input)] autofill:[-webkit-text-fill-color:var(--text-primary)] autofill:caret-[var(--text-primary)]",
 );

@@ -18,7 +18,7 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `local_primitive_count` | `export function/const Button` and the other primitive names the shared packages own | `.tsx .jsx` |
 | `font_size_literal` | Literal font sizes: `text-[13px]`, inline `fontSize: 13`, CSS `font-size: 13px` | `.tsx .jsx .astro .ts .css` |
 | `size_literal` | Literal heights and squares: `h-[34px]`, `min-h-[2.5rem]`, `size-[30px]` | `.tsx .jsx .astro .ts` |
-| `native_control` | `<button>`, `<input>`, `<select>`, `<textarea>` elements | `.tsx .jsx .astro` |
+| `native_control` | `<button>`, `<input>` (except `type="hidden"` form data), `<select>`, `<textarea>` elements | `.tsx .jsx .astro` |
 | `control_override` | `Button`, `Input`, `Textarea` or `SelectTrigger` with a `className` height, padding, text size, corner or weight on the tag's line | `.tsx .jsx` |
 | `page_heading` | A hand-written `<h1>`; `PageHeader` owns page titles | `.tsx .jsx .astro` |
 
