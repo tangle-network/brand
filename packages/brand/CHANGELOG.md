@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.19.3
+
+### Patch Changes
+
+- cf01189: Lower the drift baseline after the native-control migrations: builder 66 to 10 native controls (agent-builder main 371e1d52) and hospitality 83 to 15 (hospitality-agent main c3cce8e5).
+- c816066: Lower the gtm drift baseline to zero native controls (60 to 0) and zero size literals (1 to 0), recorded from gtm-agent master e7c15da9 after GTM moved every native control onto the shared primitives.
+
 ## 1.19.2
 
 ### Patch Changes
