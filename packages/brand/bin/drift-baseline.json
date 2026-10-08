@@ -1120,27 +1120,27 @@
    ""
   ],
   "branch": "main",
-  "head": "625db3754b84",
-  "tsx_files": 28,
+  "head": "c3cce8e5ae1e",
+  "tsx_files": 29,
   "css_files": 13,
   "versions": {
    "agent-app": [
     "0.58.20"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.2"
    ],
    "sandbox-ui": [
     "0.130.0"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.0"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 1,
-   "sandbox-ui": 23,
+   "ui": 2,
+   "sandbox-ui": 25,
    "agent-app": 52
   },
   "by_file": {
@@ -1158,21 +1158,10 @@
    },
    "size_literal": {},
    "native_control": {
-    "src/resetos/GuestHub.tsx": 6,
+    "src/resetos/GuestHub.tsx": 2,
     "src/resetos/demo/main.tsx": 3,
-    "src/ui/OperatorDashboard.tsx": 10,
     "src/web/AgentProfileSettings.tsx": 9,
-    "src/web/BuildAppsWorkspace.tsx": 4,
-    "src/web/CustomerWorkspace.tsx": 30,
-    "src/web/InternalLineSetup.tsx": 1,
-    "src/web/MessageApprovals.tsx": 1,
-    "src/web/OperationsCoordination.tsx": 2,
-    "src/web/OwnerViews.tsx": 2,
-    "src/web/PaymentsView.tsx": 3,
-    "src/web/PeopleView.tsx": 5,
-    "src/web/PhoneMessages.tsx": 2,
-    "src/web/WorkspaceAppsView.tsx": 3,
-    "src/web/WorkspaceFilesView.tsx": 2
+    "src/web/WorkspaceFilesView.tsx": 1
    },
    "control_override": {},
    "page_heading": {
@@ -1191,7 +1180,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 82,
   "size_literal": 0,
-  "native_control": 83,
+  "native_control": 15,
   "control_override": 0,
   "page_heading": 12,
   "palette_top": [],
@@ -1386,40 +1375,40 @@
    ""
   ],
   "branch": "main",
-  "head": "97ce13b3c0a1",
-  "tsx_files": 108,
+  "head": "371e1d52d7e8",
+  "tsx_files": 110,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.59.6"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.2"
    ],
    "override:agent-app": [
-    "0.58.20"
+    "0.59.6"
    ],
    "override:brand": [
-    "1.19.0"
+    "1.19.2"
    ],
    "override:sandbox-ui": [
     "0.130.1"
    ],
    "override:ui": [
-    "11.28.2"
+    "11.30.0"
    ],
    "sandbox-ui": [
     "0.130.1"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.0"
    ]
   },
   "importing_files": {
    "brand": 2,
-   "ui": 6,
-   "sandbox-ui": 67,
-   "agent-app": 59
+   "ui": 3,
+   "sandbox-ui": 76,
+   "agent-app": 60
   },
   "by_file": {
    "raw_palette": {},
@@ -1436,29 +1425,12 @@
    },
    "size_literal": {},
    "native_control": {
-    "src/components/ForkUpdateBanner.tsx": 2,
-    "src/components/SlotRenderer.tsx": 1,
-    "src/components/agent-lines.tsx": 5,
-    "src/components/command-palette.tsx": 2,
-    "src/components/feedback-pill.tsx": 5,
-    "src/components/improve-button.tsx": 1,
-    "src/components/launch-number-panel.tsx": 3,
-    "src/components/listing/booking-card.tsx": 4,
+    "src/components/launch-number-panel.tsx": 1,
+    "src/components/listing/booking-card.tsx": 3,
     "src/components/listing/listing-editor.tsx": 1,
-    "src/components/listing/listing-page.tsx": 2,
-    "src/components/onboarding.tsx": 2,
-    "src/components/private-agent-connections.tsx": 1,
-    "src/components/telegram-groups.tsx": 3,
-    "src/components/trading/BuySellPanel.tsx": 7,
-    "src/components/trading/TokenInfoCard.tsx": 1,
-    "src/routes/app.$agentId.billing.tsx": 1,
+    "src/components/onboarding.tsx": 1,
     "src/routes/app.$agentId.profile.tsx": 1,
-    "src/routes/app.$agentId.settings.tsx": 5,
-    "src/routes/app.admin.calibrate.tsx": 3,
-    "src/routes/app.admin.findings.tsx": 5,
-    "src/routes/app.admin.proposals.tsx": 3,
-    "src/routes/app.use.$slug.tsx": 3,
-    "src/routes/assistants.$slug.tsx": 5
+    "src/routes/assistants.$slug.tsx": 3
    },
    "control_override": {
     "src/components/listing/browse.tsx": 1
@@ -1484,7 +1456,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 51,
   "size_literal": 0,
-  "native_control": 66,
+  "native_control": 10,
   "control_override": 1,
   "page_heading": 12,
   "palette_top": [],
