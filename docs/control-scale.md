@@ -38,6 +38,7 @@ Brand's Tailwind theme registers the scale for product code that is not a primit
 - Heights: `h-control-sm`, `h-control-md`, `h-control-lg` (also `size-*`, `min-h-*`).
 - Text: `text-control-sm`, `text-control-md`, `text-control-lg`, `text-label`, `text-help`.
 - Titles keep Brand's existing roles: `text-page`, `text-section`, `text-eyebrow`, `text-hero`, `text-display`.
+- A page title is `PageHeader` from `@tangle-network/ui/primitives` (30px, `text-page`), with its description, actions and meta slots; `level={2}` gives a nested section header. Products do not write their own `<h1>`.
 
 Body and supporting text use Tailwind's steps: `text-xs` 12px, `text-sm` 14px, `text-base` 16px and up.
 12px is the floor.
@@ -52,6 +53,7 @@ Body and supporting text use Tailwind's steps: `text-xs` 12px, `text-sm` 14px, `
 | `size_literal` | `h-[34px]`, `min-h-[2.5rem]`, `size-[30px]` |
 | `native_control` | `<button>`, `<input>`, `<select>`, `<textarea>` in product code |
 | `control_override` | `<Button className="h-8 px-3 text-xs">` and the same on `Input`, `Textarea`, `SelectTrigger` |
+| `page_heading` | a hand-written `<h1>` instead of `PageHeader` |
 
 Each count may only fall. Token references such as `h-[var(--control-height-sm)]` and `text-[length:var(--control-text-md)]` are not counted.
 
@@ -61,4 +63,5 @@ Each count may only fall. Token references such as `h-[var(--control-height-sm)]
 2. Drop `className` height, padding, text-size and corner overrides on shared controls; pick the size that matches the row.
 3. Put a row's controls on one size: an `sm` button beside a default field is a 4px mismatch.
 4. Replace literal font sizes with a scale step or role utility, and literal heights with `h-control-*`.
-5. Lower the surface's drift baseline after the change reaches the default branch.
+5. Replace a hand-written page `<h1>` with `PageHeader`, moving the page's primary actions into its `actions` slot.
+6. Lower the surface's drift baseline after the change reaches the default branch.

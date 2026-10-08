@@ -70,7 +70,25 @@
     "src/components/Header.astro": 3,
     "src/components/QuickstartCode.tsx": 5
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "src/layouts/BlogLayout.astro": 1,
+    "src/pages/404.astro": 1,
+    "src/pages/benchmarks/[id].astro": 1,
+    "src/pages/benchmarks/index.astro": 1,
+    "src/pages/benchmarks/preview/[campaign].astro": 1,
+    "src/pages/blog/index.astro": 1,
+    "src/pages/blog/series/[series].astro": 1,
+    "src/pages/brand-kit.astro": 1,
+    "src/pages/index.astro": 1,
+    "src/pages/privacy-policy.astro": 1,
+    "src/pages/releases.astro": 1,
+    "src/pages/security.astro": 1,
+    "src/pages/status.astro": 1,
+    "src/pages/sub-processors.astro": 1,
+    "src/pages/terms-of-service.astro": 1,
+    "src/pages/what-is-tangle.astro": 1
+   }
   },
   "raw_palette": 0,
   "hex": 29,
@@ -81,6 +99,7 @@
   "size_literal": 1,
   "native_control": 9,
   "control_override": 0,
+  "page_heading": 16,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -90,7 +109,7 @@
    "products/sandbox/web"
   ],
   "branch": "develop",
-  "head": "b22b58f2936f",
+  "head": "b5c219b1ee14",
   "tsx_files": 132,
   "css_files": 3,
   "versions": {
@@ -173,7 +192,18 @@
     "products/sandbox/web/src/pages/dashboard/templates/PublicTemplatesHeader.tsx": 4,
     "products/sandbox/web/src/pages/dashboard/templates/SavedTemplatesTab.tsx": 1
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "products/sandbox/web/src/components/ErrorBoundary.tsx": 1,
+    "products/sandbox/web/src/components/landing/BuildUseCases.tsx": 1,
+    "products/sandbox/web/src/main.tsx": 1,
+    "products/sandbox/web/src/pages/AcceptTeamInvitation.tsx": 2,
+    "products/sandbox/web/src/pages/AuthError.tsx": 2,
+    "products/sandbox/web/src/pages/CliDeviceAuth.tsx": 1,
+    "products/sandbox/web/src/pages/Docs.tsx": 1,
+    "products/sandbox/web/src/pages/MfaChallenge.tsx": 1,
+    "products/sandbox/web/src/pages/dashboard/SandboxProvisioningWizard.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 21,
@@ -184,6 +214,7 @@
   "size_literal": 12,
   "native_control": 56,
   "control_override": 0,
+  "page_heading": 11,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -379,7 +410,43 @@
     "products/platform/web/src/client/pages/developer-apps/ResourceAccess.tsx": 3,
     "products/platform/web/src/client/pages/developer-apps/components.tsx": 1
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "products/platform/web/src/client/components/AuthShell.tsx": 3,
+    "products/platform/web/src/client/components/GithubAppInstallations.tsx": 1,
+    "products/platform/web/src/client/components/lab-run/LabRunPanel.tsx": 1,
+    "products/platform/web/src/client/components/workflow/run-shell/run-header.tsx": 1,
+    "products/platform/web/src/client/pages/AgentProfileDetail.tsx": 1,
+    "products/platform/web/src/client/pages/ConnectorDetail.tsx": 1,
+    "products/platform/web/src/client/pages/Connectors.tsx": 1,
+    "products/platform/web/src/client/pages/CreateKey.tsx": 1,
+    "products/platform/web/src/client/pages/DeveloperApps.tsx": 1,
+    "products/platform/web/src/client/pages/IntegrationPermissions.tsx": 1,
+    "products/platform/web/src/client/pages/KeyCreatedView.tsx": 1,
+    "products/platform/web/src/client/pages/KeyDetail.tsx": 1,
+    "products/platform/web/src/client/pages/SkillDetail.tsx": 1,
+    "products/platform/web/src/client/pages/SupportIntelligence.tsx": 1,
+    "products/platform/web/src/client/pages/TransactionDetail.tsx": 1,
+    "products/platform/web/src/client/pages/UsageProduct.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowDetailNameHeading.tsx": 2,
+    "products/platform/web/src/client/pages/WorkflowDetailPage.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowEdit.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowRunsPage.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowTemplates.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowVersionsPage.tsx": 1,
+    "products/platform/web/src/client/pages/WorkflowsLayout.tsx": 1,
+    "products/platform/web/src/client/pages/dev/AccountMenuGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/DashboardGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/NodeOutputGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/RunOutputGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/RunTriggerGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/TriggerScopeGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowFieldCatalogGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowGraphGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowInPlaceEditGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowListGallery.tsx": 1,
+    "products/platform/web/src/client/pages/dev/WorkflowTriggerRailGallery.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 24,
@@ -398,7 +465,8 @@
   "font_size_literal": 32,
   "size_literal": 8,
   "native_control": 444,
-  "control_override": 0
+  "control_override": 0,
+  "page_heading": 37
  },
  "intelligence": {
   "repo": "tangle-network/agent-dev-container",
@@ -406,7 +474,7 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "b22b58f2936f",
+  "head": "b5c219b1ee14",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
@@ -475,7 +543,16 @@
     "products/intelligence/web/src/pages/Webhooks.tsx": 1,
     "products/intelligence/web/src/pages/spine/improvement.tsx": 2
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "products/intelligence/web/src/pages/Landing.tsx": 1,
+    "products/intelligence/web/src/pages/Login.tsx": 1,
+    "products/intelligence/web/src/pages/NotFound.tsx": 1,
+    "products/intelligence/web/src/pages/RunDetail.tsx": 1,
+    "products/intelligence/web/src/pages/SessionDetail.tsx": 1,
+    "products/intelligence/web/src/pages/TraceDetail.tsx": 1,
+    "products/intelligence/web/src/pages/spine/runs.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
@@ -486,6 +563,7 @@
   "size_literal": 3,
   "native_control": 50,
   "control_override": 0,
+  "page_heading": 7,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -495,7 +573,7 @@
    ""
   ],
   "branch": "master",
-  "head": "626313ec7787",
+  "head": "04d7fbd6a59d",
   "tsx_files": 123,
   "css_files": 3,
   "versions": {
@@ -503,13 +581,13 @@
     "0.58.11"
    ],
    "brand": [
-    "1.17.0"
+    "1.17.1"
    ],
    "sandbox-ui": [
     "0.128.2"
    ],
    "ui": [
-    "11.26.0"
+    "11.27.0"
    ]
   },
   "importing_files": {
@@ -604,6 +682,31 @@
     "src/components/board/selection-action-bar.tsx": 2,
     "src/components/workspace-terminal-panel.tsx": 1,
     "src/routes/app.workspace.onboarding.tsx": 5
+   },
+   "page_heading": {
+    "src/components/content-pipeline-board.tsx": 1,
+    "src/components/publishing/publish-header.tsx": 1,
+    "src/components/workspace-terminal-panel.tsx": 2,
+    "src/root.tsx": 1,
+    "src/routes/_index.tsx": 1,
+    "src/routes/admin.integrations.tsx": 1,
+    "src/routes/agents.consent.tsx": 1,
+    "src/routes/app.account.tsx": 1,
+    "src/routes/app.workspace.agents.tsx": 1,
+    "src/routes/app.workspace.assets.tsx": 1,
+    "src/routes/app.workspace.designs.$documentId.tsx": 1,
+    "src/routes/app.workspace.designs.tsx": 1,
+    "src/routes/app.workspace.lines.tsx": 1,
+    "src/routes/app.workspace.onboarding.tsx": 1,
+    "src/routes/app.workspace.review.tsx": 1,
+    "src/routes/app.workspace.sequences.$sequenceId.tsx": 1,
+    "src/routes/app.workspace.sequences.tsx": 1,
+    "src/routes/app.workspace.settings.tsx": 1,
+    "src/routes/app.workspace.studio.tsx": 1,
+    "src/routes/app.workspace.vault.tsx": 1,
+    "src/routes/forgot-password.tsx": 2,
+    "src/routes/help.tsx": 1,
+    "src/routes/reset-password.tsx": 3
    }
   },
   "raw_palette": 0,
@@ -615,6 +718,7 @@
   "size_literal": 6,
   "native_control": 74,
   "control_override": 10,
+  "page_heading": 27,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -698,6 +802,19 @@
     "apps/web/src/components/overview/planning-panel.tsx": 2,
     "apps/web/src/components/overview/workspace-panels.tsx": 1,
     "apps/web/src/routes/app.settings.tsx": 1
+   },
+   "page_heading": {
+    "apps/web/src/components/app-error-state.tsx": 1,
+    "apps/web/src/components/legal-page.tsx": 1,
+    "apps/web/src/routes/_index.tsx": 1,
+    "apps/web/src/routes/app.$sessionId.tsx": 1,
+    "apps/web/src/routes/app.billing.tsx": 2,
+    "apps/web/src/routes/app.documents.tsx": 1,
+    "apps/web/src/routes/app.integrations.tsx": 1,
+    "apps/web/src/routes/app.members.tsx": 1,
+    "apps/web/src/routes/app.plan.tsx": 1,
+    "apps/web/src/routes/app.return.tsx": 1,
+    "apps/web/src/routes/app.welcome.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -709,6 +826,7 @@
   "size_literal": 4,
   "native_control": 30,
   "control_override": 8,
+  "page_heading": 12,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -782,6 +900,21 @@
     "src/routes/app.workspace.calendar.tsx": 2,
     "src/routes/app.workspace.captable.tsx": 1,
     "src/routes/app.workspace.deals.tsx": 1
+   },
+   "page_heading": {
+    "src/components/destination-shell.tsx": 1,
+    "src/root.tsx": 1,
+    "src/routes/_index.tsx": 1,
+    "src/routes/app.workspace.audit-log.tsx": 1,
+    "src/routes/app.workspace.billing.tsx": 1,
+    "src/routes/app.workspace.chat.$threadId.tsx": 1,
+    "src/routes/app.workspace.contracts.$id.tsx": 1,
+    "src/routes/app.workspace.contracts.redline.tsx": 1,
+    "src/routes/app.workspace.integrations.tsx": 1,
+    "src/routes/app.workspace.members.tsx": 1,
+    "src/routes/app.workspace.onboarding.tsx": 1,
+    "src/routes/app.workspace.settings.tsx": 1,
+    "src/routes/app.workspace.templates.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -793,6 +926,7 @@
   "size_literal": 1,
   "native_control": 38,
   "control_override": 4,
+  "page_heading": 13,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -882,7 +1016,24 @@
     "src/routes/login.tsx": 4,
     "src/routes/signup.tsx": 5
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "src/root.tsx": 1,
+    "src/routes/_index.tsx": 1,
+    "src/routes/app.integrations.tsx": 1,
+    "src/routes/app.workspace._index.tsx": 1,
+    "src/routes/app.workspace.approvals.tsx": 1,
+    "src/routes/app.workspace.audit-log.tsx": 1,
+    "src/routes/app.workspace.b2b.tsx": 1,
+    "src/routes/app.workspace.calendar.tsx": 1,
+    "src/routes/app.workspace.chat.$threadId.tsx": 1,
+    "src/routes/app.workspace.clients.tsx": 1,
+    "src/routes/app.workspace.integrations.tsx": 1,
+    "src/routes/app.workspace.leads.tsx": 1,
+    "src/routes/app.workspace.onboarding.tsx": 1,
+    "src/routes/app.workspace.settings.tsx": 1,
+    "src/routes/app.workspace.swaps.tsx": 1
+   }
   },
   "raw_palette": 73,
   "hex": 162,
@@ -893,6 +1044,7 @@
   "size_literal": 0,
   "native_control": 35,
   "control_override": 0,
+  "page_heading": 15,
   "palette_top": [
    [
     "text-amber-600",
@@ -1007,6 +1159,15 @@
     "src/routes/app.workspace.chat.tsx": 1,
     "src/routes/app.workspace.designs.tsx": 1,
     "src/routes/app.workspace.tasks.tsx": 1
+   },
+   "page_heading": {
+    "src/root.tsx": 1,
+    "src/routes/agents.consent.tsx": 1,
+    "src/routes/app.workspace.assets.tsx": 1,
+    "src/routes/app.workspace.experiments.tsx": 1,
+    "src/routes/app.workspace.studio.tsx": 1,
+    "src/routes/app.workspace.tsx": 1,
+    "src/routes/invite.$token.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -1018,6 +1179,7 @@
   "size_literal": 3,
   "native_control": 67,
   "control_override": 5,
+  "page_heading": 7,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1095,7 +1257,11 @@
     "apps/web/src/canvas/SystemDiagramCanvasLazy.tsx": 1,
     "apps/web/src/components/ChatComposer.tsx": 8
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "apps/web/src/ApiKeysPanel.tsx": 1,
+    "apps/web/src/assembly/AssemblyBooklet.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1106,6 +1272,7 @@
   "size_literal": 0,
   "native_control": 52,
   "control_override": 0,
+  "page_heading": 2,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1115,7 +1282,7 @@
    ""
   ],
   "branch": "main",
-  "head": "871f7e62b41f",
+  "head": "444d554b2349",
   "tsx_files": 28,
   "css_files": 13,
   "versions": {
@@ -1174,7 +1341,15 @@
     "src/web/WorkspaceAppsView.tsx": 3,
     "src/web/WorkspaceFilesView.tsx": 2
    },
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {
+    "src/resetos/GuestHub.tsx": 1,
+    "src/ui/OperatorDashboard.tsx": 1,
+    "src/web/BuildAppsWorkspace.tsx": 1,
+    "src/web/CustomerWorkspace.tsx": 5,
+    "src/web/WorkspaceAppsView.tsx": 3,
+    "src/web/WorkspaceFilesView.tsx": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1185,6 +1360,7 @@
   "size_literal": 0,
   "native_control": 83,
   "control_override": 0,
+  "page_heading": 12,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1255,6 +1431,18 @@
     "packages/website/src/pages/GitHubSetup.tsx": 3,
     "packages/website/src/pages/NewAudit.tsx": 4,
     "packages/website/src/pages/SampleAuditReport.tsx": 2
+   },
+   "page_heading": {
+    "packages/website/src/pages/AuditReport.tsx": 1,
+    "packages/website/src/pages/AuthCallback.tsx": 1,
+    "packages/website/src/pages/Dashboard.tsx": 1,
+    "packages/website/src/pages/Docs.tsx": 1,
+    "packages/website/src/pages/GitHubSetup.tsx": 1,
+    "packages/website/src/pages/Integrations.tsx": 1,
+    "packages/website/src/pages/NewAudit.tsx": 1,
+    "packages/website/src/pages/SampleAuditReport.tsx": 1,
+    "packages/website/src/pages/SignIn.tsx": 1,
+    "packages/website/src/pages/_Preview.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -1266,6 +1454,7 @@
   "size_literal": 8,
   "native_control": 16,
   "control_override": 12,
+  "page_heading": 10,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1340,6 +1529,9 @@
     "src/pages/run-detail.tsx": 1,
     "src/pages/walkthroughs.tsx": 1,
     "src/pages/workspace-detail.tsx": 1
+   },
+   "page_heading": {
+    "src/error-boundary.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -1351,6 +1543,7 @@
   "size_literal": 3,
   "native_control": 16,
   "control_override": 10,
+  "page_heading": 1,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1360,18 +1553,18 @@
    ""
   ],
   "branch": "main",
-  "head": "031de7609895",
+  "head": "7b8014524312",
   "tsx_files": 104,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.58.11"
+    "0.58.12"
    ],
    "brand": [
     "1.17.0"
    ],
    "override:agent-app": [
-    "0.58.11"
+    "0.58.12"
    ],
    "override:brand": [
     "1.17.0"
@@ -1447,6 +1640,23 @@
    },
    "control_override": {
     "src/components/listing/browse.tsx": 1
+   },
+   "page_heading": {
+    "src/components/listing/listing-page.tsx": 1,
+    "src/components/research-cycle-detail.tsx": 1,
+    "src/components/trading/TradingPage.tsx": 2,
+    "src/root.tsx": 1,
+    "src/routes/_index.tsx": 1,
+    "src/routes/agents.$slug.tsx": 1,
+    "src/routes/app.admin.auto-research.tsx": 1,
+    "src/routes/app.admin.calibrate.tsx": 1,
+    "src/routes/app.admin.findings.tsx": 1,
+    "src/routes/app.admin.proposals.tsx": 1,
+    "src/routes/app.admin.rl-bridge.tsx": 1,
+    "src/routes/app.use.$slug.tsx": 1,
+    "src/routes/creators.$handle.tsx": 1,
+    "src/routes/login.tsx": 1,
+    "src/routes/pay.$token.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -1458,6 +1668,7 @@
   "size_literal": 4,
   "native_control": 80,
   "control_override": 1,
+  "page_heading": 16,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1704,6 +1915,32 @@
     "apps/web/src/components/quests/QuestFilters.tsx": 1,
     "apps/web/src/components/reports/ReportsPage.tsx": 1,
     "apps/web/src/routes/partner.invite.$code.tsx": 5
+   },
+   "page_heading": {
+    "apps/web/src/components/@settings/tabs/partner-dashboard/PartnerDashboardTab.tsx": 1,
+    "apps/web/src/components/batch/BatchDetailView.client.tsx": 1,
+    "apps/web/src/components/billing/shared/BillingErrorBoundary.tsx": 1,
+    "apps/web/src/components/deployments/DeploymentDetailPage.tsx": 1,
+    "apps/web/src/components/deployments/DeploymentsPage.tsx": 1,
+    "apps/web/src/components/errors/ClosedRouteBoundary.tsx": 1,
+    "apps/web/src/components/landing/HeroHeader.tsx": 1,
+    "apps/web/src/components/pricing/PricingDialog.tsx": 1,
+    "apps/web/src/components/quests/competition/CompetitionHero.tsx": 1,
+    "apps/web/src/components/reports/ReportsPage.tsx": 1,
+    "apps/web/src/root.tsx": 1,
+    "apps/web/src/routes/admin._index.tsx": 1,
+    "apps/web/src/routes/admin.tsx": 2,
+    "apps/web/src/routes/events.$id.results.tsx": 1,
+    "apps/web/src/routes/judge.tsx": 1,
+    "apps/web/src/routes/leaderboard.$slug.tsx": 1,
+    "apps/web/src/routes/leaderboard._index.tsx": 1,
+    "apps/web/src/routes/partner-onboarding.tsx": 2,
+    "apps/web/src/routes/partner.invite.$code.tsx": 5,
+    "apps/web/src/routes/partner_.$partnerId.events.tsx": 1,
+    "apps/web/src/routes/privacy-policy.tsx": 1,
+    "apps/web/src/routes/quests.tsx": 1,
+    "apps/web/src/routes/settings.partner._index.tsx": 1,
+    "apps/web/src/routes/terms-of-service.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -1715,6 +1952,7 @@
   "size_literal": 28,
   "native_control": 404,
   "control_override": 18,
+  "page_heading": 30,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1758,7 +1996,8 @@
    },
    "size_literal": {},
    "native_control": {},
-   "control_override": {}
+   "control_override": {},
+   "page_heading": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1769,6 +2008,7 @@
   "size_literal": 0,
   "native_control": 0,
   "control_override": 0,
+  "page_heading": 0,
   "palette_top": [],
   "local_primitives": {}
  }
