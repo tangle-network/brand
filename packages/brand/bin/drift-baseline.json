@@ -572,28 +572,28 @@
    ""
   ],
   "branch": "master",
-  "head": "682bbec583a2",
-  "tsx_files": 124,
+  "head": "e7c15da9fb79",
+  "tsx_files": 125,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.59.2"
+    "0.59.5"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.2"
    ],
    "sandbox-ui": [
-    "0.130.0"
+    "0.131.2"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.0"
    ]
   },
   "importing_files": {
    "brand": 3,
-   "ui": 5,
-   "sandbox-ui": 101,
-   "agent-app": 204
+   "ui": 7,
+   "sandbox-ui": 107,
+   "agent-app": 205
   },
   "by_file": {
    "raw_palette": {},
@@ -607,46 +607,8 @@
     "src/app.css": 2,
     "src/components/empty-thread-composer.tsx": 1
    },
-   "size_literal": {
-    "src/components/publishing/post-composer.tsx": 1
-   },
-   "native_control": {
-    "src/components/auth-shell.tsx": 1,
-    "src/components/board/item-attachments-section.tsx": 2,
-    "src/components/board/item-editor-dialog.tsx": 5,
-    "src/components/board/media-lightbox.tsx": 2,
-    "src/components/board/vault-media-picker.tsx": 1,
-    "src/components/chat-activity-row.tsx": 2,
-    "src/components/chat-mention-parts.tsx": 1,
-    "src/components/chat-transcript.tsx": 1,
-    "src/components/chat-turn-failure-notice.tsx": 1,
-    "src/components/composer-agent-menu.tsx": 1,
-    "src/components/designs/design-agent-panel.tsx": 2,
-    "src/components/designs/design-card.tsx": 1,
-    "src/components/live-plan-strip.tsx": 1,
-    "src/components/model-availability-notice.tsx": 1,
-    "src/components/opencode-question-tool-card.tsx": 2,
-    "src/components/publishing/calendar-month.tsx": 1,
-    "src/components/publishing/channel-slots.tsx": 1,
-    "src/components/publishing/post-badges.tsx": 1,
-    "src/components/publishing/post-chip.tsx": 1,
-    "src/components/publishing/post-composer.tsx": 2,
-    "src/components/publishing/publish-list.tsx": 1,
-    "src/components/publishing/schedule-popover.tsx": 4,
-    "src/components/question-option-list.tsx": 1,
-    "src/components/sequences/gtm-sequence-agent-panel.tsx": 2,
-    "src/components/session-artifact-list.tsx": 1,
-    "src/components/ui/info-tooltip.tsx": 1,
-    "src/components/vault-chat-rail.tsx": 2,
-    "src/components/workspace-chat-surface.tsx": 1,
-    "src/root.tsx": 1,
-    "src/routes/_index.tsx": 2,
-    "src/routes/agents.consent.tsx": 2,
-    "src/routes/app.workspace.designs.tsx": 2,
-    "src/routes/app.workspace.settings.tsx": 3,
-    "src/routes/app.workspace.studio.tsx": 1,
-    "src/routes/app.workspace.vault.tsx": 6
-   },
+   "size_literal": {},
+   "native_control": {},
    "control_override": {
     "src/routes/app.workspace.onboarding.tsx": 4
    },
@@ -673,8 +635,8 @@
   "css_var_defs": 58,
   "local_primitive_count": 0,
   "font_size_literal": 3,
-  "size_literal": 1,
-  "native_control": 60,
+  "size_literal": 0,
+  "native_control": 0,
   "control_override": 4,
   "page_heading": 18,
   "palette_top": [],
