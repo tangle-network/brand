@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.28.1
+
+### Patch Changes
+
+- 084cd75: A Markdown image without alt text now gives its full-size link the accessible name "Open image full size".
+
 ## 11.28.0
 
 ### Minor Changes
