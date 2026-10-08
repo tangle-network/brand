@@ -77,6 +77,7 @@ test("counts sizing and type deviations, not token references", () => {
       'export const e = <Button className="h-8 px-3 text-xs">Save</Button>;', // 1 override
       'export const f = <Button size="sm" className="w-full gap-2">Save</Button>;', // layout only: not an override
       'export const g = <Input className="max-sm:text-base" />;', // a variant-prefixed retype is still an override
+      'export const h = <><h1 className="text-2xl">Billing</h1><PageHeader title="Billing" /><h2>Plan</h2></>;', // 1 hand-written page title
     ].join("\n"),
     "src/app.css": ".a { font-size: 13px; }\n.b { font-size: var(--text-control); }\n.c { font-size: 0.75rem; }\n", // 2 literal font sizes
   });
@@ -87,10 +88,11 @@ test("counts sizing and type deviations, not token references", () => {
   assert.equal(row.size_literal, 3);
   assert.equal(row.native_control, 4);
   assert.equal(row.control_override, 2);
+  assert.equal(row.page_heading, 1);
 });
 
 test("compare reports rises and falls on gated metrics only", () => {
-  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, importing_files: { ui: 9 } };
+  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, importing_files: { ui: 9 } };
   assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
   const { rises, falls } = compare(base, { ...base, raw_palette: 4, hex: 1 });
   assert.deepEqual(rises, [{ metric: "raw_palette", base: 3, now: 4 }]);
@@ -99,11 +101,11 @@ test("compare reports rises and falls on gated metrics only", () => {
 
 test("a metric the baseline row has not recorded is reported, not gated, and is recorded on update", () => {
   const old = { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0, by_file: { raw_palette: { "a.tsx": 3 } } };
-  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1,
-    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 } } };
+  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3,
+    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 } } };
   const { rises, unrecorded } = compare(old, now);
   assert.deepEqual(rises, []);
-  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override"]);
+  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading"]);
   assert.deepEqual(updateBaseline({ gtm: old }, { gtm: now }).next.gtm, now);
   // A row refused for a rise keeps its old counts but still records the new metrics.
   const risen = { ...now, raw_palette: 9 };

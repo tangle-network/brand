@@ -20,8 +20,9 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `size_literal` | Literal heights and squares: `h-[34px]`, `min-h-[2.5rem]`, `size-[30px]` | `.tsx .jsx .astro .ts` |
 | `native_control` | `<button>`, `<input>`, `<select>`, `<textarea>` elements | `.tsx .jsx .astro` |
 | `control_override` | `Button`, `Input`, `Textarea` or `SelectTrigger` with a `className` height, padding, text size, corner or weight on the tag's line | `.tsx .jsx` |
+| `page_heading` | A hand-written `<h1>`; `PageHeader` owns page titles | `.tsx .jsx .astro` |
 
-The last four measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
+The last five measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
 `control_override` reads one line, so a `className` on a later line of the tag is not counted.
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
@@ -82,6 +83,27 @@ Platform's row kept its earlier counts and head because its `arbitrary_color` ro
 | super | `30e0cd527` | 427 | 0 | 0 | 0 |
 
 Insurance's first row also records raw palette 73, hex 162 and CSS variable definitions 183.
+
+`page_heading` was recorded on 2026-10-08 from the same default branches:
+
+| Surface | Head | Page heading |
+| --- | --- | ---: |
+| website | `88fa36301` | 16 |
+| sandbox | `b5c219b1e` | 11 |
+| platform | `014fd01e8` | 37 |
+| intelligence | `b5c219b1e` | 7 |
+| gtm | `04d7fbd6a` | 27 |
+| tax | `d8cecba36` | 12 |
+| legal | `3dda84fd4` | 13 |
+| insurance | `8ab1851d5` | 15 |
+| creative | `459b7f342` | 7 |
+| physim | `d5fdb4760` | 2 |
+| hospitality | `444d554b2` | 12 |
+| audits | `af6c5106a` | 10 |
+| browser | `e2de2b85e` | 1 |
+| builder | `7b8014524` | 16 |
+| blueprint | `1ac4236f8` | 30 |
+| super | `30e0cd527` | 0 |
 
 ## Baseline, 2026-10-05
 
