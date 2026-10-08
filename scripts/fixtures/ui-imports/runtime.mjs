@@ -34,7 +34,7 @@ export async function verify() {
       h(Button, { size, loading: true }, "Save changes"),
       h(Select, null, h(SelectTrigger, { size, "aria-label": "Packed select" }, h(SelectValue, { placeholder: "Choose" }))),
     ));
-    assert.ok(html.includes("bg-[var(--bg-input)]"), "fields use the scoped field well");
+    assert.ok(html.includes("bg-[var(--field-surface,var(--bg-input))]"), "fields use the scoped field well");
     assert.ok(html.includes("duration-[var(--duration-fast)]"), "duration token is time-valued");
     assert.ok(!html.includes("duration-[var(--transition-fast)]"));
     assert.ok(!html.includes(`size="${size}"`), "presentation size must not leak to native attributes");
