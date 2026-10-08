@@ -94,22 +94,23 @@ try:
                 page.evaluate("mode => { document.documentElement.classList.remove('light','dark'); document.documentElement.dataset.theme=mode; document.querySelector('[data-presentation-contract]').dataset.theme=mode; }", mode)
                 settle(page)
                 measurements = {}
-                for size, height in [("default", 44), ("compact", 36), ("touch", 44)]:
+                coarse = page.evaluate("() => matchMedia('(pointer: coarse)').matches")
+                # One control scale: every control at a size shares its height and text size.
+                for size, height, font in [("sm", 32, "12px"), ("md", 36, "14px"), ("lg", 44, "16px"), ("compact", 36, "14px"), ("touch", 44, "16px")]:
                     field = page.get_by_role("textbox", name=f"{size} field", exact=True)
                     trigger = page.get_by_role("combobox", name=f"{size} choice", exact=True)
                     button = page.locator(f'[data-size-row="{size}"]').get_by_role("button", name="Save", exact=True)
                     nodes = {"input": field, "select": trigger, "button": button}
                     for name, node in nodes.items():
                         fact = node.evaluate(style)
-                        expected = (36 if name in ["select", "button"] else 44) if size == "default" else height
-                        assert fact["height"] == expected, (size, name, fact)
+                        assert fact["height"] == height, (size, name, fact)
+                        # Fields never drop below 16px on a coarse pointer (iOS zooms on focus otherwise).
+                        assert fact["font"] == ("16px" if coarse and name != "button" else font), (size, name, fact)
                         assert fact["duration"] == "0.15s", fact
                         assert abs(seconds(fact["fast"]) - 0.15) < 0.000001, fact
                         if name != "button":
                             assert fact["background"] == fact["well"] != fact["track"], fact
                             assert fact["color"] == fact["ink"], fact
-                        if size == "touch":
-                            assert fact["font"] == "16px", fact
                         measurements[f"{size}-{name}"] = fact
                     notes = page.get_by_role("textbox", name=f"{size} notes", exact=True).evaluate(style)
                     assert notes["height"] >= (96 if size == "compact" else 120), notes
@@ -140,9 +141,9 @@ try:
                 assert min(measurements["linkContrast"].values()) >= 4.5, measurements["linkContrast"]
 
                 # Real Radix keyboard and touch paths; all options remain named.
-                page.get_by_role("textbox", name="default field", exact=True).focus()
+                page.get_by_role("textbox", name="md field", exact=True).focus()
                 page.keyboard.press("Tab")
-                trigger = page.get_by_role("combobox", name="default choice", exact=True)
+                trigger = page.get_by_role("combobox", name="md choice", exact=True)
                 expect(trigger).to_be_focused()
                 page.keyboard.press("Space")
                 first_option = page.get_by_role("option", name="First account", exact=True)
@@ -164,7 +165,7 @@ try:
                     page.get_by_role("combobox", name="touch choice", exact=True).tap()
                     page.get_by_role("option", name="First account", exact=True).tap()
                     expect(page.locator("[data-choice]")).to_have_text("one")
-                button = page.locator('[data-size-row="default"]').get_by_role("button", name="Save", exact=True)
+                button = page.locator('[data-size-row="md"]').get_by_role("button", name="Save", exact=True)
                 button.focus(); page.keyboard.press("Enter")
                 expect(page.locator("[data-action-count]")).to_have_text("1")
                 assert page.locator("[data-pending]").is_disabled()

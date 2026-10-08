@@ -1,7 +1,9 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./button";
+import { HelpText } from "./help-text";
 import { Input, Textarea } from "./input";
+import { Label } from "./label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 import { Metric, MetricStrip } from "./metric-strip";
 
@@ -11,7 +13,7 @@ function Contract() {
   return (
     <main className="mx-auto max-w-5xl space-y-6 bg-background p-4 text-foreground" data-presentation-contract>
       <h1 className="text-xl font-semibold">Field and metric presentation</h1>
-      {(["default", "compact", "touch"] as const).map((size) => (
+      {(["sm", "md", "lg", "compact", "touch"] as const).map((size) => (
         <section key={size} data-size-row={size} className="space-y-2">
           <h2 className="font-semibold">{size}</h2>
           <div className="flex flex-wrap items-end gap-3">
@@ -24,10 +26,17 @@ function Contract() {
               </SelectContent>
             </Select>
             <Button size={size} onClick={() => setActions((value) => value + 1)}>Save</Button>
+            <Button size={size} variant="outline">Cancel</Button>
           </div>
           <Textarea size={size} aria-label={`${size} notes`} placeholder="Details" />
         </section>
       ))}
+      <section className="max-w-sm space-y-1.5" data-form-text>
+        <Label htmlFor="workspace-name">Workspace name</Label>
+        <Input id="workspace-name" aria-describedby="workspace-name-hint" placeholder="Acme" />
+        <HelpText id="workspace-name-hint">Shown to everyone you invite.</HelpText>
+        <HelpText tone="error">This name is already taken.</HelpText>
+      </section>
       <section className="space-y-2" data-state-controls>
         <h2 className="font-semibold">States and actions</h2>
         <Input label="Email" autoComplete="email" name="email" defaultValue="reader@example.test" />

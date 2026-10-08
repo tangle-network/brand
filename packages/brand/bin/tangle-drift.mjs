@@ -3,8 +3,10 @@
  * tangle-drift: a ratchet on design-system drift across Tangle product surfaces.
  *
  * It counts raw Tailwind palette classes, hex literals, arbitrary color values,
- * CSS custom-property definitions and locally defined primitives in a surface's
- * source, reading a git tree with `git grep` (no checkout of the tree needed).
+ * CSS custom-property definitions, locally defined primitives, and the sizing and
+ * type deviations that bypass the shared control scale (literal font sizes and
+ * heights, native controls, restyled shared controls) in a surface's source,
+ * reading a git tree with `git grep` (no checkout of the tree needed).
  * The counts committed in drift-baseline.json beside this file may only fall.
  *
  *   tangle-drift check --surface gtm --repo-dir .          # consumer gate, reads HEAD
@@ -32,6 +34,7 @@ export const SURFACES = {
   gtm: { repo: "tangle-network/gtm-agent", roots: [""] },
   tax: { repo: "tangle-network/tax-agent", roots: ["apps/web"] },
   legal: { repo: "tangle-network/legal-agent", roots: [""] },
+  insurance: { repo: "tangle-network/insurance-agent", roots: [""] },
   creative: { repo: "tangle-network/creative-agent", roots: [""] },
   physim: { repo: "tangle-network/physim", roots: ["apps/web"] },
   hospitality: { repo: "tangle-network/hospitality-agent", roots: [""] },
@@ -55,6 +58,17 @@ export const PATTERNS = {
   arbitrary_color: String.raw`-\[(?:#|rgb|hsl|oklch)`,
   css_var_defs: String.raw`^\s*--[a-zA-Z0-9-]+\s*:`,
   local_primitive_count: String.raw`export\s+(?:default\s+)?(?:function|const)\s+(?:${PRIMS})\b`,
+  // Sizes and type that bypass Brand's control and type scale. Token references such as
+  // `text-[var(--text-control)]` and `h-[var(--control-height-md)]` are not counted.
+  // A literal Tailwind size (`text-[13px]`), an inline `fontSize: 13`, or a CSS `font-size: 13px`.
+  font_size_literal: String.raw`\btext-\[(?:[0-9.]+(?:px|rem|em)\b|calc\(|clamp\()|\bfontSize:\s*["'\x60]?[0-9.]+|font-size:\s*[0-9.]+(?:px|rem|em)\b`,
+  // A literal height or square size (`h-[34px]`, `min-h-[2.4rem]`, `size-[30px]`).
+  size_literal: String.raw`(?<![\w-])(?:h|min-h|size)-\[[0-9.]+(?:px|rem)\]`,
+  // A native control element in product code; Button, Input, Textarea and Select own them.
+  native_control: String.raw`<(?:button|input|select|textarea)\b`,
+  // A shared control resized or retyped in place. Line-based: a className on its own line
+  // after the tag is not seen, so this undercounts and only ratchets what it can see.
+  control_override: String.raw`<(?:Button|Input|Textarea|SelectTrigger)\b[^>]*?\bclassName=[^>]*?(?<![\w-])(?:h-|min-h-|size-|px-|py-|text-(?:xs|sm|base|lg|\[)|rounded-|font-(?:normal|medium|semibold|bold)\b)`,
 };
 const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`);
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
@@ -70,6 +84,10 @@ function extensions(surface, metric) {
     case "arbitrary_color": return ["*.tsx", "*.jsx", "*.astro", "*.ts"];
     case "css_var_defs": return ["*.css"];
     case "local_primitive_count": return ["*.tsx", "*.jsx"];
+    case "font_size_literal": return ["*.tsx", "*.jsx", "*.astro", "*.ts", "*.css", ...extra];
+    case "size_literal": return ["*.tsx", "*.jsx", "*.astro", "*.ts", ...extra];
+    case "native_control": return ["*.tsx", "*.jsx", "*.astro"];
+    case "control_override": return ["*.tsx", "*.jsx"];
     case "imports": return ["*.tsx", "*.ts", "*.astro", "*.jsx"];
     default: return SRC_EXT;
   }
@@ -207,17 +225,23 @@ export function measure(surface, source) {
   return { row, matches };
 }
 
-/** Compare a measured row with its baseline row. Missing baseline metrics count as 0. */
+/**
+ * Compare a measured row with its baseline row. A metric the baseline row has not recorded
+ * (one added after the row was written) is `unrecorded`, not a rise: it gates from the first
+ * baseline that records it, so a consumer's own baseline file keeps passing until refreshed.
+ */
 export function compare(baseline, current) {
   const rises = [];
   const falls = [];
+  const unrecorded = [];
   for (const metric of GATED) {
-    const base = baseline?.[metric] ?? 0;
     const now = current[metric];
+    if (baseline && typeof baseline[metric] !== "number") { unrecorded.push({ metric, now }); continue; }
+    const base = baseline?.[metric] ?? 0;
     if (now > base) rises.push({ metric, base, now });
     else if (now < base) falls.push({ metric, base, now });
   }
-  return { rises, falls };
+  return { rises, falls, unrecorded };
 }
 
 /** Files whose count for `metric` rose above their baseline count, worst first. */
@@ -231,14 +255,23 @@ export function risenFiles(baseline, current, metric) {
 
 /**
  * Apply `rows` to `baseline`. Without allowRise, a row with any gated rise is refused and the
- * baseline keeps its old row. Returns { next, refused }.
+ * baseline keeps its old counts, but still records metrics that row had not recorded yet.
+ * Returns { next, refused }.
  */
 export function updateBaseline(baseline, rows, { allowRise = false } = {}) {
   const next = { ...baseline };
   const refused = [];
   for (const [surface, row] of Object.entries(rows)) {
-    const { rises } = compare(baseline[surface], row);
-    if (rises.length && !allowRise && baseline[surface]) { refused.push({ surface, rises }); continue; }
+    const { rises, unrecorded } = compare(baseline[surface], row);
+    if (rises.length && !allowRise && baseline[surface]) {
+      refused.push({ surface, rises });
+      if (unrecorded.length) {
+        const kept = { ...baseline[surface], by_file: { ...baseline[surface].by_file } };
+        for (const { metric } of unrecorded) { kept[metric] = row[metric]; kept.by_file[metric] = row.by_file?.[metric] ?? {}; }
+        next[surface] = kept;
+      }
+      continue;
+    }
     next[surface] = row;
   }
   return { next: sortedBySurface(next), refused };
@@ -407,7 +440,11 @@ export function main(argv = process.argv.slice(2), log = (s) => process.stdout.w
       if (!opts.update) failed = true;
       continue;
     }
-    const { rises, falls } = compare(base, row);
+    const { rises, falls, unrecorded } = compare(base, row);
+    if (unrecorded.length) {
+      log(`  not yet in this baseline (not gated): ${unrecorded.map((u) => `${u.metric}=${u.now}`).join(", ")}`);
+      log("  record them with --update-baseline (the shipped baseline is refreshed in tangle-network/brand)");
+    }
     for (const { metric, base: b, now } of rises) {
       log(`  FAIL ${metric}: ${now} > baseline ${b} (+${now - b}; baseline read ${base.head})`);
       const files = risenFiles(base, row, metric);
