@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.1
+
+### Patch Changes
+
+- 0325448: Lower the drift baseline for converged surfaces (website, creative, blueprint, browser, intelligence, sandbox, audits, GTM, builder), and scope the website surface to `src`.
+
 ## 1.17.0
 
 ### Minor Changes
