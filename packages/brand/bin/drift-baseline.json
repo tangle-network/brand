@@ -648,7 +648,7 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "8e1a8a7c63b0",
+  "head": "1416cabb6fa9",
   "tsx_files": 57,
   "css_files": 1,
   "versions": {
@@ -656,31 +656,31 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.3"
    ],
    "override:agent-app": [
     "0.58.20"
    ],
    "override:brand": [
-    "1.19.0"
+    "1.19.3"
    ],
    "override:sandbox-ui": [
     "0.130.1"
    ],
    "override:ui": [
-    "11.28.2"
+    "11.30.1"
    ],
    "sandbox-ui": [
     "0.130.1"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.1"
    ]
   },
   "importing_files": {
    "brand": 1,
-   "ui": 1,
-   "sandbox-ui": 35,
+   "ui": 2,
+   "sandbox-ui": 38,
    "agent-app": 100
   },
   "by_file": {
@@ -691,22 +691,7 @@
    "local_primitive_count": {},
    "font_size_literal": {},
    "size_literal": {},
-   "native_control": {
-    "apps/web/src/components/document-upload.tsx": 1,
-    "apps/web/src/components/overview/planning-panel.tsx": 4,
-    "apps/web/src/components/overview/return-sections.tsx": 3,
-    "apps/web/src/components/overview/workspace-panels.tsx": 9,
-    "apps/web/src/components/plan-card.tsx": 1,
-    "apps/web/src/components/section-nav.tsx": 1,
-    "apps/web/src/components/vault-ui/integration-approval-card.tsx": 1,
-    "apps/web/src/components/vault-ui/proposed-form-card.tsx": 1,
-    "apps/web/src/components/vault-ui/session-summary.tsx": 2,
-    "apps/web/src/routes/app._index.tsx": 3,
-    "apps/web/src/routes/app.documents.tsx": 1,
-    "apps/web/src/routes/app.return.tsx": 1,
-    "apps/web/src/routes/app.settings.tsx": 1,
-    "apps/web/src/routes/app.welcome.tsx": 1
-   },
+   "native_control": {},
    "control_override": {
     "apps/web/src/components/overview/fact-chips.tsx": 1,
     "apps/web/src/components/overview/fact-review.tsx": 2
@@ -726,7 +711,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 0,
   "size_literal": 0,
-  "native_control": 30,
+  "native_control": 0,
   "control_override": 3,
   "page_heading": 6,
   "palette_top": [],
@@ -738,7 +723,7 @@
    ""
   ],
   "branch": "main",
-  "head": "f830e7a44fff",
+  "head": "42fb7e0f2183",
   "tsx_files": 63,
   "css_files": 1,
   "versions": {
@@ -746,19 +731,19 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.3"
    ],
    "sandbox-ui": [
     "0.130.1"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 2,
    "ui": 33,
-   "sandbox-ui": 18,
+   "sandbox-ui": 25,
    "agent-app": 120
   },
   "by_file": {
@@ -772,24 +757,7 @@
     "src/lib/.server/notifications.ts": 8
    },
    "size_literal": {},
-   "native_control": {
-    "src/components/contract-drop-zone.tsx": 1,
-    "src/components/contract-risk-strip.tsx": 1,
-    "src/components/legal-entry-composer.tsx": 1,
-    "src/components/plan-card.tsx": 1,
-    "src/components/vault-review-dock.tsx": 2,
-    "src/components/vault-upload-action.tsx": 3,
-    "src/routes/app.workspace.calendar.tsx": 1,
-    "src/routes/app.workspace.captable.tsx": 1,
-    "src/routes/app.workspace.chat.$threadId.tsx": 15,
-    "src/routes/app.workspace.contracts.redline.tsx": 1,
-    "src/routes/app.workspace.deals.tsx": 1,
-    "src/routes/app.workspace.filings.tsx": 2,
-    "src/routes/app.workspace.onboarding.business.tsx": 2,
-    "src/routes/app.workspace.onboarding.tsx": 1,
-    "src/routes/app.workspace.reviews.$id.tsx": 1,
-    "src/routes/app.workspace.templates.tsx": 2
-   },
+   "native_control": {},
    "control_override": {},
    "page_heading": {
     "src/root.tsx": 1,
@@ -807,7 +775,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 11,
   "size_literal": 0,
-  "native_control": 36,
+  "native_control": 0,
   "control_override": 0,
   "page_heading": 6,
   "palette_top": [],
@@ -819,7 +787,7 @@
    ""
   ],
   "branch": "main",
-  "head": "07760a579b29",
+  "head": "22837ea9c857",
   "tsx_files": 38,
   "css_files": 1,
   "versions": {
@@ -827,19 +795,19 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.3"
    ],
    "sandbox-ui": [
     "0.130.1"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 1,
-   "sandbox-ui": 24,
+   "sandbox-ui": 27,
    "agent-app": 65
   },
   "by_file": {
@@ -862,9 +830,9 @@
     "src/routes/app.workspace.integrations.tsx": 1,
     "src/routes/app.workspace.onboarding.tsx": 1,
     "src/routes/app.workspace.swaps.tsx": 2,
-    "src/routes/app.workspace.vault.tsx": 2,
-    "src/routes/login.tsx": 16,
-    "src/routes/signup.tsx": 16
+    "src/routes/app.workspace.vault.tsx": 1,
+    "src/routes/login.tsx": 10,
+    "src/routes/signup.tsx": 9
    },
    "arbitrary_color": {},
    "css_var_defs": {
@@ -876,23 +844,11 @@
     "src/components/approval-confirmation.tsx": 5,
     "src/lib/.server/notifications.ts": 8,
     "src/routes/_index.tsx": 2,
-    "src/routes/login.tsx": 3,
+    "src/routes/login.tsx": 2,
     "src/routes/signup.tsx": 2
    },
    "size_literal": {},
-   "native_control": {
-    "src/components/approval-confirmation.tsx": 1,
-    "src/components/judges/JudgeEditor.tsx": 3,
-    "src/components/suggestion-pills.tsx": 1,
-    "src/components/vault-tree.tsx": 2,
-    "src/routes/app.workspace.approvals.tsx": 2,
-    "src/routes/app.workspace.chat.$threadId.tsx": 6,
-    "src/routes/app.workspace.onboarding.tsx": 2,
-    "src/routes/app.workspace.settings.tsx": 2,
-    "src/routes/app.workspace.vault.tsx": 5,
-    "src/routes/login.tsx": 4,
-    "src/routes/signup.tsx": 5
-   },
+   "native_control": {},
    "control_override": {},
    "page_heading": {
     "src/root.tsx": 1,
@@ -901,13 +857,13 @@
    }
   },
   "raw_palette": 72,
-  "hex": 162,
+  "hex": 148,
   "arbitrary_color": 0,
   "css_var_defs": 183,
   "local_primitive_count": 0,
-  "font_size_literal": 38,
+  "font_size_literal": 37,
   "size_literal": 0,
-  "native_control": 33,
+  "native_control": 0,
   "control_override": 0,
   "page_heading": 3,
   "palette_top": [
@@ -944,7 +900,7 @@
    ""
   ],
   "branch": "master",
-  "head": "7785e956d96f",
+  "head": "fbc53c9387ac",
   "tsx_files": 54,
   "css_files": 1,
   "versions": {
@@ -952,19 +908,19 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.0"
+    "1.19.3"
    ],
    "sandbox-ui": [
     "0.130.0"
    ],
    "ui": [
-    "11.28.2"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 1,
-   "ui": 0,
-   "sandbox-ui": 32,
+   "ui": 2,
+   "sandbox-ui": 36,
    "agent-app": 128
   },
   "by_file": {
@@ -981,25 +937,7 @@
    "size_literal": {
     "src/routes/app.workspace.tasks.tsx": 1
    },
-   "native_control": {
-    "src/components/agent-instruction-panel.tsx": 1,
-    "src/components/artifact-agent-dock.tsx": 1,
-    "src/components/generations/GenerationCard.tsx": 9,
-    "src/components/missions/MissionCard.tsx": 8,
-    "src/components/new-workspace-dialog.tsx": 1,
-    "src/components/sequences/SequenceAssetShelf.tsx": 1,
-    "src/components/sequences/SequenceExportMenu.tsx": 2,
-    "src/components/ui/info-tooltip.tsx": 1,
-    "src/components/vault-artifact.tsx": 1,
-    "src/routes/agents.consent.tsx": 2,
-    "src/routes/app.workspace.assets.tsx": 1,
-    "src/routes/app.workspace.calendar.tsx": 4,
-    "src/routes/app.workspace.chat.tsx": 9,
-    "src/routes/app.workspace.designs.tsx": 1,
-    "src/routes/app.workspace.sequences.tsx": 2,
-    "src/routes/app.workspace.settings.tsx": 3,
-    "src/routes/app.workspace.tasks.tsx": 9
-   },
+   "native_control": {},
    "control_override": {},
    "page_heading": {
     "src/root.tsx": 1,
@@ -1015,7 +953,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 20,
   "size_literal": 1,
-  "native_control": 56,
+  "native_control": 0,
   "control_override": 0,
   "page_heading": 4,
   "palette_top": [],
