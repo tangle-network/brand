@@ -136,4 +136,31 @@ describe("Markdown", () => {
     );
     expect(screen.queryByRole("link")).toBeNull();
   });
+
+  it("renders a fenced block's file name and highlights it as that file's language", () => {
+    render(<Markdown>{'```ts title="src/lib/ctr.ts"\nexport const x = 1;\n```'}</Markdown>);
+    expect(screen.getByText("src/lib/ctr.ts")).toBeInTheDocument();
+    expect(screen.getByText("TypeScript")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy to clipboard" })).toBeInTheDocument();
+  });
+
+  it("renders a single-line fence without a language as a block, not inline code", () => {
+    const { container } = render(<Markdown>{"```\nnpm run build\n```\n\nRun `npm test` too."}</Markdown>);
+    expect(container.querySelectorAll("pre")).toHaveLength(1);
+    expect(container.querySelector("pre")?.textContent).toBe("npm run build");
+    expect(container.querySelector("p code")?.textContent).toBe("npm test");
+  });
+
+  it("renders links the host classifies as chips that keep their href", () => {
+    render(
+      <Markdown linkChip={(href) => href.startsWith("/vault/") ? { kind: "file", label: "REVIEW.md", title: "campaigns/REVIEW.md" } : null}>
+        {"See [the review](/vault/REVIEW.md) and [docs](https://example.com)."}
+      </Markdown>,
+    );
+    const chip = screen.getByRole("link", { name: "REVIEW.md" });
+    expect(chip.getAttribute("href")).toBe("/vault/REVIEW.md");
+    expect(chip.getAttribute("data-link-chip")).toBe("file");
+    expect(chip.getAttribute("title")).toBe("campaigns/REVIEW.md");
+    expect(screen.getByRole("link", { name: "docs" }).hasAttribute("data-link-chip")).toBe(false);
+  });
 });

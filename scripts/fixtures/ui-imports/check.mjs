@@ -228,10 +228,10 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
     }
   }
   for (const measurements of [after, afterVite]) {
-    assert.ok(measurements.markdown.reachableGraph.modules.some((name) => name.includes("/react-syntax-highlighter/")),
+    assert.ok(measurements.markdown.reachableGraph.modules.some((name) => /\/(?:shiki|@shikijs\/[^/]+)\//.test(name)),
       "the positive-control markdown fixture must retain syntax highlighting");
     assert.deepEqual(measurements.markdown.initialGraph.modules.filter((name) =>
-      /\/(?:react-syntax-highlighter|highlight\.js|lowlight|prismjs|refractor)\//.test(name)), [],
+      /\/(?:shiki|@shikijs\/[^/]+|react-syntax-highlighter|highlight\.js|lowlight|prismjs|refractor)\//.test(name)), [],
     "the initial markdown consumer graph must not fetch the syntax engine");
     assert.ok(measurements.markdown.initialBytes.gzip < measurements.markdown.reachableBytes.gzip,
       "the markdown highlighter must occupy a lazy resource");

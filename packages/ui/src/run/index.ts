@@ -20,3 +20,20 @@ export { LiveDuration } from "./run-item-primitives";
 // because ToolCallData references it.
 export { type ToolCallType, type ToolCallStatus } from "./tool-call-step";
 export { ToolCallFeed, parseToolEvent, type ToolCallFeedProps, type ToolCallData, type FeedSegment } from "./tool-call-feed";
+export {
+  TaskList,
+  taskProgress,
+  taskStatus,
+  showsTaskPriority,
+  type TaskListItem,
+  type TaskListProps,
+  type TaskStatus,
+} from "./task-list";
+export {
+  ApprovalCard,
+  ApprovalDiffSummary,
+  type ApprovalCardProps,
+  type ApprovalDiffFile,
+  type ApprovalPlanStep,
+} from "./approval-card";
+export { RunPhaseList, type RunPhase } from "./run-phase-list";
