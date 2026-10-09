@@ -68,6 +68,12 @@ export function tableCsv(rows: string[][]): string {
   return rows.map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
+// Markdown wraps its output in `.tangle-prose`, and a consumer may ship an
+// older copy of those rules (display: block on tables, cell borders, left-aligned
+// headers). These variants out-rank them, so the card renders the same either way.
+const PROSE_TABLE = "[.tangle-prose_&]:table [.tangle-prose_&]:m-0 [.tangle-prose_&]:overflow-visible [.tangle-prose_&]:text-sm";
+const PROSE_CELL = "[.tangle-prose_&]:px-3 [.tangle-prose_&]:py-2 [.tangle-prose_&]:border-t-0 [.tangle-prose_&:not(:first-child)]:border-l-0";
+
 const TableColumns = createContext<boolean[]>([]);
 const CellColumn = createContext(-1);
 
@@ -126,7 +132,7 @@ export function MarkdownTable({ node, className, children, ...props }: Component
       {/* A keyboard reaches a sideways-scrolling table only when it can take focus. */}
       <div tabIndex={0} role="region" aria-label="Table" className={cn("overflow-x-auto", focusRingInset)}>
         <TableColumns.Provider value={numeric}>
-          <table {...props} data-markdown-table="" className={cn("w-full border-collapse text-sm text-foreground", className)}>
+          <table {...props} data-markdown-table="" className={cn("w-full border-collapse text-sm text-foreground", PROSE_TABLE, className)}>
             {children}
           </table>
         </TableColumns.Provider>
@@ -169,7 +175,8 @@ export function MarkdownTableHeaderCell({ node: _node, className, ...props }: Co
       {...props}
       className={cn(
         "whitespace-nowrap border-b border-border px-3 py-2 text-left font-semibold text-foreground",
-        numeric && "text-right",
+        PROSE_CELL,
+        numeric ? "text-right [.tangle-prose_&]:text-right" : "[.tangle-prose_&]:text-left",
         className,
       )}
     />
@@ -183,6 +190,7 @@ export function MarkdownTableCell({ node: _node, className, ...props }: Componen
       {...props}
       className={cn(
         "border-b border-border/60 px-3 py-2 align-top",
+        PROSE_CELL,
         numeric ? "whitespace-nowrap text-right tabular-nums" : "min-w-[8rem]",
         className,
       )}

@@ -103,6 +103,8 @@ function MarkdownLink({ node: _node, children, className, ...props }: ComponentP
         data-link-chip={chip.kind}
         className={cn(
           "not-prose inline-flex max-w-full items-center gap-1.5 rounded-md border border-border bg-muted/60 px-2 py-0.5 align-middle text-[0.9375em] font-medium leading-6 text-foreground no-underline transition-colors hover:border-[var(--border-strong)] hover:bg-muted",
+          // Out-ranks an older vendored `.tangle-prose a` colour and underline.
+          "[.tangle-prose_&]:text-foreground [.tangle-prose_&]:no-underline",
           focusRing,
           className,
         )}
