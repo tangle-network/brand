@@ -194,16 +194,16 @@ export const CodeBlock = memo(
       fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)",
       whiteSpace: "pre",
     };
-    const lines: Array<Array<{ content: string; style?: CSSProperties }>> =
-      highlighted && highlighted.code === code && highlighted.grammar === grammar
-        ? highlighted.lines.map((line) => line.map((token) => ({ content: token.content, style: tokenStyle(token) })))
-        : code.split("\n").map((line) => [{ content: line }]);
+    const isHighlighted = Boolean(highlighted && highlighted.code === code && highlighted.grammar === grammar);
+    const lines: Array<Array<{ content: string; style?: CSSProperties }>> = isHighlighted
+      ? highlighted!.lines.map((line) => line.map((token) => ({ content: token.content, style: tokenStyle(token) })))
+      : code.split("\n").map((line) => [{ content: line }]);
     const regionName = filename ?? headerLabel;
 
     return (
       <div
         className={cn("group relative overflow-hidden rounded-lg border font-mono", "bg-card border-border", className)}
-        data-highlighted={highlighted && highlighted.code === code ? "true" : undefined}
+        data-highlighted={isHighlighted ? "true" : undefined}
         {...props}
         {...mode}
       >
@@ -237,7 +237,8 @@ export const CodeBlock = memo(
           style={preStyle}
         >
           <code style={codeStyle}>
-            {lines.map((line, index) => (
+            {/* Plain code without line numbers stays one text node, as the server renders it. */}
+            {!isHighlighted && !showLineNumbers ? code : lines.map((line, index) => (
               <span key={index}>
                 {showLineNumbers && (
                   <span
