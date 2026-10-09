@@ -24,11 +24,10 @@ describe("Toolbar", () => {
     expect(row.children).toHaveLength(1);
   });
 
-  // Search and filters both flex, on purpose: giving the filter row its content
-  // width starves search — a 537px filter row in an 832px toolbar collapses the
-  // search field to 89px. Sharing bounds the filter row so it scrolls within its
-  // half and search stays usable. Only `actions` sits at content width.
-  it("lets search and filters share the row, holding actions at content width", () => {
+  // Filters keep their content width while it fits and shrink (scrolling) only
+  // once search reaches its 16rem floor; an even split clipped a third filter at
+  // 1440px, and no floor left search 89px wide in an 832px toolbar.
+  it("keeps filters at content width above a search floor, actions at content width", () => {
     const { container } = render(
       <Toolbar
         actions={<button type="button">Export</button>}
@@ -39,11 +38,11 @@ describe("Toolbar", () => {
     const [searchSlot, filterSlot, actionsSlot] = Array.from(
       (container.firstElementChild as HTMLElement).children,
     ) as HTMLElement[];
-    expect(searchSlot.className).toContain("lg:flex-1");
-    expect(searchSlot.className).toContain("min-w-0");
-    // Both flex, so neither can starve the other.
-    expect(filterSlot.className).toContain("lg:flex-1");
-    expect(filterSlot.className).toContain("min-w-0");
+    const search = searchSlot.className.split(" ");
+    const filters = filterSlot.className.split(" ");
+    expect(search).toEqual(expect.arrayContaining(["lg:flex-1", "lg:min-w-64", "lg:max-w-sm", "min-w-0"]));
+    expect(filters).toEqual(expect.arrayContaining(["lg:flex-initial", "min-w-0", "lg:overflow-x-auto"]));
+    expect(filters).not.toContain("lg:flex-1");
     expect(actionsSlot.className).toContain("shrink-0");
     expect(actionsSlot.className).not.toContain("flex-1");
   });

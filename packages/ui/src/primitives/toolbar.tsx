@@ -11,22 +11,22 @@ import { cn } from "../lib/utils";
  * own visual language, so one row carried a native `<select>`, a custom input
  * and a segmented control side by side.
  *
- * So search and filters SHARE the free space and `actions` stays at its content
- * width, and the row is the one place those controls are composed, which is what
- * keeps them looking like one set.
+ * So on one `lg` line the filters keep their content width while it fits,
+ * search takes what is left between a 16rem floor and `max-w-sm`, and `actions`
+ * stays at its content width. The row is the one place those controls are
+ * composed, which is what keeps them looking like one set.
  *
- * Sharing is deliberate, and the alternative is worse. Giving the filter row its
- * content width starves search: measured with a 537px filter row in an 832px
- * toolbar, the search field collapses to 89px. Letting both flex bounds the
- * filter row instead, so it scrolls within its half — 313px each in that same
- * case — and search stays usable however many filters a page adds. `max-w-sm`
- * then stops search claiming more than it can use when there are few filters.
+ * Both earlier layouts failed one side. Filters at content width with no floor
+ * starved search: a 537px filter row in an 832px toolbar left it 89px. Splitting
+ * the row evenly clipped filters that would have fitted: at 1440px the Assets
+ * bar cut its third field at the scroll edge while search sat at 384px. With the
+ * floor, filters shrink and scroll only once search is down to 16rem.
  *
  * Below `lg` the row becomes a column and the filters wrap onto as many lines
  * as they need. Scrolling them as one line hid every filter past the first
  * behind the screen edge on a phone: at 390px the second select started at
  * 403px and a third at 652px, with nothing to say more were there. From `lg`
- * up they share one line and scroll within their half, as above.
+ * up they sit on one line as above.
  */
 /**
  * Slots only — `children` is omitted deliberately. A free child would render as
@@ -56,14 +56,14 @@ const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
       )}
       {...props}
     >
-      {search && <div className="min-w-0 lg:max-w-sm lg:flex-1">{search}</div>}
+      {search && <div className="min-w-0 lg:min-w-64 lg:max-w-sm lg:flex-1">{search}</div>}
       {filters && (
         // `py-1` leaves room for a focus ring above and below; on the single
         // `lg` line the scroll container clips it horizontally, which is the
         // trade a one-line filter row makes. No negative margin — pulling the
         // row wider than its parent is what made every page report 4px of
         // horizontal overflow.
-        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 py-1 lg:flex-1 lg:flex-nowrap lg:gap-2 lg:overflow-x-auto">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 py-1 lg:flex-initial lg:flex-nowrap lg:gap-2 lg:overflow-x-auto">
           {filters}
         </div>
       )}
