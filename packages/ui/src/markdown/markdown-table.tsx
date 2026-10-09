@@ -69,10 +69,11 @@ export function tableCsv(rows: string[][]): string {
 }
 
 // Markdown wraps its output in `.tangle-prose`, and a consumer may ship an
-// older copy of those rules (display: block on tables, cell borders, left-aligned
-// headers). These variants out-rank them, so the card renders the same either way.
-const PROSE_TABLE = "[.tangle-prose_&]:table [.tangle-prose_&]:m-0 [.tangle-prose_&]:overflow-visible [.tangle-prose_&]:text-sm";
-const PROSE_CELL = "[.tangle-prose_&]:px-3 [.tangle-prose_&]:py-2 [.tangle-prose_&]:border-t-0 [.tangle-prose_&:not(:first-child)]:border-l-0";
+// older, unlayered copy of those rules (display: block on tables, cell
+// borders, left-aligned headers). Unlayered rules beat layered utilities at
+// any specificity, so these scoped overrides are important.
+const PROSE_TABLE = "[.tangle-prose_&]:table! [.tangle-prose_&]:m-0! [.tangle-prose_&]:overflow-visible! [.tangle-prose_&]:text-sm!";
+const PROSE_CELL = "[.tangle-prose_&]:px-3! [.tangle-prose_&]:py-2! [.tangle-prose_&]:border-t-0! [.tangle-prose_&]:border-l-0!";
 
 const TableColumns = createContext<boolean[]>([]);
 const CellColumn = createContext(-1);
@@ -176,7 +177,7 @@ export function MarkdownTableHeaderCell({ node: _node, className, ...props }: Co
       className={cn(
         "whitespace-nowrap border-b border-border px-3 py-2 text-left font-semibold text-foreground",
         PROSE_CELL,
-        numeric ? "text-right [.tangle-prose_&]:text-right" : "[.tangle-prose_&]:text-left",
+        numeric ? "text-right [.tangle-prose_&]:text-right!" : "[.tangle-prose_&]:text-left!",
         className,
       )}
     />

@@ -24,7 +24,7 @@ describe("Markdown tables", () => {
     expect(headers[0].className).toContain("text-left");
     expect(headers[1].className).toContain("text-right");
     // Inside `.tangle-prose`, a vendored header rule cannot left-align a figure column.
-    expect(headers[1].className).toContain("[.tangle-prose_&]:text-right");
+    expect(headers[1].className).toContain("[.tangle-prose_&]:text-right!");
     const cells = within(table).getAllByRole("cell");
     expect(cells[1].className).toContain("text-right");
     expect(cells[1].className).toContain("tabular-nums");
