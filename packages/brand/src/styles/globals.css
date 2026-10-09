@@ -196,7 +196,8 @@
 .tangle-prose li::marker { color: var(--text-muted); }
 .tangle-prose li { margin: 0.25em 0; }
 .tangle-prose li > ul, .tangle-prose li > ol { margin-top: 0.25em; }
-.tangle-prose a {
+/* A link chip draws its own surface; prose link colour would fight it. */
+.tangle-prose a:not([data-link-chip]) {
   color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -217,8 +218,10 @@
 .tangle-prose pre { margin: 0.85em 0; }
 
 /* Tables — border-collapse with hairline dividers + real cell padding, so
- * columns read as a grid instead of colliding (the "no dividers" report). */
-.tangle-prose table {
+ * columns read as a grid instead of colliding (the "no dividers" report).
+ * The Markdown renderer's table card (`data-markdown-table`) styles itself
+ * and scrolls inside its card, so these rules skip it. */
+.tangle-prose table:not([data-markdown-table]) {
   width: 100%;
   border-collapse: collapse;
   margin: 0.85em 0;
@@ -226,20 +229,20 @@
   display: block;
   overflow-x: auto;
 }
-.tangle-prose thead { border-bottom: 1px solid var(--border-default); }
-.tangle-prose th {
+.tangle-prose table:not([data-markdown-table]) thead { border-bottom: 1px solid var(--border-default); }
+.tangle-prose table:not([data-markdown-table]) th {
   text-align: left;
   font-weight: 600;
   padding: 0.5em 0.85em;
   color: var(--text-primary);
   white-space: nowrap;
 }
-.tangle-prose td {
+.tangle-prose table:not([data-markdown-table]) td {
   padding: 0.5em 0.85em;
   border-top: 1px solid var(--border-subtle);
   vertical-align: top;
 }
-.tangle-prose th:not(:first-child), .tangle-prose td:not(:first-child) {
+.tangle-prose table:not([data-markdown-table]) :is(th, td):not(:first-child) {
   border-left: 1px solid var(--border-subtle);
 }
 
