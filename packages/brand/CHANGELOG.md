@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.19.6
+
+### Patch Changes
+
+- 05857b3: The `.tangle-prose` table rules (`display: block`, a sideways scroll on the table itself, and cell borders) now skip the Markdown table card, which marks its table `data-markdown-table` and scrolls inside its card. The prose link color and underline skip link chips (`data-link-chip`).
+
 ## 1.19.5
 
 ### Patch Changes
