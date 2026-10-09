@@ -126,7 +126,7 @@ export function MarkdownTable({ node, className, children, ...props }: Component
       {/* A keyboard reaches a sideways-scrolling table only when it can take focus. */}
       <div tabIndex={0} role="region" aria-label="Table" className={cn("overflow-x-auto", focusRingInset)}>
         <TableColumns.Provider value={numeric}>
-          <table {...props} className={cn("w-full border-collapse text-sm text-foreground", className)}>
+          <table {...props} data-markdown-table="" className={cn("w-full border-collapse text-sm text-foreground", className)}>
             {children}
           </table>
         </TableColumns.Provider>

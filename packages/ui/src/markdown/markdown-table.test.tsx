@@ -37,6 +37,8 @@ describe("Markdown tables", () => {
     expect(region.getAttribute("tabindex")).toBe("0");
     expect(region.closest(".not-prose")).not.toBeNull();
     expect(screen.getByRole("table").className).toContain("text-sm");
+    // Brand's raw-table prose rules skip the card, so the table never becomes its own scroller.
+    expect(screen.getByRole("table").hasAttribute("data-markdown-table")).toBe(true);
     expect(document.body.innerHTML).not.toContain("text-xs");
   });
 
