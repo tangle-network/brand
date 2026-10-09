@@ -1058,27 +1058,27 @@
    ""
   ],
   "branch": "main",
-  "head": "c3cce8e5ae1e",
+  "head": "a0645002291b",
   "tsx_files": 29,
-  "css_files": 13,
+  "css_files": 14,
   "versions": {
    "agent-app": [
     "0.58.20"
    ],
    "brand": [
-    "1.19.2"
+    "1.19.4"
    ],
    "sandbox-ui": [
     "0.130.0"
    ],
    "ui": [
-    "11.30.0"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 0,
-   "ui": 2,
-   "sandbox-ui": 25,
+   "ui": 3,
+   "sandbox-ui": 26,
    "agent-app": 52
   },
   "by_file": {
@@ -1095,12 +1095,7 @@
     "src/web/workspace.css": 1
    },
    "size_literal": {},
-   "native_control": {
-    "src/resetos/GuestHub.tsx": 2,
-    "src/resetos/demo/main.tsx": 3,
-    "src/web/AgentProfileSettings.tsx": 9,
-    "src/web/WorkspaceFilesView.tsx": 1
-   },
+   "native_control": {},
    "control_override": {},
    "page_heading": {
     "src/resetos/GuestHub.tsx": 1,
@@ -1118,7 +1113,7 @@
   "local_primitive_count": 0,
   "font_size_literal": 82,
   "size_literal": 0,
-  "native_control": 15,
+  "native_control": 0,
   "control_override": 0,
   "page_heading": 12,
   "palette_top": [],
@@ -1313,7 +1308,7 @@
    ""
   ],
   "branch": "main",
-  "head": "371e1d52d7e8",
+  "head": "b2a661d38316",
   "tsx_files": 110,
   "css_files": 2,
   "versions": {
@@ -1321,31 +1316,31 @@
     "0.59.6"
    ],
    "brand": [
-    "1.19.2"
+    "1.19.4"
    ],
    "override:agent-app": [
     "0.59.6"
    ],
    "override:brand": [
-    "1.19.2"
+    "1.19.4"
    ],
    "override:sandbox-ui": [
-    "0.130.1"
+    "0.131.5"
    ],
    "override:ui": [
-    "11.30.0"
+    "11.30.2"
    ],
    "sandbox-ui": [
-    "0.130.1"
+    "0.131.5"
    ],
    "ui": [
-    "11.30.0"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 2,
    "ui": 3,
-   "sandbox-ui": 76,
+   "sandbox-ui": 78,
    "agent-app": 60
   },
   "by_file": {
@@ -1359,16 +1354,12 @@
     "src/components/agent-rune.tsx": 1,
     "src/components/chat-launch.tsx": 1,
     "src/routes/app.launch.$agentId.tsx": 2,
-    "src/styles/listing.css": 46
+    "src/styles/listing.css": 45
    },
    "size_literal": {},
    "native_control": {
-    "src/components/launch-number-panel.tsx": 1,
-    "src/components/listing/booking-card.tsx": 3,
     "src/components/listing/listing-editor.tsx": 1,
-    "src/components/onboarding.tsx": 1,
-    "src/routes/app.$agentId.profile.tsx": 1,
-    "src/routes/assistants.$slug.tsx": 3
+    "src/components/onboarding.tsx": 1
    },
    "control_override": {
     "src/components/listing/browse.tsx": 1
@@ -1392,9 +1383,9 @@
   "arbitrary_color": 0,
   "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 51,
+  "font_size_literal": 50,
   "size_literal": 0,
-  "native_control": 10,
+  "native_control": 2,
   "control_override": 1,
   "page_heading": 12,
   "palette_top": [],
