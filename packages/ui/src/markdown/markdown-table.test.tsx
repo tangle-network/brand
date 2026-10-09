@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Markdown } from "./markdown";
-import { numericColumns, tableCsv } from "./markdown-table";
+import { columnKinds, numericColumns, tableCsv } from "./markdown-table";
 
 const TABLE = [
   "| Variant | Impressions | CTR % | Spend $ | Note |",
@@ -23,10 +23,13 @@ describe("Markdown tables", () => {
     expect(headers.map((header) => header.textContent)).toEqual(["Variant", "Impressions", "CTR %", "Spend $", "Note"]);
     expect(headers[0].className).toContain("text-left");
     expect(headers[1].className).toContain("text-right");
+    // Inside `.tangle-prose`, a vendored header rule cannot left-align a figure column.
+    expect(headers[1].className).toContain("[.tangle-prose_&]:text-right!");
     const cells = within(table).getAllByRole("cell");
     expect(cells[1].className).toContain("text-right");
     expect(cells[1].className).toContain("tabular-nums");
     expect(cells[0].className).not.toContain("text-right");
+    expect(cells[0].className).toContain("whitespace-nowrap");
     expect(cells[4].className).not.toContain("tabular-nums");
   });
 
@@ -58,6 +61,7 @@ describe("Markdown tables", () => {
 
   it("treats a column as numeric only when every filled cell is a figure", () => {
     expect(numericColumns([["a", "1", "", "$2.50"], ["b", "x", "3", "-4%"]])).toEqual([false, false, true, true]);
+    expect(columnKinds([["Hero A", "1", "A long note that wraps across more than one line"]])).toEqual(["short", "figure", "long"]);
     expect(tableCsv([["a,b", " c"]])).toBe('"a,b"," c"');
   });
 });
