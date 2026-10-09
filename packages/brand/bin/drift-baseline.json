@@ -5,7 +5,7 @@
    "src"
   ],
   "branch": "master",
-  "head": "bebe67e00586",
+  "head": "ef34ced49ea3",
   "tsx_files": 33,
   "css_files": 5,
   "versions": {
@@ -88,7 +88,8 @@
     "src/pages/sub-processors.astro": 1,
     "src/pages/terms-of-service.astro": 1,
     "src/pages/what-is-tangle.astro": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 29,
@@ -100,6 +101,7 @@
   "native_control": 9,
   "control_override": 0,
   "page_heading": 16,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -109,7 +111,7 @@
    "products/sandbox/web"
   ],
   "branch": "develop",
-  "head": "9ebf3b2a7d2a",
+  "head": "d34b2d630a92",
   "tsx_files": 132,
   "css_files": 3,
   "versions": {
@@ -202,6 +204,9 @@
     "products/sandbox/web/src/pages/Docs.tsx": 1,
     "products/sandbox/web/src/pages/MfaChallenge.tsx": 1,
     "products/sandbox/web/src/pages/dashboard/SandboxProvisioningWizard.tsx": 1
+   },
+   "shell_override": {
+    "products/sandbox/web/src/pages/dashboard/sandbox-session/AgentWorkspace.tsx": 6
    }
   },
   "raw_palette": 0,
@@ -214,6 +219,7 @@
   "native_control": 54,
   "control_override": 0,
   "page_heading": 11,
+  "shell_override": 6,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -445,6 +451,9 @@
     "products/platform/web/src/client/pages/dev/WorkflowInPlaceEditGallery.tsx": 1,
     "products/platform/web/src/client/pages/dev/WorkflowListGallery.tsx": 1,
     "products/platform/web/src/client/pages/dev/WorkflowTriggerRailGallery.tsx": 1
+   },
+   "shell_override": {
+    "products/platform/web/src/client/components/Icons.tsx": 1
    }
   },
   "raw_palette": 0,
@@ -465,7 +474,8 @@
   "size_literal": 8,
   "native_control": 444,
   "control_override": 0,
-  "page_heading": 37
+  "page_heading": 37,
+  "shell_override": 1
  },
  "intelligence": {
   "repo": "tangle-network/agent-dev-container",
@@ -473,7 +483,7 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "9ebf3b2a7d2a",
+  "head": "d34b2d630a92",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
@@ -551,7 +561,8 @@
     "products/intelligence/web/src/pages/SessionDetail.tsx": 1,
     "products/intelligence/web/src/pages/TraceDetail.tsx": 1,
     "products/intelligence/web/src/pages/spine/runs.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -563,6 +574,7 @@
   "native_control": 50,
   "control_override": 0,
   "page_heading": 7,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -572,28 +584,28 @@
    ""
   ],
   "branch": "master",
-  "head": "e7c15da9fb79",
-  "tsx_files": 125,
+  "head": "a5956b145068",
+  "tsx_files": 126,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.59.5"
+    "0.60.2"
    ],
    "brand": [
-    "1.19.2"
+    "1.19.3"
    ],
    "sandbox-ui": [
-    "0.131.2"
+    "0.131.5"
    ],
    "ui": [
-    "11.30.0"
+    "11.30.2"
    ]
   },
   "importing_files": {
    "brand": 3,
    "ui": 7,
-   "sandbox-ui": 107,
-   "agent-app": 205
+   "sandbox-ui": 108,
+   "agent-app": 207
   },
   "by_file": {
    "raw_palette": {},
@@ -627,6 +639,11 @@
     "src/routes/app.workspace.vault.tsx": 1,
     "src/routes/forgot-password.tsx": 2,
     "src/routes/reset-password.tsx": 3
+   },
+   "shell_override": {
+    "src/components/vault-chat-rail.tsx": 2,
+    "src/components/workspace-chat-surface.tsx": 1,
+    "src/routes/app.workspace.vault.tsx": 2
    }
   },
   "raw_palette": 0,
@@ -639,6 +656,7 @@
   "native_control": 0,
   "control_override": 4,
   "page_heading": 18,
+  "shell_override": 5,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -648,7 +666,7 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "1416cabb6fa9",
+  "head": "53b2f8ca550e",
   "tsx_files": 57,
   "css_files": 1,
   "versions": {
@@ -656,25 +674,25 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.3"
+    "1.19.4"
    ],
    "override:agent-app": [
     "0.58.20"
    ],
    "override:brand": [
-    "1.19.3"
+    "1.19.4"
    ],
    "override:sandbox-ui": [
     "0.130.1"
    ],
    "override:ui": [
-    "11.30.1"
+    "11.30.2"
    ],
    "sandbox-ui": [
     "0.130.1"
    ],
    "ui": [
-    "11.30.1"
+    "11.30.2"
    ]
   },
   "importing_files": {
@@ -702,7 +720,8 @@
     "apps/web/src/routes/_index.tsx": 1,
     "apps/web/src/routes/app.$sessionId.tsx": 1,
     "apps/web/src/routes/app.billing.tsx": 2
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -714,6 +733,7 @@
   "native_control": 0,
   "control_override": 3,
   "page_heading": 6,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -723,7 +743,7 @@
    ""
   ],
   "branch": "main",
-  "head": "42fb7e0f2183",
+  "head": "5e68b59dd0da",
   "tsx_files": 63,
   "css_files": 1,
   "versions": {
@@ -731,7 +751,7 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.3"
+    "1.19.4"
    ],
    "sandbox-ui": [
     "0.130.1"
@@ -766,7 +786,8 @@
     "src/routes/app.workspace.contracts.$id.tsx": 1,
     "src/routes/app.workspace.contracts.redline.tsx": 1,
     "src/routes/app.workspace.templates.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -778,6 +799,7 @@
   "native_control": 0,
   "control_override": 0,
   "page_heading": 6,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -787,7 +809,7 @@
    ""
   ],
   "branch": "main",
-  "head": "22837ea9c857",
+  "head": "08130078bedc",
   "tsx_files": 38,
   "css_files": 1,
   "versions": {
@@ -795,7 +817,7 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.3"
+    "1.19.4"
    ],
    "sandbox-ui": [
     "0.130.1"
@@ -854,7 +876,8 @@
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
     "src/routes/app.workspace.chat.$threadId.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 72,
   "hex": 148,
@@ -866,6 +889,7 @@
   "native_control": 0,
   "control_override": 0,
   "page_heading": 3,
+  "shell_override": 0,
   "palette_top": [
    [
     "text-amber-600",
@@ -900,7 +924,7 @@
    ""
   ],
   "branch": "master",
-  "head": "fbc53c9387ac",
+  "head": "8e5e3fff35e3",
   "tsx_files": 54,
   "css_files": 1,
   "versions": {
@@ -908,7 +932,7 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.3"
+    "1.19.4"
    ],
    "sandbox-ui": [
     "0.130.0"
@@ -944,7 +968,8 @@
     "src/routes/agents.consent.tsx": 1,
     "src/routes/app.workspace.tsx": 1,
     "src/routes/invite.$token.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -956,6 +981,7 @@
   "native_control": 0,
   "control_override": 0,
   "page_heading": 4,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -965,12 +991,13 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "d5fdb47606d1",
+  "head": "2f94ff829aa1",
   "tsx_files": 17,
   "css_files": 8,
   "versions": {
    "agent-app": [
-    "0.57.17"
+    "0.57.17",
+    "0.58.15"
    ],
    "brand": [
     "1.17.0"
@@ -1037,7 +1064,8 @@
    "page_heading": {
     "apps/web/src/ApiKeysPanel.tsx": 1,
     "apps/web/src/assembly/AssemblyBooklet.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1049,6 +1077,7 @@
   "native_control": 52,
   "control_override": 0,
   "page_heading": 2,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1058,7 +1087,7 @@
    ""
   ],
   "branch": "main",
-  "head": "a0645002291b",
+  "head": "4239a87dcba3",
   "tsx_files": 29,
   "css_files": 14,
   "versions": {
@@ -1066,7 +1095,7 @@
     "0.58.20"
    ],
    "brand": [
-    "1.19.4"
+    "1.19.5"
    ],
    "sandbox-ui": [
     "0.130.0"
@@ -1104,7 +1133,8 @@
     "src/web/CustomerWorkspace.tsx": 5,
     "src/web/WorkspaceAppsView.tsx": 3,
     "src/web/WorkspaceFilesView.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1116,6 +1146,7 @@
   "native_control": 0,
   "control_override": 0,
   "page_heading": 12,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1198,6 +1229,9 @@
     "packages/website/src/pages/SampleAuditReport.tsx": 1,
     "packages/website/src/pages/SignIn.tsx": 1,
     "packages/website/src/pages/_Preview.tsx": 1
+   },
+   "shell_override": {
+    "packages/website/src/components/RedteamDashboardLayout.tsx": 4
    }
   },
   "raw_palette": 0,
@@ -1210,6 +1244,7 @@
   "native_control": 16,
   "control_override": 12,
   "page_heading": 10,
+  "shell_override": 4,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1287,6 +1322,9 @@
    },
    "page_heading": {
     "src/error-boundary.tsx": 1
+   },
+   "shell_override": {
+    "src/components/layout/app-layout.tsx": 4
    }
   },
   "raw_palette": 0,
@@ -1299,6 +1337,7 @@
   "native_control": 16,
   "control_override": 10,
   "page_heading": 1,
+  "shell_override": 4,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1308,7 +1347,7 @@
    ""
   ],
   "branch": "main",
-  "head": "b2a661d38316",
+  "head": "b9a4f52dc41f",
   "tsx_files": 110,
   "css_files": 2,
   "versions": {
@@ -1316,13 +1355,13 @@
     "0.59.6"
    ],
    "brand": [
-    "1.19.4"
+    "1.19.5"
    ],
    "override:agent-app": [
     "0.59.6"
    ],
    "override:brand": [
-    "1.19.4"
+    "1.19.5"
    ],
    "override:sandbox-ui": [
     "0.131.5"
@@ -1376,7 +1415,8 @@
     "src/routes/creators.$handle.tsx": 1,
     "src/routes/login.tsx": 1,
     "src/routes/pay.$token.tsx": 1
-   }
+   },
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1388,6 +1428,7 @@
   "native_control": 2,
   "control_override": 1,
   "page_heading": 12,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1659,6 +1700,9 @@
     "apps/web/src/routes/quests.tsx": 1,
     "apps/web/src/routes/settings.partner._index.tsx": 1,
     "apps/web/src/routes/terms-of-service.tsx": 1
+   },
+   "shell_override": {
+    "apps/web/src/components/header/Header.tsx": 2
    }
   },
   "raw_palette": 0,
@@ -1671,6 +1715,7 @@
   "native_control": 401,
   "control_override": 18,
   "page_heading": 30,
+  "shell_override": 2,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1715,7 +1760,8 @@
    "size_literal": {},
    "native_control": {},
    "control_override": {},
-   "page_heading": {}
+   "page_heading": {},
+   "shell_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1727,6 +1773,7 @@
   "native_control": 0,
   "control_override": 0,
   "page_heading": 0,
+  "shell_override": 0,
   "palette_top": [],
   "local_primitives": {}
  }

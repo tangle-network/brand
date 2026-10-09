@@ -91,8 +91,29 @@ test("counts sizing and type deviations, not token references", () => {
   assert.equal(row.page_heading, 1);
 });
 
+test("counts local re-drawings of the shared conversation shell", () => {
+  const dir = join(tmp, "shell");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  write(dir, {
+    "src/Chat.tsx": [
+      'import { PanelRightOpen, PanelLeftClose, PanelLeft } from "lucide-react";', // 3 pane-toggle icons
+      'export const a = <div className="bg-[var(--md3-surface-dim)] p-2"><section /></div>;', // 1 own recessed gutter
+      'export const b = <WorkspaceLayout collapsedControlsPlacement="overlay" centerHeaderVisibility="always" />;', // 2 moved seams
+      'export const c = <WorkspaceLayout surface="flat" />;', // 1 flattened surface
+      'export const d = <AgentWorkspaceCompanion header={<span>Plan</span>} />;', // the supported slot: not an override
+      'export const e = <PanelRightContent surface="inset" />;', // neither an icon nor a flat surface
+    ].join("\n"),
+    "src/chat.css": ".chat { background: var(--md3-surface-dim); }\n", // 1
+  });
+  commit(dir, "shell");
+  const { row } = measure("gtm", localSource(dir));
+  assert.equal(row.shell_override, 8);
+  assert.deepEqual(row.by_file.shell_override, { "src/Chat.tsx": 7, "src/chat.css": 1 });
+});
+
 test("compare reports rises and falls on gated metrics only", () => {
-  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, importing_files: { ui: 9 } };
+  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, shell_override: 0, importing_files: { ui: 9 } };
   assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
   const { rises, falls } = compare(base, { ...base, raw_palette: 4, hex: 1 });
   assert.deepEqual(rises, [{ metric: "raw_palette", base: 3, now: 4 }]);
@@ -101,11 +122,11 @@ test("compare reports rises and falls on gated metrics only", () => {
 
 test("a metric the baseline row has not recorded is reported, not gated, and is recorded on update", () => {
   const old = { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0, by_file: { raw_palette: { "a.tsx": 3 } } };
-  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3,
-    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 } } };
+  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3, shell_override: 2,
+    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 }, shell_override: { "a.tsx": 2 } } };
   const { rises, unrecorded } = compare(old, now);
   assert.deepEqual(rises, []);
-  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading"]);
+  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading", "shell_override"]);
   assert.deepEqual(updateBaseline({ gtm: old }, { gtm: now }).next.gtm, now);
   // A row refused for a rise keeps its old counts but still records the new metrics.
   const risen = { ...now, raw_palette: 9 };

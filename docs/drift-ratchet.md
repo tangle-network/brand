@@ -21,8 +21,11 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `native_control` | `<button>`, `<input>` (except `type="hidden"` form data), `<select>`, `<textarea>` elements | `.tsx .jsx .astro` |
 | `control_override` | `Button`, `Input`, `Textarea` or `SelectTrigger` with a `className` height, padding, text size, corner or weight on the tag's line | `.tsx .jsx` |
 | `page_heading` | A hand-written `<h1>`; `PageHeader` owns page titles | `.tsx .jsx .astro` |
+| `shell_override` | Product code re-drawing the conversation shell `AgentWorkspaceCompanion` owns: the `md3-surface-dim` backdrop, `PanelLeft`/`PanelRight` toggle icons (with or without `Open`/`Close`), the `collapsedControlsPlacement` or `centerHeaderVisibility` layout seams, or `surface="flat"` | `.tsx .jsx .css` |
 
-The last five measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
+`font_size_literal` through `page_heading` measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
+`shell_override` keeps products inside the shared chat shell: the companion draws the conversation's raised surface, gutter and header, and the header's top-right corner holds the tools toggle.
+A product that draws its own card or gutter around the conversation, floats or adds pane toggles, or moves the layout's controls raises the count. Header content goes through the companion's `header` prop.
 `control_override` reads one line, so a `className` on a later line of the tag is not counted.
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
@@ -57,6 +60,32 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
+
+## Shell override baseline, 2026-10-09
+
+Recorded from each default branch when `shell_override` was added.
+Platform's row kept its earlier counts and head because its `arbitrary_color` (21 to 22) and `native_control` (444 to 448) rose since that row was written; only `shell_override` was recorded for it.
+
+| Surface | Head | Shell override |
+| --- | --- | ---: |
+| website | `ef34ced49` | 0 |
+| sandbox | `d34b2d630` | 6 |
+| platform | `014fd01e8` | 1 |
+| intelligence | `d34b2d630` | 0 |
+| gtm | `a5956b145` | 5 |
+| tax | `53b2f8ca5` | 0 |
+| legal | `5e68b59dd` | 0 |
+| insurance | `08130078b` | 0 |
+| creative | `8e5e3fff3` | 0 |
+| physim | `2f94ff829` | 0 |
+| hospitality | `4239a87dc` | 0 |
+| audits | `af6c5106a` | 4 |
+| browser | `e2de2b85e` | 4 |
+| builder | `b9a4f52dc` | 0 |
+| blueprint | `1ac4236f8` | 2 |
+| super | `30e0cd527` | 0 |
+
+GTM's 5 are the chat surface's own recessed gutter (removed with the companion's inset surface) and the Vault page's chat-rail toggles.
 
 ## Sizing and type baseline, 2026-10-08
 

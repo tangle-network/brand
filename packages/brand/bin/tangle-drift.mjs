@@ -5,8 +5,8 @@
  * It counts raw Tailwind palette classes, hex literals, arbitrary color values,
  * CSS custom-property definitions, locally defined primitives, and the sizing and
  * type deviations that bypass the shared control scale (literal font sizes and
- * heights, native controls, restyled shared controls, hand-written page titles)
- * in a surface's source,
+ * heights, native controls, restyled shared controls, hand-written page titles),
+ * and local re-drawings of the shared conversation shell in a surface's source,
  * reading a git tree with `git grep` (no checkout of the tree needed).
  * The counts committed in drift-baseline.json beside this file may only fall.
  *
@@ -73,6 +73,10 @@ export const PATTERNS = {
   control_override: String.raw`<(?:Button|Input|Textarea|SelectTrigger)\b[^>]*?\bclassName=[^>]*?(?<![\w-])(?:h-|min-h-|size-|px-|py-|text-(?:xs|sm|base|lg|\[)|rounded-|font-(?:normal|medium|semibold|bold)\b)`,
   // A hand-written page title; PageHeader owns the title, description and actions row.
   page_heading: String.raw`<h1\b`,
+  // A product re-drawing the conversation shell that AgentWorkspaceCompanion owns: its own
+  // recessed backdrop for a gutter, its own pane expander icons, or a WorkspaceLayout seam
+  // that moves the shell's controls or flattens its surface.
+  shell_override: String.raw`md3-surface-dim|\bPanel(?:Right|Left)(?:Open|Close)?\b|\b(?:collapsedControlsPlacement|centerHeaderVisibility)\b|\bsurface=["'{]+flat\b`,
 };
 const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`);
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
@@ -93,6 +97,7 @@ function extensions(surface, metric) {
     case "native_control": return ["*.tsx", "*.jsx", "*.astro"];
     case "control_override": return ["*.tsx", "*.jsx"];
     case "page_heading": return ["*.tsx", "*.jsx", "*.astro"];
+    case "shell_override": return ["*.tsx", "*.jsx", "*.css", ...extra];
     case "imports": return ["*.tsx", "*.ts", "*.astro", "*.jsx"];
     default: return SRC_EXT;
   }
