@@ -1,6 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CodeBlock, CopyButton } from "./code-block";
 
@@ -21,7 +20,7 @@ describe("CodeBlock scoped semantic colors", () => {
     await waitFor(() => expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)"), { timeout: 10_000 });
     expect(container.innerHTML).toContain("var(--syntax-string, currentColor)");
     expect(container.innerHTML).toContain("var(--syntax-comment, currentColor)");
-    expect(container.querySelector(".react-syntax-highlighter-line-number")).not.toBeNull();
+    expect(container.querySelector("[data-line-number]")).not.toBeNull();
     expect(container.querySelector("pre code")?.textContent?.replace(/^1/, "")).toBe('const message = "hello";');
   });
 
@@ -66,32 +65,41 @@ describe("CodeBlock", () => {
     expect(container.querySelector("code")).not.toBeNull();
   });
 
-  it.each([
-    ["javascript", "const answer = 42;"],
-    ["js", "const answer = 42;"],
-    ["brainfuck", "++[>+++<-]"],
-    ["not-a-language", "const answer = 42;"],
-  ])("keeps the default highlighter's tokens for language %s", async (language, code) => {
-    const baseline = document.createElement("div");
-    baseline.innerHTML = renderToString(<SyntaxHighlighter language={language}>{code}</SyntaxHighlighter>);
-    const expected = Array.from(baseline.querySelectorAll("pre code span"), (span) => span.textContent);
-    expect(expected.length).toBeGreaterThan(0);
-
+  it.each(["javascript", "js", "ts", "tsx"])("highlights %s with Shiki into Brand syntax tokens", async (language) => {
+    const code = "const answer = 42; // the answer";
     const { container } = render(<CodeBlock code={code} language={language} />);
-    await waitFor(() => expect(container.querySelectorAll("pre code span").length).toBe(expected.length));
-    expect(Array.from(container.querySelectorAll("pre code span"), (span) => span.textContent)).toEqual(expected);
+    await waitFor(() => expect(container.querySelector("[data-highlighted]")).not.toBeNull(), { timeout: 10_000 });
+    const tokens = Array.from(container.querySelectorAll("pre code span span"));
+    expect(tokens.length).toBeGreaterThan(3);
+    expect(container.innerHTML).toContain("var(--syntax-keyword, currentColor)");
+    expect(container.innerHTML).toContain("var(--syntax-comment, currentColor)");
+    expect(container.innerHTML).not.toContain("--shiki-");
     expect(container.querySelector("pre code")?.textContent).toBe(code);
   });
 
-  it("preserves whitespace and line numbering after the renderer loads", async () => {
-    const code = "\tfirst  \n  second\n";
-    const baseline = document.createElement("div");
-    baseline.innerHTML = renderToString(<SyntaxHighlighter language="text" showLineNumbers>{code}</SyntaxHighlighter>);
-    const { container } = render(<CodeBlock code={code} language="text" showLineNumbers />);
+  it.each(["brainfuck", "not-a-language", undefined])("keeps %s as readable plain text", (language) => {
+    const code = "++[>+++<-]";
+    const { container } = render(<CodeBlock code={code} language={language} />);
+    expect(container.querySelector("[data-highlighted]")).toBeNull();
     expect(container.querySelector("pre code")?.textContent).toBe(code);
-    await waitFor(() => expect(container.querySelectorAll(".react-syntax-highlighter-line-number").length)
-      .toBe(baseline.querySelectorAll(".react-syntax-highlighter-line-number").length));
-    expect(container.querySelector("pre code")?.textContent).toBe(baseline.querySelector("pre code")?.textContent);
+  });
+
+  it("preserves whitespace and numbers every line", async () => {
+    const code = "\tfirst  \n  second\n";
+    const { container } = render(<CodeBlock code={code} language="text" showLineNumbers />);
+    const numbers = Array.from(container.querySelectorAll("[data-line-number]"), (node) => node.textContent);
+    expect(numbers).toEqual(["1", "2", "3"]);
+    const text = Array.from(container.querySelectorAll("pre code > span"), (line) =>
+      Array.from(line.childNodes).filter((node) => !(node instanceof HTMLElement && node.hasAttribute("data-line-number")))
+        .map((node) => node.textContent).join("")).join("");
+    expect(text).toBe(code);
+  });
+
+  it("names the file in the header beside the language", () => {
+    render(<CodeBlock code={"export {}"} language="ts" filename="src/lib/ctr.ts" />);
+    expect(screen.getByText("src/lib/ctr.ts")).toBeInTheDocument();
+    expect(screen.getByText("TypeScript")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "src/lib/ctr.ts code" })).toBeInTheDocument();
   });
 
   it("uses `label` as the header text, overriding `language`", () => {
@@ -102,9 +110,9 @@ describe("CodeBlock", () => {
     expect(queryByText("typescript")).toBeNull();
   });
 
-  it("falls back to `language` for the header when no `label` is given", () => {
+  it("falls back to the language's name for the header when no `label` is given", () => {
     const { getByText } = render(<CodeBlock code={"x"} language="python" />);
-    expect(getByText("python")).toBeInTheDocument();
+    expect(getByText("Python")).toBeInTheDocument();
   });
 
   it("renders no header when neither label nor language is set", () => {
@@ -161,9 +169,9 @@ describe("CodeBlock", () => {
     expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
   });
 
-  it("renders the header label at the 12px text-xs step", () => {
+  it("renders the header label at the 14px text-sm step", () => {
     const { getByText } = render(<CodeBlock code={"x"} label="YAML" />);
-    expect(getByText("YAML").className).toContain("text-xs");
+    expect(getByText("YAML").className).toContain("text-sm");
     expect(getByText("YAML").className).not.toContain("calc(");
   });
 

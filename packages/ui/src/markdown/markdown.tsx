@@ -9,11 +9,21 @@ import {
 } from "react";
 import ReactMarkdown, { defaultUrlTransform, type ExtraProps, type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import GithubSlugger from "github-slugger";
-import { ImageOff } from "lucide-react";
+import { FileImage, FileText, Folder, ImageOff, Package, type LucideIcon } from "lucide-react";
 import { CodeBlock, CopyButton } from "./code-block";
+import { fenceInfo, remarkCodeMeta } from "./code-meta";
+import {
+  MarkdownTable,
+  MarkdownTableBody,
+  MarkdownTableCell,
+  MarkdownTableHead,
+  MarkdownTableHeaderCell,
+  MarkdownTableRow,
+} from "./markdown-table";
+import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 const SANITIZED_HEADING_ID_PREFIX = "user-content-";
@@ -50,16 +60,100 @@ function transformMarkdownUrl(
   return safeUrl(transformed);
 }
 
+/** How a link to a known object renders: a chip with that object's icon. */
+export interface MarkdownLinkChip {
+  kind: "file" | "image" | "asset" | "folder";
+  /** Chip text; the link's own text when omitted. */
+  label?: string;
+  /** Tooltip, such as the full path. */
+  title?: string;
+}
+
+/** Classifies a link by its transformed href; null keeps an ordinary link. */
+export type MarkdownLinkChipResolver = (href: string) => MarkdownLinkChip | null | undefined;
+
+const LINK_CHIP_ICONS: Record<MarkdownLinkChip["kind"], LucideIcon> = {
+  file: FileText,
+  image: FileImage,
+  asset: Package,
+  folder: Folder,
+};
+
+const LinkChipContext = createContext<MarkdownLinkChipResolver | undefined>(undefined);
+
 // An image already wrapped in a Markdown link keeps that link: anchors cannot nest.
 const MarkdownLinkContext = createContext(false);
 
-function MarkdownLink({ node: _node, ...props }: ComponentProps<"a"> & ExtraProps) {
+function MarkdownLink({ node: _node, children, className, ...props }: ComponentProps<"a"> & ExtraProps) {
+  const resolveChip = useContext(LinkChipContext);
+  const chip = typeof props.href === "string" && props.href ? resolveChip?.(props.href) : null;
+  if (!chip) {
+    return (
+      <MarkdownLinkContext.Provider value>
+        <a {...props} className={className}>{children}</a>
+      </MarkdownLinkContext.Provider>
+    );
+  }
+  const Icon = LINK_CHIP_ICONS[chip.kind];
   return (
     <MarkdownLinkContext.Provider value>
-      <a {...props} />
+      <a
+        {...props}
+        title={chip.title ?? props.title}
+        data-link-chip={chip.kind}
+        className={cn(
+          "not-prose inline-flex max-w-full items-center gap-1.5 rounded-md border border-border bg-muted/60 px-2 py-0.5 align-middle text-[0.9375em] font-medium leading-6 text-foreground no-underline transition-colors hover:border-[var(--border-strong)] hover:bg-muted",
+          focusRing,
+          className,
+        )}
+      >
+        <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+        <span className="min-w-0 truncate">{chip.label ?? children}</span>
+      </a>
     </MarkdownLinkContext.Provider>
   );
 }
+
+// Fenced code arrives as <pre><code>; inline code is a bare <code>.
+const PreContext = createContext(false);
+
+function MarkdownPre({ children }: ComponentProps<"pre"> & ExtraProps) {
+  return <PreContext.Provider value>{children}</PreContext.Provider>;
+}
+
+function MarkdownCode({ node, className: codeClass, children: codeChildren, ...rest }: ComponentProps<"code"> & ExtraProps) {
+  const fenced = useContext(PreContext);
+  const code = String(codeChildren).replace(/\n$/, "");
+  if (!fenced) {
+    const { "data-meta": _meta, ...attributes } = rest as typeof rest & { "data-meta"?: unknown };
+    return (
+      <code
+        className={cn(
+          "px-1.5 py-0.5 rounded border border-border bg-muted text-foreground text-[0.85em] font-mono",
+          codeClass,
+        )}
+        {...attributes}
+      >
+        {codeChildren}
+      </code>
+    );
+  }
+  const { language, filename } = fenceInfo(codeClass, node?.properties?.dataMeta);
+  return (
+    <CodeBlock code={code} language={language} filename={filename} className="my-4">
+      <CopyButton text={code} />
+    </CodeBlock>
+  );
+}
+
+// The default schema plus a fence's info string on <code>, which names its file.
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code ?? []), "dataMeta"],
+  },
+};
 
 /**
  * Renders a Markdown image that opens full size in a new tab, or a labelled
@@ -131,58 +225,42 @@ export interface MarkdownProps {
   className?: string;
   /** Transform parsed link and image URLs while retaining protocol safety checks. */
   urlTransform?: UrlTransform;
+  /** Render links to known objects (a file, an asset) as chips that keep their href. */
+  linkChip?: MarkdownLinkChipResolver;
 }
 
 /**
- * Renders Markdown content with GFM support, XSS sanitisation, custom code
- * block rendering via our CodeBlock component, and images that open full size
- * or show a labelled placeholder when unavailable.
+ * Renders Markdown content with GFM support and XSS sanitisation: Shiki code
+ * blocks that name their file, tables as cards with right-aligned figures and
+ * a CSV copy, images that open full size or show a labelled placeholder, and
+ * optional chips for links to known objects.
  */
-export const Markdown = memo(({ children, className, urlTransform }: MarkdownProps) => {
+export const Markdown = memo(({ children, className, urlTransform, linkChip }: MarkdownProps) => {
   return (
     <div
       className={cn("tangle-prose max-w-none text-sm", className)}
     >
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSlug, rehypeSanitize]}
-        urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform)}
-        components={{
-          a: MarkdownLink,
-          img: MarkdownImage,
-          pre({ children: preChildren }) {
-            return <>{preChildren}</>;
-          },
-          code({ className: codeClass, children: codeChildren, ...rest }) {
-            const match = /language-(\w+)/.exec(codeClass || "");
-            const language = match?.[1];
-            const code = String(codeChildren).replace(/\n$/, "");
-
-            // Inline code (no language fence)
-            if (!language && !code.includes("\n")) {
-              return (
-                <code
-                  className={cn(
-                    "px-1.5 py-0.5 rounded border border-border bg-muted text-foreground text-[0.85em] font-mono",
-                    codeClass,
-                  )}
-                  {...rest}
-                >
-                  {codeChildren}
-                </code>
-              );
-            }
-
-            return (
-              <CodeBlock code={code} language={language}>
-                <CopyButton text={code} />
-              </CodeBlock>
-            );
-          },
-        }}
-      >
-        {children}
-      </ReactMarkdown>
+      <LinkChipContext.Provider value={linkChip}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkCodeMeta]}
+          rehypePlugins={[rehypeSlug, [rehypeSanitize, sanitizeSchema]]}
+          urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform)}
+          components={{
+            a: MarkdownLink,
+            img: MarkdownImage,
+            pre: MarkdownPre,
+            code: MarkdownCode,
+            table: MarkdownTable,
+            thead: MarkdownTableHead,
+            tbody: MarkdownTableBody,
+            tr: MarkdownTableRow,
+            th: MarkdownTableHeaderCell,
+            td: MarkdownTableCell,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </LinkChipContext.Provider>
     </div>
   );
 });
