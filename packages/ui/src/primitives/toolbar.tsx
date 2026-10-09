@@ -22,9 +22,11 @@ import { cn } from "../lib/utils";
  * case — and search stays usable however many filters a page adds. `max-w-sm`
  * then stops search claiming more than it can use when there are few filters.
  *
- * On a narrow viewport the row becomes a column and the filters scroll
- * horizontally as a group rather than wrapping into a tall stack that pushes
- * the table itself below the fold.
+ * Below `lg` the row becomes a column and the filters wrap onto as many lines
+ * as they need. Scrolling them as one line hid every filter past the first
+ * behind the screen edge on a phone: at 390px the second select started at
+ * 403px and a third at 652px, with nothing to say more were there. From `lg`
+ * up they share one line and scroll within their half, as above.
  */
 /**
  * Slots only — `children` is omitted deliberately. A free child would render as
@@ -36,7 +38,7 @@ export interface ToolbarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   /** The one control that expands to fill the row. */
   search?: React.ReactNode;
-  /** Filters, in reading order. Kept on one scrollable line when space runs out. */
+  /** Filters, in reading order. Wrapped below `lg`; one scrollable line from `lg` up. */
   filters?: React.ReactNode;
   /** View switches and exports, pinned to the end. */
   actions?: React.ReactNode;
@@ -56,11 +58,12 @@ const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
     >
       {search && <div className="min-w-0 lg:max-w-sm lg:flex-1">{search}</div>}
       {filters && (
-        // `py-1` leaves room for a focus ring above and below; horizontally the
-        // scroll container clips it, which is the trade a single-line filter row
-        // makes. No negative margin — pulling the row wider than its parent is
-        // what made every page report 4px of horizontal overflow.
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto py-1 lg:flex-1">
+        // `py-1` leaves room for a focus ring above and below; on the single
+        // `lg` line the scroll container clips it horizontally, which is the
+        // trade a one-line filter row makes. No negative margin — pulling the
+        // row wider than its parent is what made every page report 4px of
+        // horizontal overflow.
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 py-1 lg:flex-1 lg:flex-nowrap lg:gap-2 lg:overflow-x-auto">
           {filters}
         </div>
       )}

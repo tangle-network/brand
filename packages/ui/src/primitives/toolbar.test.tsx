@@ -48,12 +48,16 @@ describe("Toolbar", () => {
     expect(actionsSlot.className).not.toContain("flex-1");
   });
 
-  it("scrolls the filter row instead of wrapping it", () => {
+  it("wraps the filters on a phone and scrolls one line from lg up", () => {
     const { container } = render(<Toolbar filters={<span>Product</span>} />);
     const filterSlot = (container.firstElementChild as HTMLElement)
       .children[0] as HTMLElement;
-    expect(filterSlot.className).toContain("overflow-x-auto");
-    expect(filterSlot.className).toContain("min-w-0");
+    const classes = filterSlot.className.split(" ");
+    expect(classes).toContain("flex-wrap");
+    expect(classes).not.toContain("overflow-x-auto");
+    expect(classes).toContain("lg:flex-nowrap");
+    expect(classes).toContain("lg:overflow-x-auto");
+    expect(classes).toContain("min-w-0");
   });
 
   // A free child would render as a bare flex item with none of the slots'

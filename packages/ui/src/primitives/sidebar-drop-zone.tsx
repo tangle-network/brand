@@ -130,7 +130,7 @@ export function SidebarDropZone({
             {icon ?? <Upload className="h-4 w-4" />}
           </div>
           <p className={cn(
-            "text-xs font-medium",
+            "text-[length:var(--font-size-label,0.875rem)] font-medium",
             dragOver
               ? "text-[var(--text-primary,hsl(var(--foreground)))]"
               : "text-[var(--text-muted,hsl(var(--muted-foreground)))]",
@@ -138,7 +138,7 @@ export function SidebarDropZone({
             {title}
           </p>
           {description && (
-            <p className="text-[10px] text-[var(--text-muted,hsl(var(--muted-foreground)))]">
+            <p className="text-[length:var(--font-size-help,0.75rem)] text-[var(--text-muted,hsl(var(--muted-foreground)))]">
               {description}
             </p>
           )}

@@ -65,7 +65,7 @@ export function UploadProgress({ files, onRemove, onRetry, className }: UploadPr
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="truncate font-medium text-foreground">{file.name}</span>
-              <span className="shrink-0 text-xs text-muted-foreground">{formatSize(file.size)}</span>
+              <span className="shrink-0 text-[length:var(--font-size-help,0.75rem)] text-muted-foreground">{formatSize(file.size)}</span>
             </div>
             {/* Progress bar */}
             {file.status === "uploading" && file.progress !== undefined && (
@@ -78,7 +78,7 @@ export function UploadProgress({ files, onRemove, onRetry, className }: UploadPr
             )}
             {/* Error message */}
             {file.status === "error" && file.error && (
-              <p className="mt-0.5 text-xs text-[var(--surface-danger-text)]">{file.error}</p>
+              <p className="mt-0.5 text-[length:var(--font-size-help,0.75rem)] text-[var(--surface-danger-text)]">{file.error}</p>
             )}
           </div>
 
