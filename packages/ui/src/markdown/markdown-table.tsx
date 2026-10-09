@@ -50,10 +50,23 @@ function rowsOf(table: Element): { header: string[][]; body: string[][] } {
 
 /** A column is numeric when every non-empty body cell is a figure. */
 export function numericColumns(body: string[][]): boolean[] {
+  return columnKinds(body).map((kind) => kind === "figure");
+}
+
+/** Text this long wraps; shorter text keeps its column on one line. */
+const LONG_TEXT = 32;
+
+/**
+ * How each column lays out: figures right-aligned, short text on one line,
+ * long text wrapping at a readable width, so a phone scrolls the table instead
+ * of crushing every column into a narrow stack.
+ */
+export function columnKinds(body: string[][]): Array<"figure" | "short" | "long"> {
   const width = Math.max(0, ...body.map((row) => row.length));
   return Array.from({ length: width }, (_, column) => {
     const cells = body.map((row) => row[column] ?? "").filter(Boolean);
-    return cells.length > 0 && cells.every((cell) => NUMERIC_CELL.test(cell));
+    if (cells.length > 0 && cells.every((cell) => NUMERIC_CELL.test(cell))) return "figure";
+    return cells.some((cell) => cell.length > LONG_TEXT) ? "long" : "short";
   });
 }
 
@@ -75,7 +88,7 @@ export function tableCsv(rows: string[][]): string {
 const PROSE_TABLE = "[.tangle-prose_&]:table! [.tangle-prose_&]:m-0! [.tangle-prose_&]:overflow-visible! [.tangle-prose_&]:text-sm!";
 const PROSE_CELL = "[.tangle-prose_&]:px-3! [.tangle-prose_&]:py-2! [.tangle-prose_&]:border-t-0! [.tangle-prose_&]:border-l-0!";
 
-const TableColumns = createContext<boolean[]>([]);
+const TableColumns = createContext<Array<"figure" | "short" | "long">>([]);
 const CellColumn = createContext(-1);
 
 function CopyCsvButton({ csv }: { csv: string }) {
@@ -120,9 +133,9 @@ function CopyCsvButton({ csv }: { csv: string }) {
  * scrolling inside the card when the columns outgrow a phone.
  */
 export function MarkdownTable({ node, className, children, ...props }: ComponentProps<"table"> & ExtraProps) {
-  const { csv, numeric, rowCount } = useMemo(() => {
+  const { csv, kinds, rowCount } = useMemo(() => {
     const { header, body } = node ? rowsOf(node) : { header: [], body: [] };
-    return { csv: tableCsv([...header, ...body]), numeric: numericColumns(body), rowCount: body.length };
+    return { csv: tableCsv([...header, ...body]), kinds: columnKinds(body), rowCount: body.length };
   }, [node]);
   return (
     <div className="not-prose my-4 overflow-hidden rounded-lg border border-border bg-card">
@@ -132,7 +145,7 @@ export function MarkdownTable({ node, className, children, ...props }: Component
       </div>
       {/* A keyboard reaches a sideways-scrolling table only when it can take focus. */}
       <div tabIndex={0} role="region" aria-label="Table" className={cn("overflow-x-auto", focusRingInset)}>
-        <TableColumns.Provider value={numeric}>
+        <TableColumns.Provider value={kinds}>
           <table {...props} data-markdown-table="" className={cn("w-full border-collapse text-sm text-foreground", PROSE_TABLE, className)}>
             {children}
           </table>
@@ -163,14 +176,14 @@ export function MarkdownTableRow({ node: _node, children, ...props }: ComponentP
   );
 }
 
-function useNumericCell(): boolean {
-  const numeric = useContext(TableColumns);
+function useColumnKind(): "figure" | "short" | "long" {
+  const kinds = useContext(TableColumns);
   const column = useContext(CellColumn);
-  return column >= 0 && numeric[column] === true;
+  return (column >= 0 ? kinds[column] : undefined) ?? "short";
 }
 
 export function MarkdownTableHeaderCell({ node: _node, className, ...props }: ComponentProps<"th"> & ExtraProps) {
-  const numeric = useNumericCell();
+  const numeric = useColumnKind() === "figure";
   return (
     <th
       {...props}
@@ -185,14 +198,15 @@ export function MarkdownTableHeaderCell({ node: _node, className, ...props }: Co
 }
 
 export function MarkdownTableCell({ node: _node, className, ...props }: ComponentProps<"td"> & ExtraProps) {
-  const numeric = useNumericCell();
+  const kind = useColumnKind();
   return (
     <td
       {...props}
       className={cn(
         "border-b border-border/60 px-3 py-2 align-top",
         PROSE_CELL,
-        numeric ? "whitespace-nowrap text-right tabular-nums" : "min-w-[8rem]",
+        kind === "figure" ? "whitespace-nowrap text-right tabular-nums"
+          : kind === "long" ? "min-w-[14rem]" : "whitespace-nowrap",
         className,
       )}
     />
