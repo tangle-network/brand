@@ -5,7 +5,7 @@
    "src"
   ],
   "branch": "master",
-  "head": "ef34ced49ea3",
+  "head": "88cf5074ea42",
   "tsx_files": 33,
   "css_files": 5,
   "versions": {
@@ -89,7 +89,13 @@
     "src/pages/terms-of-service.astro": 1,
     "src/pages/what-is-tangle.astro": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "src/components/RunStory.astro": 1,
+    "src/components/quickstart-code.css": 2,
+    "src/pages/index.astro": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 29,
@@ -102,6 +108,8 @@
   "control_override": 0,
   "page_heading": 16,
   "shell_override": 0,
+  "header_height_literal": 4,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -207,7 +215,9 @@
    },
    "shell_override": {
     "products/sandbox/web/src/pages/dashboard/sandbox-session/AgentWorkspace.tsx": 6
-   }
+   },
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 21,
@@ -221,7 +231,9 @@
   "page_heading": 11,
   "shell_override": 6,
   "palette_top": [],
-  "local_primitives": {}
+  "local_primitives": {},
+  "header_height_literal": 0,
+  "transcript_type_override": 0
  },
  "platform": {
   "repo": "tangle-network/agent-dev-container",
@@ -454,7 +466,12 @@
    },
    "shell_override": {
     "products/platform/web/src/client/components/Icons.tsx": 1
-   }
+   },
+   "header_height_literal": {
+    "products/platform/web/src/client/components/NavigationFrame.tsx": 1,
+    "products/platform/web/src/client/vault.css": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 24,
@@ -475,7 +492,9 @@
   "native_control": 444,
   "control_override": 0,
   "page_heading": 37,
-  "shell_override": 1
+  "shell_override": 1,
+  "header_height_literal": 2,
+  "transcript_type_override": 0
  },
  "intelligence": {
   "repo": "tangle-network/agent-dev-container",
@@ -483,7 +502,7 @@
    "products/intelligence/web"
   ],
   "branch": "develop",
-  "head": "d34b2d630a92",
+  "head": "abe2f910be0c",
   "tsx_files": 83,
   "css_files": 1,
   "versions": {
@@ -511,7 +530,7 @@
    "hex": {},
    "arbitrary_color": {},
    "css_var_defs": {
-    "products/intelligence/web/src/globals.css": 10
+    "products/intelligence/web/src/globals.css": 5
    },
    "local_primitive_count": {},
    "font_size_literal": {
@@ -562,12 +581,14 @@
     "products/intelligence/web/src/pages/TraceDetail.tsx": 1,
     "products/intelligence/web/src/pages/spine/runs.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 10,
+  "css_var_defs": 5,
   "local_primitive_count": 0,
   "font_size_literal": 14,
   "size_literal": 3,
@@ -575,6 +596,8 @@
   "control_override": 0,
   "page_heading": 7,
   "shell_override": 0,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -584,28 +607,28 @@
    ""
   ],
   "branch": "master",
-  "head": "a5956b145068",
-  "tsx_files": 126,
+  "head": "9c6b7a92901d",
+  "tsx_files": 134,
   "css_files": 3,
   "versions": {
    "agent-app": [
-    "0.60.2"
+    "0.60.54"
    ],
    "brand": [
-    "1.19.3"
+    "1.20.0"
    ],
    "sandbox-ui": [
-    "0.131.5"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 3,
-   "ui": 7,
-   "sandbox-ui": 108,
-   "agent-app": 207
+   "ui": 9,
+   "sandbox-ui": 113,
+   "agent-app": 232
   },
   "by_file": {
    "raw_palette": {},
@@ -642,9 +665,15 @@
    },
    "shell_override": {
     "src/components/vault-chat-rail.tsx": 2,
-    "src/components/workspace-chat-surface.tsx": 1,
     "src/routes/app.workspace.vault.tsx": 2
-   }
+   },
+   "header_height_literal": {
+    "src/components/publishing/publish-header.tsx": 1,
+    "src/components/vault-chat-rail.tsx": 1,
+    "src/routes/app.workspace.designs.$documentId.tsx": 1,
+    "src/routes/app.workspace.sequences.$sequenceId.tsx": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -656,7 +685,9 @@
   "native_control": 0,
   "control_override": 4,
   "page_heading": 18,
-  "shell_override": 5,
+  "shell_override": 4,
+  "header_height_literal": 4,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -666,40 +697,40 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "53b2f8ca550e",
-  "tsx_files": 57,
+  "head": "54448faf7404",
+  "tsx_files": 58,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.60.19"
    ],
    "brand": [
-    "1.19.4"
+    "1.20.0"
    ],
    "override:agent-app": [
-    "0.58.20"
+    "0.60.19"
    ],
    "override:brand": [
-    "1.19.4"
+    "1.20.0"
    ],
    "override:sandbox-ui": [
-    "0.130.1"
+    "0.132.1"
    ],
    "override:ui": [
-    "11.30.2"
+    "11.31.2"
    ],
    "sandbox-ui": [
-    "0.130.1"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 1,
-   "ui": 2,
+   "ui": 3,
    "sandbox-ui": 38,
-   "agent-app": 100
+   "agent-app": 105
   },
   "by_file": {
    "raw_palette": {},
@@ -721,7 +752,12 @@
     "apps/web/src/routes/app.$sessionId.tsx": 1,
     "apps/web/src/routes/app.billing.tsx": 2
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "apps/web/src/components/legal-page.tsx": 1,
+    "apps/web/src/routes/app.$sessionId.tsx": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -734,6 +770,8 @@
   "control_override": 3,
   "page_heading": 6,
   "shell_override": 0,
+  "header_height_literal": 2,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -743,28 +781,28 @@
    ""
   ],
   "branch": "main",
-  "head": "5e68b59dd0da",
+  "head": "075784fc5bc6",
   "tsx_files": 63,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.60.33"
    ],
    "brand": [
-    "1.19.4"
+    "1.20.0"
    ],
    "sandbox-ui": [
-    "0.130.1"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 2,
    "ui": 33,
    "sandbox-ui": 25,
-   "agent-app": 120
+   "agent-app": 125
   },
   "by_file": {
    "raw_palette": {},
@@ -787,7 +825,9 @@
     "src/routes/app.workspace.contracts.redline.tsx": 1,
     "src/routes/app.workspace.templates.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -800,6 +840,8 @@
   "control_override": 0,
   "page_heading": 6,
   "shell_override": 0,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -809,18 +851,18 @@
    ""
   ],
   "branch": "main",
-  "head": "08130078bedc",
+  "head": "5ce0764e4f58",
   "tsx_files": 38,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.60.16"
    ],
    "brand": [
     "1.19.4"
    ],
    "sandbox-ui": [
-    "0.130.1"
+    "0.132.1"
    ],
    "ui": [
     "11.30.2"
@@ -830,7 +872,7 @@
    "brand": 1,
    "ui": 1,
    "sandbox-ui": 27,
-   "agent-app": 65
+   "agent-app": 66
   },
   "by_file": {
    "raw_palette": {
@@ -877,7 +919,9 @@
     "src/routes/_index.tsx": 1,
     "src/routes/app.workspace.chat.$threadId.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 72,
   "hex": 148,
@@ -890,6 +934,8 @@
   "control_override": 0,
   "page_heading": 3,
   "shell_override": 0,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [
    [
     "text-amber-600",
@@ -924,28 +970,28 @@
    ""
   ],
   "branch": "master",
-  "head": "8e5e3fff35e3",
-  "tsx_files": 54,
+  "head": "f0e2134d4499",
+  "tsx_files": 52,
   "css_files": 1,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.60.33"
    ],
    "brand": [
-    "1.19.4"
+    "1.20.0"
    ],
    "sandbox-ui": [
-    "0.130.0"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 2,
    "sandbox-ui": 36,
-   "agent-app": 128
+   "agent-app": 131
   },
   "by_file": {
    "raw_palette": {},
@@ -969,7 +1015,12 @@
     "src/routes/app.workspace.tsx": 1,
     "src/routes/invite.$token.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "src/routes/app.workspace.designs.$documentId.tsx": 1,
+    "src/routes/app.workspace.sequences.$sequenceId.tsx": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -982,6 +1033,8 @@
   "control_override": 0,
   "page_heading": 4,
   "shell_override": 0,
+  "header_height_literal": 2,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -991,38 +1044,37 @@
    "apps/web"
   ],
   "branch": "main",
-  "head": "2f94ff829aa1",
-  "tsx_files": 17,
+  "head": "ee37d9941628",
+  "tsx_files": 18,
   "css_files": 8,
   "versions": {
    "agent-app": [
-    "0.57.17",
-    "0.58.15"
+    "0.60.19"
    ],
    "brand": [
-    "1.17.0"
+    "1.20.0"
    ],
    "override:brand": [
-    "1.17.0"
+    "1.20.0"
    ],
    "override:sandbox-ui": [
-    "0.128.2"
+    "0.132.1"
    ],
    "override:ui": [
-    "11.26.0"
+    "11.31.2"
    ],
    "sandbox-ui": [
-    "0.128.2"
+    "0.132.1"
    ],
    "ui": [
-    "11.26.0"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 1,
    "ui": 8,
    "sandbox-ui": 6,
-   "agent-app": 6
+   "agent-app": 7
   },
   "by_file": {
    "raw_palette": {},
@@ -1062,10 +1114,17 @@
    },
    "control_override": {},
    "page_heading": {
-    "apps/web/src/ApiKeysPanel.tsx": 1,
     "apps/web/src/assembly/AssemblyBooklet.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "apps/web/src/styles.css": 1,
+    "apps/web/src/styles/canvas-nodes.css": 1,
+    "apps/web/src/styles/provenance.css": 1
+   },
+   "transcript_type_override": {
+    "apps/web/src/styles.css": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1076,8 +1135,10 @@
   "size_literal": 0,
   "native_control": 52,
   "control_override": 0,
-  "page_heading": 2,
+  "page_heading": 1,
   "shell_override": 0,
+  "header_height_literal": 3,
+  "transcript_type_override": 1,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1087,28 +1148,28 @@
    ""
   ],
   "branch": "main",
-  "head": "4239a87dcba3",
+  "head": "d9f4270af41c",
   "tsx_files": 29,
   "css_files": 14,
   "versions": {
    "agent-app": [
-    "0.58.20"
+    "0.60.23"
    ],
    "brand": [
-    "1.19.5"
+    "1.20.0"
    ],
    "sandbox-ui": [
-    "0.130.0"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 0,
    "ui": 3,
    "sandbox-ui": 26,
-   "agent-app": 52
+   "agent-app": 54
   },
   "by_file": {
    "raw_palette": {},
@@ -1134,7 +1195,15 @@
     "src/web/WorkspaceAppsView.tsx": 3,
     "src/web/WorkspaceFilesView.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "src/ui/operator-dashboard.css": 2,
+    "src/web/workspace-files-view.css": 1,
+    "src/web/workspace.css": 5
+   },
+   "transcript_type_override": {
+    "src/web/workspace.css": 1
+   }
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1147,6 +1216,8 @@
   "control_override": 0,
   "page_heading": 12,
   "shell_override": 0,
+  "header_height_literal": 8,
+  "transcript_type_override": 1,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1232,7 +1303,9 @@
    },
    "shell_override": {
     "packages/website/src/components/RedteamDashboardLayout.tsx": 4
-   }
+   },
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1245,6 +1318,8 @@
   "control_override": 12,
   "page_heading": 10,
   "shell_override": 4,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1325,7 +1400,9 @@
    },
    "shell_override": {
     "src/components/layout/app-layout.tsx": 4
-   }
+   },
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1338,6 +1415,8 @@
   "control_override": 10,
   "page_heading": 1,
   "shell_override": 4,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1347,40 +1426,40 @@
    ""
   ],
   "branch": "main",
-  "head": "b9a4f52dc41f",
+  "head": "97f77723ac9f",
   "tsx_files": 110,
   "css_files": 2,
   "versions": {
    "agent-app": [
-    "0.59.6"
+    "0.60.23"
    ],
    "brand": [
-    "1.19.5"
+    "1.20.0"
    ],
    "override:agent-app": [
-    "0.59.6"
+    "0.60.23"
    ],
    "override:brand": [
-    "1.19.5"
+    "1.20.0"
    ],
    "override:sandbox-ui": [
-    "0.131.5"
+    "0.132.1"
    ],
    "override:ui": [
-    "11.30.2"
+    "11.31.2"
    ],
    "sandbox-ui": [
-    "0.131.5"
+    "0.132.1"
    ],
    "ui": [
-    "11.30.2"
+    "11.31.2"
    ]
   },
   "importing_files": {
    "brand": 2,
    "ui": 3,
-   "sandbox-ui": 78,
-   "agent-app": 60
+   "sandbox-ui": 77,
+   "agent-app": 67
   },
   "by_file": {
    "raw_palette": {},
@@ -1416,7 +1495,11 @@
     "src/routes/login.tsx": 1,
     "src/routes/pay.$token.tsx": 1
    },
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {
+    "src/styles/listing.css": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1429,6 +1512,8 @@
   "control_override": 1,
   "page_heading": 12,
   "shell_override": 0,
+  "header_height_literal": 1,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1438,7 +1523,7 @@
    "apps/web"
   ],
   "branch": "develop",
-  "head": "1ac4236f87c8",
+  "head": "978ff883f4f5",
   "tsx_files": 356,
   "css_files": 9,
   "versions": {
@@ -1703,7 +1788,11 @@
    },
    "shell_override": {
     "apps/web/src/components/header/Header.tsx": 2
-   }
+   },
+   "header_height_literal": {
+    "apps/web/src/components/@settings/tabs/connections/NetlifyConnection.tsx": 1
+   },
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
@@ -1716,6 +1805,8 @@
   "control_override": 18,
   "page_heading": 30,
   "shell_override": 2,
+  "header_height_literal": 1,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  },
@@ -1725,15 +1816,21 @@
    "public"
   ],
   "branch": "main",
-  "head": "30e0cd52710f",
-  "tsx_files": 16,
-  "css_files": 5,
+  "head": "34483f7ae430",
+  "tsx_files": 1,
+  "css_files": 0,
   "versions": {
    "agent-app": [
-    "0.51.12"
+    "0.60.30"
    ],
    "brand": [
-    "1.15.1"
+    "1.20.0"
+   ],
+   "sandbox-ui": [
+    "0.132.2"
+   ],
+   "ui": [
+    "11.31.3"
    ]
   },
   "importing_files": {
@@ -1746,34 +1843,30 @@
    "raw_palette": {},
    "hex": {},
    "arbitrary_color": {},
-   "css_var_defs": {
-    "public/design-components.css": 8,
-    "public/style.css": 1
-   },
+   "css_var_defs": {},
    "local_primitive_count": {},
-   "font_size_literal": {
-    "public/design-components.css": 4,
-    "public/invite.css": 4,
-    "public/style.css": 386,
-    "public/timeline.css": 33
-   },
+   "font_size_literal": {},
    "size_literal": {},
    "native_control": {},
    "control_override": {},
    "page_heading": {},
-   "shell_override": {}
+   "shell_override": {},
+   "header_height_literal": {},
+   "transcript_type_override": {}
   },
   "raw_palette": 0,
   "hex": 0,
   "arbitrary_color": 0,
-  "css_var_defs": 9,
+  "css_var_defs": 0,
   "local_primitive_count": 0,
-  "font_size_literal": 427,
+  "font_size_literal": 0,
   "size_literal": 0,
   "native_control": 0,
   "control_override": 0,
   "page_heading": 0,
   "shell_override": 0,
+  "header_height_literal": 0,
+  "transcript_type_override": 0,
   "palette_top": [],
   "local_primitives": {}
  }

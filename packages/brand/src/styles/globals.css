@@ -176,6 +176,16 @@
   /* Long URLs, emails and identifiers wrap inside the column. */
   overflow-wrap: break-word;
 }
+/* Transcript text: the one size and leading for every chat message body, the
+ * person's and the agent's alike, so the two differ only by alignment and
+ * surface. The doubled selector outranks .tangle-prose on an agent message;
+ * product CSS does not restyle either (tangle-drift transcript_type_override). */
+.tangle-transcript-text,
+.tangle-prose.tangle-transcript-text {
+  font-family: inherit;
+  font-size: var(--transcript-font-size);
+  line-height: var(--transcript-line-height);
+}
 .tangle-prose > * + * { margin-top: 0.85em; }
 .tangle-prose h1, .tangle-prose h2, .tangle-prose h3, .tangle-prose h4 {
   font-weight: 600;

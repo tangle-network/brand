@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 import type { ToolPart } from "../types/parts"
 import { AgentTimeline, type AgentTimelineItem } from "./agent-timeline"
+import { TRANSCRIPT_TEXT } from "./transcript-text"
 
 const editPart: ToolPart = {
   type: "tool",
@@ -285,5 +286,24 @@ describe("AgentTimeline tool actions", () => {
     // sections — the synthesized-part path showed only a bare output block.
     expect(screen.getByText("Input")).toBeInTheDocument()
     expect(screen.getByText("Output")).toBeInTheDocument()
+  })
+})
+
+describe("transcript type scale", () => {
+  it("sets the person's and the agent's message text in one family, size and leading", () => {
+    render(
+      <AgentTimeline
+        items={[
+          { id: "u", kind: "message", role: "user", content: "Can Luz take the 3 pm massage?" },
+          { id: "a", kind: "message", role: "assistant", content: "Yes, Luz is free at 3 pm." },
+        ]}
+      />,
+    )
+    const user = screen.getByText("Can Luz take the 3 pm massage?")
+    const agent = screen.getByText("Yes, Luz is free at 3 pm.").closest(".tangle-prose")
+    const textClasses = (element: Element | null) =>
+      [...(element?.classList ?? [])].filter((name) => /^(tangle-transcript-text|text-|leading-|font-)/.test(name)).sort()
+    expect(textClasses(user)).toEqual(TRANSCRIPT_TEXT.split(" ").sort())
+    expect(textClasses(agent)).toEqual(textClasses(user))
   })
 })

@@ -23,10 +23,15 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `page_heading` | A hand-written `<h1>`; `PageHeader` owns page titles | `.tsx .jsx .astro` |
 | `shell_override` | Product code re-drawing the conversation shell `AgentWorkspaceCompanion` owns: the `md3-surface-dim` backdrop, `PanelLeft`/`PanelRight` toggle icons (with or without `Open`/`Close`), the `collapsedControlsPlacement` or `centerHeaderVisibility` layout seams, or `surface="flat"` | `.tsx .jsx .css` |
 
+| `header_height_literal` | A header row given its own height: a CSS rule whose last compound is `header` or a class ending in `-header`, `-head`, `-bar`, `-toolbar` (not a progress, scroll, side or meter bar) with a literal `height`, `min-height` or `max-height`; a `<header>` or header-row class with `h-16`, `min-h-[58px]` | `.css .tsx .jsx .astro .vue .svelte` |
+| `transcript_type_override` | Product CSS setting `font-size`, `line-height`, `font-family` or `font` on `.tangle-prose`, `.tangle-transcript-text` or a timeline step, or a `tangle-prose` className with a text size or leading | `.css .tsx .jsx` |
+
 `font_size_literal` through `page_heading` measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
 `shell_override` keeps products inside the shared chat shell: the companion draws the conversation's raised surface, gutter and header, and the header's top-right corner holds the tools toggle.
 A product that draws its own card or gutter around the conversation, floats or adds pane toggles, or moves the layout's controls raises the count. Header content goes through the companion's `header` prop.
 `control_override` reads one line, so a `className` on a later line of the tag is not counted.
+`header_height_literal` and `transcript_type_override` read whole files, because a CSS rule spans lines: a `git grep -l` prefilter with the same pathspecs picks candidate files, and the patterns run over each file's text. Each match is one rule or element, reported at the line where it starts.
+`header_height_literal` keeps the shell's one header height (`--shell-header-height`, Sandbox UI `ShellHeader`) from being re-set by a product; Hospitality's 66px and 50px inbox heads put their dividers off the sidebar's 56px line. A height inside a header row (`.x-header .avatar`, `.x-header-avatar`) is not counted.
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
 Tests, stories, fixtures, `dist`, `node_modules`, `.d.ts`, generated, proof and evidence paths are excluded.
@@ -60,6 +65,30 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
+
+## Shell header and transcript baseline, 2026-10-10
+
+Recorded from each default branch when `header_height_literal` and `transcript_type_override` were added; each surface ratchets to 0 as it adopts `ShellHeader` and the shared transcript scale.
+The same refresh lowered other counts that had fallen since their rows were written; sandbox's `native_control` (54 to 57) and platform's `arbitrary_color` (21 to 22) and `native_control` (444 to 448) rose, so those rows kept their earlier counts and head and only recorded the new metrics.
+
+| Surface | Head | Header height literal | Transcript type override |
+| --- | --- | ---: | ---: |
+| website | `88cf5074e` | 4 | 0 |
+| sandbox | `d34b2d630` | 0 | 0 |
+| platform | `014fd01e8` | 2 | 0 |
+| intelligence | `abe2f910b` | 0 | 0 |
+| gtm | `9c6b7a929` | 4 | 0 |
+| tax | `54448faf7` | 2 | 0 |
+| legal | `075784fc5` | 0 | 0 |
+| insurance | `5ce0764e4` | 0 | 0 |
+| creative | `f0e2134d4` | 2 | 0 |
+| physim | `ee37d9941` | 3 | 1 |
+| hospitality | `d9f4270af` | 8 | 1 |
+| audits | `af6c5106a` | 0 | 0 |
+| browser | `e2de2b85e` | 0 | 0 |
+| builder | `97f77723a` | 1 | 0 |
+| blueprint | `978ff883f` | 1 | 0 |
+| super | `34483f7ae` | 0 | 0 |
 
 ## Shell override baseline, 2026-10-09
 

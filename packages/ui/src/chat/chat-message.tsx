@@ -8,6 +8,7 @@
  * their author.
  */
 
+import { TRANSCRIPT_TEXT } from "./transcript-text";
 import { type ReactNode } from "react";
 import { cn } from "../lib/utils";
 import { Markdown } from "../markdown/markdown";
@@ -102,12 +103,12 @@ export function ChatMessage({
         )}
       >
         {isUser ? (
-          <div className="whitespace-pre-wrap text-[length:var(--font-size-base)] leading-[var(--line-height-base)]">
+          <div className={cn("whitespace-pre-wrap", TRANSCRIPT_TEXT)}>
             {content}
           </div>
         ) : (
           <>
-            {content && <Markdown className="tangle-prose text-[length:var(--font-size-base)] leading-[var(--line-height-base)]">{content}</Markdown>}
+            {content && <Markdown className={cn("tangle-prose", TRANSCRIPT_TEXT)}>{content}</Markdown>}
             {isStreaming && (
               <span className="ml-0.5 inline-block h-4 w-2 animate-pulse rounded-sm bg-[var(--brand-cool)] align-text-bottom" />
             )}

@@ -1,3 +1,4 @@
+import { TRANSCRIPT_TEXT } from "./transcript-text";
 import { memo, type ReactNode } from "react";
 import type { ChatAuthor, SessionMessage } from "../types/message";
 import type { SessionPart } from "../types/parts";
@@ -53,7 +54,7 @@ function UserBubble({ text, timestamp, actions }: {
               {formatTime(timestamp)}
             </span>
           ) : null}
-          <div className="break-words whitespace-pre-wrap text-[length:var(--font-size-base)] leading-[1.5]">
+          <div className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}>
             {text}
           </div>
         </div>
@@ -88,7 +89,7 @@ function OtherPersonBubble({ text, timestamp, actions, author }: {
               {formatTime(timestamp)}
             </span>
           ) : null}
-          <div className="break-words whitespace-pre-wrap text-[length:var(--font-size-base)] leading-[1.5]">
+          <div className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}>
             {text}
           </div>
         </div>

@@ -78,11 +78,52 @@ export const PATTERNS = {
   // that moves the shell's controls or flattens its surface.
   shell_override: String.raw`md3-surface-dim|\bPanel(?:Right|Left)(?:Open|Close)?\b|\b(?:collapsedControlsPlacement|centerHeaderVisibility)\b|\bsurface=["'{]+flat\b`,
 };
+
+// Header-like: an element named `header`, or a class/id ending in one of the words below. It must be
+// the selector's last compound (pseudo-classes and attributes aside), so `.top-header .avatar`
+// and `.top-header-avatar` size something inside a header, not the header row.
+// A `-bar` row counts too (`.files-bar`), but not a progress, scroll, side or meter bar.
+const HEADER_WORD = String.raw`(?:header|head|topbar|toolbar|titlebar|appbar|navbar|(?<![\w-]*(?:progress|scroll|side|meter|loading|track|fill|status)-?)bar)`;
+const HEADER_COMPOUND = String.raw`(?:[\w#.:-]*[.#-]${HEADER_WORD}|(?<![\w.#-])header)(?![\w-])(?::{1,2}[\w-]+(?:\([^)]*\))?|\[[^\]]*\])*`;
+const LITERAL_HEIGHT_UTILITY = String.raw`(?<![\w-])(?:h|min-h|max-h)-(?:[0-9]|\[(?!var\())`;
+
+/**
+ * Metrics that span lines, so they read whole files rather than `git grep` lines. Each is a set
+ * of JavaScript patterns run over a file's text; `prefilter` selects candidate files with
+ * `git grep -l` and the same pathspecs, so the excluded paths match the line metrics.
+ */
+export const RULE_PATTERNS = {
+  // A header row given its own height. The shell owns one header height
+  // (`--shell-header-height`, `ShellHeader`); content fills the row and never sets it, so the
+  // main pane's divider lands on the sidebar's. Token references (`var(--shell-header-height)`)
+  // and non-length values (`auto`, `100%`) are not counted.
+  header_height_literal: {
+    prefilter: String.raw`height|\bh-`,
+    patterns: [
+      // CSS: `.x-header { min-height: 66px }`, `.page header { height: 4rem }`, across lines.
+      String.raw`(?<=^|[\s{},;>+~])${HEADER_COMPOUND}\s*(?:,[^{};]*)?\{[^{}]*?(?<![\w-])(?:min-|max-)?height\s*:\s*[0-9.]+(?:px|rem|em)\b`,
+      // JSX: `<header className="h-16">`, or any element whose class names a header row and a height.
+      String.raw`<header\b[^>]*?\bclassName=\{?["'\x60][^"'\x60]*?${LITERAL_HEIGHT_UTILITY}`,
+      String.raw`(?<!<header\b[^>]*)\bclassName=\{?["'\x60](?=[^"'\x60]*(?<![\w-])[\w-]*${HEADER_WORD}(?![\w-]))[^"'\x60]*?${LITERAL_HEIGHT_UTILITY}`,
+    ],
+  },
+  // Product CSS restyling transcript text. Brand's `tangle-transcript-text` gives the person's and
+  // the agent's messages one family, size and leading; an app rule on `.tangle-prose` or a
+  // timeline step re-splits them (an agent message at 16px beside a 15px user message).
+  transcript_type_override: {
+    prefilter: String.raw`tangle-prose|tangle-transcript-text|data-timeline-step|transcript`,
+    patterns: [
+      String.raw`(?:tangle-prose|tangle-transcript-text|data-timeline-step|transcript)[^{};]*\{[^{}]*?(?<![\w-])(?:font-size|line-height|font-family|font)\s*:`,
+      String.raw`\bclassName=\{?["'\x60](?=[^"'\x60]*\btangle-(?:prose|transcript-text)\b)[^"'\x60]*?(?<![\w-])(?:text-(?:xs|sm|base|lg|xl|\[)|leading-|font-(?:sans|serif|mono))`,
+    ],
+  },
+};
+
 const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`);
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
 
 /** The counts the gate ratchets. Everything else in a row is informational. */
-export const GATED = Object.keys(PATTERNS);
+export const GATED = [...Object.keys(PATTERNS), ...Object.keys(RULE_PATTERNS)];
 
 function extensions(surface, metric) {
   const extra = SURFACES[surface]?.extraExt ?? [];
@@ -98,6 +139,8 @@ function extensions(surface, metric) {
     case "control_override": return ["*.tsx", "*.jsx"];
     case "page_heading": return ["*.tsx", "*.jsx", "*.astro"];
     case "shell_override": return ["*.tsx", "*.jsx", "*.css", ...extra];
+    case "header_height_literal": return ["*.tsx", "*.jsx", "*.astro", "*.css", "*.vue", "*.svelte"];
+    case "transcript_type_override": return ["*.tsx", "*.jsx", "*.css"];
     case "imports": return ["*.tsx", "*.ts", "*.astro", "*.jsx"];
     default: return SRC_EXT;
   }
@@ -142,6 +185,30 @@ export function grepMatches(source, roots, pattern, exts) {
     rows.push({ path: file.startsWith(prefix) ? file.slice(prefix.length) : file, line: Number(line), match });
   }
   return rows;
+}
+
+/** Every match of a multi-line metric: [{ path, line, match }], `line` being where the match starts. */
+export function ruleMatches(source, roots, metric, exts) {
+  const { prefilter, patterns } = RULE_PATTERNS[metric];
+  const args = ["grep", "-I", "-P", "-l", "--null", "-e", prefilter];
+  if (source.rev) args.push(source.rev);
+  else args.push("--untracked");
+  args.push("--", ...pathspecs(roots, exts), ...EXCLUDE);
+  const prefix = source.rev ? `${source.rev}:` : "";
+  const files = git(source.dir, args, { allowExit1: true }).split("\0").filter(Boolean)
+    .map((f) => (f.startsWith(prefix) ? f.slice(prefix.length) : f).trim()).filter(Boolean);
+  const rows = [];
+  for (const path of files) {
+    const text = readFile(source, path);
+    const found = new Map();
+    for (const pattern of patterns) {
+      for (const m of text.matchAll(new RegExp(pattern, "g"))) found.set(m.index, m[0]);
+    }
+    for (const [index, match] of [...found].sort(([a], [b]) => a - b)) {
+      rows.push({ path, line: text.slice(0, index).split("\n").length, match });
+    }
+  }
+  return rows.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : a.line - b.line));
 }
 
 /** Full text of matching lines in the named files, for failure reports. */
@@ -224,7 +291,9 @@ export function measure(surface, source) {
   }
   row.by_file = {};
   for (const metric of GATED) {
-    const hits = grepMatches(source, roots, PATTERNS[metric], extensions(surface, metric));
+    const hits = RULE_PATTERNS[metric]
+      ? ruleMatches(source, roots, metric, extensions(surface, metric))
+      : grepMatches(source, roots, PATTERNS[metric], extensions(surface, metric));
     matches[metric] = hits;
     row[metric] = hits.length;
     row.by_file[metric] = sortedObject(countBy(hits.map((h) => h.path)));
@@ -442,7 +511,7 @@ export function main(argv = process.argv.slice(2), log = (s) => process.stdout.w
   }
 
   let failed = false;
-  for (const [surface, { row, source }] of Object.entries(measured)) {
+  for (const [surface, { row, source, matches }] of Object.entries(measured)) {
     const base = baseline[surface];
     log(describe(surface, row));
     if (!base) {
@@ -462,7 +531,10 @@ export function main(argv = process.argv.slice(2), log = (s) => process.stdout.w
         .sort((x, y) => y.now - x.now).slice(0, 10);
       log(files.length ? "  files above their baseline count:" : "  no single file rose (moved or renamed?); largest files:");
       for (const f of shown.slice(0, 10)) log(`    ${f.path}: ${f.base} -> ${f.now}`);
-      const lines = grepLines(source, PATTERNS[metric], shown.slice(0, 10).map((f) => f.path));
+      const shownPaths = shown.slice(0, 10).map((f) => f.path);
+      const lines = RULE_PATTERNS[metric]
+        ? matches[metric].filter((m) => shownPaths.includes(m.path)).map((m) => ({ path: m.path, line: m.line, text: m.match.replace(/\s+/g, " ") }))
+        : grepLines(source, PATTERNS[metric], shownPaths);
       for (const l of lines.slice(0, opts.top)) log(`    ${l.path}:${l.line}: ${l.text.slice(0, 160)}`);
       if (lines.length > opts.top) log(`    ... ${lines.length - opts.top} more lines`);
     }
