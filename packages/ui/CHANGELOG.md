@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.31.3
+
+### Patch Changes
+
+- 58bce3d: FilterField labels read at 14px (`text-sm`) instead of 12px, so a toolbar's field labels meet the same type floor as the controls beside them.
+
 ## 11.31.2
 
 ### Patch Changes
