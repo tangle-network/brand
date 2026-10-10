@@ -464,7 +464,7 @@
   --shell-inset-gutter: 0.5rem;   /* 8px */
   /* Transcript: the person's and the agent's messages share one family, size
      and leading; they differ only by alignment and surface. */
-  --transcript-font-size: var(--font-size-base);
+  --transcript-font-size: 1rem;   /* 16px: the chat reading size */
   --transcript-line-height: var(--line-height-base);
 
   /* Typography scale — override per-app for custom type hierarchy.

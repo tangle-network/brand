@@ -186,6 +186,12 @@
   font-size: var(--transcript-font-size);
   line-height: var(--transcript-line-height);
 }
+/* Markdown inside a transcript container reads at the container's size and
+ * leading, not .tangle-prose's own 1.7. */
+.tangle-transcript-text .tangle-prose {
+  font-size: inherit;
+  line-height: inherit;
+}
 .tangle-prose > * + * { margin-top: 0.85em; }
 .tangle-prose h1, .tangle-prose h2, .tangle-prose h3, .tangle-prose h4 {
   font-weight: 600;
