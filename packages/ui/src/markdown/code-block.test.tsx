@@ -116,6 +116,17 @@ describe("CodeBlock", () => {
     expect(getByText("Python")).toBeInTheDocument();
   });
 
+  it.each(["text", "TXT", "plain", "plaintext"])("shows no %s label on a plain-text fence, only its copy control", (language) => {
+    const { container, queryByText } = render(
+      <CodeBlock code={"x"} language={language}>
+        <CopyButton text="x" />
+      </CodeBlock>,
+    );
+    expect(container.querySelector(".border-b")).toBeNull();
+    expect(queryByText(language)).toBeNull();
+    expect(container.querySelector('button[title="Copy to clipboard"]')).not.toBeNull();
+  });
+
   it("renders no header when neither label nor language is set", () => {
     const { container } = render(<CodeBlock code={"x"} />);
     // The header is the only element carrying a bottom border.

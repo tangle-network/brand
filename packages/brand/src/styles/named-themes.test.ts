@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   blockIn,
   blocksIn,
+  compositeOver,
   contrastRatio,
   declIn,
   hexIn,
@@ -651,5 +652,51 @@ describe('named theme: [data-theme="website"]', () => {
         expect(contrastRatio(hexIn(css, token), plane), `${token} on ${name}`).toBeGreaterThanOrEqual(4.5);
       }
     }
+  });
+});
+
+describe("dark themes: destructive reads as text", () => {
+  // `text-destructive` is the error ink on cards, popovers and wells, and
+  // `bg-destructive text-destructive-foreground` is the destructive fill. In
+  // dark mode one token must serve both, so it is a light red carrying dark
+  // ink, as the dark primary does: 2.5:1 error text on a sage card shipped
+  // before every dark scope was checked here.
+  const scopes: Array<[string, string]> = [
+    [".dark", CANON],
+    ...[
+      '[data-theme="tangle-dark"]',
+      '[data-theme="aubergine"]',
+      '[data-theme="arena"]',
+      '[data-theme="super"]',
+      '.dark[data-theme="intelligence"]',
+      '.dark[data-theme="hospitality"]',
+      '[data-theme="agents"]',
+      '.dark[data-theme="website"]',
+    ].map((selector): [string, string] => {
+      const css = blocksIn(themes, selector).find((b) => b.includes("--hsl-background"));
+      if (!css) throw new Error(`missing dark theme block: ${selector}`);
+      return [selector, css];
+    }),
+  ];
+  it.each(scopes)("%s holds AA for destructive text and its fill", (_selector, css) => {
+    const effective = (token: string) => {
+      try {
+        return hslToRgb(hslIn(css, token));
+      } catch {
+        return hslToRgb(hslIn(CANON, token));
+      }
+    };
+    const destructive = effective("hsl-destructive");
+    for (const plane of ["hsl-background", "hsl-card", "hsl-popover", "hsl-muted"]) {
+      const bg = effective(plane);
+      expect(contrastRatio(destructive, bg), `destructive text on ${plane}`).toBeGreaterThanOrEqual(4.5);
+      // Error rows commonly sit on a 10% destructive tint (bg-destructive/10).
+      const tint = compositeOver(destructive, bg, 0.1);
+      expect(contrastRatio(destructive, tint), `destructive text on its tint over ${plane}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(
+      contrastRatio(effective("hsl-destructive-foreground"), destructive),
+      "destructive-foreground on the destructive fill",
+    ).toBeGreaterThanOrEqual(4.5);
   });
 });

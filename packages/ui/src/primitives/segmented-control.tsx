@@ -3,6 +3,7 @@
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
 import * as React from "react"
+import { touchTarget } from "../lib/control-presentation"
 import { focusRing, focusRingInset } from "../lib/focus"
 import { cn } from "../lib/utils"
 
@@ -23,6 +24,12 @@ import { cn } from "../lib/utils"
  *     that darken on hover. This keeps the selected segment as the
  *     single visual anchor instead of the whole group competing with
  *     itself.
+ *   - Every label keeps one weight. Selection is colour plus surface or
+ *     underline, so changing the value never reflows the row.
+ *
+ * The tabs variant scrolls sideways when its options outgrow the row: the
+ * selected tab is kept in view, and a faded edge shows that more tabs sit
+ * past it.
  */
 export interface SegmentedControlOption<T extends string = string> {
   value: T
@@ -49,6 +56,15 @@ export interface SegmentedControlProps<T extends string = string>
   "data-testid"?: string
 }
 
+/** Width of the faded edge that marks more tabs past the strip, in px. */
+const TAB_EDGE_FADE = 24
+// Fade whichever edge has tabs past it; the two-attribute rule wins on specificity.
+const tabEdgeFade = [
+  "data-[overflow-start]:[mask-image:linear-gradient(to_right,transparent,#000_24px)]",
+  "data-[overflow-end]:[mask-image:linear-gradient(to_right,#000_calc(100%-24px),transparent)]",
+  "data-[overflow-start]:data-[overflow-end]:[mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)]",
+]
+
 export function SegmentedControl<T extends string = string>({
   value,
   onValueChange,
@@ -69,6 +85,44 @@ export function SegmentedControl<T extends string = string>({
   }
 
   const optionRefs = React.useRef<Map<string, HTMLButtonElement>>(new Map())
+  const stripRef = React.useRef<HTMLDivElement>(null)
+  const [overflow, setOverflow] = React.useState({ start: false, end: false })
+  const tabs = variant === "tabs"
+
+  const measureOverflow = React.useCallback(() => {
+    const strip = stripRef.current
+    if (!strip) return
+    const start = strip.scrollLeft > 1
+    const end = strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1
+    setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }))
+  }, [])
+
+  // Keep the selected tab inside the strip. Only the strip scrolls: the page
+  // never moves, which scrollIntoView cannot promise.
+  React.useLayoutEffect(() => {
+    if (!tabs) return
+    const strip = stripRef.current
+    const option = optionRefs.current.get(value)
+    if (strip && option) {
+      const start = option.offsetLeft
+      const end = start + option.offsetWidth
+      if (start < strip.scrollLeft + TAB_EDGE_FADE) {
+        strip.scrollLeft = Math.max(0, start - TAB_EDGE_FADE)
+      } else if (end > strip.scrollLeft + strip.clientWidth - TAB_EDGE_FADE) {
+        strip.scrollLeft = end - strip.clientWidth + TAB_EDGE_FADE
+      }
+    }
+    measureOverflow()
+  }, [tabs, value, options.length, measureOverflow])
+
+  React.useEffect(() => {
+    if (!tabs || typeof ResizeObserver === "undefined") return
+    const strip = stripRef.current
+    if (!strip) return
+    const observer = new ResizeObserver(measureOverflow)
+    observer.observe(strip)
+    return () => observer.disconnect()
+  }, [tabs, measureOverflow])
 
   const hasMatch = options.some((o) => o.value === value)
 
@@ -98,13 +152,17 @@ export function SegmentedControl<T extends string = string>({
       aria-label={rest["aria-label"]}
       aria-labelledby={rest["aria-labelledby"]}
       data-testid={rest["data-testid"]}
+      data-overflow-start={overflow.start || undefined}
+      data-overflow-end={overflow.end || undefined}
+      ref={stripRef}
       onKeyDown={handleKeyDown}
+      onScroll={tabs ? measureOverflow : undefined}
       className={cn(
         "flex gap-1",
         variant === "row" &&
           "flex-wrap items-center rounded-lg border border-border bg-card p-1",
         variant === "tabs" &&
-          "flex-nowrap items-end border-b border-border pb-0 overflow-x-auto",
+          ["relative flex-nowrap items-end border-b border-border pb-0 overflow-x-auto", tabEdgeFade],
         className,
       )}
     >
@@ -127,17 +185,17 @@ export function SegmentedControl<T extends string = string>({
               if (!active) onValueChange(option.value)
             }}
             className={cn(
-              "relative inline-flex items-center gap-2 whitespace-nowrap text-sm transition-[color,background-color,border-color,box-shadow]",
+              "relative inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow]",
               variant === "row" && ["rounded-md px-3 py-1.5", focusRing],
               // The strip scrolls horizontally, which would clip an outer ring.
-              variant === "tabs" && ["rounded-none border-b-2 -mb-px px-4 py-2", focusRingInset],
+              variant === "tabs" && ["shrink-0 rounded-none border-b-2 -mb-px px-4 py-2", touchTarget, focusRingInset],
               // Active styling is the ONLY styled state — unselected
               // segments stay transparent on purpose so they don't
               // compete visually with the selection.
               active
                 ? variant === "row"
-                  ? "border border-transparent bg-[var(--accent-surface)] text-[var(--accent-text)] font-semibold"
-                  : "border-[var(--accent-text)] text-[var(--accent-text)] font-semibold"
+                  ? "border border-transparent bg-[var(--accent-surface)] text-[var(--accent-text)]"
+                  : "border-[var(--accent-text)] text-[var(--accent-text)]"
                 : variant === "row"
                   ? "border border-transparent text-muted-foreground hover:text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground",

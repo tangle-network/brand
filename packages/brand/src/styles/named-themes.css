@@ -243,7 +243,7 @@
   --hsl-secondary: 249 24% 16%;        --hsl-secondary-foreground: 0 0% 90.1961%;
   --hsl-muted: 249 24% 16%;            --hsl-muted-foreground: 240 5% 68%;
   --hsl-accent: 249 24% 16%;           --hsl-accent-foreground: 0 0% 90.1961%;
-  --hsl-destructive: 348 74% 48%;        --hsl-destructive-foreground: 0 0% 100%;
+  --hsl-destructive: 0 90% 77%;        --hsl-destructive-foreground: 0 60% 10%;
   --hsl-border: 243 20% 20%;           --hsl-input: 244 29% 9%;
   --hsl-ring: 233 100% 87%;
   --depth-1: #0a0a14; --depth-2: #191826; --depth-3: #221f33; --depth-4: #2c2942;

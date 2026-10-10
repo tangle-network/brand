@@ -105,7 +105,7 @@ Renderers that cannot read CSS variables (PDF, canvas, WebGL, email, the `theme-
 
 The base surface ladder is the one GTM proved out: dark is indigo-lifted `#0a0a14` / `#191826` / `#221f33` / `#2c2942`; light is a cool `#eceef3` canvas, white paper cards and overlays, and `#f1f2f7` nested wells. The cast stays below 0.1 chroma and ink stays achromatic, so indigo still reads as the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
 
-Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
+Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter (variable, then static) leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
 
 Existing `--transition-*` values are preserved. The shared `--duration-*`, `--ease-*` and `--motion-*` vocabulary comes from the existing Agent App contract. It does not apply animations automatically. Reduced motion zeroes those durations and re-resolves composites at theme boundaries.
 
@@ -113,22 +113,19 @@ Focus uses `--focus-border`, `--focus-halo`, their danger variants, and `--borde
 
 ## Fonts
 
-Fonts are referenced, **not bundled or remotely fetched**. Consumers own loading, privacy and network fallbacks. For example:
+Fonts are referenced, **not bundled or remotely fetched**. Consumers own loading, privacy and network fallbacks, and an app that loads nothing renders in the OS fallback (DejaVu, Segoe, SF), whose widths and weights the type scale was not tuned for. Load Inter in the app entry. The variable build is one file that renders every weight the scale uses, including in-between weights such as 650 that static files round to the nearest cut:
 
 ```sh
-pnpm add @fontsource/inter @fontsource/geist-mono
+pnpm add @fontsource-variable/inter @fontsource/geist-mono
 ```
 
 ```tsx
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/inter/700.css";
+import "@fontsource-variable/inter";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
 ```
 
-Omitted families fall back through the `--font-*` stacks. Keep external font imports out of library CSS: they can break reordered CSS imports and should not impose a third-party request on every consumer.
+The `--font-sans` and `--font-display` stacks name `"Inter Variable"` (the family that package registers) ahead of `"Inter"`, so static `@fontsource/inter` imports keep working. Omitted families fall back through the `--font-*` stacks. Keep external font imports out of library CSS: they can break reordered CSS imports and should not impose a font download on every consumer.
 
 ## Policy and development
 

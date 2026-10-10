@@ -162,3 +162,18 @@ export const Overview: Story = {
     </div>
   ),
 }
+
+/** A value longer than its trigger ends in an ellipsis before the chevron. */
+export const LongValue: Story = {
+  render: () => (
+    <Select defaultValue="concierge">
+      <SelectTrigger className="w-48">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="concierge">Luna — ReCenter Guest Concierge</SelectItem>
+        <SelectItem value="practitioner">Luna — ReCenter Wellness &amp; Practitioner Desk</SelectItem>
+      </SelectContent>
+    </Select>
+  ),
+}
