@@ -455,6 +455,17 @@
   --font-size-help: 0.75rem;      /* 12px */
   --panel-padding: 1rem;
   --content-max-width: 80rem;
+  /* Shell: every header row in the app shell (sidebar rail, main pane, side
+     panels, drawers, the assistant) is this tall, so their bottom dividers
+     share one y. Header content fills the row; it never sets the height.
+     An inset pane sits one gutter plus its 1px border below the shell top, so
+     its header is shorter by exactly that amount (see ShellHeader). */
+  --shell-header-height: 3.5rem;  /* 56px */
+  --shell-inset-gutter: 0.5rem;   /* 8px */
+  /* Transcript: the person's and the agent's messages share one family, size
+     and leading; they differ only by alignment and surface. */
+  --transcript-font-size: var(--font-size-base);
+  --transcript-line-height: var(--line-height-base);
 
   /* Typography scale — override per-app for custom type hierarchy.
      Components reference these instead of hardcoded pixel values. */

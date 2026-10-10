@@ -17,3 +17,4 @@ export {
   type AgentTimelineCustomItem,
   type AgentTimelineTone,
 } from "./agent-timeline";
+export { TRANSCRIPT_TEXT } from "./transcript-text";

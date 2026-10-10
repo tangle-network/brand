@@ -112,8 +112,67 @@ test("counts local re-drawings of the shared conversation shell", () => {
   assert.deepEqual(row.by_file.shell_override, { "src/Chat.tsx": 7, "src/chat.css": 1 });
 });
 
+test("counts header rows given their own height, across lines, and nothing inside a header", () => {
+  const dir = join(tmp, "header");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  write(dir, {
+    "src/app.css": [
+      ".ha-conversation-header { min-height: 66px; padding: 11px 32px; }", // 1
+      ".ha-first header { height: 68px; }", // 1: the element itself
+      ".ha-files-bar {", // 1: a multi-line rule
+      "  display: flex;",
+      "  min-height: 56px;",
+      "}",
+      "@media (max-width: 600px) { .ha-inbox-detail-head:hover { min-height: 3.5rem } }", // 1: inside a media block, with a pseudo-class
+      ".ha-header-avatar { height: 30px; }", // inside a header, not the row
+      ".ha-conversation-header .ha-mark { height: 30px; }", // a descendant, not the row
+      ".ha-progress-bar { height: 4px; } .ha-sidebar { height: 100vh; }", // not header rows
+      ".ha-page-header { height: var(--shell-header-height); min-height: auto; }", // token and non-length
+      ".ha-conversation-header h1 { font-size: var(--text-base); }", // no height
+    ].join("\n"),
+    "src/Page.tsx": [
+      'export const a = <header className="flex h-16 items-center border-b" />;', // 1
+      'export const b = <div className="ha-files-toolbar flex min-h-[58px]" />;', // 1: a header-row class with a literal height
+      'export const c = <header className="flex h-[var(--shell-header-height)]" />;', // token
+      'export const d = <ShellHeader className="gap-2"><span className="h-4 w-4" /></ShellHeader>;', // the primitive; an icon inside it
+      'export const e = <div className="ha-card h-12" />;', // not a header row
+    ].join("\n"),
+  });
+  commit(dir, "header");
+  const { row, matches } = measure("hospitality", localSource(dir));
+  assert.deepEqual(matches.header_height_literal.map((m) => `${m.path}:${m.line}`),
+    ["src/Page.tsx:1", "src/Page.tsx:2", "src/app.css:1", "src/app.css:2", "src/app.css:3", "src/app.css:7"]);
+  assert.equal(row.header_height_literal, 6);
+});
+
+test("counts product rules that restyle transcript text", () => {
+  const dir = join(tmp, "transcript");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  write(dir, {
+    "src/chat.css": [
+      ".ha-chat-scroll .tangle-prose,", // 1: a selector list across lines
+      ".ha-build .tangle-prose {",
+      "  font-size: var(--text-base);",
+      "  line-height: 1.6;",
+      "}",
+      ".ha-chat [data-timeline-step='user'] + [data-timeline-step] { margin-top: 24px; }", // spacing, not type
+      ".ha-chat [data-timeline-step='user'] div { font: 400 14px/1.4 Georgia, serif; }", // 1
+    ].join("\n"),
+    "src/Chat.tsx": [
+      'export const a = <Markdown className="tangle-prose text-sm leading-7" />;', // 1
+      'export const b = <Markdown className="tangle-prose mt-2" />;', // layout only
+    ].join("\n"),
+  });
+  commit(dir, "transcript");
+  const { row } = measure("hospitality", localSource(dir));
+  assert.equal(row.transcript_type_override, 3);
+  assert.deepEqual(row.by_file.transcript_type_override, { "src/Chat.tsx": 1, "src/chat.css": 2 });
+});
+
 test("compare reports rises and falls on gated metrics only", () => {
-  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, shell_override: 0, importing_files: { ui: 9 } };
+  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, shell_override: 0, header_height_literal: 0, transcript_type_override: 0, importing_files: { ui: 9 } };
   assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
   const { rises, falls } = compare(base, { ...base, raw_palette: 4, hex: 1 });
   assert.deepEqual(rises, [{ metric: "raw_palette", base: 3, now: 4 }]);
@@ -122,11 +181,11 @@ test("compare reports rises and falls on gated metrics only", () => {
 
 test("a metric the baseline row has not recorded is reported, not gated, and is recorded on update", () => {
   const old = { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0, by_file: { raw_palette: { "a.tsx": 3 } } };
-  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3, shell_override: 2,
-    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 }, shell_override: { "a.tsx": 2 } } };
+  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3, shell_override: 2, header_height_literal: 4, transcript_type_override: 1,
+    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 }, shell_override: { "a.tsx": 2 }, header_height_literal: { "a.css": 4 }, transcript_type_override: { "a.css": 1 } } };
   const { rises, unrecorded } = compare(old, now);
   assert.deepEqual(rises, []);
-  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading", "shell_override"]);
+  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading", "shell_override", "header_height_literal", "transcript_type_override"]);
   assert.deepEqual(updateBaseline({ gtm: old }, { gtm: now }).next.gtm, now);
   // A row refused for a rise keeps its old counts but still records the new metrics.
   const risen = { ...now, raw_palette: 9 };

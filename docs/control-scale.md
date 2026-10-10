@@ -21,6 +21,18 @@ A product picks a size name, never a pixel value.
 - `compact` and `touch` remain for existing callers: `compact` is `md` with tighter padding; `touch` is at least 44px with 16px text. `Button` keeps `xl` (52px) for a display call to action outside the scale.
 - A `Textarea` keeps its 120px minimum height; its size sets text, padding and corner.
 
+## Shell header
+
+Every header row in the app shell is `--shell-header-height` (56px) tall: the sidebar rail's top row, the main pane's header, side panels, drawers and the assistant panel. Their bottom dividers therefore share one y, so the main header's underline continues the sidebar's.
+
+- Sandbox UI's `ShellHeader` is the row; products put content in it and never set its height. Tailwind code that is not the primitive uses `h-shell-header`.
+- An inset pane (Agent App's conversation companion) sits one `--shell-inset-gutter` plus its 1px border below the shell top, so `ShellHeader inset` is shorter by exactly that amount and its divider still lands on the shared y.
+- `tangle-drift` counts a header row given its own height (`header_height_literal`); each surface ratchets to 0.
+
+## Transcript text
+
+The person's and the agent's messages use one family, size and leading: `--transcript-font-size` (the 15px message body) and `--transcript-line-height` (1.6), applied by `tangle-transcript-text`. They differ only by alignment and surface. UI's `AgentTimeline`, `UserMessage` and `ChatMessage` apply it through the exported `TRANSCRIPT_TEXT`; a product that wants a roomier transcript sets the two tokens on a subtree, never a rule on `.tangle-prose` (`transcript_type_override`).
+
 ## Dates, times and pressables
 
 - `DatePicker` replaces `<input type="date">`: a trigger on the scale that opens `Calendar` (a keyboard-navigable month grid) and reports `YYYY-MM-DD`; it shows the date in the viewer's locale, never a `mm/dd/yyyy` mask. `Calendar` stands alone for inline pickers.
@@ -65,6 +77,8 @@ Body and supporting text use Tailwind's steps: `text-xs` 12px, `text-sm` 14px, `
 | `native_control` | `<button>`, `<input>` (not `type="hidden"`), `<select>`, `<textarea>` in product code |
 | `control_override` | `<Button className="h-8 px-3 text-xs">` and the same on `Input`, `Textarea`, `SelectTrigger` |
 | `page_heading` | a hand-written `<h1>` instead of `PageHeader` |
+| `header_height_literal` | a header row with its own `height`/`min-height` (`.x-header { min-height: 66px }`, `<header className="h-16">`) instead of `ShellHeader` |
+| `transcript_type_override` | product CSS setting font size, leading or family on `.tangle-prose` or a timeline step |
 
 Each count may only fall. Token references such as `h-[var(--control-height-sm)]` and `text-[length:var(--control-text-md)]` are not counted.
 

@@ -1,3 +1,4 @@
+import { TRANSCRIPT_TEXT } from "./transcript-text";
 import { useState, type KeyboardEvent, type ReactNode } from "react";
 import {
   AlertTriangle,
@@ -188,10 +189,9 @@ function AssistantMessage({ item, author }: { item: AgentTimelineMessageItem; au
       {author && <MessageAuthor author={author} className="mb-1.5" />}
       {item.content && (
         <Markdown
-          // `length:` types the token: a bare `text-[var(--x)]` compiles to a
-          // color, which left the reading size at the Markdown default.
           className={cn(
-            "tangle-prose text-[length:var(--font-size-base)] leading-[1.5]",
+            "tangle-prose",
+            TRANSCRIPT_TEXT,
             item.isStreaming && STREAMING_CARET,
           )}
         >
