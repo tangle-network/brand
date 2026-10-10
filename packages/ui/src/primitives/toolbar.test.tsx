@@ -89,4 +89,15 @@ describe("FilterField", () => {
       screen.getByRole("combobox"),
     );
   });
+
+  it("sets its label on the 14px step of the shared scale, never smaller", () => {
+    render(
+      <FilterField htmlFor="status" label="Status">
+        <select id="status" />
+      </FilterField>,
+    );
+    const label = screen.getByText("Status");
+    expect(label.className).toMatch(/\btext-sm\b/);
+    expect(label.className).not.toMatch(/\btext-xs\b|text-\[/);
+  });
 });

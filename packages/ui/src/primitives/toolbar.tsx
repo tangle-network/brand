@@ -95,9 +95,10 @@ const FilterField = React.forwardRef<HTMLDivElement, FilterFieldProps>(
       className={cn("flex shrink-0 items-center gap-2", className)}
       {...props}
     >
+      {/* 14px, the floor for any text a product shows; a 12px label beside a 14px control reads as a footnote. */}
       <label
         htmlFor={htmlFor}
-        className="whitespace-nowrap text-muted-foreground text-xs"
+        className="whitespace-nowrap text-muted-foreground text-sm"
       >
         {label}
       </label>
