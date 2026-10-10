@@ -31,7 +31,7 @@ Every header row in the app shell is `--shell-header-height` (56px) tall: the si
 
 ## Transcript text
 
-The person's and the agent's messages use one family, size and leading: `--transcript-font-size` (the 15px message body) and `--transcript-line-height` (1.6), applied by `tangle-transcript-text`. They differ only by alignment and surface. UI's `AgentTimeline`, `UserMessage` and `ChatMessage` apply it through the exported `TRANSCRIPT_TEXT`; a product that wants a roomier transcript sets the two tokens on a subtree, never a rule on `.tangle-prose` (`transcript_type_override`).
+The person's and the agent's messages use one family, size and leading: `--transcript-font-size` (16px, the chat reading size) and `--transcript-line-height` (1.6), applied by `tangle-transcript-text`. They differ only by alignment and surface. UI's `AgentTimeline`, `UserMessage` and `ChatMessage` apply it through the exported `TRANSCRIPT_TEXT`; a product that wants a roomier transcript sets the two tokens on a subtree, never a rule on `.tangle-prose` (`transcript_type_override`).
 
 ## Dates, times and pressables
 
