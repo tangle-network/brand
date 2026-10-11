@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatBytes, formatUptime } from "./format";
+import { formatBytes, formatUptime, plainTextFromMarkdown } from "./format";
 
 describe("formatUptime", () => {
   it("renders seconds for short durations", () => {
@@ -39,5 +39,20 @@ describe("formatBytes", () => {
   it("handles invalid input", () => {
     expect(formatBytes(Number.NaN)).toBe("—");
     expect(formatBytes(-1)).toBe("—");
+  });
+});
+
+describe("plainTextFromMarkdown", () => {
+  it("drops emphasis, headings, list markers, code marks and link syntax", () => {
+    expect(plainTextFromMarkdown("**Ensuring workspace configuration** I need to check")).toBe("Ensuring workspace configuration I need to check");
+    expect(plainTextFromMarkdown("## Plan\n- item one\n- *soft* point")).toBe("Plan\nitem one\nsoft point");
+    expect(plainTextFromMarkdown("see [docs](https://example.com) and _this_")).toBe("see docs and this");
+    expect(plainTextFromMarkdown("**bold** and __also__ ~~gone~~")).toBe("bold and also gone");
+    expect(plainTextFromMarkdown("1. First\n2) Second")).toBe("First\nSecond");
+  });
+
+  it("keeps characters that are not markdown marks", () => {
+    expect(plainTextFromMarkdown("read `src/a_b.ts` and snake_case_name")).toBe("read src/a_b.ts and snake_case_name");
+    expect(plainTextFromMarkdown("2 * 3 * 4 = 24")).toBe("2 * 3 * 4 = 24");
   });
 });
