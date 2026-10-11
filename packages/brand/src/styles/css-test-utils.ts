@@ -184,3 +184,20 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
 export function hexRelativeLuminanceIn(css: string, token: string): number {
   return relativeLuminance(hexIn(css, token));
 }
+
+/**
+ * OKLCH lightness x100 of an opaque color — the unit the surface ladder is
+ * specified in. Perceptual, so equal steps read as equal steps; contrast
+ * floors are still checked with `contrastRatio`.
+ */
+export function oklchLightness(rgb: Rgb): number {
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = rgb.map(lin);
+  const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+  const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+  const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+  return 100 * (0.2104542553 * Math.cbrt(l) + 0.793617785 * Math.cbrt(m) - 0.0040720468 * Math.cbrt(s));
+}

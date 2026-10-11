@@ -128,7 +128,7 @@ describe("raised fields in a Toolbar", () => {
     );
     expect(screen.getByTestId("toolbar").className).toContain("[--field-surface:hsl(var(--card))]");
     for (const name of ["Format", "Elsewhere"]) {
-      expect(screen.getByRole("combobox", { name }).className).toContain("bg-[var(--field-surface,var(--bg-input))]");
+      expect(screen.getByRole("combobox", { name }).className).toContain("bg-[var(--field-surface,var(--well))]");
     }
   });
 });

@@ -940,6 +940,85 @@
   --border-strong: color-mix(in srgb, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 20%);
 }
 
+/* Surface ladder and interaction states — the palette behind @tangle-network/ui's
+ * interaction helpers (`ixControl`, `ixField`, `ixSelected`, `ixRow` … in ui's
+ * lib/interaction.ts) and the Card primitive's surface context.
+ *
+ * LADDER. A card (`[data-slot="card"]`) re-declares two context variables for
+ * everything inside it, so nesting needs no app selector:
+ *   --card  the plane a nested card or `bg-card` box paints: --hsl-raised one
+ *           level in, --hsl-raised-2 two levels in.
+ *   --well  the field fill: --well-page on the page, --well-card in a card,
+ *           --well-raised in a card in a card, --well-raised-2 deeper still.
+ * A theme that tunes its ladder (Hospitality) sets these per mode. The defaults
+ * below reproduce the plain spine exactly — every level paints the card and
+ * every well is --bg-input — so a theme that does not set them looks as it did.
+ *
+ * INTERACTION. Four states, all from the focus ring hue (--hsl-ring), so one
+ * green or one indigo marks every interactive thing in a theme:
+ *   hover     1px edge at .45 plus a 4px halo at .16 (--ix-hover)
+ *   press     1px edge at .95 plus a 4px halo at .30 (--ix-press)
+ *   after     a mouse-focused control keeps a 1px .60 / 3px .14 ring (--ix-after)
+ *   selected  a .13 tint (.18 in dark) with a 1px inset ring at .85
+ * Keyboard focus-visible keeps --focus-border / --focus-halo above.
+ *
+ * Declared on every scope that can redefine --hsl-ring or the ladder, as the
+ * focus rule is, because a custom property is resolved where it is declared. */
+:root,
+.dark,
+.light,
+[data-sandbox-ui],
+[data-sandbox-theme],
+[data-theme] {
+  --hsl-raised: var(--hsl-card);
+  --hsl-raised-2: var(--hsl-card);
+  --well-page: var(--bg-input);
+  --well-card: var(--bg-input);
+  --well-raised: var(--bg-input);
+  --well-raised-2: var(--bg-input);
+  --well: var(--well-page);
+  --field-border: hsl(var(--hsl-border));
+  --shadow-raised: var(--shadow-card);
+  /* A shadow token joins a comma list, so "none" would void the whole list. */
+  --shadow-well: 0 0 0 0 transparent;
+  --edge-highlight: 0 0 0 0 transparent;
+  --ix-hover: 0 0 0 1px hsl(var(--hsl-ring) / 0.45), 0 0 0 4px hsl(var(--hsl-ring) / 0.16);
+  --ix-hover-border: hsl(var(--hsl-ring) / 0.7);
+  --ix-press: 0 0 0 1px hsl(var(--hsl-ring) / 0.95), 0 0 0 4px hsl(var(--hsl-ring) / 0.3);
+  --ix-after: 0 0 0 1px hsl(var(--hsl-ring) / 0.6), 0 0 0 3px hsl(var(--hsl-ring) / 0.14);
+  --ix-sel-ring: hsl(var(--hsl-ring) / 0.85);
+  --ix-sel-bg: hsl(var(--hsl-ring) / 0.18);
+  --ix-hover-bg: hsl(var(--hsl-ring) / 0.08);
+}
+
+/* Light planes need less tint for the same step. Same scope list as the chart
+ * light rule below; dark is the default. */
+[data-sandbox-theme="vault"]:where(:not(.dark)),
+[data-sandbox-theme="dawn"]:where(:not(.dark)),
+[data-theme="hospitality"]:where(:not(.dark)),
+[data-theme="website"]:where(:not(.dark)),
+[data-theme="light"],
+.light,
+[data-theme$="-light"] {
+  --ix-sel-bg: hsl(var(--hsl-ring) / 0.13);
+  --ix-hover-bg: hsl(var(--hsl-ring) / 0.07);
+}
+
+/* Surface context: keyed only on the Card primitive's data-slot, never on app
+ * classes. :where(*) keeps it at the specificity of one attribute, so a theme
+ * scope opened inside a card still wins. */
+[data-slot="card"] :where(*) {
+  --card: var(--hsl-raised);
+  --well: var(--well-card);
+}
+[data-slot="card"] [data-slot="card"] :where(*) {
+  --card: var(--hsl-raised-2);
+  --well: var(--well-raised);
+}
+[data-slot="card"] [data-slot="card"] [data-slot="card"] :where(*) {
+  --well: var(--well-raised-2);
+}
+
 /* Chart marks — the palette behind @tangle-network/charts.
  *
  * One accent marks the measure a reader decides on (a rate bar, a frontier

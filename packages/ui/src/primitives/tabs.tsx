@@ -1,6 +1,7 @@
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import * as React from "react";
 import { focusRing } from "../lib/focus";
+import { ixControlSoft, ixSelected, ixTabUnderline } from "../lib/interaction";
 import { cn } from "../lib/utils";
 
 const Tabs = TabsPrimitive.Root;
@@ -34,13 +35,16 @@ const TabsTrigger = React.forwardRef<
     variant?: "default" | "pills" | "underline";
   }
 >(({ className, variant = "default", ...props }, ref) => {
+  // Selection is the shared selected state (lib/interaction.ts): a tint and an
+  // inset ring for default and pills, a 2px underline for underline, whose
+  // border-b-2 slot stays transparent.
   const variants = {
     default:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 ${ixControlSoft} ${ixSelected}`,
     pills:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-muted`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=inactive]:text-muted-foreground ${ixControlSoft} ${ixSelected}`,
     underline:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-t-md pb-3 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-t-md pb-3 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent data-[state=inactive]:text-muted-foreground ${ixTabUnderline}`,
   };
 
   return (

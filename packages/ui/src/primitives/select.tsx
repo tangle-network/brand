@@ -4,6 +4,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
 import { controlSizes, fieldPresentation, fieldSizes, fieldTouchText } from "../lib/control-presentation";
+import { ixControlAfter, ixRow } from "../lib/interaction";
 import { cn } from "../lib/utils";
 
 const Select = SelectPrimitive.Root;
@@ -22,14 +23,18 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex w-full items-center justify-between gap-2 whitespace-nowrap border py-1 shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50",
+      "flex w-full items-center justify-between gap-2 whitespace-nowrap border py-1 placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50",
+      // A field (ixField, via fieldPresentation) that keeps a soft ring after a
+      // mouse click, like every control.
       fieldPresentation,
+      ixControlAfter,
       fieldTouchText,
       // A long value ends in an ellipsis before the chevron: line-clamp cannot
       // ellipsize a nowrap line, so it clipped mid-glyph under the icon.
       "data-[placeholder]:text-[var(--text-dim)] [&>span]:min-w-0 [&>span]:truncate [&>span]:text-left",
-      // The designed open state: accent border and surface while the menu is up.
-      "data-[state=open]:border-primary data-[state=open]:bg-[var(--accent-surface-strong)] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform",
+      // Open: the after-click ring stays while the menu is up, and the field
+      // keeps its well fill so it still reads as the field it is.
+      "data-[state=open]:border-[var(--ix-hover-border)] data-[state=open]:shadow-[var(--ix-after)] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform",
       size === "compact" || size === "touch" ? cn(fieldSizes.md, controlSizes[size]) : fieldSizes[size === "default" ? "md" : size],
       className,
     )}
@@ -86,7 +91,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border border-border bg-card text-foreground shadow-[var(--shadow-dropdown)] data-[state=closed]:animate-out data-[state=open]:animate-in",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-[var(--edge-highlight),var(--shadow-card)] data-[state=closed]:animate-out data-[state=open]:animate-in",
         position === "popper" &&
           "data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
         className,
@@ -129,7 +134,8 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pr-8 pl-2 text-sm outline-none transition-colors focus:bg-[var(--accent-surface-strong)] focus:text-foreground data-[state=checked]:bg-[var(--accent-surface-strong)] data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pr-8 pl-2 text-sm outline-none transition-[color,background-color,box-shadow] focus:text-foreground data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      ixRow,
       className,
     )}
     {...props}

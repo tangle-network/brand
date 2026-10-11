@@ -271,7 +271,9 @@ describe("SegmentedControl", () => {
     const radiogroup = screen.getByRole("radiogroup")
     expect(radiogroup.className).toContain("flex-wrap")
     expect(radiogroup.className).toContain("rounded-lg")
-    expect(radiogroup.className).toContain("bg-card")
+    // The row track is a field well, so it steps off whatever plane holds it.
+    expect(radiogroup.className).toContain("bg-[var(--well)]")
+    expect(radiogroup.className).toContain("border-[var(--field-border)]")
   })
 
   it("applies tabs variant classes with nowrap", () => {
@@ -287,7 +289,7 @@ describe("SegmentedControl", () => {
     expect(radiogroup.className).toContain("flex-nowrap")
     expect(radiogroup.className).toContain("overflow-x-auto")
     expect(radiogroup.className).toContain("border-b")
-    expect(radiogroup.className).not.toContain("bg-card")
+    expect(radiogroup.className).not.toContain("bg-[var(--well)]")
   })
 
   it("passes aria-label to the radiogroup", () => {

@@ -5,6 +5,7 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
 import * as React from "react"
 import { touchTarget } from "../lib/control-presentation"
 import { focusRing, focusRingInset } from "../lib/focus"
+import { ixControlSoft, ixSelected, ixTabUnderline } from "../lib/interaction"
 import { cn } from "../lib/utils"
 
 /**
@@ -19,7 +20,11 @@ import { cn } from "../lib/utils"
  * console warning fires when both are omitted.
  *
  * Design rules baked into the default variant:
- *   - Only the SELECTED segment shows a surface colour + accent text.
+ *   - The row track is a field well (`--well`, `--field-border`), so the
+ *     control reads as one inset group on whatever plane it sits on.
+ *   - Only the SELECTED segment shows a surface colour + accent text: the
+ *     shared selected state (`ixSelected`: tint plus an inset ring). A tab
+ *     shows it as an underline instead (`ixTabUnderline`).
  *   - Unselected segments have NO background — they're plain-text labels
  *     that darken on hover. This keeps the selected segment as the
  *     single visual anchor instead of the whole group competing with
@@ -160,7 +165,7 @@ export function SegmentedControl<T extends string = string>({
       className={cn(
         "flex gap-1",
         variant === "row" &&
-          "flex-wrap items-center rounded-lg border border-border bg-card p-1",
+          "flex-wrap items-center rounded-lg border border-[var(--field-border)] bg-[var(--well)] p-1",
         variant === "tabs" &&
           ["relative flex-nowrap items-end border-b border-border pb-0 overflow-x-auto", tabEdgeFade],
         className,
@@ -186,19 +191,13 @@ export function SegmentedControl<T extends string = string>({
             }}
             className={cn(
               "relative inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow]",
-              variant === "row" && ["rounded-md px-3 py-1.5", focusRing],
+              variant === "row" && ["rounded-md border border-transparent px-3 py-1.5", focusRing, ixControlSoft, ixSelected],
               // The strip scrolls horizontally, which would clip an outer ring.
-              variant === "tabs" && ["shrink-0 rounded-none border-b-2 -mb-px px-4 py-2", touchTarget, focusRingInset],
-              // Active styling is the ONLY styled state — unselected
-              // segments stay transparent on purpose so they don't
-              // compete visually with the selection.
-              active
-                ? variant === "row"
-                  ? "border border-transparent bg-[var(--accent-surface)] text-[var(--accent-text)]"
-                  : "border-[var(--accent-text)] text-[var(--accent-text)]"
-                : variant === "row"
-                  ? "border border-transparent text-muted-foreground hover:text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
+              // The border-b-2 slot stays transparent: the underline is ixTabUnderline's inset shadow.
+              variant === "tabs" && ["shrink-0 rounded-none border-b-2 border-transparent -mb-px px-4 py-2", touchTarget, focusRingInset, ixTabUnderline],
+              // Selection (aria-checked) is the only filled state; unselected
+              // segments stay transparent so they don't compete with it.
+              active ? "text-[var(--accent-text)]" : "text-muted-foreground hover:text-foreground",
             )}
           >
             <span>{option.label}</span>

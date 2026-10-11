@@ -1,17 +1,31 @@
 import * as React from "react";
+import { ixControl } from "../lib/interaction";
 import { cn } from "../lib/utils";
 import { Heading } from "./heading";
 
+/**
+ * A card is one level of the brand surface ladder. It carries
+ * `data-slot="card"`, and the brand's surface-context rule (tokens.css)
+ * re-declares `--card` and `--well` for everything inside it: a Card or a
+ * `bg-card` box inside a card paints the raised level, one inside that the
+ * raised-2 level, and a field in any of them takes the well that is the
+ * opposite step from its parent. Nesting needs no prop and no app selector.
+ */
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     variant?: "default" | "glass" | "sandbox" | "elevated";
-    /** Decorative border feedback only. Put actions in a native button or link. */
+    /** Decorative hover feedback only (the shared green edge). Put actions in a native button or link. */
     hover?: boolean;
+    /**
+     * The card is itself the control, such as a card wrapped in a link: it takes
+     * the full control states (hover glow, press, the ring after a click).
+     */
+    interactive?: boolean;
   }
->(({ className, variant = "default", hover = false, ...props }, ref) => {
+>(({ className, variant = "default", hover = false, interactive = false, ...props }, ref) => {
   const variants = {
-    default: "bg-card border-border",
+    default: "bg-card border-border shadow-[var(--edge-highlight),var(--shadow-card)]",
     elevated: "bg-muted/50 border-border shadow-[var(--shadow-card)]",
     glass: "bg-card/80 backdrop-blur-xl border-border shadow-[var(--shadow-card)]",
     sandbox: "bg-muted/50 border-primary/20 shadow-[var(--shadow-accent)]",
@@ -21,12 +35,13 @@ const Card = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow]",
+        "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow,background-color]",
         "duration-[var(--transition-default)]",
         variants[variant],
-        hover && "hover:border-[var(--border-strong)]",
+        (hover || interactive) && ixControl,
         className,
       )}
+      data-slot="card"
       {...props}
     />
   );
@@ -69,7 +84,9 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-muted-foreground text-sm", className)}
+    // Two lines at most: a guard, not a copy budget. Long copy belongs in help
+    // text or a disclosure.
+    className={cn("text-muted-foreground text-sm line-clamp-2", className)}
     {...props}
   />
 ));

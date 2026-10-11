@@ -42,7 +42,7 @@ The person's and the agent's messages use one family, size and leading: `--trans
 
 ## Field surfaces
 
-Fields sit in a recessed well (`--bg-input`) inside cards. On the page canvas that well barely differs from the page, so `Toolbar` sets `--field-surface` to the card surface and every field inside it (Input, SelectTrigger, DatePicker, TimeSelect) reads as a raised control with its border and focus ring. Filter rows belong in `Toolbar` with `FilterField` labels.
+Fields fill with the well for the level they sit on (`--well`, re-declared by each card level) and draw a `--field-border` hairline; see [surfaces and interaction states](surfaces-and-states.md) for the ladder, the hover, press, after-click and selected states, and which helper each primitive takes. `Toolbar` sets `--field-surface` to the card surface, so every field inside it (Input, SelectTrigger, DatePicker, TimeSelect) reads as a raised control with its border and focus ring. Filter rows belong in `Toolbar` with `FilterField` labels.
 
 ## Form text
 

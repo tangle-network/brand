@@ -35,6 +35,7 @@ const tokens = readFileSync(
 // header (`:root, [data-sandbox-ui], [data-theme="dark"], .dark {`) — the same
 // trick tokens.test.ts uses.
 const CANON = blockIn(tokens, ".dark");
+const CANON_LIGHT = blockIn(tokens, ".light");
 
 function block(selector: string): string {
   return blockIn(themes, selector);
@@ -445,11 +446,17 @@ describe('named theme: [data-theme="hospitality"]', () => {
   });
 
   it("never redefines what a status or category color means", () => {
+    // The success/warning/danger/neutral surface triples are retuned for the
+    // sage planes (surface-ladder.test.ts holds their hue and contrast), and the
+    // dark destructive red is lightened to read on the lighter popover; it stays
+    // red. The other status hues, info and every category stay canonical.
     for (const css of [light, dark]) {
       expect(css).not.toMatch(
-        /--(hsl-)?(success|warning|destructive|info|error)\b|--surface-(success|warning|danger|info|neutral)-|--status-|--tone-|--run-mix-|--syntax-/,
+        /--(hsl-)?(success|warning|info|error)\b|--destructive|--hsl-destructive-foreground|--surface-info-|--status-|--tone-|--run-mix-|--syntax-/,
       );
+      expect(hslIn(css, "hsl-destructive").h, "destructive stays red").toBe(0);
     }
+    expect(declIn(light, "hsl-destructive")).toBe(declIn(CANON_LIGHT, "hsl-destructive"));
   });
 
   it("keeps the canonical ladder roles: paper cards on a tinted canvas in light, rising planes in dark", () => {
