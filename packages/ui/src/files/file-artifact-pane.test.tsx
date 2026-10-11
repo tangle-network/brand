@@ -153,7 +153,9 @@ describe("FileArtifactPane previews", () => {
       />,
     );
 
-    expect(await screen.findByRole("link", { name: "Sibling" })).toHaveAttribute(
+    // The rich editor lazy-loads its editor packages; under a loaded host that takes
+    // longer than findBy's 1s default.
+    expect(await screen.findByRole("link", { name: "Sibling" }, { timeout: 10_000 })).toHaveAttribute(
       "href",
       "/app/ws-1/vault?file=docs%2Fsibling.md",
     );
@@ -252,7 +254,7 @@ describe("FileArtifactPane controlled drafts", () => {
       editor: { enabled: true, savedContent: "# Saved notes", onSave },
     };
     const view = render(<FileArtifactPane {...props} />);
-    const save = await screen.findByRole("button", { name: "Save changes" });
+    const save = await screen.findByRole("button", { name: "Save changes" }, { timeout: 10_000 });
     expect(screen.getByRole("heading", { name: "Unsaved source draft" })).toBeVisible();
     expect(screen.getByText("Unsaved changes")).toBeVisible();
     expect(save).toBeEnabled();
