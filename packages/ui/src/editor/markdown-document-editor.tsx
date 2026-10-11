@@ -7,11 +7,8 @@ import { retryableLazyEditor } from "./editor-lazy";
 import { EditorLoadingPlaceholder } from "./editor-loading";
 import { type DocumentEditorPeers, loadDocumentEditorPeers } from "./editor-peers";
 import { EditorToolbar } from "./editor-toolbar";
-import {
-  htmlToMarkdown,
-  markdownToHtml,
-  normalizeMarkdown,
-} from "./markdown-conversion";
+import { normalizeMarkdown } from "./markdown-conversion";
+import { createSourceMarkdownExtensions, SourceMarkdownSession } from "./source-markdown-editor";
 
 export interface MarkdownDocumentEditorProps {
   value?: string;
@@ -28,12 +25,18 @@ export interface MarkdownDocumentEditorProps {
  * Builds the local markdown editor against loaded tiptap namespaces. The
  * peers arrive as an argument so that this module reaches them through
  * type-only imports, which a bundler erases.
+ *
+ * The editor writes back the file's own bytes wherever the reader changed
+ * nothing (see `source-markdown.ts`): opening a file and leaving it reports no
+ * change, and an edit changes only the edited span. Blocks it cannot represent,
+ * such as tables, are shown read-only and kept verbatim.
  */
 export function createMarkdownDocumentEditor(
   peers: DocumentEditorPeers,
 ): ComponentType<MarkdownDocumentEditorProps> {
   const { EditorContent, useEditor } = peers.react;
   const StarterKit = peers.starterKit.default;
+  const sourceExtensions = createSourceMarkdownExtensions(peers.react);
 
   return function MarkdownDocumentEditor({
     value = "",
@@ -45,8 +48,13 @@ export function createMarkdownDocumentEditor(
     onChange,
     onReady,
   }: MarkdownDocumentEditorProps) {
-    const initialHtml = useMemo(() => markdownToHtml(value), []);
-    const lastAppliedMarkdownRef = useRef(normalizeMarkdown(value));
+    const sessionRef = useRef<SourceMarkdownSession | null>(null);
+    if (!sessionRef.current) sessionRef.current = new SourceMarkdownSession(peers.react, value);
+    const initialHtml = useMemo(() => sessionRef.current!.html, []);
+    // The Markdown last written by this editor or applied from `value`.
+    const lastMarkdownRef = useRef(value);
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
 
     const editor = useEditor({
       extensions: [
@@ -56,7 +64,10 @@ export function createMarkdownDocumentEditor(
               class: "hljs",
             },
           },
+          // Markdown has no underline, so an underline could not be saved.
+          underline: false,
         }),
+        ...sourceExtensions,
       ],
       content: initialHtml,
       editable: !readOnly,
@@ -73,33 +84,37 @@ export function createMarkdownDocumentEditor(
         },
       },
       onUpdate: ({ editor: currentEditor }) => {
-        const nextMarkdown = normalizeMarkdown(htmlToMarkdown(currentEditor.getHTML()));
-        lastAppliedMarkdownRef.current = nextMarkdown;
-        onChange?.(nextMarkdown, currentEditor);
+        const nextMarkdown = sessionRef.current!.serialize(currentEditor.state.doc);
+        // A transaction that changes no Markdown (a selection, a trailing empty
+        // paragraph) is not an edit.
+        if (nextMarkdown === lastMarkdownRef.current) return;
+        lastMarkdownRef.current = nextMarkdown;
+        onChangeRef.current?.(nextMarkdown, currentEditor);
       },
       onCreate: ({ editor: currentEditor }) => {
+        sessionRef.current!.attach(currentEditor);
         onReady?.(currentEditor);
       },
     });
 
     useEffect(() => {
-      if (editor) {
-        editor.setEditable(!readOnly);
-      }
+      // No update event: toggling read-only is not an edit.
+      editor?.setEditable(!readOnly, false);
     }, [editor, readOnly]);
 
     useEffect(() => {
       if (!editor) {
         return;
       }
-
-      const normalizedValue = normalizeMarkdown(value);
-      if (normalizedValue === lastAppliedMarkdownRef.current) {
+      if (normalizeMarkdown(value) === normalizeMarkdown(lastMarkdownRef.current)) {
         return;
       }
 
-      editor.commands.setContent(markdownToHtml(value), { emitUpdate: false });
-      lastAppliedMarkdownRef.current = normalizedValue;
+      const session = new SourceMarkdownSession(peers.react, value);
+      sessionRef.current = session;
+      editor.commands.setContent(session.html, { emitUpdate: false });
+      session.attach(editor);
+      lastMarkdownRef.current = value;
     }, [editor, value]);
 
     return (
