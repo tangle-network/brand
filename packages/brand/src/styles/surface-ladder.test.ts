@@ -39,7 +39,7 @@ const ladder: Array<[role: string, token: string, light: number, dark: number]> 
   ["well in raised", "well-raised", 100, 22.1],
   ["well in raised-2", "well-raised-2", 94.9, 22.1],
   ["hairline", "hsl-border", 85.0, 42.0],
-  ["field border", "field-border", 60.0, 64.0],
+  ["field border", "field-border", 60.0, 68.3],
 ];
 
 describe("Hospitality surface ladder", () => {
@@ -88,6 +88,9 @@ describe("Hospitality surface ladder", () => {
     const border = rgbOf(css, "field-border");
     expect(contrastRatio(border, rgbOf(css, "hsl-card")), "on the card").toBeGreaterThanOrEqual(3);
     expect(contrastRatio(border, rgbOf(css, "well-card")), "on the well in a card").toBeGreaterThanOrEqual(3);
+    // A field in a card in a card sits on the raised plane: production measured
+    // the dark Select edge at 2.99:1 there before #939c94.
+    expect(contrastRatio(border, rgbOf(css, "hsl-raised")), "on the raised plane").toBeGreaterThanOrEqual(3);
     expect(declIn(css, "border-strong")).toBe(declIn(css, "field-border"));
   });
 
