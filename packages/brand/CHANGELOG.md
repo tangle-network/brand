@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.24.1
+
+### Patch Changes
+
+- ea4b052: Hospitality dark field border #868f87 → #939c94: it measured 2.99:1 on the raised plane (a Select in a card in a card on Connections). Now 4.6:1 on the card and 3.5:1 on raised.
+
 ## 1.24.0
 
 ### Minor Changes
