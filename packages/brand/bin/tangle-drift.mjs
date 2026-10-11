@@ -55,7 +55,6 @@ const PRIMS = "Button|IconButton|Badge|Card|Chip|Tag|Pill|Avatar|Dialog|Modal|Sh
 /** PCRE patterns, passed to `git grep -P`. */
 export const PATTERNS = {
   raw_palette: String.raw`\b(?:bg|text|border|ring|fill|stroke|from|to|via|outline|divide|decoration|accent|caret|shadow)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b`,
-  hex: String.raw`#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b`,
   arbitrary_color: String.raw`-\[(?:#|rgb|hsl|oklch)`,
   css_var_defs: String.raw`^\s*--[a-zA-Z0-9-]+\s*:`,
   local_primitive_count: String.raw`export\s+(?:default\s+)?(?:function|const)\s+(?:${PRIMS})\b`,
@@ -93,6 +92,12 @@ const LITERAL_HEIGHT_UTILITY = String.raw`(?<![\w-])(?:h|min-h|max-h)-(?:[0-9]|\
  * `git grep -l` and the same pathspecs, so the excluded paths match the line metrics.
  */
 export const RULE_PATTERNS = {
+  // A colour literal: `#rgb` or `#rrggbb`. Read as a rule metric so comments are blanked first: an
+  // issue reference such as "React error #310" or "(#346)" in a comment is not a colour.
+  hex: {
+    prefilter: String.raw`#[0-9a-fA-F]{3}`,
+    patterns: [String.raw`#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b`],
+  },
   // A header row given its own height. The shell owns one header height
   // (`--shell-header-height`, `ShellHeader`); content fills the row and never sets it, so the
   // main pane's divider lands on the sidebar's. Token references (`var(--shell-header-height)`)
@@ -124,7 +129,8 @@ const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
 
 /** The counts the gate ratchets. Everything else in a row is informational. */
-export const GATED = [...Object.keys(PATTERNS), ...Object.keys(RULE_PATTERNS)];
+const LINE_METRICS = Object.keys(PATTERNS);
+export const GATED = [LINE_METRICS[0], "hex", ...LINE_METRICS.slice(1), ...Object.keys(RULE_PATTERNS).filter((m) => m !== "hex")];
 
 function extensions(surface, metric) {
   const extra = SURFACES[surface]?.extraExt ?? [];
@@ -202,7 +208,11 @@ export function ruleMatches(source, roots, metric, exts) {
   for (const path of files) {
     // Comments name things without styling them (a CSS note that mentions "transcript" or
     // "header"); blank them, keeping offsets and newlines, so only real rules count.
-    const text = readFile(source, path).replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
+    const blank = (comment) => comment.replace(/[^\n]/g, " ");
+    const text = readFile(source, path)
+      .replace(/\/\*[\s\S]*?\*\//g, blank)
+      .replace(/<!--[\s\S]*?-->/g, blank)
+      .replace(/(^|[\s;{}(])\/\/[^\n]*/gm, (m, lead) => lead + blank(m.slice(lead.length)));
     const found = new Map();
     for (const pattern of patterns) {
       for (const m of text.matchAll(new RegExp(pattern, "g"))) found.set(m.index, m[0]);

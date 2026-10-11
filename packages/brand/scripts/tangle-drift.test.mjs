@@ -176,6 +176,25 @@ test("counts product rules that restyle transcript text", () => {
   assert.deepEqual(row.by_file.transcript_type_override, { "src/Chat.tsx": 1, "src/chat.css": 3 });
 });
 
+test("hex ignores issue references in comments but counts colours in code and CSS", () => {
+  const dir = join(tmp, "hex-comments");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  write(dir, {
+    "src/Page.tsx": [
+      "// a hook after them blanked the page (React error #310), see (#346)",
+      "/* also #abc in a block comment */",
+      'export const a = <div style={{ color: "#123456" }} />; // #fff here is a comment',
+      'export const url = "https://example.com/#top";',
+    ].join("\n"),
+    "src/app.css": ".a { color: #fff; } /* #000 */\n",
+  });
+  commit(dir, "hex");
+  const { row, matches } = measure("hospitality", localSource(dir));
+  assert.deepEqual(matches.hex.map((m) => m.match), ["#123456", "#fff"]);
+  assert.equal(row.hex, 2);
+});
+
 test("compare reports rises and falls on gated metrics only", () => {
   const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, shell_override: 0, header_height_literal: 0, transcript_type_override: 0, importing_files: { ui: 9 } };
   assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
