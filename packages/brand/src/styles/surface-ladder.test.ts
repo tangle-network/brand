@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn, contrastRatio, declIn, hexIn, hslIn, hslToRgb, oklchLightness } from "./css-test-utils";
+import { blockIn, blocksIn, contrastRatio, declIn, hexIn, hslIn, hslToRgb, oklchLightness } from "./css-test-utils";
 
 /**
  * The surface ladder and the interaction palette.
@@ -39,7 +39,7 @@ const ladder: Array<[role: string, token: string, light: number, dark: number]> 
   ["well in raised", "well-raised", 100, 22.1],
   ["well in raised-2", "well-raised-2", 94.9, 22.1],
   ["hairline", "hsl-border", 85.0, 42.0],
-  ["field border", "field-border", 60.0, 64.0],
+  ["field border", "field-border", 60.0, 68.3],
 ];
 
 describe("Hospitality surface ladder", () => {
@@ -88,6 +88,9 @@ describe("Hospitality surface ladder", () => {
     const border = rgbOf(css, "field-border");
     expect(contrastRatio(border, rgbOf(css, "hsl-card")), "on the card").toBeGreaterThanOrEqual(3);
     expect(contrastRatio(border, rgbOf(css, "well-card")), "on the well in a card").toBeGreaterThanOrEqual(3);
+    // A field in a card in a card sits on the raised plane: production measured
+    // the dark Select edge at 2.99:1 there before #939c94.
+    expect(contrastRatio(border, rgbOf(css, "hsl-raised")), "on the raised plane").toBeGreaterThanOrEqual(3);
     expect(declIn(css, "border-strong")).toBe(declIn(css, "field-border"));
   });
 
@@ -168,14 +171,10 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
     }
   });
 
-  it("defaults every new ladder token to the plain spine, so other themes look as they did", () => {
+  it("defaults the raised planes and shadows to the plain spine (wells: the canonical suite below)", () => {
     expect(declIn(body, "hsl-raised")).toBe("var(--hsl-card)");
     expect(declIn(body, "hsl-raised-2")).toBe("var(--hsl-card)");
-    for (const well of ["well-page", "well-card", "well-raised", "well-raised-2"]) {
-      expect(declIn(body, well)).toBe("var(--bg-input)");
-    }
     expect(declIn(body, "well")).toBe("var(--well-page)");
-    expect(declIn(body, "field-border")).toBe("hsl(var(--hsl-border))");
     expect(declIn(body, "shadow-raised")).toBe("var(--shadow-card)");
     // A shadow token joins a comma list; "none" would void the list.
     expect(declIn(body, "shadow-well")).toBe("0 0 0 0 transparent");
@@ -190,7 +189,7 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
     expect(declIn(body, "ix-sel-ring")).toBe("hsl(var(--hsl-ring) / 0.85)");
     expect(declIn(body, "ix-sel-bg")).toBe("hsl(var(--hsl-ring) / 0.18)");
     expect(declIn(body, "ix-hover-bg")).toBe("hsl(var(--hsl-ring) / 0.08)");
-    const lightTint = css.match(/([^{}]*)\{\s*--ix-sel-bg:\s*hsl\(var\(--hsl-ring\) \/ 0\.13\);\s*--ix-hover-bg:\s*hsl\(var\(--hsl-ring\) \/ 0\.07\);\s*\}/);
+    const lightTint = css.match(/([^{}]*)\{\s*--ix-sel-bg:\s*hsl\(var\(--hsl-ring\) \/ 0\.13\);\s*--ix-hover-bg:\s*hsl\(var\(--hsl-ring\) \/ 0\.07\);[^{}]*\}/);
     expect(lightTint, "light tint override").not.toBeNull();
     expect(lightTint![1]).toContain('[data-theme="hospitality"]:where(:not(.dark))');
     expect(lightTint![1]).toContain(".light");
@@ -221,5 +220,71 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
         expect(css, `--${token}`).toMatch(new RegExp(`--${token}:`));
       }
     }
+  });
+});
+
+describe("Canonical surface ladder (every theme without its own ladder)", () => {
+  // The spine's shared --bg-input sat +3.1 L above the dark page and -2.6 L under
+  // the white card, so a field read as the plane it was on. The defaults derive
+  // wells and the field border from each theme's own page, card, hairline and ink.
+  const withWells = (selector: string) => {
+    const block = blocksIn(tokens, selector).find((b) => /--well-page:/.test(b));
+    if (!block) throw new Error(`no well defaults under ${selector}`);
+    return block;
+  };
+  const defaults = withWells("[data-theme]");
+  const lightDefaults = withWells('[data-theme$="-light"]');
+  const DARK = blockIn(tokens, ".dark");
+  const LIGHT = blockIn(tokens, ".light");
+
+  type Rgb = [number, number, number];
+  const toLab = (rgb: Rgb) => {
+    const lin = (c: number) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const [r, g, b] = rgb.map(lin);
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+  };
+  const fromLab = ([L, a, b]: number[]): Rgb => {
+    const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+    const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+    const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+    const enc = (c: number) => 255 * Math.min(1, Math.max(0, c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055));
+    return [enc(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s), enc(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s), enc(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s)];
+  };
+  /** `color-mix(in oklab, a, b <t>)`. */
+  const mix = (a: Rgb, b: Rgb, t: number) => fromLab(toLab(a).map((v, i) => v * (1 - t) + toLab(b)[i] * t));
+  const spine = (css: string, token: string) => hslToRgb(hslIn(css, token)) as Rgb;
+
+  it("declares the derivations this suite measures", () => {
+    expect(declIn(defaults, "well-page")).toBe("color-mix(in oklab, hsl(var(--hsl-background)) 70%, black)");
+    expect(declIn(defaults, "field-border")).toBe("color-mix(in oklab, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 45%)");
+    expect(declIn(lightDefaults, "well-page")).toBe("hsl(var(--hsl-card))");
+    for (const token of ["well-card", "well-raised", "well-raised-2"]) {
+      expect(declIn(defaults, token)).toBe("var(--well-page)");
+      expect(declIn(lightDefaults, token)).toBe("hsl(var(--hsl-background))");
+    }
+  });
+
+  it("recesses the dark well at least 4 L below the page and the card", () => {
+    const well = mix(spine(DARK, "hsl-background"), [0, 0, 0], 0.3);
+    expect(oklchLightness(spine(DARK, "hsl-background")) - oklchLightness(well)).toBeGreaterThanOrEqual(4);
+    expect(oklchLightness(spine(DARK, "hsl-card")) - oklchLightness(well)).toBeGreaterThanOrEqual(10);
+  });
+
+  it("steps the light well 4 L or more off the page and the card", () => {
+    const page = oklchLightness(spine(LIGHT, "hsl-background"));
+    const card = oklchLightness(spine(LIGHT, "hsl-card"));
+    expect(card - page).toBeGreaterThanOrEqual(4);
+  });
+
+  it.each([
+    ["dark", () => DARK],
+    ["light", () => LIGHT],
+  ])("draws a field border that clears 3:1 on the card and the page in %s (WCAG 1.4.11)", (_mode, css) => {
+    const border = mix(spine(css(), "hsl-border"), spine(css(), "hsl-foreground"), 0.45);
+    expect(contrastRatio(border, spine(css(), "hsl-card")), "on the card").toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(border, spine(css(), "hsl-background")), "on the page").toBeGreaterThanOrEqual(3);
   });
 });
