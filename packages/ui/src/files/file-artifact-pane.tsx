@@ -20,6 +20,8 @@ export interface FileArtifactPaneEditorOptions {
   enabled?: boolean;
   /** Persisted baseline when content is the current draft. */
   savedContent?: string;
+  /** Whether the draft has unsaved edits, when the host tracks that itself. Overrides `savedContent`. */
+  dirty?: boolean;
   mode?: DocumentEditorMode;
   defaultMode?: DocumentEditorMode;
   onModeChange?: (mode: DocumentEditorMode) => void;
@@ -158,6 +160,7 @@ export function FileArtifactPane({
           hideTitleBlock={hideTitleBlock}
           markdown={content ?? ""}
           savedMarkdown={editor.savedContent}
+          dirty={editor.dirty}
           urlTransform={urlTransform}
           mode={editor.mode}
           defaultMode={editor.defaultMode}
