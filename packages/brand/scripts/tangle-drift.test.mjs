@@ -162,6 +162,8 @@ test("counts product rules that restyle transcript text", () => {
       ".ha-chat [data-timeline-step='user'] + [data-timeline-step] { margin-top: 24px; }", // spacing, not type
       ".ha-chat [data-timeline-step='user'] div { font: 400 14px/1.4 Georgia, serif; }", // 1
       "/* The transcript reads at brand's scale; .tangle-prose { font-size: 18px } is not set here. */",
+      "[data-role=\"assistant\"] p { line-height: 1.75 !important; }", // 1: a message role attribute
+      "[data-assistant-prose] h2 { font-size: 1.25em; } .tangle-prose code { font-size: .9em; }", // headings and code keep their sizes
     ].join("\n"),
     "src/Chat.tsx": [
       'export const a = <Markdown className="tangle-prose text-sm leading-7" />;', // 1
@@ -170,8 +172,8 @@ test("counts product rules that restyle transcript text", () => {
   });
   commit(dir, "transcript");
   const { row } = measure("hospitality", localSource(dir));
-  assert.equal(row.transcript_type_override, 3);
-  assert.deepEqual(row.by_file.transcript_type_override, { "src/Chat.tsx": 1, "src/chat.css": 2 });
+  assert.equal(row.transcript_type_override, 4);
+  assert.deepEqual(row.by_file.transcript_type_override, { "src/Chat.tsx": 1, "src/chat.css": 3 });
 });
 
 test("compare reports rises and falls on gated metrics only", () => {
