@@ -6,6 +6,13 @@ import { expect, test } from "playwright/test"
 
 const PHONE = { width: 390, height: 844 }
 
+// Screenshots are evidence, not assertions: a loaded host can stall the frame a screenshot waits for, so cap
+// it and keep the test's verdict on the geometry checks.
+async function shot(page, path) {
+  try { await page.screenshot({ path, timeout: 15_000 }) }
+  catch (error) { if (error?.name !== "TimeoutError") throw error; console.log(`screenshot skipped: ${path}`) }
+}
+
 async function openStory(page, id, theme) {
   const errors = []
   page.on("pageerror", (error) => errors.push(error.message))
@@ -50,7 +57,7 @@ for (const theme of ["light", "dark"]) {
     const strip = page.getByTestId("overflow-tabs")
     const metrics = await strip.evaluate((node) => ({ scrollWidth: node.scrollWidth, clientWidth: node.clientWidth }))
     expect(metrics.scrollWidth, "the tab strip overflows and scrolls").toBeGreaterThan(metrics.clientWidth)
-    await page.screenshot({ path: testInfo.outputPath(`tabs-${theme}.png`) })
+    await shot(page, testInfo.outputPath(`tabs-${theme}.png`))
 
     const box = await rect(strip)
     const cues = await visibleCues(strip)
@@ -86,7 +93,7 @@ for (const theme of ["light", "dark"]) {
     const strip = page.getByTestId("overflow-row")
     const scrollLeft = () => strip.evaluate((node) => node.scrollLeft)
     expect(await strip.evaluate((node) => node.scrollWidth > node.clientWidth), "the row overflows").toBe(true)
-    await page.screenshot({ path: testInfo.outputPath(`row-${theme}.png`) })
+    await shot(page, testInfo.outputPath(`row-${theme}.png`))
     await expectSelectedClear(strip)
 
     const end = strip.locator('[data-scroll-cue="end"]')
