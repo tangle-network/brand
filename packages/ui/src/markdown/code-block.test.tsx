@@ -14,6 +14,13 @@ afterEach(() => {
 
 describe("CodeBlock scoped semantic colors", () => {
   it("keeps code readable before the renderer loads, then applies live semantic colors and line numbers", async () => {
+    // Shiki stops tokenizing a line after 500ms and paints the rest in the last
+    // token's color. The first pass over a cold grammar also compiles its
+    // patterns, which on a loaded host can take longer than that. Warm the
+    // grammar first: this test checks the color mapping, not cold-start time.
+    const warm = render(<CodeBlock code={'const message = "hello";'} language="javascript" />);
+    await waitFor(() => expect(warm.container.querySelector("[data-highlighted]")).not.toBeNull(), { timeout: 10_000 });
+    warm.unmount();
     const { container } = render(<CodeBlock code={'const message = "hello";'} language="javascript" showLineNumbers />);
     // Plain code already carries its line numbers, so highlighting shifts no layout.
     expect(container.querySelector("pre code")?.textContent?.replace(/^1/, "")).toBe('const message = "hello";');
