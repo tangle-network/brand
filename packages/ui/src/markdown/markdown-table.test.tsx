@@ -45,6 +45,15 @@ describe("Markdown tables", () => {
     expect(document.body.innerHTML).not.toContain("text-xs");
   });
 
+  it("contains its screen-reader status line, so a table deep in a scrolling panel cannot stretch the page", () => {
+    render(<Markdown>{TABLE}</Markdown>);
+    const status = screen.getByRole("status");
+    expect(status.className).toContain("sr-only");
+    // The status is absolutely positioned; the card it sits in must be its containing block.
+    const card = status.closest(".not-prose") as HTMLElement;
+    expect(card.className.split(" ")).toEqual(expect.arrayContaining(["relative", "overflow-hidden"]));
+  });
+
   it("copies the table as CSV with quoting and formula-safe cells", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
