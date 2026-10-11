@@ -64,6 +64,7 @@ import {
   type OpenUIAction,
   type OpenUIComponentNode,
 } from "../openui/openui-artifact-renderer";
+import { TRANSCRIPT_TEXT } from "../chat/transcript-text";
 
 // ---------------------------------------------------------------------------
 // Default branding
@@ -427,7 +428,7 @@ export const RunGroup = memo(
                 if (part.type === "text" && !part.synthetic && part.text.trim()) {
                   return (
                     <div key={key} className="px-0.5">
-                      <Markdown className="tangle-prose text-[15px] leading-7 text-[var(--text-primary)]">
+                      <Markdown className={`tangle-prose ${TRANSCRIPT_TEXT} text-[var(--text-primary)]`}>
                         {part.text}
                       </Markdown>
                     </div>
@@ -570,7 +571,7 @@ export const RunGroup = memo(
                     <SyntheticText text={part.text} />
                   ) : (
                     <div className="px-1 py-0.5">
-                      <Markdown className="tangle-prose text-[15px] leading-7">{part.text}</Markdown>
+                      <Markdown className={`tangle-prose ${TRANSCRIPT_TEXT}`}>{part.text}</Markdown>
                     </div>
                   );
                 }

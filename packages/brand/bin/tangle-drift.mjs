@@ -83,7 +83,7 @@ export const PATTERNS = {
 // the selector's last compound (pseudo-classes and attributes aside), so `.top-header .avatar`
 // and `.top-header-avatar` size something inside a header, not the header row.
 // A `-bar` row counts too (`.files-bar`), but not a progress, scroll, side or meter bar.
-const HEADER_WORD = String.raw`(?:header|head|topbar|toolbar|titlebar|appbar|navbar|(?<![\w-]*(?:progress|scroll|side|meter|loading|track|fill|status)-?)bar)`;
+const HEADER_WORD = String.raw`(?:header|head|topbar|toolbar|titlebar|appbar|navbar|(?<![\w-]*(?:progress|scroll|side|meter|loading|track|fill|status|steps?)-?)bar)`;
 const HEADER_COMPOUND = String.raw`(?:[\w#.:-]*[.#-]${HEADER_WORD}|(?<![\w.#-])header)(?![\w-])(?::{1,2}[\w-]+(?:\([^)]*\))?|\[[^\]]*\])*`;
 const LITERAL_HEIGHT_UTILITY = String.raw`(?<![\w-])(?:h|min-h|max-h)-(?:[0-9]|\[(?!var\())`;
 
@@ -199,7 +199,9 @@ export function ruleMatches(source, roots, metric, exts) {
     .map((f) => (f.startsWith(prefix) ? f.slice(prefix.length) : f).trim()).filter(Boolean);
   const rows = [];
   for (const path of files) {
-    const text = readFile(source, path);
+    // Comments name things without styling them (a CSS note that mentions "transcript" or
+    // "header"); blank them, keeping offsets and newlines, so only real rules count.
+    const text = readFile(source, path).replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
     const found = new Map();
     for (const pattern of patterns) {
       for (const m of text.matchAll(new RegExp(pattern, "g"))) found.set(m.index, m[0]);
