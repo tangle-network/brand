@@ -334,11 +334,33 @@
 
 /* ───────────────────── Hospitality — sage paper, forest accent ─────────────────
  * Hospitality's product identity: a sage-tinted surface ladder and a forest-green
- * accent in place of iris. It follows the canonical ladder's roles exactly (light
- * paper cards on a tinted canvas; dark planes rising in the same steps as the
- * neutral spine), so shared components keep their hierarchy and only the hue
- * changes. Status tones are deliberately NOT overridden: approval, overdue and
- * failure read the same in Hospitality as everywhere else.
+ * accent in place of iris. Green is reserved for interaction and status; the
+ * planes stay near-neutral (hue 108-150, low chroma).
+ *
+ * The ladder, in OKLCH L x100 (light / dark), each step at least 4.4 from its
+ * neighbour so a card, a card in a card and a field never sit flat on their
+ * parent:
+ *   page        91.6 #dee6dc        16.9 #0d100e
+ *   sidebar     96.9 #f2f6f1        21.6 #171b17
+ *   card       100   #ffffff+shadow 31.1 #2d322e (1.46:1 on the page)
+ *   raised      95.6 #edf2ec        37.9 #3e443f + 1px top highlight
+ *   raised-2   100   #ffffff        43.9 #4e544f
+ *   popover    100   #ffffff+shadow 42.0 #494f4a
+ *   well (field fill) on page / in card / in raised / in raised-2:
+ *              100 / 94.9 / 100 / 94.9      12.4 / 12.4 / 22.1 / 22.1
+ *   hairline    85.0 #c9d0c7        42.0 #494f4a
+ *   field border 60.0 #798479       64.0 #868f87 (both 3.9:1 on the card)
+ * A well is always the opposite step from its parent in light and always
+ * deeper in dark; tokens.css carries the `--well` context that picks one.
+ *
+ * The dark inks that sit on those planes are lifted to keep 4.5:1: accent text
+ * and the destructive red (same hue, lighter; light keeps the canonical red).
+ *
+ * Status fills are retuned for these planes (ROOT-SPEC section c): light fills
+ * sit at L 91-93, at least 7 under the white card, dark fills at L 37-38, at
+ * least 6 over the card, so a status box never reads as a flat card. The
+ * MEANING is unchanged: success is green, warning is amber (pending only),
+ * danger is red, neutral is grey; info/running stay canonical.
  *
  * Apply `data-theme="hospitality"` on <html>. The mode comes from the `.dark`
  * class the shared theme control already toggles: without `.dark` the scope is
@@ -347,76 +369,104 @@
  * dark baseline and this file's dark ladder. A mode switch never needs a second
  * attribute, and the two blocks declare the same properties. */
 [data-theme="hospitality"]:where(:not(.dark)) {
-  --hsl-background: 102 18% 92%;  --hsl-foreground: 143 25% 12%;
+  --hsl-background: 108 16.7% 88.2%; --hsl-foreground: 143 25% 12%;
   --hsl-card: 0 0% 100%;          --hsl-card-foreground: 143 25% 12%;
   --hsl-popover: 0 0% 100%;       --hsl-popover-foreground: 143 25% 12%;
   --hsl-primary: 153 38% 25%;     --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 126 17% 94%;   --hsl-secondary-foreground: 143 25% 12%;
-  --hsl-muted: 126 17% 94%;       --hsl-muted-foreground: 146 9% 39%;
-  --hsl-accent: 131 20% 91%;      --hsl-accent-foreground: 143 25% 12%;
-  --hsl-border: 130 15% 84%;      --hsl-input: 105 22% 97.5%;
+  --hsl-secondary: 110 18.7% 93.7%; --hsl-secondary-foreground: 143 25% 12%;
+  --hsl-muted: 110 18.7% 93.7%;   --hsl-muted-foreground: 138 7.3% 35.5%;
+  --hsl-accent: 133 38.4% 88%;    --hsl-accent-foreground: 143 25% 12%;
+  --hsl-border: 107 8.7% 79.8%;   --hsl-input: 0 0% 100%;
   --hsl-ring: 148 28% 43%;
-  --sidebar-background: 0 0% 100%;       --sidebar-foreground: 143 25% 12%;
+  --hsl-destructive: 0 72% 41%;
+  --hsl-raised: 110 18.7% 93.7%;  --hsl-raised-2: 0 0% 100%;
+  --sidebar-background: 108 21.7% 95.5%; --sidebar-foreground: 143 25% 12%;
   --sidebar-primary: 153 38% 25%;        --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 126 17% 94%;         --sidebar-accent-foreground: 143 25% 12%;
-  --sidebar-border: 130 15% 84%;         --sidebar-ring: 148 28% 43%;
-  --md3-surface: #e9eee7; --md3-surface-dim: #d5ded3; --md3-surface-bright: #ffffff;
-  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #f8faf7;
-  --md3-surface-container: #ffffff; --md3-surface-container-high: #edf2ee;
-  --md3-surface-container-highest: #ffffff; --md3-surface-variant: #edf2ee;
-  --md3-on-surface: #17261d; --md3-on-surface-variant: #5a6c62;
-  --md3-outline: #6d8376; --md3-outline-variant: #d0dcd2;
+  --sidebar-accent: 133 38.4% 88%;       --sidebar-accent-foreground: 143 25% 12%;
+  --sidebar-border: 107 8.7% 79.8%;      --sidebar-ring: 148 28% 43%;
+  --md3-surface: #dee6dc; --md3-surface-dim: #d3dcd1; --md3-surface-bright: #ffffff;
+  --md3-surface-container-lowest: #ffffff; --md3-surface-container-low: #f2f6f1;
+  --md3-surface-container: #ffffff; --md3-surface-container-high: #edf2ec;
+  --md3-surface-container-highest: #ffffff; --md3-surface-variant: #edf2ec;
+  --md3-on-surface: #17261d; --md3-on-surface-variant: #546158;
+  --md3-outline: #6d8376; --md3-outline-variant: #c9d0c7;
   --md3-primary: #285842; --md3-primary-dim: #1f4735; --md3-primary-container: #1f4735;
   --md3-on-primary: #ffffff; --md3-surface-tint: #285842;
-  --depth-1: #e9eee7; --depth-2: #ffffff; --depth-3: #edf2ee; --depth-4: #ffffff;
-  --bg-root: #e9eee7; --bg-dark: #e9eee7; --bg-section: #e9eee7;
-  --bg-card: #ffffff; --bg-elevated: #ffffff; --bg-input: #f8faf7;
+  --depth-1: #dee6dc; --depth-2: #ffffff; --depth-3: #edf2ec; --depth-4: #ffffff;
+  --bg-root: #dee6dc; --bg-dark: #dee6dc; --bg-section: #dee6dc;
+  --bg-card: #ffffff; --bg-elevated: #ffffff; --bg-input: #ffffff;
+  --well-page: #ffffff; --well-card: #ebf0e9; --well-raised: #ffffff; --well-raised-2: #ebf0e9;
   --bg-hover: rgba(40, 88, 66, 0.05); --bg-selection: rgba(40, 88, 66, 0.16);
-  --border-subtle: rgba(23, 38, 29, 0.10); --border-default: rgba(23, 38, 29, 0.14);
-  --border-hover: rgba(23, 38, 29, 0.24);
+  --border-subtle: rgba(23, 38, 29, 0.11); --border-default: rgba(23, 38, 29, 0.16);
+  --border-hover: rgba(23, 38, 29, 0.28); --border-strong: #798479;
+  --field-border: #798479;
   --border-accent: rgba(40, 88, 66, 0.20); --border-accent-hover: rgba(40, 88, 66, 0.36);
+  --shadow-card: 0 1px 2px rgba(23, 38, 29, 0.07), 0 4px 14px -4px rgba(23, 38, 29, 0.10);
+  --shadow-raised: 0 1px 1px rgba(23, 38, 29, 0.05), 0 2px 6px -2px rgba(23, 38, 29, 0.07);
+  --shadow-well: inset 0 1px 2px rgba(23, 38, 29, 0.06);
+  --edge-highlight: 0 0 0 0 transparent;
   --accent-text: #285842;
   --accent-surface-soft: rgba(40, 88, 66, 0.05); --accent-surface-strong: rgba(40, 88, 66, 0.13);
   --accent-gradient-strong: linear-gradient(135deg, #1f4735, #336c52);
   --brand-primary: #3d7b5f; --brand-cool: #4f8c6c; --brand-glow: #6cac8a; --brand-vibrant: #3d7b5f;
   --btn-primary-bg: #285842; --btn-primary-hover: #336c52; --btn-primary-text: #ffffff;
-  --text-primary: #17261d; --text-secondary: #36493e; --text-muted: #5a6c62; --text-dim: #5f6d65;
+  --text-primary: #17261d; --text-secondary: #36493e; --text-muted: #546158; --text-dim: #546158;
+  --surface-success-bg: #c5edce; --surface-success-text: #1e5b34; --surface-success-border: #91c79e;
+  --surface-warning-bg: #f4e3bf; --surface-warning-text: #804d0c; --surface-warning-border: #dcb87a;
+  --surface-danger-bg: #fadad8;  --surface-danger-text: #a5292b;  --surface-danger-border: #e8acaa;
+  --surface-neutral-bg: #e5e9e4; --surface-neutral-text: #576157; --surface-neutral-border: #c0c6bf;
 }
 .dark[data-theme="hospitality"] {
-  --hsl-background: 150 8% 8.6%;  --hsl-foreground: 140 12% 90.2%;
-  --hsl-card: 150 6% 18.8%;       --hsl-card-foreground: 140 12% 90.2%;
-  --hsl-popover: 150 6% 20.8%;    --hsl-popover-foreground: 140 12% 90.2%;
+  --hsl-background: 140 10.3% 5.7%; --hsl-foreground: 140 12% 90.2%;
+  --hsl-card: 132 5.3% 18.6%;     --hsl-card-foreground: 140 12% 90.2%;
+  --hsl-popover: 130 3.9% 29.8%;  --hsl-popover-foreground: 140 12% 90.2%;
   --hsl-primary: 145 31% 59%;     --hsl-primary-foreground: 153 35% 10%;
-  --hsl-secondary: 150 6% 20.8%;  --hsl-secondary-foreground: 140 12% 90.2%;
-  --hsl-muted: 150 6% 20.8%;      --hsl-muted-foreground: 145 8% 71%;
-  --hsl-accent: 150 6% 20.8%;     --hsl-accent-foreground: 140 12% 90.2%;
-  --hsl-border: 150 5% 29.8%;     --hsl-input: 150 8% 12.2%;
+  --hsl-secondary: 130 4.6% 25.5%; --hsl-secondary-foreground: 140 12% 90.2%;
+  --hsl-muted: 130 4.6% 25.5%;    --hsl-muted-foreground: 128 5.6% 73.9%;
+  --hsl-accent: 140 18% 20%;      --hsl-accent-foreground: 140 12% 90.2%;
+  --hsl-border: 130 3.9% 29.8%;   --hsl-input: 120 16.7% 2.4%;
   --hsl-ring: 145 31% 59%;
-  --sidebar-background: 150 9% 6.3%;     --sidebar-foreground: 140 12% 90.2%;
+  /* The canonical dark red (0 90% 77%) is 3.8:1 on this popover (L 42); the
+   * same red, lighter, clears 4.5:1 as text on every plane and on its 10% tint. */
+  --hsl-destructive: 0 80% 88%;
+  --hsl-raised: 130 4.6% 25.5%;   --hsl-raised-2: 130 3.7% 31.8%;
+  --sidebar-background: 120 8% 9.8%;     --sidebar-foreground: 140 12% 90.2%;
   --sidebar-primary: 145 31% 59%;        --sidebar-primary-foreground: 153 35% 10%;
-  --sidebar-accent: 150 6% 20.8%;        --sidebar-accent-foreground: 140 12% 90.2%;
-  --sidebar-border: 150 5% 29.8%;        --sidebar-ring: 145 31% 59%;
-  --md3-surface: #141816; --md3-surface-dim: #0f1210; --md3-surface-bright: #383e3b;
-  --md3-surface-container-lowest: #0f1210; --md3-surface-container-low: #212624;
-  --md3-surface-container: #2d3330; --md3-surface-container-high: #323835;
-  --md3-surface-container-highest: #383e3b; --md3-surface-variant: #323835;
-  --md3-on-surface: #e3e9e5; --md3-on-surface-variant: #afbbb4;
-  --md3-outline: #8a938e; --md3-outline-variant: #48504c;
+  --sidebar-accent: 140 18% 20%;         --sidebar-accent-foreground: 140 12% 90.2%;
+  --sidebar-border: 130 3.9% 29.8%;      --sidebar-ring: 145 31% 59%;
+  --md3-surface: #0d100e; --md3-surface-dim: #050705; --md3-surface-bright: #494f4a;
+  --md3-surface-container-lowest: #050705; --md3-surface-container-low: #171b17;
+  --md3-surface-container: #2d322e; --md3-surface-container-high: #3e443f;
+  --md3-surface-container-highest: #494f4a; --md3-surface-variant: #3e443f;
+  --md3-on-surface: #e3e9e5; --md3-on-surface-variant: #b9c0ba;
+  --md3-outline: #8a938e; --md3-outline-variant: #494f4a;
   --md3-primary: #99caad; --md3-primary-dim: #396a52; --md3-primary-container: #396a52;
   --md3-on-primary: #11221a; --md3-surface-tint: #76b791;
-  --depth-1: #141816; --depth-2: #2d3330; --depth-3: #323835; --depth-4: #383e3b;
-  --bg-root: #141816; --bg-dark: #141816; --bg-section: #141816;
-  --bg-card: #2d3330; --bg-elevated: #383e3b; --bg-input: #1d221f;
+  --depth-1: #0d100e; --depth-2: #2d322e; --depth-3: #3e443f; --depth-4: #494f4a;
+  --bg-root: #0d100e; --bg-dark: #0d100e; --bg-section: #0d100e;
+  --bg-card: #2d322e; --bg-elevated: #494f4a; --bg-input: #050705;
+  --well-page: #050705; --well-card: #050705; --well-raised: #181c18; --well-raised-2: #181c18;
   --bg-hover: rgba(118, 183, 145, 0.07); --bg-selection: rgba(118, 183, 145, 0.28);
   --border-subtle: rgba(227, 233, 229, 0.10); --border-default: rgba(227, 233, 229, 0.16);
-  --border-hover: rgba(227, 233, 229, 0.28);
+  --border-hover: rgba(227, 233, 229, 0.28); --border-strong: #868f87;
+  --field-border: #868f87;
   --border-accent: rgba(118, 183, 145, 0.35); --border-accent-hover: rgba(118, 183, 145, 0.50);
-  --accent-text: #99caad;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45), 0 10px 24px -14px rgba(0, 0, 0, 0.6);
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-well: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* Lifted from #99caad so selected text on a primary tint still clears 4.5:1
+   * over the lighter raised plane (L 37.9). */
+  --accent-text: #b2dbc2;
   --accent-surface-soft: rgba(118, 183, 145, 0.07); --accent-surface-strong: rgba(57, 106, 82, 0.40);
   --accent-gradient-strong: linear-gradient(135deg, #396a52, #76b791);
   --brand-primary: #529873; --brand-cool: #76b791; --brand-glow: #94c7a9; --brand-vibrant: #529873;
   --btn-primary-bg: #76b791; --btn-primary-hover: #8dc3a4; --btn-primary-text: #11221a;
-  --text-primary: #e3e9e5; --text-secondary: #c5cec9; --text-muted: #afbbb4; --text-dim: #9ea9a2;
+  --text-primary: #e3e9e5; --text-secondary: #c5cec9; --text-muted: #b9c0ba; --text-dim: #b9c0ba;
+  --surface-success-bg: #254930; --surface-success-text: #9ce9b1; --surface-success-border: #437652;
+  --surface-warning-bg: #513d21; --surface-warning-text: #fed081; --surface-warning-border: #8d6b39;
+  --surface-danger-bg: #5c3231;  --surface-danger-text: #f7b3b0;  --surface-danger-border: #a45857;
+  --surface-neutral-bg: #3e443f; --surface-neutral-text: #b9c0ba; --surface-neutral-border: #5f6560;
 }
 /* agents:begin — generated by scripts/gen-ladders.mjs from its MAP; edit there, not these lines.
  * Agents (Agent Builder): white light pages, cards separated by shadow, and a

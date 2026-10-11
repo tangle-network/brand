@@ -12,10 +12,13 @@ afterEach(cleanup);
 
 describe("shared control presentation", () => {
   it("uses the field well, not the border/track alias, with scoped foreground and time-only motion", () => {
-    expect(fieldPresentation).toContain("bg-[var(--field-surface,var(--bg-input))]");
+    // The well is the brand's --well context variable; Toolbar can still pick the fill.
+    expect(fieldPresentation).toContain("bg-[var(--field-surface,var(--well))]");
     expect(fieldPresentation.split(" ")).not.toContain("bg-input");
     expect(fieldPresentation.split(" ")).not.toContain("bg-card");
-    expect(fieldPresentation).toContain("border-border");
+    // ixField's --field-border replaces focusField's resting border-border.
+    expect(fieldPresentation.split(" ")).toContain("border-[var(--field-border)]");
+    expect(fieldPresentation.split(" ")).not.toContain("border-border");
     expect(fieldPresentation).toContain("text-foreground");
     expect(fieldPresentation).not.toContain("duration-150");
     expect(controlMotion).toContain("duration-[var(--duration-fast)]");
@@ -100,7 +103,7 @@ describe("shared control presentation", () => {
     expect(input.current).toHaveAttribute("aria-invalid", "true");
     expect(input.current!.className).toContain("autofill:shadow-");
     expect(input.current!.className.split(" ")).toContain("bg-card");
-    expect(input.current!.className).not.toContain("bg-[var(--field-surface,var(--bg-input))]");
+    expect(input.current!.className).not.toContain("bg-[var(--field-surface,var(--well))]");
     expect(textarea.current).toBeDisabled();
     expect(trigger.current).toBe(screen.getByLabelText("Choice"));
     expect(trigger.current).toBeDisabled();

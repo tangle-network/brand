@@ -15,3 +15,12 @@ export {
   focusRing,
   focusRingInset,
 } from '../lib/focus';
+export {
+  ixControl,
+  ixControlAfter,
+  ixControlSoft,
+  ixField,
+  ixRow,
+  ixSelected,
+  ixTabUnderline,
+} from '../lib/interaction';

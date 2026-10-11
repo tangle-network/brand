@@ -3,29 +3,35 @@ import { cva } from "class-variance-authority";
 import * as React from "react";
 import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText } from "../lib/control-presentation";
 import { focusRing } from "../lib/focus";
+import { ixControl, ixControlSoft, ixSelected } from "../lib/interaction";
 import { cn } from "../lib/utils";
 
 // Sizes follow the shared control scale (control-presentation.ts): sm, md and
 // lg match Input, Textarea and SelectTrigger at the same size. xl is a display
 // call to action outside that scale.
+//
+// Interaction (lib/interaction.ts): a variant with a border or a fill takes
+// `ixControl` (green edge and glow on hover, press and after a click); ghost,
+// link and bare take `ixControlSoft`, a wash that never glows. A toggle button
+// (any `aria-pressed`) adds `ixControl` + `ixSelected` whatever its variant.
 const buttonVariants = cva(
   `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-[color,background-color,border-color,box-shadow,transform,scale] ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97]",
+          `bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97] ${ixControl}`,
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97]",
+          `bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97] ${ixControl}`,
         outline:
-          "border border-border bg-card hover:bg-muted active:scale-[0.97] text-foreground",
+          `border border-border bg-card hover:bg-muted active:scale-[0.97] text-foreground ${ixControl}`,
         secondary:
-          "bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97]",
+          `bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97] ${ixControl}`,
         ghost:
-          "hover:bg-muted hover:text-foreground text-muted-foreground border border-transparent",
-        link: "text-[var(--accent-text)] underline-offset-4 hover:underline",
+          `hover:text-foreground text-muted-foreground border border-transparent ${ixControlSoft}`,
+        link: `text-[var(--accent-text)] underline-offset-4 hover:underline ${ixControlSoft}`,
         sandbox:
-          "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97]",
+          `bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97] ${ixControl}`,
       },
       size: {
         default: `${controlHeight.md} ${controlText.md} ${controlRadius.md} px-4 py-2`,
@@ -50,7 +56,20 @@ const buttonVariants = cva(
 // every surface, size and type class. It is for pressable rows, tiles and pills
 // that draw their own layout; anything that reads as a button uses a styled
 // variant and a size.
-const bareButton = `${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`;
+const bareButton = `${focusRing} ${ixControlSoft} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`;
+
+/** One Button render's classes: variant and size, the toggle states, then the caller's. */
+function buttonClassName(
+  variant: ButtonProps["variant"],
+  size: ButtonProps["size"],
+  pressed: React.AriaAttributes["aria-pressed"],
+  className: string | undefined,
+) {
+  const toggle = pressed === undefined ? undefined : `${ixControl} ${ixSelected}`;
+  return variant === "bare"
+    ? cn(bareButton, toggle, className)
+    : cn(buttonVariants({ variant, size }), toggle, className);
+}
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -115,7 +134,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Keep slotted content intact: its action name must survive loading too.
       return (
         <Slot
-          className={variant === "bare" ? cn(bareButton, className) : cn(buttonVariants({ variant, size, className }))}
+          className={buttonClassName(variant, size, props["aria-pressed"], className)}
           ref={ref}
           {...props}
           {...(isDisabled ? disabledHandlers(props) : {})}
@@ -140,7 +159,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={variant === "bare" ? cn(bareButton, className) : cn(buttonVariants({ variant, size, className }))}
+        className={buttonClassName(variant, size, props["aria-pressed"], className)}
         ref={ref}
         {...props}
         disabled={disabled || loading}
