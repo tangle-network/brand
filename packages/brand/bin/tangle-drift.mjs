@@ -37,7 +37,7 @@ export const SURFACES = {
   legal: { repo: "tangle-network/legal-agent", roots: [""] },
   insurance: { repo: "tangle-network/insurance-agent", roots: [""] },
   creative: { repo: "tangle-network/creative-agent", roots: [""] },
-  physim: { repo: "tangle-network/physim", roots: ["apps/web"] },
+  physim: { repo: "tangle-network/hardware-agent", roots: ["apps/web"] },
   hospitality: { repo: "tangle-network/hospitality-agent", roots: [""] },
   audits: { repo: "tangle-network/redteam", roots: ["packages/website"] },
   browser: { repo: "tangle-network/bad-app", roots: [""] },
