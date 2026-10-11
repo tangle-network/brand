@@ -8,6 +8,23 @@ export function formatDuration(ms: number): string {
   return remaining > 0 ? `${minutes}m ${remaining}s` : `${minutes}m`;
 }
 
+/**
+ * Markdown read as plain text, for a one-line preview: code fences, emphasis,
+ * headings, list and quote markers, and link syntax are removed, so a preview
+ * never shows `**` or `#`. Underscores inside words (`snake_case`) are kept.
+ */
+export function plainTextFromMarkdown(text: string): string {
+  return text
+    .replace(/```[^\n]*\n?([\s\S]*?)```/g, "$1")
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/^[ \t]{0,3}(?:#{1,6}[ \t]+|>[ \t]?|[-*+][ \t]+|\d+[.)][ \t]+)/gm, "")
+    .replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, "$2")
+    .replace(/(^|[^\w*])\*(?=\S)([^*\n]*?\S)\*(?![\w*])/g, "$1$2")
+    .replace(/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, "$1$2")
+    .replace(/~~(?=\S)([\s\S]*?\S)~~/g, "$1");
+}
+
 /** Truncate text to `max` characters, appending "..." if truncated. */
 export function truncateText(text: string, max: number): string {
   const cleaned = text.replace(/\s+/g, " ").trim();
