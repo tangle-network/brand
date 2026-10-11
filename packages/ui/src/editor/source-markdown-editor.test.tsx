@@ -21,10 +21,17 @@ async function openEditor(value: string) {
       }}
     />,
   );
-  await waitFor(() => expect(editor).not.toBeNull(), PEERS_LOADED);
+  // The first mount after the peers load can replace its editor instance, so
+  // wait for a live one and hand back the latest.
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+    expect((editor as Editor | null)?.isDestroyed).toBe(false);
+  }, PEERS_LOADED);
   return {
     view,
-    editor: editor! as Editor,
+    get editor() {
+      return editor! as Editor;
+    },
     onChange,
     /** The Markdown the editor last reported, or the value it opened. */
     saved: () => onChange.mock.calls.at(-1)?.[0] ?? value,
