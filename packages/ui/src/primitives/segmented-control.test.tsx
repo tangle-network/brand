@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { SegmentedControl, type SegmentedControlOption } from "./segmented-control"
@@ -344,5 +344,92 @@ describe("SegmentedControl test ids", () => {
     expect(screen.getByTestId("workbench-tabs")).toHaveAttribute("role", "radiogroup")
     expect(screen.getByTestId("workbench-tab-preview")).toHaveAttribute("aria-checked", "false")
     expect(screen.getByTestId("workbench-tab-code")).toHaveAttribute("aria-checked", "true")
+  })
+})
+
+describe("SegmentedControl tabs on a narrow strip", () => {
+  // jsdom has no layout. Model a 250px strip holding six 100px tabs, so the
+  // strip scrolls and some tabs sit past its edges.
+  const STRIP = 250
+  const TAB = 100
+  const scroll = new WeakMap<Element, number>()
+  const overrides: Array<[object, string, PropertyDescriptor | undefined]> = []
+  const define = (proto: object, key: string, descriptor: PropertyDescriptor) => {
+    overrides.push([proto, key, Object.getOwnPropertyDescriptor(proto, key)])
+    Object.defineProperty(proto, key, { configurable: true, ...descriptor })
+  }
+  const isStrip = (el: Element) => el.getAttribute("role") === "radiogroup"
+  const index = (el: Element) => Array.from(el.parentElement?.children ?? []).indexOf(el)
+
+  beforeEach(() => {
+    define(HTMLElement.prototype, "offsetLeft", { get(this: HTMLElement) { return isStrip(this) ? 0 : index(this) * TAB } })
+    define(HTMLElement.prototype, "offsetWidth", { get(this: HTMLElement) { return isStrip(this) ? STRIP : TAB } })
+    define(Element.prototype, "clientWidth", { get(this: Element) { return isStrip(this) ? STRIP : TAB } })
+    define(Element.prototype, "scrollWidth", { get(this: Element) { return isStrip(this) ? this.children.length * TAB : TAB } })
+    define(Element.prototype, "scrollLeft", {
+      get(this: Element) { return scroll.get(this) ?? 0 },
+      set(this: Element, v: number) { scroll.set(this, v) },
+    })
+  })
+  afterEach(() => {
+    for (const [proto, key, original] of overrides.reverse()) {
+      if (original) Object.defineProperty(proto, key, original)
+      else delete (proto as Record<string, unknown>)[key]
+    }
+    overrides.length = 0
+  })
+
+  const work: SegmentedControlOption[] = ["Today", "Messages", "Tasks", "Operations", "Payments", "People"].map(
+    (label) => ({ value: label.toLowerCase(), label }),
+  )
+
+  it("scrolls the strip, not the page, so the selected tab is in view", () => {
+    const { rerender } = render(
+      <SegmentedControl aria-label="Work" variant="tabs" value="payments" onValueChange={vi.fn()} options={work} />,
+    )
+    const strip = screen.getByRole("radiogroup")
+    // Payments spans 400-500px: its right edge plus the 24px fade fits the 250px view.
+    expect(strip.scrollLeft).toBe(500 - STRIP + 24)
+
+    rerender(<SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />)
+    expect(strip.scrollLeft).toBe(0)
+  })
+
+  it("fades the edge that has more tabs past it", () => {
+    const { rerender } = render(
+      <SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />,
+    )
+    const strip = screen.getByRole("radiogroup")
+    expect(strip).toHaveAttribute("data-overflow-end", "true")
+    expect(strip).not.toHaveAttribute("data-overflow-start")
+    expect(strip.className).toContain("data-[overflow-end]:[mask-image:linear-gradient(to_right,#000_calc(100%-24px),transparent)]")
+
+    rerender(<SegmentedControl aria-label="Work" variant="tabs" value="people" onValueChange={vi.fn()} options={work} />)
+    expect(strip).toHaveAttribute("data-overflow-start", "true")
+    expect(strip).not.toHaveAttribute("data-overflow-end")
+  })
+
+  it("leaves a strip that fits unmasked", () => {
+    render(<SegmentedControl aria-label="Work" variant="tabs" value="all" onValueChange={vi.fn()} options={options.slice(0, 2)} />)
+    const strip = screen.getByRole("radiogroup")
+    expect(strip).not.toHaveAttribute("data-overflow-start")
+    expect(strip).not.toHaveAttribute("data-overflow-end")
+  })
+})
+
+describe("SegmentedControl stable labels and touch targets", () => {
+  it.each(["row", "tabs"] as const)("keeps one label weight whichever %s option is selected", (variant) => {
+    render(<SegmentedControl aria-label="Scope" variant={variant} value="personal" onValueChange={vi.fn()} options={options} />)
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio.className).toContain("font-medium")
+      expect(radio.className).not.toMatch(/font-(semibold|bold)/)
+    }
+  })
+
+  it("gives each tab a 44px hit height on a coarse pointer", () => {
+    render(<SegmentedControl aria-label="Scope" variant="tabs" value="all" onValueChange={vi.fn()} options={options} />)
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio.className).toContain("pointer-coarse:min-h-11")
+    }
   })
 })

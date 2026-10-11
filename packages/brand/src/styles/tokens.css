@@ -129,8 +129,10 @@
      contrast floor against the L2 card. */
   --hsl-accent: 249 24% 16%; /* neutral hover (indigo lives in accent-surface-strong) */
   --hsl-accent-foreground: 0 0% 90.1961%;
-  --hsl-destructive: 348 74% 48%;
-  --hsl-destructive-foreground: 0 0% 100%;
+  /* Light red carrying dark ink, as the dark primary does: it must read as
+   * error TEXT on every dark plane (AA) and still carry its foreground as a fill. */
+  --hsl-destructive: 0 90% 77%;
+  --hsl-destructive-foreground: 0 60% 10%;
   /* Quiet on purpose: 1.5:1 against the resting card. Shadow does no work on a
    * dark canvas, so the hairline is what states where a plane ends. */
   --hsl-border: 243 20% 20%; /* #2a293d = --md3-outline-variant */
@@ -548,8 +550,8 @@
   --transition-medium: 0.24s ease;
 
   /* Fonts — unified on Inter (dark + light) */
-  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Inter", "Geist", sans-serif;
+  --font-sans: "Inter Variable", "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter Variable", "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -877,8 +879,8 @@
   --accent-text: #3c32e9;
 
   /* Typography — unified on Inter */
-  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Inter", "Geist", sans-serif;
+  --font-sans: "Inter Variable", "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter Variable", "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 
   /* Radius — unified chrome scale (matches dark; 8px md) */

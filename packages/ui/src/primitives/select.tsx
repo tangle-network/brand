@@ -22,10 +22,12 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex w-full items-center justify-between whitespace-nowrap border py-1 shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex w-full items-center justify-between gap-2 whitespace-nowrap border py-1 shadow-sm placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50",
       fieldPresentation,
       fieldTouchText,
-      "data-[placeholder]:text-[var(--text-dim)] [&>span]:min-w-0 [&>span]:text-left",
+      // A long value ends in an ellipsis before the chevron: line-clamp cannot
+      // ellipsize a nowrap line, so it clipped mid-glyph under the icon.
+      "data-[placeholder]:text-[var(--text-dim)] [&>span]:min-w-0 [&>span]:truncate [&>span]:text-left",
       // The designed open state: accent border and surface while the menu is up.
       "data-[state=open]:border-primary data-[state=open]:bg-[var(--accent-surface-strong)] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform",
       size === "compact" || size === "touch" ? cn(fieldSizes.md, controlSizes[size]) : fieldSizes[size === "default" ? "md" : size],

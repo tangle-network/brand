@@ -46,6 +46,12 @@ export const controlSquare = {
  */
 export const fieldTouchText = "pointer-coarse:text-base";
 
+/**
+ * A control that is shorter than 44px on a fine pointer still gets a 44px hit
+ * height on a coarse one (WCAG 2.5.5, Apple HIG). Same floor as `touch`.
+ */
+export const touchTarget = "pointer-coarse:min-h-11";
+
 /** Field sizes: the control scale with field padding. */
 export const fieldSizes = {
   sm: cn(controlHeight.sm, controlText.sm, controlRadius.sm, "px-2.5"),

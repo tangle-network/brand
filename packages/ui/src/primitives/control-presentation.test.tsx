@@ -117,3 +117,19 @@ describe("shared control presentation", () => {
     expect(buttonVariants()).toContain("motion-reduce:active:scale-100");
   });
 });
+
+describe("SelectTrigger with a value longer than the trigger", () => {
+  it("ends the value in an ellipsis with a gap before the chevron", () => {
+    const value = "Luna — ReCenter Guest Concierge & Practitioner Desk";
+    render(<Select value="concierge"><SelectTrigger aria-label="Agent" className="w-40"><SelectValue>{value}</SelectValue></SelectTrigger></Select>);
+    const trigger = screen.getByLabelText("Agent");
+    const classes = trigger.className.split(" ");
+    // line-clamp cannot ellipsize a nowrap line: it clipped mid-glyph under the chevron.
+    expect(trigger.className).not.toContain("line-clamp");
+    expect(classes).toContain("[&>span]:truncate");
+    expect(classes).toContain("[&>span]:min-w-0");
+    expect(classes).toContain("gap-2");
+    // The rule targets the value span, which Radix renders as the trigger's direct child.
+    expect(trigger.querySelector(":scope > span")?.textContent).toBe(value);
+  });
+});

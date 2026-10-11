@@ -94,6 +94,8 @@ const LANGUAGE_NAMES: Record<string, string> = {
 };
 
 /** The Shiki grammar for a fence language, or undefined for plain text. */
+const PLAIN_TEXT = new Set(["text", "txt", "plain", "plaintext"]);
+
 export function codeBlockGrammar(language: string | undefined): string | undefined {
   if (!language) return undefined;
   const id = language.toLowerCase();
@@ -177,7 +179,8 @@ export const CodeBlock = memo(
       return () => { active = false; };
     }, [code, grammar]);
 
-    const languageName = grammar ? LANGUAGE_NAMES[grammar] : language;
+    // A plain-text fence names no language worth showing; it keeps its copy control.
+    const languageName = grammar ? LANGUAGE_NAMES[grammar] : PLAIN_TEXT.has(language?.toLowerCase() ?? "") ? undefined : language;
     const headerLabel = label ?? (filename ? undefined : languageName);
     const hasHeader = Boolean(filename || headerLabel);
     const mode = light === undefined ? {} : { "data-theme": light ? "light" : "dark" };

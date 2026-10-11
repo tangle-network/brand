@@ -5,8 +5,8 @@
  * override --font-* / --radius-* on a subtree.
  */
 @theme {
-  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Inter", "Geist", sans-serif;
+  --font-sans: "Inter Variable", "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter Variable", "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 
   --text-display--line-height: 1.05;
