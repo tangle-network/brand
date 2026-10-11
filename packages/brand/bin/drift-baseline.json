@@ -1028,7 +1028,7 @@
   "local_primitives": {}
  },
  "physim": {
-  "repo": "tangle-network/physim",
+  "repo": "tangle-network/hardware-agent",
   "roots": [
    "apps/web"
   ],
