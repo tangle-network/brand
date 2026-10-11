@@ -68,10 +68,14 @@ export interface SegmentedControlProps<T extends string = string>
 /** Size of the edge chevron, in px. The selected option is kept this far
  *  (plus the strip's own padding) from an edge so the chevron never covers it. */
 const SCROLL_CUE_SIZE = 32
+/** The strip's flex gap (`gap-1`). A cue's negative margin cancels its width
+ *  and this gap, so showing it never shifts the options: a shift is not a
+ *  resize, so nothing would re-reveal the selected option afterwards. */
+const STRIP_GAP = 4
 
 /**
  * A chevron pinned to one edge of the scrolling strip. It is a sticky flex
- * item with a negative margin equal to its width, so it takes no room in the
+ * item with a negative margin equal to its width plus the gap, so it takes no room in the
  * row (showing it never reflows the options) and stays at the visible edge
  * while the strip scrolls. A solid surface keeps it legible on any plane,
  * which an edge fade is not: a fade over the gap between two options, or over
@@ -90,9 +94,13 @@ function ScrollCue({ side, onPage }: { side: "start" | "end"; onPage: () => void
       onClick={onPage}
       className={cn(
         "sticky z-[1] flex shrink-0 items-center justify-center self-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:text-foreground",
-        side === "start" ? "left-0 -mr-8" : "right-0 -ml-8",
+        side === "start" ? "left-0" : "right-0",
       )}
-      style={{ width: SCROLL_CUE_SIZE, height: SCROLL_CUE_SIZE }}
+      style={{
+        width: SCROLL_CUE_SIZE,
+        height: SCROLL_CUE_SIZE,
+        [side === "start" ? "marginRight" : "marginLeft"]: -(SCROLL_CUE_SIZE + STRIP_GAP),
+      }}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
     </button>
