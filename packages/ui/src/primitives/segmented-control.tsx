@@ -143,8 +143,11 @@ export function SegmentedControl<T extends string = string>({
     const option = optionRefs.current.get(valueRef.current)
     if (strip && option && strip.scrollWidth > strip.clientWidth) {
       const style = getComputedStyle(strip)
-      const reserveStart = SCROLL_CUE_SIZE + (Number.parseFloat(style.paddingLeft) || 0)
-      const reserveEnd = SCROLL_CUE_SIZE + (Number.parseFloat(style.paddingRight) || 0)
+      // offsetLeft/offsetWidth round to whole pixels while the tab is fractional (a 101.42 px tab overlapped the
+      // chevron by 0.66 px at 390 px), so keep a small gap beside each cue rather than touching its edge.
+      const gap = 4
+      const reserveStart = SCROLL_CUE_SIZE + gap + (Number.parseFloat(style.paddingLeft) || 0)
+      const reserveEnd = SCROLL_CUE_SIZE + gap + (Number.parseFloat(style.paddingRight) || 0)
       const start = option.offsetLeft
       const end = start + option.offsetWidth
       if (start - reserveStart < strip.scrollLeft) {

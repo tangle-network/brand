@@ -391,8 +391,8 @@ describe("SegmentedControl tabs on a narrow strip", () => {
       <SegmentedControl aria-label="Work" variant="tabs" value="payments" onValueChange={vi.fn()} options={work} />,
     )
     const strip = screen.getByRole("radiogroup")
-    // Payments spans 400-500px: its right edge clears the 32px chevron in the 250px view.
-    expect(strip.scrollLeft).toBe(500 - STRIP + 32)
+    // Payments spans 400-500px: its right edge clears the 32px chevron, plus a 4px gap, in the 250px view.
+    expect(strip.scrollLeft).toBe(500 - STRIP + 32 + 4)
 
     rerender(<SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />)
     expect(strip.scrollLeft).toBe(0)
