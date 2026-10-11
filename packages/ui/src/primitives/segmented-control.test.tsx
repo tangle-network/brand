@@ -361,13 +361,14 @@ describe("SegmentedControl tabs on a narrow strip", () => {
     Object.defineProperty(proto, key, { configurable: true, ...descriptor })
   }
   const isStrip = (el: Element) => el.getAttribute("role") === "radiogroup"
-  const index = (el: Element) => Array.from(el.parentElement?.children ?? []).indexOf(el)
+  // Options sit side by side; the edge chevrons take no room in the row.
+  const index = (el: Element) => Array.from(el.parentElement?.querySelectorAll(':scope > [role="radio"]') ?? []).indexOf(el)
 
   beforeEach(() => {
     define(HTMLElement.prototype, "offsetLeft", { get(this: HTMLElement) { return isStrip(this) ? 0 : index(this) * TAB } })
     define(HTMLElement.prototype, "offsetWidth", { get(this: HTMLElement) { return isStrip(this) ? STRIP : TAB } })
     define(Element.prototype, "clientWidth", { get(this: Element) { return isStrip(this) ? STRIP : TAB } })
-    define(Element.prototype, "scrollWidth", { get(this: Element) { return isStrip(this) ? this.children.length * TAB : TAB } })
+    define(Element.prototype, "scrollWidth", { get(this: Element) { return isStrip(this) ? this.querySelectorAll(':scope > [role="radio"]').length * TAB : TAB } })
     define(Element.prototype, "scrollLeft", {
       get(this: Element) { return scroll.get(this) ?? 0 },
       set(this: Element, v: number) { scroll.set(this, v) },
@@ -390,32 +391,44 @@ describe("SegmentedControl tabs on a narrow strip", () => {
       <SegmentedControl aria-label="Work" variant="tabs" value="payments" onValueChange={vi.fn()} options={work} />,
     )
     const strip = screen.getByRole("radiogroup")
-    // Payments spans 400-500px: its right edge plus the 24px fade fits the 250px view.
-    expect(strip.scrollLeft).toBe(500 - STRIP + 24)
+    // Payments spans 400-500px: its right edge clears the 32px chevron in the 250px view.
+    expect(strip.scrollLeft).toBe(500 - STRIP + 32)
 
     rerender(<SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />)
     expect(strip.scrollLeft).toBe(0)
   })
 
-  it("fades the edge that has more tabs past it", () => {
+  it("shows a chevron at the edge that has more tabs past it", () => {
     const { rerender } = render(
       <SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />,
     )
     const strip = screen.getByRole("radiogroup")
     expect(strip).toHaveAttribute("data-overflow-end", "true")
     expect(strip).not.toHaveAttribute("data-overflow-start")
-    expect(strip.className).toContain("data-[overflow-end]:[mask-image:linear-gradient(to_right,#000_calc(100%-24px),transparent)]")
+    expect(strip.querySelector('[data-scroll-cue="end"]')).not.toBeNull()
+    expect(strip.querySelector('[data-scroll-cue="start"]')).toBeNull()
 
     rerender(<SegmentedControl aria-label="Work" variant="tabs" value="people" onValueChange={vi.fn()} options={work} />)
     expect(strip).toHaveAttribute("data-overflow-start", "true")
     expect(strip).not.toHaveAttribute("data-overflow-end")
+    expect(strip.querySelector('[data-scroll-cue="start"]')).not.toBeNull()
+    expect(strip.querySelector('[data-scroll-cue="end"]')).toBeNull()
   })
 
-  it("leaves a strip that fits unmasked", () => {
+  it("keeps the chevrons out of the radio group and the tab order", () => {
+    render(<SegmentedControl aria-label="Work" variant="tabs" value="today" onValueChange={vi.fn()} options={work} />)
+    expect(screen.getAllByRole("radio")).toHaveLength(work.length)
+    const cue = screen.getByRole("radiogroup").querySelector('[data-scroll-cue="end"]')
+    expect(cue).toHaveAttribute("aria-hidden", "true")
+    expect(cue).toHaveAttribute("tabindex", "-1")
+  })
+
+  it("leaves a strip that fits without chevrons", () => {
     render(<SegmentedControl aria-label="Work" variant="tabs" value="all" onValueChange={vi.fn()} options={options.slice(0, 2)} />)
     const strip = screen.getByRole("radiogroup")
     expect(strip).not.toHaveAttribute("data-overflow-start")
     expect(strip).not.toHaveAttribute("data-overflow-end")
+    expect(strip.querySelector("[data-scroll-cue]")).toBeNull()
   })
 })
 

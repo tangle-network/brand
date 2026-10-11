@@ -40,7 +40,7 @@ async function expectSelectedClear(strip) {
   expect(s.right, "selected option ends inside the strip").toBeLessThanOrEqual(box.right + 0.5)
   for (const cue of await visibleCues(strip)) {
     const overlap = Math.min(s.right, cue.right) - Math.max(s.left, cue.left)
-    expect(overlap, "a scroll cue covers the selected option").toBeLessThanOrEqual(0)
+    expect(overlap, `a scroll cue covers the selected option: option ${JSON.stringify(s)} cue ${JSON.stringify(cue)}`).toBeLessThanOrEqual(0)
   }
 }
 

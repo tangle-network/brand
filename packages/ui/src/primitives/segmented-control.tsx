@@ -136,9 +136,11 @@ export function SegmentedControl<T extends string = string>({
   // Keep the selected option inside the strip and clear of the chevrons.
   // Only the strip scrolls: the page never moves, which scrollIntoView cannot
   // promise. A strip that does not overflow ignores the assignment.
-  React.useLayoutEffect(() => {
+  const valueRef = React.useRef(value)
+  valueRef.current = value
+  const revealSelected = React.useCallback(() => {
     const strip = stripRef.current
-    const option = optionRefs.current.get(value)
+    const option = optionRefs.current.get(valueRef.current)
     if (strip && option && strip.scrollWidth > strip.clientWidth) {
       const style = getComputedStyle(strip)
       const reserveStart = SCROLL_CUE_SIZE + (Number.parseFloat(style.paddingLeft) || 0)
@@ -152,19 +154,21 @@ export function SegmentedControl<T extends string = string>({
       }
     }
     measureOverflow()
-  }, [value, options.length, measureOverflow])
+  }, [measureOverflow])
+
+  React.useLayoutEffect(revealSelected, [value, options.length, revealSelected])
 
   // The strip's own size and its options' sizes (late web fonts, a changed
-  // label or adornment) both move the overflow edges.
+  // label or adornment) move both the selected option and the overflow edges.
   React.useEffect(() => {
     if (typeof ResizeObserver === "undefined") return
     const strip = stripRef.current
     if (!strip) return
-    const observer = new ResizeObserver(measureOverflow)
+    const observer = new ResizeObserver(revealSelected)
     observer.observe(strip)
     for (const option of optionRefs.current.values()) observer.observe(option)
     return () => observer.disconnect()
-  }, [optionKey, measureOverflow])
+  }, [optionKey, revealSelected])
 
   const page = (direction: 1 | -1) => {
     const strip = stripRef.current
