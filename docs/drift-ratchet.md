@@ -66,6 +66,11 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
 
+## Shell header ratchet, 2026-10-11
+
+After every agent app adopted sandbox-ui ShellHeader and the one transcript scale, the baseline was lowered from each default branch: header_height_literal is 0 for hospitality (was 8), gtm (4), physim (3), tax (2), creative (2) and builder (1); transcript_type_override is 0 everywhere. A product cannot add a header height or restyle transcript text again without raising a gated count. website (4), platform (2) and blueprint (1) are not agent apps and keep their counts.
+transcript_type_override also matches a message role attribute (`[data-role="assistant"]`, `[data-assistant-prose]`): creative restyled agent paragraphs that way at 1.75 !important, which the class-based pattern missed. Headings, code and tables inside a message keep their own sizes and are not counted.
+
 ## Shell header and transcript baseline, 2026-10-10
 
 Recorded from each default branch when `header_height_literal` and `transcript_type_override` were added; each surface ratchets to 0 as it adopts `ShellHeader` and the shared transcript scale.

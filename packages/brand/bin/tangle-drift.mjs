@@ -107,13 +107,14 @@ export const RULE_PATTERNS = {
       String.raw`(?<!<header\b[^>]*)\bclassName=\{?["'\x60](?=[^"'\x60]*(?<![\w-])[\w-]*${HEADER_WORD}(?![\w-]))[^"'\x60]*?${LITERAL_HEIGHT_UTILITY}`,
     ],
   },
-  // Product CSS restyling transcript text. Brand's `tangle-transcript-text` gives the person's and
+  // Product CSS restyling transcript text (by class, timeline step, or a message role attribute such
+  // as [data-role="assistant"]). Brand's `tangle-transcript-text` gives the person's and
   // the agent's messages one family, size and leading; an app rule on `.tangle-prose` or a
   // timeline step re-splits them (an agent message at 16px beside a 15px user message).
   transcript_type_override: {
-    prefilter: String.raw`tangle-prose|tangle-transcript-text|data-timeline-step|transcript`,
+    prefilter: String.raw`tangle-prose|tangle-transcript-text|data-timeline-step|transcript|data-role|data-message-role|data-assistant-prose`,
     patterns: [
-      String.raw`(?:tangle-prose|tangle-transcript-text|data-timeline-step|transcript)[^{};]*\{[^{}]*?(?<![\w-])(?:font-size|line-height|font-family|font)\s*:`,
+      String.raw`(?:tangle-prose|tangle-transcript-text|data-timeline-step|transcript|data-(?:message-)?role=["']?(?:assistant|user|agent)|data-assistant-prose)[^{};]*?(?<![\s>+~](?:h[1-6]|code|pre|kbd|table|th|td)\s*)\{[^{}]*?(?<![\w-])(?:font-size|line-height|font-family|font)\s*:`,
       String.raw`\bclassName=\{?["'\x60](?=[^"'\x60]*\btangle-(?:prose|transcript-text)\b)[^"'\x60]*?(?<![\w-])(?:text-(?:xs|sm|base|lg|xl|\[)|leading-|font-(?:sans|serif|mono))`,
     ],
   },
