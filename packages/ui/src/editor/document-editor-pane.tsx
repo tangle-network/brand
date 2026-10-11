@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type KeyboardEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import type { UrlTransform } from "react-markdown";
 import { PencilLine, Save, Users, Wifi, WifiOff } from "lucide-react";
 import { Markdown } from "../markdown/markdown";
@@ -39,6 +39,12 @@ export interface DocumentEditorPaneProps
   markdown?: string;
   /** Persisted baseline when the host controls the current markdown draft. */
   savedMarkdown?: string;
+  /**
+   * Whether the draft has unsaved edits, when the host tracks that itself
+   * (for example against the file's full bytes, frontmatter included). It
+   * takes precedence over comparing the draft with `savedMarkdown`.
+   */
+  dirty?: boolean;
   /** Transform Markdown links and images through the shared URL policy. */
   urlTransform?: UrlTransform;
   mode?: DocumentEditorMode;
@@ -194,6 +200,7 @@ export function DocumentEditorPane({
   toolbar,
   markdown = "",
   savedMarkdown,
+  dirty,
   urlTransform,
   mode,
   defaultMode = "preview",
@@ -215,16 +222,32 @@ export function DocumentEditorPane({
     useState<DocumentEditorMode>(defaultMode);
   const activeMode = mode ?? uncontrolledMode;
   const isCollaborative = backend === "collaborative" && Boolean(collaboration);
-  const isDirty = normalizeMarkdown(draft) !== normalizeMarkdown(savedMarkdown ?? markdown);
+  const isDirty = dirty ?? normalizeMarkdown(draft) !== normalizeMarkdown(savedMarkdown ?? markdown);
+  const canSave = Boolean(onSave) && !readOnly && isDirty && !saving;
   const saveStateLabel = readOnly
     ? "Read only"
     : isCollaborative
       ? isDirty
         ? "Snapshot pending"
         : "Live document current"
-      : isDirty
-        ? "Unsaved changes"
-        : "Saved";
+      : saving
+        ? "Saving…"
+        : isDirty
+          ? "Unsaved changes"
+          : "Saved";
+
+  const save = () => {
+    if (canSave) void onSave?.(draft);
+  };
+
+  // Ctrl+S / Cmd+S saves from anywhere in the pane, the editor included.
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onSave || readOnly) return;
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return;
+    if (event.key.toLowerCase() !== "s") return;
+    event.preventDefault();
+    save();
+  };
 
   useEffect(() => {
     setDraft(markdown);
@@ -271,26 +294,40 @@ export function DocumentEditorPane({
         </TabsTrigger>
       </TabsList>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+      {/* One save state: the status says whether the draft is saved, and the
+          Save button exists only while there is something to save. */}
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         {toolbar}
-        <span className="rounded-full border border-border bg-card px-2.5 py-1 font-medium">
-          {isCollaborative ? "Live document" : "Local draft"}
-        </span>
-        <span className="rounded-full border border-border bg-background px-2.5 py-1">
+        {isCollaborative && (
+          <span className="rounded-full border border-border bg-card px-2.5 py-1 font-medium">
+            Live document
+          </span>
+        )}
+        <span
+          role="status"
+          aria-live="polite"
+          className={cn(
+            "rounded-full border px-2.5 py-1",
+            isDirty && !readOnly
+              ? "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)] text-[var(--surface-warning-text)]"
+              : "border-border bg-background",
+          )}
+        >
           {saveStateLabel}
         </span>
-        {onSave && !readOnly && (
+        {onSave && !readOnly && (isDirty || saving) && (
           <button
             type="button"
-            onClick={() => void onSave(draft)}
-            disabled={saving || !isDirty}
+            onClick={save}
+            disabled={!canSave}
+            title="Save changes (Ctrl+S)"
             className={cn(
-              "inline-flex items-center gap-2 rounded-[var(--radius-full)] border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-[var(--border-strong)] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50",
+              "inline-flex items-center gap-2 rounded-[var(--radius-full)] border border-primary bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50",
               focusRing,
             )}
           >
-            <Save className="h-3.5 w-3.5" />
-            {saving ? "Saving..." : saveLabel}
+            <Save className="h-4 w-4" />
+            {saveLabel}
           </button>
         )}
       </div>
@@ -341,6 +378,7 @@ export function DocumentEditorPane({
     <Tabs
       value={activeMode}
       onValueChange={(nextValue) => setMode(nextValue as DocumentEditorMode)}
+      onKeyDown={handleKeyDown}
       className="h-full"
     >
       <ArtifactPane

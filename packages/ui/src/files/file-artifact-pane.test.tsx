@@ -262,7 +262,40 @@ describe("FileArtifactPane controlled drafts", () => {
     expect(onSave).toHaveBeenCalledWith(draft);
 
     view.rerender(<FileArtifactPane {...props} editor={{ ...props.editor, savedContent: draft }} />);
-    expect(screen.getByText("Saved")).toBeVisible();
+    // One save state: "Saved", with no Save button left to press.
+    expect(screen.getByRole("status")).toHaveTextContent("Saved");
+    expect(screen.queryByRole("button", { name: "Save changes" })).toBeNull();
+    expect(screen.queryByText("Local draft")).toBeNull();
+  });
+
+  it("follows the host's dirty flag over its own comparison, and saves on Ctrl+S", async () => {
+    const onSave = vi.fn();
+    const content = "# Same text the host saved";
+    const props = { filename: "notes.md", content, editor: { enabled: true, dirty: true, onSave } };
+    const view = render(<FileArtifactPane {...props} />);
+    const save = await screen.findByRole("button", { name: "Save changes" }, { timeout: 10_000 });
+    expect(save).toBeEnabled();
+    expect(screen.getByRole("status")).toHaveTextContent("Unsaved changes");
+
+    fireEvent.keyDown(save, { key: "s", ctrlKey: true });
+    expect(onSave).toHaveBeenCalledWith(content);
+
+    view.rerender(<FileArtifactPane {...props} editor={{ ...props.editor, dirty: false }} />);
+    expect(screen.getByRole("status")).toHaveTextContent("Saved");
+    fireEvent.keyDown(screen.getByRole("status"), { key: "s", metaKey: true });
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows Saving while the host saves", async () => {
+    render(
+      <FileArtifactPane
+        filename="notes.md"
+        content="# Draft"
+        editor={{ enabled: true, dirty: true, saving: true, onSave: vi.fn() }}
+      />,
+    );
+    const save = await screen.findByRole("button", { name: "Save changes" }, { timeout: 10_000 });
     expect(save).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent("Saving…");
   });
 });
