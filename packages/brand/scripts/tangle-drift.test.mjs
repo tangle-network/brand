@@ -130,6 +130,8 @@ test("counts header rows given their own height, across lines, and nothing insid
       ".ha-progress-bar { height: 4px; } .ha-sidebar { height: 100vh; }", // not header rows
       ".ha-page-header { height: var(--shell-header-height); min-height: auto; }", // token and non-length
       ".ha-conversation-header h1 { font-size: var(--text-base); }", // no height
+      "/* .note-header { min-height: 40px } documents a rule; it styles nothing */",
+      ".create-steps-bar { height: 4px; }", // a step-progress bar, not a header row
     ].join("\n"),
     "src/Page.tsx": [
       'export const a = <header className="flex h-16 items-center border-b" />;', // 1
@@ -159,6 +161,7 @@ test("counts product rules that restyle transcript text", () => {
       "}",
       ".ha-chat [data-timeline-step='user'] + [data-timeline-step] { margin-top: 24px; }", // spacing, not type
       ".ha-chat [data-timeline-step='user'] div { font: 400 14px/1.4 Georgia, serif; }", // 1
+      "/* The transcript reads at brand's scale; .tangle-prose { font-size: 18px } is not set here. */",
     ].join("\n"),
     "src/Chat.tsx": [
       'export const a = <Markdown className="tangle-prose text-sm leading-7" />;', // 1
