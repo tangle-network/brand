@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Brain } from "lucide-react";
-import { truncateText } from "../utils/format";
+import { plainTextFromMarkdown, truncateText } from "../utils/format";
 import type { ReasoningPart } from "../types/parts";
 import { Markdown } from "../markdown/markdown";
 import { TextShimmer } from "../primitives/text-shimmer";
@@ -11,6 +11,12 @@ export interface InlineThinkingItemProps {
   part: ReasoningPart;
   defaultOpen?: boolean;
   autoCollapse?: boolean;
+  /**
+   * Open the row while the model is still thinking. A product that keeps
+   * deliberation out of the reader's way passes false: the row stays as
+   * `defaultOpen` left it, with its one-line preview, until the reader opens it.
+   */
+  openWhileActive?: boolean;
   className?: string;
   contentClassName?: string;
 }
@@ -20,6 +26,7 @@ export const InlineThinkingItem = memo(
     part,
     defaultOpen = false,
     autoCollapse = true,
+    openWhileActive = true,
     className,
     contentClassName,
   }: InlineThinkingItemProps) => {
@@ -31,12 +38,12 @@ export const InlineThinkingItem = memo(
     const durationMs =
       startTime != null && endTime != null ? endTime - startTime : undefined;
     const isActive = startTime != null && endTime == null;
-    const preview = part.text ? truncateText(part.text, 120) : undefined;
+    const preview = part.text ? truncateText(plainTextFromMarkdown(part.text), 120) : undefined;
 
     useEffect(() => {
       if (isActive) {
         autoCollapsedRef.current = false;
-        setOpen(true);
+        if (openWhileActive) setOpen(true);
         return;
       }
 
@@ -48,7 +55,7 @@ export const InlineThinkingItem = memo(
 
         return () => window.clearTimeout(timer);
       }
-    }, [autoCollapse, durationMs, isActive]);
+    }, [autoCollapse, durationMs, isActive, openWhileActive]);
 
     return (
       <RunRowShell

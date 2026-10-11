@@ -138,7 +138,11 @@ export function MarkdownTable({ node, className, children, ...props }: Component
     return { csv: tableCsv([...header, ...body]), kinds: columnKinds(body), rowCount: body.length };
   }, [node]);
   return (
-    <div className="not-prose my-4 overflow-hidden rounded-lg border border-border bg-card">
+    // `relative` makes the card the containing block of the copy control's
+    // screen-reader status line. Without it that absolutely positioned line
+    // resolves against the nearest positioned ancestor, often the page, and a
+    // table far down a scrolling panel stretches the page past the viewport.
+    <div className="not-prose relative my-4 overflow-hidden rounded-lg border border-border bg-card">
       <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-1">
         <span className="text-sm text-muted-foreground">{rowCount === 1 ? "1 row" : `${rowCount} rows`}</span>
         <CopyCsvButton csv={csv} />
