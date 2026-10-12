@@ -7,3 +7,5 @@ dist/
 thoughts/
 storybook-static/
 .vite/
+test-results/
+playwright-report/
