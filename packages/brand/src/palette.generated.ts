@@ -78,7 +78,7 @@ export const palettes = {
     well: "#12111f",
     nested: "#221f33",
     overlay: "#2c2942",
-    deepest: "#050509",
+    deepest: "#040408",
     hairline: "#2a293d",
     ink: "#e6e6e6",
     inkSecondary: "#c7c7c7",
