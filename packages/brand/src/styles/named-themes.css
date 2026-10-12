@@ -248,7 +248,7 @@
   --hsl-ring: 233 100% 87%;
   --depth-1: #0a0a14; --depth-2: #191826; --depth-3: #221f33; --depth-4: #2c2942;
   --bg-root: #0a0a14; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
-  --md3-surface-container-lowest: #050509; --md3-surface-container-low: #12111f;
+  --md3-surface-container-lowest: #040408; --md3-surface-container-low: #12111f;
   --md3-surface-container: #191826; --md3-surface-container-high: #221f33;
   --md3-surface-container-highest: #2c2942; --md3-outline-variant: #2a293d;
   --border-subtle: rgba(255, 255, 255, 0.10); --border-default: rgba(255, 255, 255, 0.16);
