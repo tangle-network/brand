@@ -288,3 +288,23 @@ describe("Canonical surface ladder (every theme without its own ladder)", () => 
     expect(contrastRatio(border, spine(css(), "hsl-background")), "on the page").toBeGreaterThanOrEqual(3);
   });
 });
+
+describe("Inset workspace backdrop (canonical themes)", () => {
+  // sandbox-ui WorkspaceSurface / WorkspaceLayout surface="inset" paint the
+  // panel with the page colour on a --md3-surface-dim gutter. In dark the two
+  // were 2.2 L apart (#0a0a14 on #060610), so every page on the shared panel
+  // failed surface-ladder card-step on Creative production.
+  const DARK = blockIn(tokens, ".dark");
+  const LIGHT = blockIn(tokens, ".light");
+  it.each([
+    ["dark", () => DARK],
+    ["light", () => LIGHT],
+  ])("steps the panel at least 3 L off its backdrop in %s", (_mode, css) => {
+    const panel = oklchLightness(hslToRgb(hslIn(css(), "hsl-background")));
+    const backdrop = oklchLightness(hexIn(css(), "md3-surface-dim"));
+    expect(Math.abs(panel - backdrop)).toBeGreaterThanOrEqual(3);
+  });
+  it("keeps the dark floor tokens equal, as their comment says", () => {
+    expect(declIn(DARK, "md3-surface-dim")).toBe(declIn(DARK, "md3-surface-container-lowest"));
+  });
+});

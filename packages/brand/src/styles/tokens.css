@@ -57,14 +57,14 @@
 .dark {
   color-scheme: dark;
   --md3-surface: #0a0a14; /* L0 page canvas — indigo-lifted off black */
-  --md3-surface-dim: #060610; /* recessed page */
+  --md3-surface-dim: #040408; /* recessed page: 4.1 L under the #0a0a14 panel (the inset workspace surface needs >= 3) */
   --md3-surface-bright: #232238;
   /* Same value as --md3-surface-dim by design, not by drift: both name the floor
    * of the ladder, and dark has no plane below it to give them. They stay two
    * tokens because the roles diverge in light, where the well is paper (#ffffff)
    * and the recessed page is grey (#dcdee6) — a consumer binding to the wrong one
    * there gets the wrong surface. */
-  --md3-surface-container-lowest: #050509; /* L-1 terminal/code well */
+  --md3-surface-container-lowest: #040408; /* L-1 terminal/code well */
   --md3-surface-container-low: #12111f; /* L1 chrome, field wells */
   --md3-surface-container: #191826; /* L2 resting card */
   --md3-surface-container-high: #221f33; /* L3 nested / hover */
