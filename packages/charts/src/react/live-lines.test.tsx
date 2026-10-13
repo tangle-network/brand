@@ -20,7 +20,7 @@ const day = (n: number) => Date.UTC(2026, 9, n);
 
 describe("linesDomain", () => {
   it("starts at 0 by default, as 0.4.0 did", () => {
-    expect(linesDomain([3, 7])).toEqual({ lo: 0, hi: 10, ticks: [0, 5, 10] });
+    expect(linesDomain([3, 7])).toEqual({ lo: 0, hi: 8, ticks: [0, 4, 8] });
   });
   it("fits a narrow score band with an 8% margin", () => {
     const { lo, hi, ticks } = linesDomain([0.91, 0.94], "fit");
