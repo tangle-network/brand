@@ -82,4 +82,14 @@ describe("Lines", () => {
     fireEvent.keyDown(marks[2]!, { key: "Enter" });
     expect(onSelect.mock.calls).toEqual([[1], [2]]);
   });
+
+  it("titles the readout with the axis label of the nearest point", () => {
+    const { container } = render(
+      <Lines axis={(i) => `#${i}`} series={[{ name: "score", color: "#123", points: [[1, 0.5], [2, 0.6], [3, 0.7]] }]} />,
+    );
+    const plot = container.querySelector(".ov-plot") as HTMLElement;
+    plot.getBoundingClientRect = () => ({ left: 0, top: 0, width: 600, height: 200, right: 600, bottom: 200, x: 0, y: 0, toJSON: () => ({}) });
+    fireEvent.mouseMove(plot, { clientX: 590 });
+    expect(container.querySelector(".ov-tip strong")?.textContent).toBe("#3");
+  });
 });

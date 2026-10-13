@@ -262,8 +262,8 @@ const REFERENCE_DASH = { solid: undefined, dashed: '6 4', dotted: '2 4' } as con
 
 /** Lines over time on one axis (at most four series); the crosshair readout lists each series at the nearest time. A
  * `dots` series draws its points as marks (checkpoints) instead of a line, a `step` series draws a staircase, and
- * `references` draw labelled horizontal lines. `axis` labels the time axis (default MM-DD); `domain="fit"` fits the value
- * axis to the data instead of starting at 0. */
+ * `references` draw labelled horizontal lines. `axis` labels the x axis and titles the readout (default: dates, from
+ * epoch ms); `domain="fit"` fits the value axis to the data instead of starting at 0. */
 export function Lines({ series, format = formatCompact, rows = 13, axis, domain = 'zero', references = [], ariaLabel }: { series: LinesSeries[]; format?: (v: number) => string; rows?: number; axis?: (t: number) => string; domain?: 'zero' | 'fit'; references?: LinesReference[]; ariaLabel?: string }) {
   const [ref, width, em] = useWidth<HTMLDivElement>()
   const height = Math.round(rows * em)
@@ -356,7 +356,12 @@ export function Lines({ series, format = formatCompact, rows = 13, axis, domain 
           tip={{
             x: Math.min(x(hover) + 10, width - em * 14),
             y: 8,
-            title: day(hover),
+            // The readout is titled by the nearest point's own x, in the chart's axis labels (a date by default;
+            // a submission number on a chart indexed by submission).
+            title: (() => {
+              const t = nearest(all, hover)[0]
+              return axis ? axis(t) : day(t)
+            })(),
             lines: series.filter((s) => s.points.length).map((s) => {
               const p = nearest(s.points, hover)
               return { label: s.label ? s.label(p[0]) : s.name, value: format(p[1]), color: s.color }
