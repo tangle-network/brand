@@ -9,6 +9,8 @@ Tangle design-system foundation: brand tokens + generic UI components.
 | [`@tangle-network/brand`](packages/brand/README.md) | `packages/brand/` | Tokens, fonts, Tailwind v4 `@theme`, Logo. Published API unchanged from 0.2.x. |
 | [`@tangle-network/ui`](packages/ui/README.md) | `packages/ui/` | Generic React components for product surfaces. |
 
+The shared chart library is maintained in [tangle-network/charts](https://github.com/tangle-network/charts) as `@tangle-network/charts`. Brand remains its token source.
+
 ## Guidelines
 
 - [Brand guidelines](docs/brand-guidelines.md)

@@ -1,6 +1,6 @@
-# Brand, UI, and Charts
+# Brand and UI
 
-Keep shared design tokens, components, and chart behavior in their owning packages.
+Keep shared design tokens and UI components in their owning packages. Chart implementations and releases are owned by tangle-network/charts.
 Choose checks for the changed package and surface; instruction-only changes need diff and link checks.
 Reuse passing checks while their inputs remain unchanged.
 Honor explicit hosted-CI waivers while preserving hooks and enforced branch protections.
