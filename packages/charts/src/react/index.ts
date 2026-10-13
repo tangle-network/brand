@@ -21,4 +21,4 @@ export type {
   WaterfallWindow, WaterfallSpanGeometry, WaterfallTimeAxisProps,
   WaterfallBarProps, WaterfallRowProps, WaterfallHeaderProps,
 } from "./waterfall.js";
-export { DayBars, HBars, Histogram, Lines, Meter, Spark, Gantt, LIVE_SERIES, formatCompact } from "./live.js";
+export { DayBars, HBars, Histogram, Lines, linesDomain, Meter, Spark, Gantt, LIVE_SERIES, formatCompact, stepPoints, type LinesReference, type LinesSeries } from "./live.js";

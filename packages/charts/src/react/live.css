@@ -25,3 +25,6 @@ line.ov-gridline { stroke: color-mix(in srgb, var(--chart-live-faint, #777) 22%,
 .ov-spark { display: block; width: 8em; height: 1.6em; }
 .ov-spark-empty { font-size: .8em; color: var(--chart-live-faint, #777); }
 .ov-tip-line i { display: inline-block; width: .7em; height: .7em; border-radius: 3px; margin-right: .4em; vertical-align: -.05em; }
+.ov-point { cursor: pointer; }
+.ov-point:focus-visible { outline: none; stroke: var(--chart-live-ink, currentColor); stroke-width: 2.5; }
+text.ov-reference { font-size: .78em; }

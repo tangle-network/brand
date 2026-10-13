@@ -206,9 +206,65 @@ export function Histogram({ bins, format = formatCompact, color = LIVE_SERIES[0]
   )
 }
 
+/** A horizontal reference on a `Lines` chart: a baseline, the current best, a target. */
+export interface LinesReference {
+  label: string
+  value: number
+  color?: string
+  /** Line style; references read apart by dash as well as colour. Default `dashed`. */
+  dash?: 'solid' | 'dashed' | 'dotted'
+}
+
+/** One `Lines` series. Points are `[time, value]`. */
+export interface LinesSeries {
+  name: string
+  color: string
+  points: [number, number][]
+  /** Draw the points as marks (checkpoints, submissions) instead of a line. */
+  dots?: boolean
+  /** Draw the line as a staircase that holds each value until the next point (a running record). */
+  step?: boolean
+  /** The readout label for a point at time `t` (default: the series name). */
+  label?: (t: number) => string
+  /** A mark's own colour (a `dots` series), by point index: one series can carry many contributors. */
+  pointColor?: (index: number) => string
+  /** Makes each mark of a `dots` series a button; called with the point's index. */
+  onSelect?: (index: number) => void
+}
+
+/** The value axis of a `Lines` chart. `zero` (default) starts at 0 for counts and totals; `fit` spans the data and the
+ * references with a margin, for scores that live in a narrow band (0.91 to 0.94) where a 0 baseline flattens them. */
+export function linesDomain(values: number[], mode: 'zero' | 'fit' = 'zero') {
+  const finite = values.filter(Number.isFinite)
+  if (mode === 'zero' || !finite.length) {
+    const { top, ticks } = ticksFor(finite.length ? Math.max(...finite) : 0)
+    return { lo: 0, hi: top, ticks }
+  }
+  const min = Math.min(...finite)
+  const max = Math.max(...finite)
+  const pad = max > min ? (max - min) * 0.08 : Math.abs(max) * 0.05 || 1
+  const lo = min - pad
+  const hi = max + pad
+  return { lo, hi, ticks: [lo, (lo + hi) / 2, hi] }
+}
+
+/** SVG polyline points for a staircase: each value holds until the next point's time. */
+export function stepPoints(points: [number, number][]): [number, number][] {
+  const out: [number, number][] = []
+  points.forEach((p, i) => {
+    if (i > 0) out.push([p[0], points[i - 1]![1]])
+    out.push(p)
+  })
+  return out
+}
+
+const REFERENCE_DASH = { solid: undefined, dashed: '6 4', dotted: '2 4' } as const
+
 /** Lines over time on one axis (at most four series); the crosshair readout lists each series at the nearest time. A
- * `dots` series draws its points as marks (checkpoints) instead of a line; `axis` labels the time axis (default MM-DD). */
-export function Lines({ series, format = formatCompact, rows = 13, axis }: { series: { name: string; color: string; points: [number, number][]; dots?: boolean; label?: (t: number) => string }[]; format?: (v: number) => string; rows?: number; axis?: (t: number) => string }) {
+ * `dots` series draws its points as marks (checkpoints) instead of a line, a `step` series draws a staircase, and
+ * `references` draw labelled horizontal lines. `axis` labels the x axis and titles the readout (default: dates, from
+ * epoch ms); `domain="fit"` fits the value axis to the data instead of starting at 0. */
+export function Lines({ series, format = formatCompact, rows = 13, axis, domain = 'zero', references = [], ariaLabel }: { series: LinesSeries[]; format?: (v: number) => string; rows?: number; axis?: (t: number) => string; domain?: 'zero' | 'fit'; references?: LinesReference[]; ariaLabel?: string }) {
   const [ref, width, em] = useWidth<HTMLDivElement>()
   const height = Math.round(rows * em)
   const [hover, setHover] = useState<number | null>(null)
@@ -216,13 +272,13 @@ export function Lines({ series, format = formatCompact, rows = 13, axis }: { ser
   if (!all.length) return <p className="ov-empty">No history yet.</p>
   const t0 = Math.min(...all.map((p) => p[0]))
   const t1 = Math.max(...all.map((p) => p[0]))
-  const { top, ticks } = ticksFor(Math.max(...all.map((p) => p[1])))
+  const { lo, hi, ticks } = linesDomain([...all.map((p) => p[1]), ...references.map((r) => r.value)], domain)
   const left = Math.round(3.4 * em)
   const bottom = Math.round(1.8 * em)
   const plotW = Math.max(0, width - left - 10)
   const plotH = height - bottom - 8
   const x = (t: number) => left + (t1 > t0 ? ((t - t0) / (t1 - t0)) * plotW : 0)
-  const y = (v: number) => 8 + plotH - (v / top) * plotH
+  const y = (v: number) => 8 + plotH - ((v - lo) / (hi - lo || 1)) * plotH
   const nearest = (points: [number, number][], t: number) => points.reduce((best, p) => (Math.abs(p[0] - t) < Math.abs(best[0] - t) ? p : best), points[0]!)
   const day = (t: number) => new Date(t).toISOString().slice(5, 16).replace('T', ' ')
   return (
@@ -237,7 +293,7 @@ export function Lines({ series, format = formatCompact, rows = 13, axis }: { ser
       onMouseLeave={() => setHover(null)}
     >
       {width > 0 && (
-        <svg width={width} height={height} role="img" aria-label={series.map((s) => s.name).join(', ')}>
+        <svg width={width} height={height} role="img" aria-label={ariaLabel ?? series.map((s) => s.name).join(', ')}>
           {ticks.map((t) => (
             <g key={t}>
               <line x1={left} x2={width - 10} y1={y(t)} y2={y(t)} className="ov-gridline" />
@@ -247,22 +303,51 @@ export function Lines({ series, format = formatCompact, rows = 13, axis }: { ser
           {[t0, (t0 + t1) / 2, t1].map((t, i) => (
             <text key={i} x={x(t)} y={height - em * 0.35} className="ov-axis" textAnchor={i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}>{axis ? axis(t) : day(t).slice(0, 5)}</text>
           ))}
+          {references.map((r) => (
+            <g key={r.label} data-reference={r.label}>
+              <line x1={left} x2={width - 10} y1={y(r.value)} y2={y(r.value)} stroke={r.color ?? 'var(--chart-live-faint, #777)'} strokeWidth={1.25} strokeDasharray={REFERENCE_DASH[r.dash ?? 'dashed']} />
+              <text x={left + em * 0.4} y={y(r.value) - em * 0.35} className="ov-axis ov-reference">{`${r.label} · ${format(r.value)}`}</text>
+            </g>
+          ))}
           {series.map((s) =>
             s.dots ? (
               <g key={s.name}>
-                {s.points.map((p) => (
-                  <circle key={p[0]} cx={x(p[0])} cy={y(p[1])} r={Math.max(3, em / 5)} fill={s.color} stroke="var(--chart-live-surface, #fff)" strokeWidth={1.5} />
+                {s.points.map((p, i) => (
+                  <circle
+                    key={`${p[0]}:${i}`}
+                    cx={x(p[0])}
+                    cy={y(p[1])}
+                    r={Math.max(3, em / 5)}
+                    fill={s.pointColor ? s.pointColor(i) : s.color}
+                    stroke="var(--chart-live-surface, #fff)"
+                    strokeWidth={1.5}
+                    {...(s.onSelect
+                      ? {
+                          role: 'button',
+                          tabIndex: 0,
+                          'aria-label': `${s.label ? s.label(p[0]) : s.name}: ${format(p[1])}`,
+                          className: 'ov-point',
+                          onClick: () => s.onSelect!(i),
+                          onKeyDown: (event: { key: string; preventDefault: () => void }) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              s.onSelect!(i)
+                            }
+                          },
+                        }
+                      : {})}
+                  />
                 ))}
               </g>
             ) : (
-              <polyline key={s.name} fill="none" stroke={s.color} strokeWidth={Math.max(2, em / 8)} strokeLinejoin="round" points={s.points.map((p) => `${x(p[0])},${y(p[1])}`).join(' ')} />
+              <polyline key={s.name} fill="none" stroke={s.color} strokeWidth={Math.max(2, em / 8)} strokeLinejoin="round" points={(s.step ? stepPoints(s.points) : s.points).map((p) => `${x(p[0])},${y(p[1])}`).join(' ')} />
             ),
           )}
           {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={8} y2={8 + plotH} className="ov-crosshair" />}
           {hover !== null &&
             series.map((s) => {
               const p = s.points.length ? nearest(s.points, hover) : null
-              return p ? <circle key={s.name} cx={x(p[0])} cy={y(p[1])} r={Math.max(4, em / 4)} fill={s.color} stroke="var(--chart-live-surface, #fff)" strokeWidth={2} /> : null
+              return p ? <circle key={s.name} cx={x(p[0])} cy={y(p[1])} r={Math.max(4, em / 4)} fill={s.color} stroke="var(--chart-live-surface, #fff)" strokeWidth={2} pointerEvents="none" /> : null
             })}
         </svg>
       )}
@@ -271,7 +356,12 @@ export function Lines({ series, format = formatCompact, rows = 13, axis }: { ser
           tip={{
             x: Math.min(x(hover) + 10, width - em * 14),
             y: 8,
-            title: day(hover),
+            // The readout is titled by the nearest point's own x, in the chart's axis labels (a date by default;
+            // a submission number on a chart indexed by submission).
+            title: (() => {
+              const t = nearest(all, hover)[0]
+              return axis ? axis(t) : day(t)
+            })(),
             lines: series.filter((s) => s.points.length).map((s) => {
               const p = nearest(s.points, hover)
               return { label: s.label ? s.label(p[0]) : s.name, value: format(p[1]), color: s.color }
