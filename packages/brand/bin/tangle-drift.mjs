@@ -29,9 +29,9 @@ export const DEFAULT_BASELINE = fileURLToPath(new URL("./drift-baseline.json", i
 /** surface → GitHub repository and web roots. The default branch is resolved from the remote. */
 export const SURFACES = {
   website: { repo: "tangle-network/tangle-website", roots: ["src"] },
-  sandbox: { repo: "tangle-network/agent-dev-container", roots: ["products/sandbox/web"] },
-  platform: { repo: "tangle-network/agent-dev-container", roots: ["products/platform/web"] },
-  intelligence: { repo: "tangle-network/agent-dev-container", roots: ["products/intelligence/web"] },
+  sandbox: { repo: "tangle-network/agent-container", roots: ["products/sandbox/web"] },
+  platform: { repo: "tangle-network/agent-container", roots: ["products/platform/web"] },
+  intelligence: { repo: "tangle-network/agent-container", roots: ["products/intelligence/web"] },
   gtm: { repo: "tangle-network/gtm-agent", roots: [""] },
   tax: { repo: "tangle-network/tax-agent", roots: ["apps/web"] },
   legal: { repo: "tangle-network/legal-agent", roots: [""] },
