@@ -139,10 +139,25 @@ export function bindDialog(dialog: HTMLDialogElement, trigger: HTMLElement): () 
     const target = event.target;
     if (target instanceof Element && target.closest("[data-dialog-close]")) dialog.close();
   };
+  // Native modal inertness blocks page controls, but Tab can still visit browser
+  // chrome at a boundary. Keep this reading surface's keyboard cycle local.
+  const key = (event: KeyboardEvent) => {
+    if (event.key !== "Tab" || !dialog.open) return;
+    const stops = [...dialog.querySelectorAll<HTMLElement>("*")]
+      .filter(element => (element.tabIndex >= 0 || (element.isContentEditable && !element.hasAttribute("tabindex")))
+        && !element.matches(":disabled") && !element.closest("[inert]")
+        && element.getClientRects().length > 0 && getComputedStyle(element).visibility === "visible")
+      .sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Infinity) - (b.tabIndex > 0 ? b.tabIndex : Infinity));
+    const first = stops[0], last = stops.at(-1), active = document.activeElement;
+    if (!first) { event.preventDefault(); dialog.focus(); return; }
+    if (event.shiftKey ? active === first || active === dialog : active === last || active === dialog) {
+      event.preventDefault(); (event.shiftKey ? last! : first).focus();
+    }
+  };
   trigger.setAttribute("aria-haspopup", "dialog");
   if (dialog.id) trigger.setAttribute("aria-controls", dialog.id);
-  sync();trigger.addEventListener("click",show);dialog.addEventListener("close",close);dialog.addEventListener("click",click);
-  return () => {trigger.removeEventListener("click",show);dialog.removeEventListener("close",close);dialog.removeEventListener("click",click);};
+  sync();trigger.addEventListener("click",show);dialog.addEventListener("close",close);dialog.addEventListener("click",click);dialog.addEventListener("keydown",key);
+  return () => {trigger.removeEventListener("click",show);dialog.removeEventListener("close",close);dialog.removeEventListener("click",click);dialog.removeEventListener("keydown",key);};
 }
 
 export const labelVariants = cva(
