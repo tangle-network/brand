@@ -1,5 +1,5 @@
 import { designServer } from "./design-contract-server.mjs";
-import { proveKnotPackage } from "./design-package-proof.mjs";
+import { proveKnotPackage, provePresentationPackage } from "./design-package-proof.mjs";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -7,6 +7,8 @@ import { execFileSync } from "node:child_process";
 const out = resolve(process.env.DESIGN_EVIDENCE ?? "/tmp/brand-design-evidence");
 await mkdir(out, {recursive:true});
 await proveKnotPackage(out);
+await provePresentationPackage(out);
+if(process.argv.includes("--package-only"))process.exit(0);
 const {server,url} = await designServer();
 const browser = await chromium.launch({headless:true});
 const cases=[];
