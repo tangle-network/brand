@@ -87,3 +87,20 @@ rebinding matters. The aliases adopt shared default sizing and surface behavior.
 
 `StatusPill` accepts a decorative `icon` slot and `tone="violet"` using Brand's
 existing matched violet surface tokens; visible status text is always required.
+
+## Segmented controls and section navigation
+
+`tabsPresentation.list` and `tabsPresentation.trigger` expose the existing Tabs
+owner's `default`, `pills` and `underline` classes through `@tangle-network/ui/presentation`.
+React TabsList/TabsTrigger use those same definitions. Hono actual tabs retain
+proper tablist/tab/tabpanel relationships, `aria-selected` and roving focus; match
+`data-state="active"` or `"inactive"` for the shared selection styles. B3's
+`bindCodeTabs` owns the generic native keyboard/selection binding for tab panels.
+A segmented action without panels is a button group with `aria-pressed`; the
+exported `ixSelected` and `ixControlSoft` own those states, without inventing tabs.
+
+Section links use `tangle-reading-nav` / `tangle-reading-outline` and `aria-current`.
+Routes, link destinations, form submission and persistence remain consumer-owned.
+Button sizes use `buttonVariants({size:"sm"|"lg"})`; fields use `labelVariants` and
+`helpPresentation`; tables use `tablePresentation`; panels use `cardPresentation`.
+Delete the local classes as each corresponding caller migrates.

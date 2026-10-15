@@ -2,7 +2,7 @@
 import { cva } from "class-variance-authority";
 import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "./lib/control-presentation";
 import { focusRing, focusFieldInvalid } from "./lib/focus";
-import { ixControl, ixControlSoft } from "./lib/interaction";
+import { ixControl, ixControlSoft, ixSelected, ixTabUnderline } from "./lib/interaction";
 import { cn } from "./lib/utils";
 export { controlHeight, controlMotion, controlRadius, controlSizes, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "./lib/control-presentation";
 
@@ -164,3 +164,22 @@ export const cardPresentation = {
     sandbox: "bg-muted/50 border-primary/20 shadow-[var(--shadow-accent)]",
   },
 } as const;
+
+/** Canonical segmented, pill and underline navigation presentation. */
+export const tabsPresentation = {
+list: {
+    default:
+      "inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+    pills: "inline-flex items-center gap-2",
+    underline: "inline-flex items-center gap-4 border-b border-border",
+  },
+trigger: {
+    default:
+      `inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 ${ixControlSoft} ${ixSelected}`,
+    pills:
+      `inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=inactive]:text-muted-foreground ${ixControlSoft} ${ixSelected}`,
+    underline:
+      `inline-flex items-center justify-center whitespace-nowrap rounded-t-md pb-3 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent data-[state=inactive]:text-muted-foreground ${ixTabUnderline}`,
+  }
+} as const;
+export { ixControlSoft, ixSelected, ixTabUnderline } from "./lib/interaction";
