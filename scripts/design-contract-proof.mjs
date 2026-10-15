@@ -1,4 +1,5 @@
 import { designServer } from "./design-contract-server.mjs";
+import { proveKnotPackage } from "./design-package-proof.mjs";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -20,6 +21,7 @@ if(process.argv.includes("--registry") || process.argv.includes("--published")) 
  if(process.argv.includes("--published")&&published!==3)throw Error("Requested contracts are not all published");
  process.exit(0);
 }
+await proveKnotPackage(out);
 const {server,url} = await designServer();
 const browser = await chromium.launch({headless:true});
 const cases=[];
