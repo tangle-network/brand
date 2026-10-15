@@ -25,3 +25,14 @@
 /* Native dialog has the same solid reading surface as React's Dialog/Sheet. */
 .tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
 .tangle-native-dialog::backdrop { background: var(--scrim); }
+
+.tangle-code-tabs { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid hsl(var(--border)); padding: 0.25rem; }
+.tangle-code-tabs [role="tab"] { flex: none; min-height: var(--control-height-lg); padding: 0.5rem 0.75rem; color: hsl(var(--muted-foreground)); border-radius: var(--radius-md); }
+.tangle-code-tabs [aria-selected="true"] { background: hsl(var(--muted)); color: var(--accent-text); }
+.tangle-code-tabs [role="tab"]:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -2px; }
+.tangle-api-meta { font-family: var(--font-mono); font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); overflow-wrap: anywhere; }
+.tangle-api-schema { margin: 1rem 0; }
+.tangle-api-schema > div { padding-block: 0.75rem; border-bottom: 1px solid hsl(var(--border)); overflow-wrap: anywhere; }
+.tangle-api-schema dt { font-family: var(--font-mono); font-size: var(--font-size-label); }
+.tangle-api-schema dt span, .tangle-api-schema dd { color: hsl(var(--muted-foreground)); }
+.tangle-api-schema dd { margin: 0.25rem 0 0; font-size: var(--font-size-label); }

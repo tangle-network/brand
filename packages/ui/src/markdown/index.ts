@@ -8,3 +8,4 @@ export {
 export { CodeBlock, CopyButton, codeBlockGrammar, type CodeBlockProps } from "./code-block";
 export { fenceInfo } from "./code-meta";
 export { numericColumns, tableCsv } from "./markdown-table";
+export { ApiSchema, type ApiSchemaProps } from "./api-schema";

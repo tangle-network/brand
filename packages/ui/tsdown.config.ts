@@ -19,6 +19,7 @@ export default defineConfig({
     types: "src/types/index.ts",
     utils: "src/utils/index.ts",
     "tool-previews": "src/tool-previews/index.ts",
+    "code-presentation": "src/code-presentation.ts",
     presentation: "src/presentation.ts",
     redaction: "src/redaction/index.ts",
   },

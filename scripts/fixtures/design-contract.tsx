@@ -20,7 +20,8 @@ function Intro() {
  </header>;
 }
 const target = document.getElementById("root")!;
-if (params.get("surface") === "layout") await import("./layout-contract");
+if (params.get("surface") === "code") await import("./code-contract");
+else if (params.get("surface") === "layout") await import("./layout-contract");
 else if (renderer === "react") createRoot(target).render(<Intro/>);
 else target.innerHTML = jsx("header", {class: "tangle-intro", "data-grid":"", "data-motion":"", children: [
  jsx("span",{class:"tangle-intro-knot",children:raw(knotSvg({id:"hono-intro",size:640}))}),

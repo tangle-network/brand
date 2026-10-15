@@ -19,7 +19,7 @@ on the server: DOM APIs are used only when its event binding is called in a brow
 | Dialog | `Dialog`/`Sheet` (Radix) | `dialogPresentation` parts; `tangle-native-dialog`, `bindDialog` for native dialog | Local modal styles and handwritten focus traps |
 | Metrics | `MetricStrip`, `Metric` | `metricPresentation`, `metricLayouts` | Local metric grids/typography; retain data source |
 | Empty state | `EmptyState` | `emptyStatePresentation` named parts | Local generic empty-state definitions |
-| Code, copy and API blocks | Canonical `markdown/CodeBlock`, forwarded by primitives | B3 owns the separate code contract | Adoption waits for B3 release |
+| Code, copy and API blocks | Canonical `markdown/CodeBlock`, forwarded by primitives | `@tangle-network/ui/code-presentation` owns the shared code contract | Local code/highlighting/copy/tab implementations |
 
 React primitives read the same named class definitions as Hono. `presentation` is
 an explicit opt-in for Heading and PageHeader; their prior default output remains.
@@ -39,3 +39,33 @@ Duplicate counts are scoped to migrated roles. Hono fixtures contain markup and
 bindings only: no copied primitive classes or palette/size declarations. Downstream
 lanes record the exact deleted paths; no downstream application is declared adopted
 by this package release.
+
+## Code and API presentation
+
+`@tangle-network/ui/code-presentation` exports `highlightCode`, `codePresentation`,
+`codePreStyle`, `codeTextStyle`, `bindCopyButton`, `bindCodeTabs`, `schemaRows`,
+`apiMetadataText` and their metadata types. It imports no React runtime. Highlighting
+uses the existing lazy Shiki grammar owner and Brand syntax tokens; unsupported
+languages remain readable plain text. A failed grammar download must leave the
+consumer's escaped plain code in place.
+
+React `CodeBlock` keeps its existing props. Supply `examples` for roving-keyboard
+language tabs and automatic exact-copy controls for the active example. `metadata`
+adds request, response or error context with optional method, status and content type.
+The existing `code` prop remains the plain fallback; tabs never send requests.
+`ApiSchema` is exported from `@tangle-network/ui/markdown`; schema values belong to
+the consumer, not the design package.
+
+Hono calls `highlightCode(code, language)` on the server or client and renders the
+returned token content as escaped JSX text with its shared style object. Use the
+published root/header classes and pre/code styles. Mark the scrollable pre as a
+named `role="region"` with `tabindex="0"`. Register `bindCopyButton(button,status,
+getExactText)` with a `role="status" aria-live="polite"` region. It shares ordering,
+announcements and cleanup with React; failed clipboard writes remain visible.
+
+For tabs, render a named tablist with uniquely identified buttons, one roving tab
+stop, aria-selected and aria-controls relationships to tabpanels. Register
+`bindCodeTabs(tablist)` and retain its cleanup. React uses this same event owner.
+Content types distinguish JSON, SSE and binary descriptions; binary bytes are never
+silently decoded or represented as JSON. Use literal provided strings for copy,
+including trailing newlines. Render `schemaRows` as escaped definition-list content.

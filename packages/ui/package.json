@@ -119,7 +119,12 @@
       "import": "./dist/presentation.js",
       "default": "./dist/presentation.js"
     },
-    "./styles/presentation.css": "./src/styles/presentation.css"
+    "./styles/presentation.css": "./src/styles/presentation.css",
+    "./code-presentation": {
+      "types": "./dist/code-presentation.d.ts",
+      "import": "./dist/code-presentation.js",
+      "default": "./dist/code-presentation.js"
+    }
   },
   "scripts": {
     "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",
