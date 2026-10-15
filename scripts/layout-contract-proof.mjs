@@ -37,5 +37,5 @@ try {
   }}finally{await context.close();}
  }
  for(const width of [390,1440])for(const theme of ["light","dark"]){const [a,b]=cases.filter(c=>c.width===width&&c.theme===theme);if(a.font!==b.font||a.size!==b.size||a.inputHeight!==b.inputHeight)throw Error("Renderer role mismatch");}
- await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},null,2));console.log(JSON.stringify(cases));
+ await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));
 }finally{await browser.close();await server.close();}
