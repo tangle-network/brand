@@ -16,6 +16,7 @@ try {
     // Slow both directions equally for consecutive-frame velocity calibration.
     // Derive the fixture profile from the served role; never replace product timing.
     const seconds=scopedSeconds*16;
+    const temporalResolutionMs=seconds*1000/32; // At least 32 samples per calibrated response.
     root.style.setProperty("--motion-surface",`${seconds}s var(--ease-entrance)`);root.style.setProperty("--motion-dismiss",`${seconds}s var(--ease-exit)`);
     const frame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
     const intent=window.motionFixture[kind];intent(true);await frame();
@@ -45,7 +46,7 @@ try {
     const closeBoundary=boundary(previous,before,after);
     const closing=[];
     for(let i=0;i<3;i++){await frame();closing.push(read());}
-    const first=closing.find(s=>s.at-before.at>=12&&s.at-before.at<=45&&Math.abs(s.progress-before.progress)>0.0001);
+    const first=closing.find(s=>s.at-before.at>0&&s.at-before.at<=temporalResolutionMs&&Math.abs(s.progress-before.progress)>0.0001);
     if(!first)throw Error(`Uncalibrated reversal frame gaps: ${JSON.stringify({before,closing})}`);
     if(first.progress<=before.progress)throw Error(`Velocity restarted on Close: ${JSON.stringify({previous,before,first})}`);
     let retreat=closing.at(-1);const closeDeadline=performance.now()+seconds*500;
@@ -54,12 +55,12 @@ try {
     if(!node.isConnected||node!==document.querySelector('[role="dialog"]'))throw Error("Reopen replaced the surface");
     const reopenBoundary=boundary(previous,reopenBefore,reopenAfter);
     const reopening=[];for(let i=0;i<3;i++){await frame();reopening.push(read());}
-    const reverse=reopening.find(s=>s.at-reopenBefore.at>=12&&s.at-reopenBefore.at<=45&&Math.abs(s.progress-reopenBefore.progress)>0.0001);
+    const reverse=reopening.find(s=>s.at-reopenBefore.at>0&&s.at-reopenBefore.at<=temporalResolutionMs&&Math.abs(s.progress-reopenBefore.progress)>0.0001);
     if(!reverse||reverse.progress>=reopenBefore.progress)throw Error(`Velocity restarted on reopen: ${JSON.stringify({reopenBefore,reopening})}`);
     const end=performance.now()+seconds*2000;let final=read();while(performance.now()<end&&Math.abs(final.progress-1)>0.001){await frame();final=read();}
     if(Math.abs(final.progress-1)>0.001||!node.contains(document.activeElement))throw Error(`Surface failed to settle/focus: ${JSON.stringify(final)}`);
     const bounds=node.getBoundingClientRect();if(kind==="dialog"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
-    return {scopedSeconds,calibrationMultiplier:16,closeBoundary,reopenBoundary,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
+    return {scopedSeconds,calibrationMultiplier:16,temporalResolutionMs,closeBoundary,reopenBoundary,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
    },kind);
    await page.screenshot({path:`${out}/${kind}-${width}.png`});await page.emulateMedia({reducedMotion:"reduce"});
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
