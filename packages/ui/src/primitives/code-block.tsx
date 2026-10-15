@@ -1,7 +1,7 @@
 // Re-exports the canonical themed CodeBlock from the markdown package.
 // Kept here for backwards compatibility with openui and other importers.
 export { CodeBlock, CopyButton } from "../markdown/code-block";
-export type { CodeBlockProps } from "../markdown/code-block";
+export type { CodeBlockProps, CopyButtonProps } from "../markdown/code-block";
 
 import { cn } from "../lib/utils";
 

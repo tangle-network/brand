@@ -5,6 +5,8 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ButtonHTMLAttributes,
+  type MouseEvent,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -141,22 +143,32 @@ export const CodeBlock = memo(
 );
 CodeBlock.displayName = "CodeBlock";
 
-/** Copy-to-clipboard button for use inside CodeBlock. */
-export const CopyButton = memo(({ text }: { text: string }) => {
+export interface CopyButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,"children"> {
+  text:string;
+  /** Supply for a visible action label; omitted preserves the icon-only control. */
+  label?:string;
+  copiedLabel?:string;
+  failedLabel?:string;
+}
+/** Copy-to-clipboard button for use inside CodeBlock or other exact-text actions. */
+export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied", failedLabel="Copy failed", className, onClick, ...props }: CopyButtonProps) => {
   const [{copied,status},setFeedback] = useState({copied:false,status:""});
   const feedback=useRef<ReturnType<typeof createCopyFeedback>|null>(null);
   useEffect(()=>{const controller=createCopyFeedback(setFeedback);feedback.current=controller;return()=>controller.dispose();},[]);
-  const handleCopy=()=>void feedback.current?.copy(text);
+  const handleCopy=(event:MouseEvent<HTMLButtonElement>)=>{onClick?.(event);if(!event.defaultPrevented)void feedback.current?.copy(text);};
 
-  const label = copied ? "Copied" : "Copy to clipboard";
+  const label = copied ? copiedLabel : actionLabel && status === "Copy failed" ? failedLabel : actionLabel ?? "Copy to clipboard";
   return (
     <>
       <button
+        {...props}
         type="button"
         onClick={handleCopy}
         className={cn(
           codePresentation.copy,
+          actionLabel && "gap-2 px-3",
           focusRing,
+          className,
         )}
         aria-label={label}
         title={label}
@@ -166,6 +178,7 @@ export const CopyButton = memo(({ text }: { text: string }) => {
         ) : (
           <Copy aria-hidden="true" className="w-3.5 h-3.5 text-muted-foreground" />
         )}
+        {actionLabel && <span>{label}</span>}
       </button>
       {/* Announce the result; the icon swap alone is silent to screen readers. */}
       <span className="sr-only" role="status" aria-live="polite">

@@ -152,10 +152,21 @@ export async function highlightCode(code:string,language?:string) {
  if(!grammar)return code.split("\n").map(content=>[{content,style:undefined as TokenStyle|undefined}]);
  return (await tokenize(code,grammar)).map(line=>line.map(token=>({content:token.content,style:tokenStyle(token)})));
 }
+/** Legacy fallback is used only when the modern clipboard API is absent. */
+export async function writeClipboard(text:string):Promise<void> {
+ if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);return;}
+ const active=document.activeElement as HTMLElement|null,selection=document.getSelection();
+ const ranges=selection?Array.from({length:selection.rangeCount},(_,i)=>selection.getRangeAt(i).cloneRange()):[];
+ const field=document.createElement("textarea");field.value=text;field.readOnly=true;field.tabIndex=-1;
+ field.setAttribute("aria-hidden","true");field.style.position="fixed";field.style.left="-9999px";
+ document.body.append(field);
+ try {field.select();if(!document.execCommand?.("copy"))throw Error("Clipboard unavailable");}
+ finally {field.remove();active?.focus({preventScroll:true});if(selection){selection.removeAllRanges();for(const range of ranges)selection.addRange(range);}}
+}
 const COPY_FEEDBACK_MS=2000;
 export interface CopyFeedback {copied:boolean;status:string;}
 /** Owns async ordering, announcements and timer cleanup for both renderers. */
-export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text:string)=>Promise<void>=text=>navigator.clipboard.writeText(text)) {
+export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text:string)=>Promise<void>=writeClipboard) {
  let attempt=0,disposed=false,timer:ReturnType<typeof setTimeout>|undefined;
  return {
   async copy(text:string) {

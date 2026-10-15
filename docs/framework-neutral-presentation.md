@@ -69,3 +69,9 @@ stop, aria-selected and aria-controls relationships to tabpanels. Register
 Content types distinguish JSON, SSE and binary descriptions; binary bytes are never
 silently decoded or represented as JSON. Use literal provided strings for copy,
 including trailing newlines. Render `schemaRows` as escaped definition-list content.
+
+`CopyButton` also accepts a visible `label` (for example, "Copy all commands"),
+`copiedLabel`, `failedLabel`, native button attributes and `className`. Omit `label`
+to retain the icon-only control. The shared clipboard owner uses a selection-
+preserving native copy fallback only when the Clipboard API is unavailable;
+permission rejection remains a visible failure, with no repeated permission attempt.
