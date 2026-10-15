@@ -5,7 +5,7 @@ import { CodeBlock,CopyButton } from "../../packages/ui/src/markdown/code-block"
 import { ApiSchema } from "../../packages/ui/src/markdown/api-schema";
 import { highlightCode,codePreStyle,codeTextStyle,codePresentation,bindCopyButton,bindCodeTabs,schemaRows,type ApiField } from "../../packages/ui/src/code-presentation";
 const params=new URLSearchParams(location.search),before=params.get("phase")==="before";
-const examples=[{label:"curl",language:"bash",code:'curl https://example.invalid/v1/chat \\n  -H "Content-Type: application/json" \\n  -d '{"messages":[{"role":"user","content":"Hello"}]}''},{label:"TypeScript",language:"ts",code:'const body = { messages: [{ role: "user", content: "Hello" }] };\nconsole.log(JSON.stringify(body));'},{label:"Python",language:"python",code:'body = {"messages": [{"role": "user", "content": "Hello"}]}\nprint(body)'}];
+const examples=[{"label": "curl", "language": "bash", "code": "curl https://example.invalid/v1/chat \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"messages\":[{\"role\":\"user\",\"content\":\"Hello\"}]}'"}, {"label": "TypeScript", "language": "ts", "code": "const body = { messages: [{ role: \"user\", content: \"Hello\" }] };\nconsole.log(JSON.stringify(body));"}, {"label": "Python", "language": "python", "code": "body = {\"messages\": [{\"role\": \"user\", \"content\": \"Hello\"}]}\nprint(body)"}];
 const fields:ApiField[]=[{name:"messages",type:"array",required:true,description:"Example request messages",children:[{name:"content",type:"string",required:true,description:"The text to send."}]}];
 const sse='data: {"delta":"Hello"}\n\ndata: [DONE]\n';
 const binary='HTTP/1.1 200 OK\nContent-Type: audio/wav\n\n<binary response; save as output.wav>';

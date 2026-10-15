@@ -96,7 +96,6 @@ export const CodeBlock = memo(
         {!hasHeader && children && (
           <div className="absolute right-2 top-2 z-10 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
             {children}
-            {examples?.length ? <CopyButton text={code}/> : null}
           </div>
         )}
         {examples && examples.length > 1 && <div role="tablist" aria-label="Code examples" ref={tabList} className="tangle-code-tabs">
