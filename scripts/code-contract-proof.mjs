@@ -19,7 +19,7 @@ try{
    if(await page.evaluate(()=>navigator.clipboard.readText())!==expected)throw Error("Copy changed bytes");
    await page.getByRole("status").filter({hasText:"Copied to clipboard"}).first().waitFor();
    for(const [label,key] of [["SSE response","sse"],["Binary response","binary"],["Error response","error"],["Long JSON line","long"]]){
-    const block=page.getByRole("region",{name:`${label} code`}).locator("..");
+    const block=page.locator(`[data-copy-example="${key}"]`);
     await block.getByRole("button",{name:"Copy to clipboard",exact:true}).click();
     const bytes=await page.evaluate(key=>window.fixtureCodes[key],key);
     if(await page.evaluate(()=>navigator.clipboard.readText())!==bytes)throw Error(`Copy changed ${key} bytes`);

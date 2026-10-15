@@ -16,10 +16,10 @@ function Page(){return <main className="mx-auto min-w-0 max-w-3xl space-y-6 p-6"
  <p>Illustrative examples; this fixture sends no API requests.</p>
  <CodeBlock code={examples[0].code} language="bash" examples={before?undefined:examples} metadata={before?undefined:{kind:"request",method:"POST",contentType:"application/json"}}>{before&&<CopyButton text={examples[0].code}/>}</CodeBlock>
  {!before&&<ApiSchema fields={fields}/>}
- <CodeBlock code={sse} label="SSE response" metadata={before?undefined:{kind:"response",contentType:"text/event-stream"}}><CopyButton text={sse}/></CodeBlock>
- <CodeBlock code={binary} label="Binary response" metadata={before?undefined:{kind:"response",status:200,contentType:"audio/wav"}}><CopyButton text={binary}/></CodeBlock>
- <CodeBlock code={errorJson} language="json" label="Error response" metadata={before?undefined:{kind:"error",status:400,contentType:"application/json"}}>{!before&&<CopyButton text={errorJson}/>}</CodeBlock>
- <CodeBlock code={longLine} language="json" label="Long JSON line"><CopyButton text={longLine}/></CodeBlock>
+ <CodeBlock code={sse} label="SSE response" data-copy-example="sse" metadata={before?undefined:{kind:"response",contentType:"text/event-stream"}}><CopyButton text={sse}/></CodeBlock>
+ <CodeBlock code={binary} label="Binary response" data-copy-example="binary" metadata={before?undefined:{kind:"response",status:200,contentType:"audio/wav"}}><CopyButton text={binary}/></CodeBlock>
+ <CodeBlock code={errorJson} language="json" label="Error response" data-copy-example="error" metadata={before?undefined:{kind:"error",status:400,contentType:"application/json"}}>{!before&&<CopyButton text={errorJson}/>}</CodeBlock>
+ <CodeBlock code={longLine} language="json" label="Long JSON line" data-copy-example="long"><CopyButton text={longLine}/></CodeBlock>
  </main>}
 const target=document.getElementById("root")!;
 if(params.get("renderer")==="react")createRoot(target).render(<Page/>);
@@ -28,7 +28,7 @@ else {
  async function block(code:string,language:string|undefined,label:string,id:string,metadata?:ApiMetadata){
   codes.set(id,code);
   const lines=await highlightCode(code,language);
-  return h("div",{class:codePresentation.root,children:[h("div",{class:codePresentation.header,children:[metadata?apiMetadataText(metadata):label,h("button",{type:"button",class:codePresentation.copy,"aria-label":"Copy to clipboard","data-copy":id,children:"Copy"}),h("span",{role:"status",class:codePresentation.copyStatus,"aria-live":"polite","data-status":id})]}),h("pre",{role:"region","aria-label":`${label} code`,tabindex:0,style:codePreStyle,children:h("code",{style:codeTextStyle,children:lines.map((line,index)=>[...line.map(token=>h("span",{style:token.style,children:token.content})),index<lines.length-1?"\n":""])})})]});
+  return h("div",{class:codePresentation.root,"data-copy-example":id,children:[h("div",{class:codePresentation.header,children:[metadata?apiMetadataText(metadata):label,h("button",{type:"button",class:codePresentation.copy,"aria-label":"Copy to clipboard","data-copy":id,children:"Copy"}),h("span",{role:"status",class:codePresentation.copyStatus,"aria-live":"polite","data-status":id})]}),h("pre",{role:"region","aria-label":`${label} code`,tabindex:0,style:codePreStyle,children:h("code",{style:codeTextStyle,children:lines.map((line,index)=>[...line.map(token=>h("span",{style:token.style,children:token.content})),index<lines.length-1?"\n":""])})})]});
  }
  const panels=await Promise.all(examples.map((e,i)=>block(e.code,e.language,e.label,`example-${i}`,{kind:"request",method:"POST",contentType:"application/json"})));
  const tabs=h("div",{role:"tablist","aria-label":"Code examples",class:codePresentation.tabs,id:"examples",children:examples.map((e,i)=>h("button",{role:"tab",type:"button",class:codePresentation.tab,"data-state":i===0?"active":"inactive",id:`tab-${i}`,"aria-controls":`panel-${i}`,"aria-selected":i===0,tabindex:i===0?0:-1,children:e.label}))});
