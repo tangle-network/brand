@@ -1,0 +1,120 @@
+/* Framework-neutral opt-in presentation. Load fonts from the application's origin. */
+[data-typography="expressive"],
+[data-typography="expressive"] :is([data-theme], [data-sandbox-ui], [data-sandbox-theme], .dark, .light) {
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  font-family: var(--font-sans);
+}
+.tangle-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  padding: var(--hero-padding-top) var(--hero-gutter) var(--hero-padding-bottom);
+  text-align: center;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+.tangle-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--hero-atmosphere-opacity);
+  background: radial-gradient(ellipse at 50% 0%, hsl(var(--primary)), transparent 70%);
+}
+.tangle-intro[data-grid]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(var(--border-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: var(--hero-grid-pitch) var(--hero-grid-pitch);
+  mask-image: radial-gradient(ellipse at top, black, transparent 75%);
+}
+.tangle-display {
+  margin: 0 auto;
+  max-width: var(--display-max-width);
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+.tangle-display[data-gradient] {
+  background-image: var(--display-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.tangle-intro-description {
+  margin: var(--hero-content-gap) auto 0;
+  max-width: var(--reading-max-width);
+  color: hsl(var(--muted-foreground));
+  font-size: clamp(1rem, 0.8rem + 1vw, 1.25rem);
+  line-height: 1.625;
+}
+.tangle-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hero-action-gap);
+  margin-top: 2.5rem;
+}
+.tangle-control-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hero-action-gap);
+  min-height: var(--display-control-height);
+  padding: 0 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--display-control-radius);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font: 600 var(--display-control-font-size)/1 var(--font-sans);
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--display-control-shadow);
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease-out;
+}
+.tangle-control-display[data-variant="outline"] {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+  box-shadow: none;
+}
+.tangle-control-display:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+.tangle-control-display:disabled, .tangle-control-display[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+@media (hover: hover) and (pointer: fine) {
+  .tangle-control-display:not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-1px); }
+}
+.tangle-control-display:not(:disabled):not([aria-disabled="true"]):active { transform: translateY(1px); }
+.tangle-intro-knot {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: clamp(30rem, 45vw, 40rem);
+  height: auto;
+  right: -10rem;
+  top: 1.5rem;
+  opacity: var(--hero-knot-opacity);
+  rotate: -14deg;
+}
+.tangle-intro-knot > svg { width: 100%; height: auto; }
+.tangle-intro[data-motion] { animation: tangle-intro-enter var(--duration-expressive-entrance) var(--ease-expressive) both; }
+.tangle-intro[data-motion] .tangle-intro-knot { animation: tangle-intro-drift var(--duration-expressive-ambient) ease-in-out infinite; }
+@keyframes tangle-intro-enter { from { opacity: 0; transform: translateY(var(--arrive-distance)); } to { opacity: 1; transform: none; } }
+@keyframes tangle-intro-drift { 50% { transform: translateY(-0.75rem) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) {
+  .tangle-intro, .tangle-intro *, .tangle-control-display { animation: none !important; transition: none !important; transform: none !important; }
+}
+@media (forced-colors: active) {
+  .tangle-display[data-gradient] { background: none; color: CanvasText; }
+  .tangle-intro::before, .tangle-intro::after { display: none; }
+}

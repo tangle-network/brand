@@ -142,3 +142,32 @@ pnpm test
 For actual browser cascade checks, serve the repository with any local static server and open `packages/brand/scripts/theme-browser.html`. Repeat with light/dark color preferences and reduced motion. The page reports assertions for both default contracts, all named modes, nested scopes, aliases and immediate code-color changes. This CSS fixture does not substitute for the React SSR/hydration tests or a consuming app build.
 
 For local consumer iteration, use workspace linking or a `file:` dependency, then run that consumer's real build and browser path before release.
+
+## Expressive introductions and framework-neutral knot
+
+Opt in with `data-typography="expressive"` on the application root. Load Outfit,
+Geist and Geist Mono from your own origin using `@font-face` with
+`font-display: swap`; the default Inter contract stays available. Theme boundaries
+rebind the opt-in stacks, so changing between Tangle dark and light keeps identity.
+
+`@tangle-network/brand/styles` includes the presentation recipes. Consumers that
+import individual files also import `@tangle-network/brand/styles/presentation.css`
+after tokens, theme and named themes. Use `tangle-intro`, `tangle-display`,
+`tangle-intro-description`, `tangle-intro-actions` and `tangle-control-display`.
+`data-grid`, `data-gradient` and `data-motion` opt into atmosphere; reading and
+operational surfaces stay solid. Reduced motion removes expressive movement.
+The display control reads shared role tokens; operational sizes are unchanged.
+
+Hono and static consumers import `{ knot, knotSvg }` from
+`@tangle-network/brand/knot`. That entry requires neither React nor a DOM.
+`raw(knotSvg({ id: "request-unique-mark" }))` is safe static SVG with escaped
+labels; IDs must be unique per inline instance. Omit `label` for decoration,
+supply it for informative marks. React uses the same geometry in `TangleKnot`;
+`label=""` makes it decorative while the existing default accessible name remains.
+Consumers must remove their copied paths and palette/type definitions on adoption.
+
+`scripts/design-contract-proof.mjs` measures real React and Hono rendering with
+one set of recipes. It captures 390/1440px light/dark, contrast, font loading,
+contained width, reduced motion, control roles and path parity. `DESIGN_FONT_DIR`
+points to a consumer's self-hosted font assets; `DESIGN_EVIDENCE` selects a retained
+output directory. The baseline Hono capture explicitly records the prior export gap.
