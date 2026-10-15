@@ -28,6 +28,9 @@ try {
     const opening=await dialog.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction,focus:e.contains(document.activeElement)};});
     if(!opening.focus)throw Error(`${kind} did not own focus`);
     if(reducedMotion==="reduce"?opening.name!=="none":opening.name!=="enter"||opening.duration!==timing.role.surface.duration||opening.easing!==timing.role.surface.easing)throw Error(`Invalid ${kind} opening role: ${JSON.stringify(opening)}`);
+    const overlays=await page.evaluate(()=>[...document.querySelectorAll('[data-state="open"]')].map(e=>getComputedStyle(e)).filter(s=>s.position==="fixed"&&[s.top,s.right,s.bottom,s.left].every(v=>v==="0px")).map(s=>({animation:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction})));
+    if(overlays.length!==1)throw Error(`Expected one modal overlay, got ${overlays.length}`);
+    if(reducedMotion==="reduce"?overlays[0].animation!=="none":overlays[0].duration!==timing.role.surface.duration)throw Error(`Invalid modal overlay motion: ${JSON.stringify(overlays)}`);
     await page.screenshot({path:`${out}/${kind}-${reducedMotion}.png`});
     await page.keyboard.press("Escape");
     if(reducedMotion!=="reduce"){

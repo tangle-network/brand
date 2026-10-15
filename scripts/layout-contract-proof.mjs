@@ -17,6 +17,8 @@ try {
    const trigger=page.getByRole("button",{name:"Sections",exact:true});await trigger.focus();await page.keyboard.press("Enter");
    const dialog=page.getByRole("dialog");await dialog.waitFor();
    await dialog.evaluate(d=>{const hidden=document.createElement("button"),disabled=document.createElement("button");hidden.hidden=true;hidden.textContent="Hidden decoy";disabled.disabled=true;disabled.tabIndex=1;disabled.textContent="Disabled decoy";d.append(hidden,disabled);});
+   const backdrop=await dialog.evaluate(e=>{const s=getComputedStyle(e,"::backdrop");return {animation:s.animationName,duration:s.transitionDuration};});
+   if(backdrop.animation!=="none"||backdrop.duration.split(", ").some(d=>d!=="0s"))throw Error(`Reduced native backdrop moves: ${JSON.stringify(backdrop)}`);
    const cycle=["Quickstart","Authentication","Errors","Close navigation"];let index=0;
    if(await page.evaluate(()=>document.activeElement.textContent)!==cycle[0])throw Error("Wrong initial dialog focus");
    for(const direction of ["Tab","Shift+Tab"])for(let i=0;i<9;i++) {
@@ -31,7 +33,7 @@ try {
    const compatibilityHeight=await page.getByRole("button",{name:"Compatibility action"}).evaluate(e=>e.getBoundingClientRect().height);
    if(compatibilityHeight!==36)throw Error(`Compatibility recipe height: ${compatibilityHeight}`);
    const facts=await page.evaluate(()=>{const h=document.querySelector("h1"),input=document.querySelector("input"),s=getComputedStyle(h);return {font:s.fontFamily,size:s.fontSize,inputHeight:input.getBoundingClientRect().height,inputFont:getComputedStyle(input).fontSize,h1:document.querySelectorAll("h1").length,overflow:document.documentElement.scrollWidth>innerWidth,fields:document.querySelectorAll("input").length};});
-   if(errors.length||facts.overflow||facts.h1!==1||facts.inputHeight!==44)throw Error(JSON.stringify({errors,facts}));cases.push({width,theme,renderer,...facts,video:`videos/${basename(await page.video().path())}`});
+   if(errors.length||facts.overflow||facts.h1!==1||facts.inputHeight!==44)throw Error(JSON.stringify({errors,facts}));cases.push({width,theme,renderer,...facts,backdrop,video:`videos/${basename(await page.video().path())}`});
   }}finally{await context.close();}
  }
  for(const width of [390,1440])for(const theme of ["light","dark"]){const [a,b]=cases.filter(c=>c.width===width&&c.theme===theme);if(a.font!==b.font||a.size!==b.size||a.inputHeight!==b.inputHeight)throw Error("Renderer role mismatch");}
