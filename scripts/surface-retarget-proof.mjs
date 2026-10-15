@@ -15,7 +15,7 @@ try {
     const scopedSeconds=parseFloat(getComputedStyle(probe).animationDuration);probe.remove();
     // Slow both directions equally for consecutive-frame velocity calibration.
     // Derive the fixture profile from the served role; never replace product timing.
-    const seconds=scopedSeconds*8;
+    const seconds=scopedSeconds*16;
     root.style.setProperty("--motion-surface",`${seconds}s var(--ease-entrance)`);root.style.setProperty("--motion-dismiss",`${seconds}s var(--ease-exit)`);
     const frame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
     const intent=window.motionFixture[kind];intent(true);await frame();
@@ -34,7 +34,7 @@ try {
     if(!first)throw Error(`Uncalibrated reversal frame gaps: ${JSON.stringify({before,closing})}`);
     if(first.progress<=before.progress)throw Error(`Velocity restarted on Close: ${JSON.stringify({previous,before,first})}`);
     let retreat=closing.at(-1);const closeDeadline=performance.now()+seconds*500;
-    while(performance.now()<closeDeadline){await frame();const next=read();samples.push(next);if(next.progress<retreat.progress-0.002){previous=retreat;retreat=next;break;}retreat=next;}
+    while(performance.now()<closeDeadline){await frame();const next=read();samples.push(next);if(next.progress<before.progress-0.1&&next.progress<retreat.progress-0.002){previous=retreat;retreat=next;break;}retreat=next;}
     const reopenBefore=read();intent(true);const reopenAfter=read();
     if(!node.isConnected||node!==document.querySelector('[role="dialog"]')||Math.abs(reopenAfter.progress-reopenBefore.progress)>0.002)throw Error(`Reopen replaced or jumped: ${JSON.stringify({reopenBefore,reopenAfter})}`);
     const reopening=[];for(let i=0;i<3;i++){await frame();reopening.push(read());}
@@ -43,7 +43,7 @@ try {
     const end=performance.now()+seconds*2000;let final=read();while(performance.now()<end&&Math.abs(final.progress-1)>0.001){await frame();final=read();}
     if(Math.abs(final.progress-1)>0.001||!node.contains(document.activeElement))throw Error(`Surface failed to settle/focus: ${JSON.stringify(final)}`);
     const bounds=node.getBoundingClientRect();if(kind==="dialog"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
-    return {scopedSeconds,calibrationMultiplier:8,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
+    return {scopedSeconds,calibrationMultiplier:16,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
    },kind);
    await page.screenshot({path:`${out}/${kind}-${width}.png`});await page.emulateMedia({reducedMotion:"reduce"});
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
