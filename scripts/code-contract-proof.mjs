@@ -18,8 +18,14 @@ try{
    await page.getByRole("button",{name:"Copy to clipboard"}).first().click();
    if(await page.evaluate(()=>navigator.clipboard.readText())!==expected)throw Error("Copy changed bytes");
    await page.getByRole("status").filter({hasText:"Copied to clipboard"}).first().waitFor();
+   for(const [label,key] of [["SSE response","sse"],["Binary response","binary"],["Error response","error"],["Long JSON line","long"]]){
+    const block=page.getByRole("region",{name:`${label} code`}).locator("..");
+    await block.getByRole("button",{name:"Copy to clipboard",exact:true}).click();
+    const bytes=await page.evaluate(key=>window.fixtureCodes[key],key);
+    if(await page.evaluate(()=>navigator.clipboard.readText())!==bytes)throw Error(`Copy changed ${key} bytes`);
+   }
    await page.evaluate(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async()=>{throw Error("denied")}}}));
-   await page.getByRole("button",{name:"Copied",exact:true}).first().click();await page.getByRole("status").filter({hasText:"Copy failed"}).first().waitFor();
+   await page.getByRole("button",{name:/^(Copy to clipboard|Copied)$/}).first().click();await page.getByRole("status").filter({hasText:"Copy failed"}).first().waitFor();
    const failedButton=page.getByRole("button",{name:"Copy to clipboard",exact:true}).first();
    if(!await failedButton.evaluate(e=>e===document.activeElement))throw Error("Copy failure moved focus");
    await page.evaluate(()=>{
@@ -66,7 +72,7 @@ try{
    const long=page.getByRole("region",{name:"Long JSON line code"});await long.focus();await page.keyboard.press("End");
    const contained=await long.evaluate(e=>e.scrollWidth>e.clientWidth&&e.clientWidth<=innerWidth);
    const facts=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,schema:document.querySelector('.tangle-api-schema').textContent,regions:document.querySelectorAll('[role="region"]').length}));
-   if(errors.length||facts.overflow||!contained||!facts.schema.includes("messages.content"))throw Error(JSON.stringify({errors,contained,facts}));cases.push({width,theme,renderer,reducedMotion,copyTiming,loadingVisible,longVisible,controlledWriteExceededMutationBudget:firstLong.at>budgets.mutation,...facts,exactCopy:true,copyFailure:true,singlePendingWrite:true,failureFocus:true,contained,video:`videos/${basename(await page.video().path())}`});
+   if(errors.length||facts.overflow||!contained||!facts.schema.includes("messages.content"))throw Error(JSON.stringify({errors,contained,facts}));cases.push({width,theme,renderer,reducedMotion,copyTiming,loadingVisible,longVisible,controlledWriteExceededMutationBudget:firstLong.at>budgets.mutation,...facts,exactCopy:true,exactCopyFormats:["typescript","sse","binary","error","long-json"],copyFailure:true,singlePendingWrite:true,failureFocus:true,contained,video:`videos/${basename(await page.video().path())}`});
   }}finally{await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));
