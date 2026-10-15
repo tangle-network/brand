@@ -152,10 +152,10 @@ export interface CopyButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
 }
 /** Copy-to-clipboard button for use inside CodeBlock or other exact-text actions. */
 export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied", failedLabel="Copy failed", className, onClick, ...props }: CopyButtonProps) => {
-  const [{copied,status},setFeedback] = useState({copied:false,status:""});
+  const [{copied,status,pending},setFeedback] = useState({copied:false,status:"",pending:false});
   const feedback=useRef<ReturnType<typeof createCopyFeedback>|null>(null);
   useEffect(()=>{const controller=createCopyFeedback(setFeedback);feedback.current=controller;return()=>controller.dispose();},[]);
-  const handleCopy=(event:MouseEvent<HTMLButtonElement>)=>{onClick?.(event);if(!event.defaultPrevented)void feedback.current?.copy(text);};
+  const handleCopy=(event:MouseEvent<HTMLButtonElement>)=>{if(pending||props["aria-disabled"]===true||props["aria-disabled"]==="true")return;onClick?.(event);if(!event.defaultPrevented)void feedback.current?.copy(text);};
 
   const label = copied ? copiedLabel : actionLabel && status === "Copy failed" ? failedLabel : actionLabel ?? "Copy to clipboard";
   return (
@@ -170,7 +170,9 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
           focusRing,
           className,
         )}
-        aria-label={label}
+        aria-label={pending?"Copying to clipboard":label}
+        aria-busy={pending||props["aria-busy"]}
+        aria-disabled={pending||props["aria-disabled"]}
         title={label}
       >
         {copied ? (

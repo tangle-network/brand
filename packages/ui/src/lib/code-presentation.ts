@@ -167,27 +167,34 @@ export async function writeClipboard(text:string):Promise<void> {
  finally {field.remove();active?.focus({preventScroll:true});if(selection){selection.removeAllRanges();for(const range of ranges)selection.addRange(range);}}
 }
 const COPY_FEEDBACK_MS=2000;
-export interface CopyFeedback {copied:boolean;status:string;}
-/** Owns async ordering, announcements and timer cleanup for both renderers. */
+export interface CopyFeedback {copied:boolean;status:string;pending:boolean;}
+/** Owns one in-flight write, announcements and timer cleanup for both renderers. */
 export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text:string)=>Promise<void>=writeClipboard) {
- let attempt=0,disposed=false,timer:ReturnType<typeof setTimeout>|undefined;
+ let disposed=false,pending=false,timer:ReturnType<typeof setTimeout>|undefined;
  return {
   async copy(text:string) {
-   const current=++attempt;if(timer)clearTimeout(timer);if(disposed)return;
-   change({copied:false,status:""});
+   if(disposed||pending)return;
+   pending=true;if(timer)clearTimeout(timer);
+   change({copied:false,status:"Copying to clipboard",pending:true});
    let state:CopyFeedback;
-   try {await write(text);state={copied:true,status:"Copied to clipboard"};}
-   catch {state={copied:false,status:"Copy failed"};}
-   if(disposed||current!==attempt)return;change(state);
-   timer=setTimeout(()=>{if(!disposed)change({copied:false,status:""});},COPY_FEEDBACK_MS);
+   try {await write(text);state={copied:true,status:"Copied to clipboard",pending:false};}
+   catch {state={copied:false,status:"Copy failed",pending:false};}
+   pending=false;if(disposed)return;change(state);
+   timer=setTimeout(()=>{if(!disposed)change({copied:false,status:"",pending:false});},COPY_FEEDBACK_MS);
   },
-  dispose(){disposed=true;attempt++;if(timer)clearTimeout(timer);},
+  dispose(){disposed=true;if(timer)clearTimeout(timer);},
  };
 }
 export function bindCopyButton(button:HTMLButtonElement,status:HTMLElement,text:()=>string) {
- const feedback=createCopyFeedback(state=>{status.textContent=state.status;button.setAttribute("aria-label",state.copied?"Copied":"Copy to clipboard");});
- const click=()=>void feedback.copy(text());button.addEventListener("click",click);
- return ()=>{button.removeEventListener("click",click);feedback.dispose();};
+ const previous={disabled:button.getAttribute("aria-disabled"),busy:button.getAttribute("aria-busy")};
+ const restore=(name:string,value:string|null)=>{if(value===null)button.removeAttribute(name);else button.setAttribute(name,value);};
+ const feedback=createCopyFeedback(state=>{
+  status.textContent=state.status;button.setAttribute("aria-label",state.pending?"Copying to clipboard":state.copied?"Copied":"Copy to clipboard");
+  if(state.pending){button.setAttribute("aria-disabled","true");button.setAttribute("aria-busy","true");}
+  else {restore("aria-disabled",previous.disabled);restore("aria-busy",previous.busy);}
+ });
+ const click=()=>{if(!button.disabled&&button.getAttribute("aria-disabled")!=="true")void feedback.copy(text());};button.addEventListener("click",click);
+ return ()=>{button.removeEventListener("click",click);feedback.dispose();restore("aria-disabled",previous.disabled);restore("aria-busy",previous.busy);};
 }
 /** Native tabs adapter. The consumer owns labels, IDs and escaped panel content. */
 export function bindCodeTabs(list:HTMLElement,onSelect?:(index:number)=>void) {
