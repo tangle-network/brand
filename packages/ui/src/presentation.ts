@@ -139,14 +139,22 @@ export function bindDialog(dialog: HTMLDialogElement, trigger: HTMLElement): () 
   // chrome at a boundary. Keep this reading surface's keyboard cycle local.
   const key = (event: KeyboardEvent) => {
     if (event.key !== "Tab" || !dialog.open) return;
-    const stops = [...dialog.querySelectorAll<HTMLElement>("*")]
+    const candidates = [...dialog.querySelectorAll<HTMLElement>("*")]
       .filter(element => (element.tabIndex >= 0 || (element.isContentEditable && !element.hasAttribute("tabindex")))
         && !element.matches(":disabled") && !element.closest("[inert]")
-        && element.getClientRects().length > 0 && getComputedStyle(element).visibility === "visible")
-      .sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Infinity) - (b.tabIndex > 0 ? b.tabIndex : Infinity));
+        && element.getClientRects().length > 0 && getComputedStyle(element).visibility === "visible");
+    const radio = (element: Element): element is HTMLInputElement => element instanceof HTMLInputElement && element.type === "radio" && !!element.name;
+    const sameRadioGroup = (a: Element, b: Element) => radio(a) && radio(b) && a.name === b.name && a.form === b.form && a.getRootNode() === b.getRootNode();
+    const stops = candidates.filter(element => {
+      if (!radio(element)) return true;
+      const group = candidates.filter(candidate => sameRadioGroup(element, candidate));
+      const checked = group.find(candidate => (candidate as HTMLInputElement).checked);
+      return element === (checked ?? (event.shiftKey ? group.at(-1) : group[0]));
+    }).sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Infinity) - (b.tabIndex > 0 ? b.tabIndex : Infinity));
     const first = stops[0], last = stops.at(-1), active = document.activeElement;
     if (!first) { event.preventDefault(); dialog.focus(); return; }
-    if (event.shiftKey ? active === first || active === dialog : active === last || active === dialog) {
+    const atBoundary = (boundary: HTMLElement) => active === boundary || (active instanceof Element && sameRadioGroup(active, boundary));
+    if (active === dialog || (event.shiftKey ? atBoundary(first) : atBoundary(last!))) {
       event.preventDefault(); (event.shiftKey ? last! : first).focus();
     }
   };

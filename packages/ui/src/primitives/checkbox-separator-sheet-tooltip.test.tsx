@@ -71,7 +71,8 @@ describe("Sheet", () => {
     );
     fireEvent.click(screen.getByText("Open chat"));
     const dialog = await screen.findByRole("dialog", { name: "Assistant" });
-    expect(dialog.className).toContain("slide-in-from-left");
+    expect(dialog).toHaveAttribute("data-state", "open");
+    expect(dialog.style.opacity).toBe("1");
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });

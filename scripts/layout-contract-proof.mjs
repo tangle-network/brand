@@ -26,12 +26,19 @@ if(process.argv.includes("--review-only")){
      for(const direction of ["Tab","Shift+Tab"]){
       // Enter then cross the radio group boundary twice in each direction.
       await page.locator("#boundary-start").focus();
-      for(let i=0;i<4;i++){await page.keyboard.press(direction);trace.push(await page.evaluate(()=>({direction:window.reviewDirection,id:document.activeElement.id,inside:document.querySelector("dialog").contains(document.activeElement)})));trace.at(-1).direction=direction;}
+      for(let i=0;i<4;i++){await page.keyboard.press(direction);trace.push(await page.evaluate(()=>({id:document.activeElement.id,inside:document.querySelector("dialog").contains(document.activeElement)})));trace.at(-1).direction=direction;}
      }
      const forwardRadio=`choice-${selected<0?0:selected}`,reverseRadio=`choice-${selected<0?2:selected}`;
      const expected=[forwardRadio,"boundary-start",forwardRadio,"boundary-start",reverseRadio,"boundary-start",reverseRadio,"boundary-start"];
      const pass=trace.every((point,i)=>point.inside&&point.id===expected[i]);
      reviewCases.push({check:"radio",renderer,selected,pass,expected,trace});await page.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});
+    }
+    {
+     const trigger=page.getByRole("button",{name:"Sections",exact:true});await trigger.click();const dialog=page.getByRole("dialog");await dialog.waitFor();
+     await dialog.evaluate(d=>{d.innerHTML='<button id="boundary-start">Start</button>'+[1,2].map(form=>`<form><input type="radio" name="shared-name" id="form-${form}-checked" checked><input type="radio" name="shared-name" id="form-${form}-unchecked"></form>`).join("");document.getElementById("boundary-start").focus();});
+     const trace=[];for(let i=0;i<6;i++){await page.keyboard.press("Tab");trace.push(await page.evaluate(()=>document.activeElement.id));}
+     const expected=["form-1-checked","form-2-checked","boundary-start","form-1-checked","form-2-checked","boundary-start"];
+     reviewCases.push({check:"radio-form-owners",renderer,pass:trace.every((id,i)=>id===expected[i]),trace,expected});await page.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});
     }
     const video=`videos/${basename(await page.video().path())}`;for(const c of reviewCases.filter(c=>c.renderer===renderer))c.video=video;
    }finally{await context.close();}
