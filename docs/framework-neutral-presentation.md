@@ -116,3 +116,9 @@ motion settles both paths, including a preference change while open. Application
 state and focus never wait for a JavaScript animation callback. The native-dialog
 adapter remains the Hono semantics owner; it wraps keyboard boundaries and
 returns focus on close.
+
+### Clipboard pending state
+
+`createCopyFeedback` and `bindCopyButton` accept one write until the browser settles it. The React CopyButton uses that same controller. The controller reads scoped Brand `--interaction-*` roles from the button, resolving CSS durations into milliseconds; it never copies their values. Pending and duplicate-write suppression begin synchronously. The contextual ellipsis appears at the pending delay. At the long-work delay, the shared status reports elapsed time, unknown remaining time and that an accepted clipboard write cannot be cancelled. Success requires browser confirmation. Disposal suppresses later updates without claiming cancellation.
+
+Use `codePresentation.copy` on native copy buttons and `codePresentation.copyStatus` on the live status element. Reduced motion uses the same static indicator. The optional settlement `measurement` reports elapsed/feedback milliseconds, the resolved budgets and whether the local mutation exceeded its budget; missing CSS roles remain unknown. Consumers retain ownership of external operation identity, cancellation acknowledgment and reconciliation.

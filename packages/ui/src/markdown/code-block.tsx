@@ -14,7 +14,7 @@ import type { ThemedToken } from "shiki/core";
 import { Check, Copy, FileCode2 } from "lucide-react";
 import { focusRing, focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
-import { SYNTAX, LANGUAGE_NAMES, PLAIN_TEXT, codeBlockGrammar, tokenize, tokenStyle, codePreStyle, codeTextStyle, codePresentation, createCopyFeedback, bindCodeTabs, apiMetadataText, type CodeExample, type ApiMetadata } from "../lib/code-presentation";
+import { SYNTAX, LANGUAGE_NAMES, PLAIN_TEXT, codeBlockGrammar, tokenize, tokenStyle, codePreStyle, codeTextStyle, codePresentation, createCopyFeedback, bindCodeTabs, apiMetadataText, type CopyFeedback, type CodeExample, type ApiMetadata } from "../lib/code-presentation";
 export { codeBlockGrammar } from "../lib/code-presentation";
 
 
@@ -152,9 +152,10 @@ export interface CopyButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
 }
 /** Copy-to-clipboard button for use inside CodeBlock or other exact-text actions. */
 export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied", failedLabel="Copy failed", className, onClick, ...props }: CopyButtonProps) => {
-  const [{copied,status,pending},setFeedback] = useState({copied:false,status:"",pending:false});
+  const [{copied,status,pending,loading,longRunning},setFeedback] = useState<CopyFeedback>({copied:false,status:"",pending:false});
+  const button=useRef<HTMLButtonElement>(null);
   const feedback=useRef<ReturnType<typeof createCopyFeedback>|null>(null);
-  useEffect(()=>{const controller=createCopyFeedback(setFeedback);feedback.current=controller;return()=>controller.dispose();},[]);
+  useEffect(()=>{const controller=createCopyFeedback(setFeedback,undefined,button.current??undefined);feedback.current=controller;return()=>controller.dispose();},[]);
   const handleCopy=(event:MouseEvent<HTMLButtonElement>)=>{if(pending||props["aria-disabled"]===true||props["aria-disabled"]==="true")return;onClick?.(event);if(!event.defaultPrevented)void feedback.current?.copy(text);};
 
   const label = copied ? copiedLabel : actionLabel && status === "Copy failed" ? failedLabel : actionLabel ?? "Copy to clipboard";
@@ -162,6 +163,8 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
     <>
       <button
         {...props}
+        ref={button}
+        data-copy-loading={!!loading}
         type="button"
         onClick={handleCopy}
         className={cn(
@@ -183,7 +186,7 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
         {actionLabel && <span>{label}</span>}
       </button>
       {/* Announce the result; the icon swap alone is silent to screen readers. */}
-      <span className="sr-only" role="status" aria-live="polite">
+      <span className={codePresentation.copyStatus} data-copy-long-work={!!longRunning} role="status" aria-live="polite">
         {status}
       </span>
     </>

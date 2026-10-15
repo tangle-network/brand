@@ -143,7 +143,8 @@ export const codePresentation = {
   tab: tabsPresentation.trigger.underline,
   root: "group relative min-w-0 overflow-hidden rounded-lg border font-mono bg-card border-border",
   header: "flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-1.5 bg-[var(--code-header-bg,hsl(var(--background)))]",
-  copy: "flex items-center justify-center min-w-8 min-h-8 pointer-coarse:min-w-11 pointer-coarse:min-h-11 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
+  copy: "flex items-center justify-center min-w-8 min-h-8 pointer-coarse:min-w-11 pointer-coarse:min-h-11 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors data-[copy-loading=true]:after:content-[\'…\'] data-[copy-loading=true]:gap-1",
+  copyStatus: "sr-only data-[copy-long-work=true]:not-sr-only data-[copy-long-work=true]:text-xs data-[copy-long-work=true]:text-muted-foreground",
 };
 export interface CodeExample {label:string;code:string;language?:string;filename?:string;}
 export interface ApiMetadata {kind:"request"|"response"|"error";method?:string;status?:number;contentType?:string;}
@@ -167,34 +168,69 @@ export async function writeClipboard(text:string):Promise<void> {
  finally {field.remove();active?.focus({preventScroll:true});if(selection){selection.removeAllRanges();for(const range of ranges)selection.addRange(range);}}
 }
 const COPY_FEEDBACK_MS=2000;
-export interface CopyFeedback {copied:boolean;status:string;pending:boolean;}
-/** Owns one in-flight write, announcements and timer cleanup for both renderers. */
-export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text:string)=>Promise<void>=writeClipboard) {
+export interface InteractionBudgets { feedback?:number; pending?:number; longWork?:number; mutation?:number; }
+/** Resolve scoped Brand times, including calc(), without duplicating token values. */
+export function interactionBudgets(scope:HTMLElement):InteractionBudgets {
+ const view=scope.ownerDocument.defaultView;if(!view)return {};
+ const probe=scope.ownerDocument.createElement("i");probe.hidden=true;scope.append(probe);
+ const read=(role:string)=>{
+  const name=`--interaction-${role}`;
+  if(!view.getComputedStyle(scope).getPropertyValue(name).trim())return undefined;
+  probe.style.animationDuration=`var(${name})`;
+  const time=/^(\d+(?:\.\d+)?)(ms|s)$/.exec(view.getComputedStyle(probe).animationDuration);
+  return time?Number(time[1])*(time[2]==="s"?1000:1):undefined;
+ };
+ try{return {feedback:read("feedback-budget"),pending:read("pending-delay"),longWork:read("long-work-delay"),mutation:read("mutation-budget")};}
+ finally{probe.remove();}
+}
+export interface CopyFeedback {
+ copied:boolean;status:string;pending:boolean;loading?:boolean;longRunning?:boolean;elapsedMs?:number;
+ measurement?:{elapsedMs:number;feedbackMs:number;budgets:InteractionBudgets;mutationBudgetExceeded:boolean|undefined};
+}
+/** Owns one accepted write, scoped delays and cleanup for both renderers. */
+export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text:string)=>Promise<void>=writeClipboard,scope?:HTMLElement) {
  let disposed=false,pending=false,timer:ReturnType<typeof setTimeout>|undefined;
+ let delays:Array<ReturnType<typeof setTimeout>>=[],elapsed:ReturnType<typeof setInterval>|undefined;
+ const clearPending=()=>{for(const delay of delays)clearTimeout(delay);delays=[];if(elapsed)clearInterval(elapsed);elapsed=undefined;};
  return {
   async copy(text:string) {
    if(disposed||pending)return;
+   const started=performance.now(),budgets=scope?interactionBudgets(scope):{};
    pending=true;if(timer)clearTimeout(timer);
-   change({copied:false,status:"Copying to clipboard",pending:true});
-   let state:CopyFeedback;
-   try {await write(text);state={copied:true,status:"Copied to clipboard",pending:false};}
-   catch {state={copied:false,status:"Copy failed",pending:false};}
-   pending=false;if(disposed)return;change(state);
+   let loading=budgets.pending===undefined,longRunning=false;
+   const announce=()=>{
+    const elapsedMs=performance.now()-started;
+    change({copied:false,pending:true,loading,longRunning,elapsedMs,status:longRunning
+     ?`Copying · ${Math.floor(elapsedMs/1000)}s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation.`
+     :"Copying to clipboard"});
+   };
+   announce();const feedbackMs=performance.now()-started;
+   if(budgets.pending!==undefined)delays.push(setTimeout(()=>{loading=true;announce();},budgets.pending));
+   if(budgets.longWork!==undefined)delays.push(setTimeout(()=>{longRunning=true;announce();elapsed=setInterval(announce,1000);},budgets.longWork));
+   let copied:boolean;
+   try {await write(text);copied=true;}
+   catch {copied=false;}
+   pending=false;clearPending();if(disposed)return;
+   const elapsedMs=performance.now()-started;
+   change({copied,status:copied?"Copied to clipboard":"Copy failed",pending:false,measurement:{elapsedMs,feedbackMs,budgets,
+    mutationBudgetExceeded:budgets.mutation===undefined?undefined:elapsedMs>budgets.mutation}});
    timer=setTimeout(()=>{if(!disposed)change({copied:false,status:"",pending:false});},COPY_FEEDBACK_MS);
   },
-  dispose(){disposed=true;if(timer)clearTimeout(timer);},
+  dispose(){disposed=true;clearPending();if(timer)clearTimeout(timer);},
  };
 }
 export function bindCopyButton(button:HTMLButtonElement,status:HTMLElement,text:()=>string) {
- const previous={disabled:button.getAttribute("aria-disabled"),busy:button.getAttribute("aria-busy")};
- const restore=(name:string,value:string|null)=>{if(value===null)button.removeAttribute(name);else button.setAttribute(name,value);};
+ const previous={disabled:button.getAttribute("aria-disabled"),busy:button.getAttribute("aria-busy"),loading:button.getAttribute("data-copy-loading"),long:status.getAttribute("data-copy-long-work")};
+ const restore=(element:HTMLElement,name:string,value:string|null)=>{if(value===null)element.removeAttribute(name);else element.setAttribute(name,value);};
  const feedback=createCopyFeedback(state=>{
-  status.textContent=state.status;button.setAttribute("aria-label",state.pending?"Copying to clipboard":state.copied?"Copied":"Copy to clipboard");
+  status.textContent=state.status;status.setAttribute("data-copy-long-work",String(!!state.longRunning));
+  button.setAttribute("data-copy-loading",String(!!state.loading));
+  button.setAttribute("aria-label",state.pending?"Copying to clipboard":state.copied?"Copied":"Copy to clipboard");
   if(state.pending){button.setAttribute("aria-disabled","true");button.setAttribute("aria-busy","true");}
-  else {restore("aria-disabled",previous.disabled);restore("aria-busy",previous.busy);}
- });
+  else {restore(button,"aria-disabled",previous.disabled);restore(button,"aria-busy",previous.busy);}
+ },writeClipboard,button);
  const click=()=>{if(!button.disabled&&button.getAttribute("aria-disabled")!=="true")void feedback.copy(text());};button.addEventListener("click",click);
- return ()=>{button.removeEventListener("click",click);feedback.dispose();restore("aria-disabled",previous.disabled);restore("aria-busy",previous.busy);};
+ return ()=>{button.removeEventListener("click",click);feedback.dispose();restore(button,"aria-disabled",previous.disabled);restore(button,"aria-busy",previous.busy);restore(button,"data-copy-loading",previous.loading);restore(status,"data-copy-long-work",previous.long);};
 }
 /** Native tabs adapter. The consumer owns labels, IDs and escaped panel content. */
 export function bindCodeTabs(list:HTMLElement,onSelect?:(index:number)=>void) {
