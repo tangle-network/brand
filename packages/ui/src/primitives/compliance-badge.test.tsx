@@ -17,6 +17,33 @@ describe("ComplianceBadge", () => {
     expect(screen.getByLabelText("HIPAA Compliant")).toBeInTheDocument();
   });
 
+  it("keeps the HIPAA copy exact when a product is given", () => {
+    render(<ComplianceBadge product="hipaa" status="ready" />);
+    expect(screen.getByLabelText("HIPAA-Ready")).toBeInTheDocument();
+  });
+
+  // SOC 2 Type II is an attained audit (compliance/evidence/2026-09-01-final-audit),
+  // so unlike HIPAA the filled claim is legitimate to render today — but still
+  // only under an explicit status, with plain "SOC 2" as the default.
+  it("defaults soc2 to plain SOC 2", () => {
+    render(<ComplianceBadge product="soc2" />);
+    expect(screen.getByLabelText("SOC 2")).toBeInTheDocument();
+    expect(screen.queryByText("SOC 2 Type II")).not.toBeInTheDocument();
+  });
+
+  it("renders SOC 2 Type II with an explicit compliant status", () => {
+    render(<ComplianceBadge product="soc2" status="compliant" />);
+    expect(screen.getByLabelText("SOC 2 Type II")).toBeInTheDocument();
+  });
+
+  it("fills the attained SOC 2 claim like any compliant status", () => {
+    const { container } = render(
+      <ComplianceBadge product="soc2" status="compliant" />,
+    );
+    const badge = container.firstElementChild as HTMLElement;
+    expect(badge.className).toContain("bg-[var(--surface-success-bg)]");
+  });
+
   it("never says certified", () => {
     const { container } = render(<ComplianceBadge status="compliant" />);
     expect(container.textContent).not.toMatch(/certif/i);

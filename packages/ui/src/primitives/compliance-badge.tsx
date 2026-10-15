@@ -10,15 +10,21 @@ import { cn } from "../lib/utils";
  * Copy discipline is the point of the component. There is NO official HIPAA
  * certification a product can hold, so the badge never says "certified", and
  * it renders "HIPAA Compliant" ONLY when a caller passes `status="compliant"`
- * explicitly. The default — and the only state surfaces may ship today — is
- * `status="ready"`, which renders "HIPAA-Ready".
+ * explicitly. The default — and the only HIPAA state surfaces may ship
+ * today — is `status="ready"`, which renders "HIPAA-Ready".
  *
- * `status="compliant"` is reserved for use AFTER the company's documented
- * launch gate closes: business associate agreements executed AND the
- * infrastructure blockers resolved, per
+ * For HIPAA, `status="compliant"` is reserved for use AFTER the company's
+ * documented launch gate closes: business associate agreements executed AND
+ * the infrastructure blockers resolved, per
  * compliance/policies/hipaa-security-program.md. Do not pass it before that
  * gate is confirmed closed in the policy record, whatever a page design
  * suggests.
+ *
+ * That gate is HIPAA's. SOC 2 Type II is an ATTAINED audit, not a pending
+ * one — the final report is on file at
+ * compliance/evidence/2026-09-01-final-audit — so for `product="soc2"` the
+ * filled `status="compliant"` form, "SOC 2 Type II", is legitimate to render
+ * today.
  *
  * The claim is told three ways, matching StatusPill's doctrine: the LABEL
  * text itself ("HIPAA-Ready" vs "HIPAA Compliant"), the FILL (outlined vs
@@ -35,14 +41,18 @@ import { cn } from "../lib/utils";
 export type ComplianceStatus = "ready" | "compliant";
 
 /**
- * Only HIPAA exists today. The record is keyed by product so SOC 2 and ISO
- * 27001 slot in as new entries with their own reviewed copy, not as string
- * interpolation at call sites.
+ * The record is keyed by product so each framework's claim is reviewed copy
+ * in one place, not string interpolation at call sites. ISO 27001 slots in
+ * the same way when its audit lands.
  */
-export type ComplianceProduct = "hipaa";
+export type ComplianceProduct = "hipaa" | "soc2";
 
 export interface ComplianceBadgeProps {
-  /** Defaults to "ready"; "compliant" only after the launch gate closes. */
+  /**
+   * Defaults to "ready". For HIPAA, pass "compliant" only after the launch
+   * gate closes; for SOC 2 the Type II audit is already attained, so
+   * "compliant" is legitimate today.
+   */
   status?: ComplianceStatus;
   product?: ComplianceProduct;
   size?: "sm" | "md";
@@ -61,12 +71,17 @@ const PRODUCT_COPY: Record<
     ready: "HIPAA-Ready",
     compliant: "HIPAA Compliant",
   },
+  soc2: {
+    ready: "SOC 2",
+    compliant: "SOC 2 Type II",
+  },
 };
 
 /**
- * Outlined while the gate is open (info: still moving), filled once it closes
- * (success: settled). Both draw from ONE matched token triple — no hardcoded
- * colours — so themes repaint the badge like any other surface.
+ * Outlined while a claim is still being earned (info: still moving), filled
+ * once it is attained (success: settled). Both draw from ONE matched token
+ * triple — no hardcoded colours — so themes repaint the badge like any other
+ * surface.
  */
 const STATUS_SURFACE: Record<ComplianceStatus, string> = {
   ready:
