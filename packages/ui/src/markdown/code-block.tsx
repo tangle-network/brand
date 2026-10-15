@@ -103,7 +103,7 @@ export const CodeBlock = memo(
         {examples && examples.length > 1 && <div role="tablist" aria-label="Code examples" ref={tabList} className={codePresentation.tabs}>
           {examples.map((item,index)=><button key={index} id={`${tabId}-tab-${index}`} type="button" role="tab" className={codePresentation.tab} data-state={index===selectedIndex?"active":"inactive"} aria-selected={index===selectedIndex} tabIndex={index===selectedIndex?0:-1} aria-controls={`${tabId}-panel`}>{item.label}</button>)}
         </div>}
-        <div id={`${tabId}-panel`} role={examples?.length ? "tabpanel" : undefined} aria-labelledby={examples?.length ? `${tabId}-tab-${selectedIndex}` : undefined}>
+        <div id={`${tabId}-panel`} role={examples && examples.length > 1 ? "tabpanel" : undefined} aria-labelledby={examples && examples.length > 1 ? `${tabId}-tab-${selectedIndex}` : undefined}>
         {/* A long line scrolls the block sideways, which a keyboard reaches only
             if the block takes focus; a label on a bare <pre> is prohibited ARIA,
             so the block is a named region. Inset: the rounded card clips an outer ring. */}
