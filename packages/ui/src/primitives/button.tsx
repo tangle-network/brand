@@ -1,6 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { buttonVariants } from "../presentation";
 import * as React from "react";
+import { controlMotion } from "../lib/motion";
 import { focusRing } from "../lib/focus";
 import { ixControl, ixControlSoft, ixSelected } from "../lib/interaction";
 import { cn } from "../lib/utils";
@@ -18,7 +19,7 @@ import { cn } from "../lib/utils";
 // every surface, size and type class. It is for pressable rows, tiles and pills
 // that draw their own layout; anything that reads as a button uses a styled
 // variant and a size.
-const bareButton = `${focusRing} ${ixControlSoft} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`;
+const bareButton = `${focusRing} ${controlMotion} ${ixControlSoft} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`;
 
 /** One Button render's classes: variant and size, the toggle states, then the caller's. */
 function buttonClassName(

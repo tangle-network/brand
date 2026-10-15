@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 const out=resolve(process.env.DESIGN_EVIDENCE??"/tmp/brand-retarget-evidence");await mkdir(out,{recursive:true});
 const {server,url}=await designServer(),browser=await chromium.launch({headless:true}),cases=[];
 try {
- for(const width of [390,1440])for(const kind of ["dialog","sheet"]){
+ for(const width of [390,1440])for(const kind of ["dialog","sheet","popover"]){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"no-preference",recordVideo:{dir:`${out}/videos`}});
   try {
    const page=await context.newPage();await page.goto(`${url}?surface=motion&theme=light`,{waitUntil:"networkidle"});await page.getByRole("button",{name:`Open ${kind}`,exact:true}).waitFor();
@@ -59,7 +59,7 @@ try {
     if(!reverse||reverse.progress>=reopenBefore.progress)throw Error(`Velocity restarted on reopen: ${JSON.stringify({reopenBefore,reopening})}`);
     const end=performance.now()+seconds*2000;let final=read();while(performance.now()<end&&Math.abs(final.progress-1)>0.001){await frame();final=read();}
     if(Math.abs(final.progress-1)>0.001||!node.contains(document.activeElement))throw Error(`Surface failed to settle/focus: ${JSON.stringify(final)}`);
-    const bounds=node.getBoundingClientRect();if(kind==="dialog"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
+    const bounds=node.getBoundingClientRect();if(kind!=="sheet"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
     return {scopedSeconds,calibrationMultiplier:16,temporalResolutionMs,closeBoundary,reopenBoundary,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
    },kind);
    await page.screenshot({path:`${out}/${kind}-${width}.png`});await page.emulateMedia({reducedMotion:"reduce"});

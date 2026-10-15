@@ -6,7 +6,7 @@ import { animate } from "motion";
 
 type Side = "top" | "right" | "bottom" | "left";
 type SurfaceProps = React.HTMLAttributes<HTMLDivElement> & {
-  kind: "dialog" | "sheet" | "overlay" | "tooltip";
+  kind: "dialog" | "sheet" | "overlay" | "tooltip" | "popover";
   side?: Side;
   asChild?: boolean;
   "data-state"?: string;
@@ -35,7 +35,7 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
         const bounds = node.getBoundingClientRect();
         const hidden = {
           opacity: kind === "sheet" ? 1 : 0,
-          scale: kind === "dialog" || kind === "tooltip" ? 0.98 : 1,
+          scale: kind === "dialog" || kind === "tooltip" || kind === "popover" ? 0.98 : 1,
           x: kind === "sheet" ? side === "left" ? -bounds.width : side === "right" ? bounds.width : 0 : 0,
           y: kind === "sheet" ? side === "top" ? -bounds.height : side === "bottom" ? bounds.height : 0 : 0,
         };
