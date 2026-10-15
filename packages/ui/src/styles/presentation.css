@@ -16,11 +16,12 @@
 .tangle-reading-nav a[aria-current]:not([aria-current="false"]), .tangle-reading-outline a[aria-current]:not([aria-current="false"]) { color: var(--accent-text); font-weight: 600; }
 @media(min-width: 64rem) {
   .tangle-reading-shell { grid-template-columns: 13rem minmax(0,1fr); }
+  .tangle-reading-outline { display: none; }
   .tangle-reading-nav { position: sticky; top: var(--shell-header-height); align-self: start; max-height: calc(100dvh - var(--shell-header-height)); overflow: auto; }
 }
 @media(min-width: 80rem) {
   .tangle-reading-shell:has(.tangle-reading-outline) { grid-template-columns: 13rem minmax(0,1fr) 11rem; }
-  .tangle-reading-outline { position: sticky; top: var(--shell-header-height); align-self: start; }
+  .tangle-reading-outline { display: block; position: sticky; top: var(--shell-header-height); align-self: start; }
 }
 /* Native dialog has the same solid reading surface as React's Dialog/Sheet. */
 .tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
