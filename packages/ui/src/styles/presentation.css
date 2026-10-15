@@ -27,4 +27,12 @@
 .tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
 .tangle-native-dialog::backdrop { background: var(--scrim); }
 
+.tangle-api-meta { font-family: var(--font-mono); font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); overflow-wrap: anywhere; }
+.tangle-api-schema { margin: 1rem 0; }
+.tangle-api-schema > div { padding-block: 0.75rem; border-bottom: 1px solid hsl(var(--border)); overflow-wrap: anywhere; }
+.tangle-api-schema dt { font-family: var(--font-mono); font-size: var(--font-size-label); }
+.tangle-api-schema dt span, .tangle-api-schema dd { color: hsl(var(--muted-foreground)); }
+.tangle-api-schema dd { margin: 0.25rem 0 0; font-size: var(--font-size-label); }
 .tangle-page-description { margin-top: 0.25rem; max-width: 65ch; color: hsl(var(--muted-foreground)); font-size: var(--font-size-label); overflow-wrap: anywhere; }
+.tangle-code-tabs { overflow-x: auto; max-width: 100%; }
+.tangle-code-tabs [role="tab"] { flex: none; min-height: var(--control-height-lg); }

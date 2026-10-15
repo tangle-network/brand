@@ -120,6 +120,11 @@
       "default": "./dist/presentation.js"
     },
     "./styles/presentation.css": "./src/styles/presentation.css",
+    "./code-presentation": {
+      "types": "./dist/code-presentation.d.ts",
+      "import": "./dist/code-presentation.js",
+      "default": "./dist/code-presentation.js"
+    },
     "./styles/compat.css": "./src/styles/compat.css"
   },
   "scripts": {

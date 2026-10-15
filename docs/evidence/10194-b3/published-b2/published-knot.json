@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-15T23:33:42.441Z",
+  "name": "@tangle-network/brand",
+  "version": "1.25.1",
+  "integrity": "sha512-ahsX9AWIZ9cE2qZxvGDo+IEJWgvueMUbMnC9957xiN9YIr/o/kepkBfn1jfAerAXOilSotnaaQVU33AK1+LZRQ==",
+  "tarballUrl": "https://registry.npmjs.org/@tangle-network/brand/-/brand-1.25.1.tgz",
+  "sourceSha": "0df22723a928f514c8c86b05efdf1a9f8a2a8c2e",
+  "registryGitHead": null,
+  "sources": [
+    "src/knot.ts",
+    "src/logo.tsx",
+    "src/styles/presentation.css",
+    "src/styles/tokens.css",
+    "src/styles/index.css",
+    "src/styles/legacy-light.css"
+  ],
+  "roles": [
+    "--interaction-feedback-budget",
+    "--interaction-pending-delay",
+    "--interaction-long-work-delay",
+    "--interaction-mutation-budget",
+    "--motion-control",
+    "--motion-surface",
+    "--motion-dismiss",
+    "--motion-stream",
+    "--motion-arrive"
+  ],
+  "smoke": "packed knot import passes without React"
+}

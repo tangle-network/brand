@@ -1,151 +1,27 @@
 import {
   memo,
-  useCallback,
+  useId,
   useEffect,
   useRef,
   useState,
   type CSSProperties,
+  type ButtonHTMLAttributes,
+  type MouseEvent,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
-import type { HighlighterCore, LanguageRegistration, ThemedToken } from "shiki/core";
+import type { ThemedToken } from "shiki/core";
 import { Check, Copy, FileCode2 } from "lucide-react";
 import { focusRing, focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
+import { SYNTAX, LANGUAGE_NAMES, PLAIN_TEXT, codeBlockGrammar, tokenize, tokenStyle, codePreStyle, codeTextStyle, codePresentation, createCopyFeedback, bindCodeTabs, apiMetadataText, type CopyFeedback, type CodeExample, type ApiMetadata } from "../lib/code-presentation";
+export { codeBlockGrammar } from "../lib/code-presentation";
 
-// Leave variables unresolved: the browser resolves them on each token span,
-// including nested themes, inline overrides and CSS/media changes. No document
-// sampling, observers, layout reads or React re-render are needed to recolor code.
-const SYNTAX = {
-  comment: "var(--syntax-comment, currentColor)",
-  keyword: "var(--syntax-keyword, currentColor)",
-  string: "var(--syntax-string, currentColor)",
-  function: "var(--syntax-function, currentColor)",
-  number: "var(--syntax-number, currentColor)",
-  variable: "var(--syntax-variable, currentColor)",
-  foreground: "var(--syntax-foreground, currentColor)",
-} as const;
-
-const SHIKI_THEME = "tangle-syntax";
-// Shiki's CSS-variables theme names token roles; each maps onto a Brand syntax token.
-const BRAND_COLOR_FOR_SHIKI: Record<string, string> = {
-  "var(--shiki-foreground)": SYNTAX.foreground,
-  "var(--shiki-token-comment)": SYNTAX.comment,
-  "var(--shiki-token-keyword)": SYNTAX.keyword,
-  "var(--shiki-token-string)": SYNTAX.string,
-  "var(--shiki-token-string-expression)": SYNTAX.string,
-  "var(--shiki-token-function)": SYNTAX.function,
-  "var(--shiki-token-constant)": SYNTAX.number,
-  "var(--shiki-token-link)": SYNTAX.number,
-  "var(--shiki-token-parameter)": SYNTAX.variable,
-  "var(--shiki-token-punctuation)": SYNTAX.foreground,
-};
-
-type GrammarModule = { default: LanguageRegistration[] };
-const GRAMMARS: Record<string, () => Promise<GrammarModule>> = {
-  typescript: () => import("shiki/langs/typescript.mjs"),
-  tsx: () => import("shiki/langs/tsx.mjs"),
-  javascript: () => import("shiki/langs/javascript.mjs"),
-  jsx: () => import("shiki/langs/jsx.mjs"),
-  json: () => import("shiki/langs/json.mjs"),
-  jsonc: () => import("shiki/langs/jsonc.mjs"),
-  bash: () => import("shiki/langs/bash.mjs"),
-  python: () => import("shiki/langs/python.mjs"),
-  html: () => import("shiki/langs/html.mjs"),
-  css: () => import("shiki/langs/css.mjs"),
-  scss: () => import("shiki/langs/scss.mjs"),
-  markdown: () => import("shiki/langs/markdown.mjs"),
-  mdx: () => import("shiki/langs/mdx.mjs"),
-  yaml: () => import("shiki/langs/yaml.mjs"),
-  toml: () => import("shiki/langs/toml.mjs"),
-  sql: () => import("shiki/langs/sql.mjs"),
-  diff: () => import("shiki/langs/diff.mjs"),
-  go: () => import("shiki/langs/go.mjs"),
-  rust: () => import("shiki/langs/rust.mjs"),
-  solidity: () => import("shiki/langs/solidity.mjs"),
-  ruby: () => import("shiki/langs/ruby.mjs"),
-  java: () => import("shiki/langs/java.mjs"),
-  kotlin: () => import("shiki/langs/kotlin.mjs"),
-  swift: () => import("shiki/langs/swift.mjs"),
-  php: () => import("shiki/langs/php.mjs"),
-  c: () => import("shiki/langs/c.mjs"),
-  cpp: () => import("shiki/langs/cpp.mjs"),
-  csharp: () => import("shiki/langs/csharp.mjs"),
-  graphql: () => import("shiki/langs/graphql.mjs"),
-  xml: () => import("shiki/langs/xml.mjs"),
-  dockerfile: () => import("shiki/langs/dockerfile.mjs"),
-};
-
-const LANGUAGE_ALIASES: Record<string, string> = {
-  ts: "typescript", mts: "typescript", cts: "typescript", js: "javascript", mjs: "javascript",
-  cjs: "javascript", node: "javascript", sh: "bash", shell: "bash", zsh: "bash", console: "bash",
-  shellscript: "bash", py: "python", python3: "python", yml: "yaml", md: "markdown", rs: "rust",
-  sol: "solidity", rb: "ruby", kt: "kotlin", cs: "csharp", "c#": "csharp", "c++": "cpp",
-  gql: "graphql", svg: "xml", docker: "dockerfile", patch: "diff", htm: "html",
-};
-
-const LANGUAGE_NAMES: Record<string, string> = {
-  typescript: "TypeScript", tsx: "TSX", javascript: "JavaScript", jsx: "JSX", json: "JSON",
-  jsonc: "JSONC", bash: "Bash", python: "Python", html: "HTML", css: "CSS", scss: "SCSS",
-  markdown: "Markdown", mdx: "MDX", yaml: "YAML", toml: "TOML", sql: "SQL", diff: "Diff",
-  go: "Go", rust: "Rust", solidity: "Solidity", ruby: "Ruby", java: "Java", kotlin: "Kotlin",
-  swift: "Swift", php: "PHP", c: "C", cpp: "C++", csharp: "C#", graphql: "GraphQL", xml: "XML",
-  dockerfile: "Dockerfile",
-};
-
-/** The Shiki grammar for a fence language, or undefined for plain text. */
-const PLAIN_TEXT = new Set(["text", "txt", "plain", "plaintext"]);
-
-export function codeBlockGrammar(language: string | undefined): string | undefined {
-  if (!language) return undefined;
-  const id = language.toLowerCase();
-  const resolved = LANGUAGE_ALIASES[id] ?? id;
-  return GRAMMARS[resolved] ? resolved : undefined;
-}
-
-let highlighterPromise: Promise<HighlighterCore> | undefined;
-const grammarLoads = new Map<string, Promise<void>>();
-
-function loadHighlighter(): Promise<HighlighterCore> {
-  // The JavaScript regex engine needs no WebAssembly, so it runs under a strict CSP.
-  return highlighterPromise ??= Promise.all([import("shiki/core"), import("shiki/engine/javascript")])
-    .then(([core, engine]) => core.createHighlighterCore({
-      themes: [core.createCssVariablesTheme({ name: SHIKI_THEME, variablePrefix: "--shiki-", fontStyle: true })],
-      langs: [],
-      engine: engine.createJavaScriptRegexEngine(),
-    }))
-    .catch((error: unknown) => {
-      highlighterPromise = undefined;
-      throw error;
-    });
-}
-
-async function tokenize(code: string, grammar: string): Promise<ThemedToken[][]> {
-  const highlighter = await loadHighlighter();
-  let load = grammarLoads.get(grammar);
-  if (!load) {
-    load = GRAMMARS[grammar]!().then((module) => highlighter.loadLanguage(module.default));
-    load.catch(() => grammarLoads.delete(grammar));
-    grammarLoads.set(grammar, load);
-  }
-  await load;
-  return highlighter.codeToTokensBase(code, { lang: grammar, theme: SHIKI_THEME });
-}
-
-function tokenStyle(token: ThemedToken): CSSProperties | undefined {
-  const color = token.color ? BRAND_COLOR_FOR_SHIKI[token.color] ?? SYNTAX.foreground : undefined;
-  const style = token.fontStyle ?? 0;
-  if (!color && !style) return undefined;
-  return {
-    ...(color ? { color } : {}),
-    ...(style & 1 ? { fontStyle: "italic" } : {}),
-    ...(style & 2 ? { fontWeight: "bold" } : {}),
-    ...(style & 4 ? { textDecoration: "underline" } : {}),
-  };
-}
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   code: string;
+  examples?: readonly CodeExample[];
+  metadata?: ApiMetadata;
   language?: string;
   /**
    * Header text. Defaults to the language's name. Set this when the display
@@ -165,7 +41,13 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
  * plain code first (and on the server), then highlights once its grammar loads.
  */
 export const CodeBlock = memo(
-  ({ code, language, label, filename, showLineNumbers = false, light, className, children, ...props }: CodeBlockProps) => {
+  ({ code: defaultCode, language: defaultLanguage, label, filename: defaultFilename, examples, metadata, showLineNumbers = false, light, className, children, ...props }: CodeBlockProps) => {
+    const [selected,setSelected]=useState(0);
+    const tabId=useId(),tabList=useRef<HTMLDivElement>(null);
+    const selectedIndex=Math.min(selected,Math.max(0,(examples?.length??1)-1));
+    const example=examples?.[selectedIndex];
+    const code=example?.code??defaultCode,language=example?.language??defaultLanguage,filename=example?.filename??defaultFilename;
+    useEffect(()=>{if(tabList.current)return bindCodeTabs(tabList.current,setSelected);},[examples?.length]);
     const grammar = codeBlockGrammar(language);
     const [highlighted, setHighlighted] = useState<{ code: string; grammar: string; lines: ThemedToken[][] } | null>(null);
     useEffect(() => {
@@ -182,21 +64,8 @@ export const CodeBlock = memo(
     // A plain-text fence names no language worth showing; it keeps its copy control.
     const languageName = grammar ? LANGUAGE_NAMES[grammar] : PLAIN_TEXT.has(language?.toLowerCase() ?? "") ? undefined : language;
     const headerLabel = label ?? (filename ? undefined : languageName);
-    const hasHeader = Boolean(filename || headerLabel);
+    const hasHeader = Boolean(filename || headerLabel || metadata || examples?.length);
     const mode = light === undefined ? {} : { "data-theme": light ? "light" : "dark" };
-    const preStyle: CSSProperties = {
-      margin: 0,
-      padding: "var(--code-padding-y, 0.625rem) var(--code-padding-x, 0.75rem)",
-      background: "transparent",
-      color: SYNTAX.foreground,
-      fontSize: "var(--code-font-size, 0.8125rem)",
-      lineHeight: "var(--code-line-height, 1.5)",
-      overflowX: "auto",
-    };
-    const codeStyle: CSSProperties = {
-      fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)",
-      whiteSpace: "pre",
-    };
     const isHighlighted = Boolean(highlighted && highlighted.code === code && highlighted.grammar === grammar);
     const lines: Array<Array<{ content: string; style?: CSSProperties }>> = isHighlighted
       ? highlighted!.lines.map((line) => line.map((token) => ({ content: token.content, style: tokenStyle(token) })))
@@ -205,13 +74,14 @@ export const CodeBlock = memo(
 
     return (
       <div
-        className={cn("group relative overflow-hidden rounded-lg border font-mono", "bg-card border-border", className)}
+        className={cn(codePresentation.root, className)}
         data-highlighted={isHighlighted ? "true" : undefined}
         {...props}
         {...mode}
       >
         {hasHeader && (
-          <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-1.5 bg-[var(--code-header-bg,hsl(var(--background)))]">
+          <div className={codePresentation.header}>
+            {metadata && <span className="tangle-api-meta">{apiMetadataText(metadata)}</span>}
             {filename ? (
               <span className="flex min-w-0 items-center gap-2 font-sans text-sm">
                 <FileCode2 aria-hidden className="size-4 shrink-0 text-muted-foreground" />
@@ -222,6 +92,7 @@ export const CodeBlock = memo(
               <span className="font-sans text-sm font-medium text-muted-foreground">{headerLabel}</span>
             )}
             {children}
+            {examples?.length ? <CopyButton text={code}/> : null}
           </div>
         )}
         {!hasHeader && children && (
@@ -229,6 +100,10 @@ export const CodeBlock = memo(
             {children}
           </div>
         )}
+        {examples && examples.length > 1 && <div role="tablist" aria-label="Code examples" ref={tabList} className={codePresentation.tabs}>
+          {examples.map((item,index)=><button key={index} id={`${tabId}-tab-${index}`} type="button" role="tab" className={codePresentation.tab} data-state={index===selectedIndex?"active":"inactive"} aria-selected={index===selectedIndex} tabIndex={index===selectedIndex?0:-1} aria-controls={`${tabId}-panel`}>{item.label}</button>)}
+        </div>}
+        <div id={`${tabId}-panel`} role={examples?.length ? "tabpanel" : undefined} aria-labelledby={examples?.length ? `${tabId}-tab-${selectedIndex}` : undefined}>
         {/* A long line scrolls the block sideways, which a keyboard reaches only
             if the block takes focus; a label on a bare <pre> is prohibited ARIA,
             so the block is a named region. Inset: the rounded card clips an outer ring. */}
@@ -237,9 +112,9 @@ export const CodeBlock = memo(
           role="region"
           aria-label={regionName ? `${regionName} code` : "Code"}
           className={focusRingInset}
-          style={preStyle}
+          style={codePreStyle}
         >
-          <code style={codeStyle}>
+          <code style={codeTextStyle}>
             {/* Plain code without line numbers stays one text node, as the server renders it. */}
             {!isHighlighted && !showLineNumbers ? code : lines.map((line, index) => (
               <span key={index}>
@@ -261,53 +136,46 @@ export const CodeBlock = memo(
             ))}
           </code>
         </pre>
+        </div>
       </div>
     );
   },
 );
 CodeBlock.displayName = "CodeBlock";
 
-/** Copy-to-clipboard button for use inside CodeBlock. */
-export const CopyButton = memo(({ text }: { text: string }) => {
-  const [copied, setCopied] = useState(false);
-  // Status text for the live region. Cleared before each attempt so a repeat
-  // copy or a failure is announced again.
-  const [status, setStatus] = useState("");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export interface CopyButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,"children"> {
+  text:string;
+  /** Supply for a visible action label; omitted preserves the icon-only control. */
+  label?:string;
+  copiedLabel?:string;
+  failedLabel?:string;
+}
+/** Copy-to-clipboard button for use inside CodeBlock or other exact-text actions. */
+export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied", failedLabel="Copy failed", className, onClick, ...props }: CopyButtonProps) => {
+  const [{copied,status,pending,loading,longRunning},setFeedback] = useState<CopyFeedback>({copied:false,status:"",pending:false});
+  const button=useRef<HTMLButtonElement>(null);
+  const feedback=useRef<ReturnType<typeof createCopyFeedback>|null>(null);
+  useEffect(()=>{const controller=createCopyFeedback(setFeedback,undefined,button.current??undefined);feedback.current=controller;return()=>controller.dispose();},[]);
+  const handleCopy=(event:MouseEvent<HTMLButtonElement>)=>{if(pending||props["aria-disabled"]===true||props["aria-disabled"]==="true")return;onClick?.(event);if(!event.defaultPrevented)void feedback.current?.copy(text);};
 
-  useEffect(() => {
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, []);
-
-  const handleCopy = useCallback(async () => {
-    setStatus("");
-    if (timerRef.current) clearTimeout(timerRef.current);
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setStatus("Copied to clipboard");
-    } catch (err) {
-      console.warn("Clipboard write failed:", err);
-      setCopied(false);
-      setStatus("Copy failed");
-    }
-    timerRef.current = setTimeout(() => {
-      setCopied(false);
-      setStatus("");
-    }, 2000);
-  }, [text]);
-
-  const label = copied ? "Copied" : "Copy to clipboard";
+  const label = copied ? copiedLabel : actionLabel && status === "Copy failed" ? failedLabel : actionLabel ?? "Copy to clipboard";
   return (
     <>
       <button
+        {...props}
+        ref={button}
+        data-copy-loading={!!loading}
         type="button"
         onClick={handleCopy}
         className={cn(
-          "flex items-center justify-center w-6 h-6 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
+          codePresentation.copy,
+          actionLabel && "gap-2 px-3",
           focusRing,
+          className,
         )}
-        aria-label={label}
+        aria-label={pending?"Copying to clipboard":label}
+        aria-busy={pending||props["aria-busy"]}
+        aria-disabled={pending||props["aria-disabled"]}
         title={label}
       >
         {copied ? (
@@ -315,9 +183,10 @@ export const CopyButton = memo(({ text }: { text: string }) => {
         ) : (
           <Copy aria-hidden="true" className="w-3.5 h-3.5 text-muted-foreground" />
         )}
+        {actionLabel && <span>{label}</span>}
       </button>
       {/* Announce the result; the icon swap alone is silent to screen readers. */}
-      <span className="sr-only" role="status" aria-live="polite">
+      <span className={codePresentation.copyStatus} data-copy-long-work={!!longRunning} role="status" aria-live="polite">
         {status}
       </span>
     </>

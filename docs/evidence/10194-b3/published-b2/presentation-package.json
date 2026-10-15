@@ -1,0 +1,44 @@
+{
+  "sha": "c61984e9e0371c37edea508fcb2f4e56195c391a",
+  "at": "2026-10-15T23:33:43.283Z",
+  "name": "@tangle-network/ui",
+  "version": "11.36.0",
+  "tarball": "published-ui.tgz",
+  "dependencySource": "frozen workspace graph; actual packed exports bundled by esbuild",
+  "published": true,
+  "integrity": "sha512-93qnIjAo1zOJpTgKSHd1FJFoKXzq2q4OkQsN6M9J7ml+xkzAh2Wf2V9BE5QzPVR7d5nyJffedlLklajYiqhC0g==",
+  "sourceSha": "0df22723a928f514c8c86b05efdf1a9f8a2a8c2e",
+  "sources": [
+    "src/presentation.ts",
+    "src/lib/surface-motion.tsx",
+    "src/styles/presentation.css",
+    "src/styles/compat.css"
+  ],
+  "registryGitHead": null,
+  "entries": [
+    {
+      "entry": "presentation",
+      "bytes": 40833,
+      "gzipBytes": 12520,
+      "inputs": [
+        "node_modules/@tangle-network/ui/dist/lib/motion.js",
+        "node_modules/@tangle-network/ui/dist/lib/interaction.js",
+        "node_modules/@tangle-network/ui/dist/lib/focus.js",
+        "node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+        "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+        "node_modules/@tangle-network/ui/dist/lib/utils.js",
+        "node_modules/@tangle-network/ui/dist/lib/control-presentation.js",
+        "node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs",
+        "node_modules/@tangle-network/ui/dist/presentation.js",
+        "../../../../../../..packed-consumer/presentation-entry.mjs"
+      ],
+      "smoke": "Packed presentation bundle imports with React unavailable"
+    }
+  ],
+  "surfaces": {
+    "bytes": 193970,
+    "gzipBytes": 67079,
+    "motionBytes": 64666,
+    "meaning": "Motion-attributed minified bytes; not a before/after gzip delta"
+  }
+}
