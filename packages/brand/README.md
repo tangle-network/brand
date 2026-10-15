@@ -1,6 +1,6 @@
 # @tangle-network/brand
 
-The authoring owner of shared Tangle color, typography, radius, motion, shadow and status decisions. Generic components live in `@tangle-network/ui`; product composition stays in its product repository. See the [brand guidelines](../../docs/brand-guidelines.md) for visual, copy and component standards.
+The authoring owner of shared Tangle color, typography, radius, motion, shadow and status decisions. Generic components live in `@tangle-network/ui`; product composition stays in its product repository. Read the [design bible](../../docs/design-bible.md) for shared policy and the [brand guidelines](../../docs/brand-guidelines.md) for implementation contracts.
 
 ## Install
 
@@ -107,7 +107,7 @@ The base surface ladder is the one GTM proved out: dark is indigo-lifted `#0a0a1
 
 Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Inter (variable, then static) leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
 
-Existing `--transition-*` values are preserved. The shared `--duration-*`, `--ease-*` and `--motion-*` vocabulary comes from the existing Agent App contract. It does not apply animations automatically. Reduced motion zeroes those durations and re-resolves composites at theme boundaries.
+Existing `--transition-*` values are preserved. The shared `--duration-*`, `--ease-*` and `--motion-*` vocabulary comes from the existing Agent App contract. It does not apply animations automatically. Reduced motion zeroes those durations and re-resolves composites at theme boundaries. The adjacent `--interaction-*` roles are elapsed acknowledgment/loading thresholds for existing product instrumentation, not animation durations; reduced motion does not change them.
 
 Focus uses `--focus-border`, `--focus-halo`, their danger variants, and `--border-strong`, derived from the local ring/border palette. UI's `focusField` / `focusRing` consume them. `globals.css` supplies the existing fallback for controls without their own focus treatment.
 
