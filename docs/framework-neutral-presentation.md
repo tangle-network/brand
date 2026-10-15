@@ -104,3 +104,5 @@ Routes, link destinations, form submission and persistence remain consumer-owned
 Button sizes use `buttonVariants({size:"sm"|"lg"})`; fields use `labelVariants` and
 `helpPresentation`; tables use `tablePresentation`; panels use `cardPresentation`.
 Delete the local classes as each corresponding caller migrates.
+
+Display and operational controls, fields and table hover consume Brand’s `--motion-control`; reduced motion removes their transitions. The optional hero entrance consumes `--motion-arrive`. The shared hero has no ambient knot loop. Skeletons render a still placeholder under reduced motion.

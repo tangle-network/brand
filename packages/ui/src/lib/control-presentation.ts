@@ -5,7 +5,7 @@ import { cn } from "./utils";
 // Time-valued tokens only: --transition-fast is a legacy duration + easing
 // shorthand, not a valid transition-duration. Reuse Brand's scoped vocabulary.
 export const controlMotion =
-  "duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:duration-0";
+  "duration-[var(--motion-control)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:duration-0";
 
 /**
  * The control scale. Button, Input, Textarea and SelectTrigger take the same
