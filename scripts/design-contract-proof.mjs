@@ -1,5 +1,5 @@
 import { designServer } from "./design-contract-server.mjs";
-import { proveKnotPackage, provePublishedKnot } from "./design-package-proof.mjs";
+import { proveKnotPackage, provePublishedKnot, provePresentationPackage } from "./design-package-proof.mjs";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -25,6 +25,8 @@ if(process.argv.includes("--registry") || process.argv.includes("--published")) 
  process.exit(0);
 }
 await proveKnotPackage(out);
+await provePresentationPackage(out);
+if(process.argv.includes("--package-only"))process.exit(0);
 const {server,url} = await designServer();
 const browser = await chromium.launch({headless:true});
 const cases=[];

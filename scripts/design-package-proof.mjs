@@ -61,3 +61,43 @@ export async function provePublishedKnot(out, registry, sourceSha) {
   console.log(JSON.stringify(receipt));return receipt;
  } finally {await rm(packed,{recursive:true,force:true});}
 }
+
+/** Prove the packed presentation entry's graph, not the workspace import alias. */
+export async function provePresentationPackage(out) {
+ const [{build},{gzipSync},{resolve,join},{default:assert}]=await Promise.all([import("esbuild"),import("node:zlib"),import("node:path"),import("node:assert/strict")]);
+ const packed=await mkdtemp(`${tmpdir()}/brand-ui-proof-`),repo=process.cwd();
+ try {
+  execFileSync("pnpm",["--filter","@tangle-network/ui","pack","--pack-destination",packed],{stdio:"inherit"});
+  const tarballs=(await readdir(packed)).filter(name=>name.endsWith(".tgz"));assert.equal(tarballs.length,1);
+  const packageRoot=join(packed,"node_modules/@tangle-network/ui");await mkdir(packageRoot,{recursive:true});
+  execFileSync("tar",["-xzf",join(packed,tarballs[0]),"-C",packageRoot,"--strip-components=1"]);
+  const manifest=JSON.parse(await readFile(join(packageRoot,"package.json"),"utf8"));
+  const nodePaths=[resolve("packages/ui/node_modules"),resolve("node_modules")],entries=[];
+  const forbidden=/\/node_modules\/(?:react(?:-dom)?|@radix-ui\/react[^/]*|framer-motion|motion(?:-dom|-utils)?)\//;
+  const graphPath=path=>path.includes("node_modules/")?path.slice(path.indexOf("node_modules/")):path.replace(packed,"packed-consumer").replace(repo,"workspace");
+  for(const entry of ["presentation",...(manifest.exports["./code-presentation"]?["code-presentation"]:[])]) {
+   const input=join(packed,`${entry}-entry.mjs`);await writeFile(input,`export * from "@tangle-network/ui/${entry}";`);
+   const bundle=await build({entryPoints:[input],bundle:true,write:false,metafile:true,minify:true,platform:"node",format:"esm",nodePaths,treeShaking:true,logLevel:"silent"});
+   const inputs=Object.keys(bundle.metafile.inputs);assert.ok(!inputs.some(path=>forbidden.test(`/${path}`)),`React/motion entered pure ${entry} graph`);
+   const file=join(packed,`${entry}.mjs`);await writeFile(file,bundle.outputFiles[0].contents);
+   const smoke=execFileSync(process.execPath,["--input-type=module","-e",`
+    import assert from "node:assert/strict";
+    assert.throws(()=>import.meta.resolve("react"),{code:"ERR_MODULE_NOT_FOUND"});
+    const api=await import(${JSON.stringify(file)});
+    ${entry==="presentation"?'assert.equal(typeof api.bindDialog,"function");assert.ok(api.buttonVariants({variant:"outline",size:"lg"}).includes("inline-flex"));assert.ok(api.inputVariants().includes("w-full"));assert.ok(api.tablePresentation.cell);':'assert.equal(typeof api.createCopyFeedback,"function");assert.equal((await api.highlightCode("line\\n","text")).length,2);'}
+    console.log(${JSON.stringify(`Packed ${entry} bundle imports with React unavailable`)});
+   `],{cwd:packed,encoding:"utf8"}).trim();
+   await readFile(join(packageRoot,manifest.exports[`./${entry}`].types));
+   entries.push({entry,bytes:bundle.outputFiles[0].contents.length,gzipBytes:gzipSync(bundle.outputFiles[0].contents).length,inputs:inputs.map(graphPath),smoke});
+  }
+  const surface=join(packed,"surface-entry.mjs");await writeFile(surface,'export {DialogContent,SheetContent,TooltipContent} from "@tangle-network/ui/primitives";');
+  const bundle=await build({entryPoints:[surface],bundle:true,write:false,metafile:true,minify:true,platform:"browser",format:"esm",nodePaths,treeShaking:true,logLevel:"silent"});
+  const motion=/\/node_modules\/(?:motion(?:-dom|-utils)?|framer-motion)\//;
+  const motionBytes=Object.values(bundle.metafile.outputs).flatMap(output=>Object.entries(output.inputs)).filter(([path])=>motion.test(`/${path}`)).reduce((sum,[,input])=>sum+input.bytesInOutput,0);
+  assert.ok(motionBytes>0,"Surface bundle did not include the motion adapter runtime");
+  for(const asset of ["./styles/presentation.css","./styles/compat.css"])assert.ok((await readFile(join(packageRoot,manifest.exports[asset]))).length);
+  const receipt={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),name:manifest.name,version:manifest.version,tarball:tarballs[0],dependencySource:"frozen workspace graph; actual packed exports bundled by esbuild",entries,surfaces:{bytes:bundle.outputFiles[0].contents.length,gzipBytes:gzipSync(bundle.outputFiles[0].contents).length,motionBytes,meaning:"Motion-attributed minified bytes; not a before/after gzip delta"}};
+  await writeFile(join(out,tarballs[0]),await readFile(join(packed,tarballs[0])));await writeFile(join(out,"presentation-package.json"),JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
+  return receipt;
+ } finally {await rm(packed,{recursive:true,force:true});}
+}
