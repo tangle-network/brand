@@ -11,7 +11,7 @@ Tangle design-system foundation: brand tokens + generic UI components.
 
 ## Guidelines
 
-- [Tangle design bible](docs/design-bible.md), shared policy; concept examples await human approval and consumer proof
+- [Tangle design bible](docs/design-bible.md), shared identity, motion, interaction and evidence principles
 - [Brand implementation contracts](docs/brand-guidelines.md)
 - [Component audit](docs/component-audit.md)
 - [Control and type scale](docs/control-scale.md)
