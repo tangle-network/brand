@@ -1,0 +1,8 @@
+{
+  "sha": "215e2c12cf6c52c6da725326699388908d71b90b",
+  "at": "2026-10-15T20:27:36.039Z",
+  "name": "@tangle-network/brand",
+  "version": "1.24.2",
+  "tarball": "tangle-network-brand-1.24.2.tgz",
+  "smoke": "packed knot import passes without React"
+}
