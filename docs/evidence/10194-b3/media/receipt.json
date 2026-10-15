@@ -1,0 +1,958 @@
+{
+  "sha": "951a1bb26c52680356d855986caeb95645904dc0",
+  "at": "2026-10-15T23:24:44.451Z",
+  "cases": [
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "react",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.5,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.1,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.4,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.6,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@6d8210f68b99fe81249059fb45a0dfcd.webm"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "react",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.6,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.4,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.5,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.8,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@4ef5dac619843697d9c8e21a1b8c8e63.webm"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "hono",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.5,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 200.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1000.9,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@d9dc2ad3d25495f893c5404f3ab1d061.webm"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "hono",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.5,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 200.6,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1000.8,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@dbd05a48604759ff64f48b329cb353f6.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "react",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.4,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.8,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@09f34de6c98edf851f595cd1f622671f.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "react",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.6,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 2.8,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.5,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1002,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@d57b5abed8adb1777ebf3f242c023b19.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "hono",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@001d68004830ac16fe0ff14624022774.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "hono",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.5,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 200.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@56294f701cd6988ff8b9e34005791a7b.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "react",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.8,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.9,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.8,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@395af56b227ae91fe918d3ef169f3acc.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "react",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.6,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.7,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 203.5,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1002.1,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@66a964d39ca08768fe51ff5b21f996cb.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "hono",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.8,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 200.9,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.2,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@a19814c88c42f9ce816f4599610bb9fc.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "hono",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 200.9,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.1,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@f0c5308073724b23b436f829b1edca4b.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "react",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 1,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 2.1,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 202.1,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1003,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@7c75debcca943e97d735bc299710fc6e.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "react",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": null,
+            "loading": "false",
+            "long": "false",
+            "status": "Copy failed"
+          },
+          {
+            "at": 1.8,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 202.6,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 5,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@db52db615a1cb81f23337f89e23290d8.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "hono",
+      "reducedMotion": "no-preference",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 0.7,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.1,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.1,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@469c7e7b7b642c52637b4f539d601e4d.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "hono",
+      "reducedMotion": "reduce",
+      "copyTiming": {
+        "budgets": {
+          "feedback": 100,
+          "pending": 200,
+          "longWork": 1000,
+          "mutation": 500
+        },
+        "samples": [
+          {
+            "at": 1.2,
+            "busy": "true",
+            "loading": "false",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 201.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "false",
+            "status": "Copying to clipboard"
+          },
+          {
+            "at": 1001.7,
+            "busy": "true",
+            "loading": "true",
+            "long": "true",
+            "status": "Copying · 1s elapsed. Time remaining unknown. Cannot cancel this clipboard write; waiting for confirmation."
+          }
+        ]
+      },
+      "loadingVisible": true,
+      "longVisible": true,
+      "controlledWriteExceededMutationBudget": true,
+      "overflow": false,
+      "schema": "messages array · requiredExample request messagesmessages.content string · requiredThe text to send.",
+      "regions": 7,
+      "exactCopy": true,
+      "exactCopyFormats": [
+        "typescript",
+        "sse",
+        "binary",
+        "error",
+        "long-json"
+      ],
+      "copyFailure": true,
+      "singlePendingWrite": true,
+      "failureFocus": true,
+      "contained": true,
+      "video": "videos/page@c05da430c72792e69b33de8dd653df0d.webm"
+    }
+  ]
+}
