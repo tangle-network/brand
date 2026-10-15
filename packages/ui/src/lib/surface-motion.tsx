@@ -21,7 +21,7 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
     const ref = React.useCallback<React.RefCallback<HTMLDivElement>>((node) => {
       element.current = node;
       if (typeof forwardedRef === "function") {
-        const cleanup = forwardedRef(node);
+        const cleanup: unknown = forwardedRef(node);
         if (typeof cleanup === "function") return () => { element.current = null; cleanup(); };
       } else if (forwardedRef) forwardedRef.current = node;
     }, [forwardedRef]);
