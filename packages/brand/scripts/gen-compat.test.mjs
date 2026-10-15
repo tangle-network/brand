@@ -28,7 +28,7 @@ test("every declaration derives from canonical CSS, except the host-owned --radi
   assert.doesNotMatch(generated, /@import|ladders\.css|system\.css/);
 });
 
-for (const property of ["--hsl-background", "--syntax-keyword", "--font-sans", "--radius-md", "--duration-fast"]) {
+for (const property of ["--hsl-background", "--syntax-keyword", "--font-sans", "--radius-md", "--duration-fast", "--interaction-feedback-budget"]) {
   test(`${property}: a canonical edit changes the projection, not a second palette`, () => {
     const source = postcss.parse(tokens);
     let changed = false;

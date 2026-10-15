@@ -1,5 +1,7 @@
 # Control and type scale
 
+Shared principles and craft/runtime acceptance live in the [design bible](design-bible.md). This document owns the implementation contract.
+
 One scale sizes every control and form text in Tangle products.
 Brand owns the tokens; `@tangle-network/ui` owns the primitives that read them; Sandbox UI and Agent App re-export or compose those primitives.
 A product picks a size name, never a pixel value.

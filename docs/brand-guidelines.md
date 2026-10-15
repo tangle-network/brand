@@ -1,13 +1,8 @@
-# Tangle Brand Guidelines
+# Brand guidelines
 
-This repo is the source of truth for shared Tangle visual decisions. It should not become a gallery of every experiment. If a rule belongs across products, document it here; if it belongs to one product, keep it in that product.
+Read the [Tangle design bible](design-bible.md) first for shared principles, visual direction, copy, graphics, motion, interaction and acceptance. This page retains implementation contracts.
 
-Tangle has two core themes:
-
-- **Dark** for the main site, product launches, product UI, and system diagrams.
-- **Light** for blog, research, docs, and long-form editorial surfaces.
-
-## Package Boundary
+## Package boundary
 
 `@tangle-network/brand` owns:
 
@@ -28,7 +23,7 @@ Consumer apps own:
 - Screenshots, demos, and diagrams using real UI and real data.
 - Page-level copy, navigation, and product hierarchy.
 
-## Theme Contract and Authoring
+## Theme contract and authoring
 
 Author shared decisions in Brand's `tokens.css`; named product overrides live in `named-themes.css`. `theme.css` registers that contract for Tailwind, including inline variable-dependent utilities and checked font/radius defaults. HSL channel aliases and full-color aliases are distinct public APIs; do not change their value formats or copy their palettes into app globals.
 
@@ -40,36 +35,13 @@ UI's root theme control must tolerate SSR and unavailable storage, update its re
 
 The optional `ladders.css` / `system.css` remain opt-in. This contract does not introduce a theme provider, a token DSL, or an automatic rollout of those styles. Shared motion variables do not apply animations by themselves and must respect reduced motion when consumed.
 
-## Visual Direction
-
-Indigo/purple is the interaction and brand accent. The canonical product surface ladder carries a faint indigo cast, with an indigo-lifted dark canvas above pure black and light paper cards on a cool grey canvas; GTM set this standard. Named product themes may intentionally retint their surfaces; they are explicit opt-ins, not copies of a second global palette.
-
-Use:
-
-- Indigo, periwinkle, cool surfaces, paper, and ink as the main brand range.
-- Distinct surface planes with visible fill and border relationships.
-- Smooth wave assets for hero, launch, and brand-system work.
-- Light wave and paper assets for research pages and editorial graphics.
-- Real product UI, trace diagrams, or screenshot composites when explaining the product.
-- Large readable type, direct hierarchy, and restrained copy.
-
-Avoid:
-
-- Green as the production identity.
-- Pure black as the default canvas.
-- Tiny eyebrow labels above headings.
-- Taxonomy chips as design.
-- Traffic-light rows, fake status boards, and generic agent step cards as marketing graphics.
-- Pages that are only text, chips, and cards.
-- Labeling every internal repo or product at once.
-
-## Color Roles
+## Color roles
 
 Product UI uses color for three separate jobs. A component picks one role and never borrows another role's color.
 
 | Role | Job | Source | Rule |
 | --- | --- | --- | --- |
-| Brand | Identity and the primary action | The iris accent tokens | One primary action per view. |
+| Brand | Identity and the primary action | The iris accent tokens | See [action priority](design-bible.md#theory). |
 | Category | Tell kinds of things apart: file types, entities, capabilities, chart series | Categorical tone families | Always paired with a label or icon. A category color never means success, failure, or progress. |
 | Status | Report a state the product observed | Success, warning, danger, info, and neutral tones | Unknown or unrecorded states stay neutral. |
 
@@ -84,107 +56,32 @@ Products do not paint states or categories with Tailwind palette utilities such 
 
 A customer or co-brand preset is a named theme in `named-themes.css`. It may change the logo, display name, and accent. It may not change what a status or category color means, and it is never a consumer-side stylesheet override.
 
-## Theme Roles
+## Policy index
 
-Use **Dark** for:
+### Visual direction
 
-- Homepage hero and primary product sections.
-- Sandbox, Router, and Intelligence pages.
-- Product screenshots, trace diagrams, and system architecture.
-- Launch assets where Tangle needs to feel immediately recognizable.
+See the [design bible](design-bible.md#visual-grammar).
 
-Use **Light** for:
+### Theme roles
 
-- Blog.
-- Research.
-- Docs.
-- Long-form pages where reading comfort matters more than launch energy.
+See the [design bible](design-bible.md#theme-roles).
 
-Do not present theme experiments in production pages. Put exploratory layouts, generated atmospheres, and rejected directions in scratch files until a direction is chosen.
+### Product hierarchy
 
-## Product Hierarchy
+See the [design bible](design-bible.md#product-hierarchy).
 
-The public site should lead with the product boundary:
+### Copy standard
 
-- Sandbox.
-- Router.
-- Intelligence.
+See the [design bible](design-bible.md#copy-standard).
 
-Open-source tools are supporting proof and adoption paths:
+### Graphic standard
 
-- `agent-eval`.
-- `agent-runtime`.
-- `agent-app`.
-- `agent-sdk`.
+See the [design bible](design-bible.md#graphic-standard).
 
-Specialized agents are examples or later surfaces, not the top-level homepage hierarchy:
+### Component standard
 
-- `browser-agent`.
-- `blueprint-agent`.
-- `tax-agent`.
-- `legal-agent`.
-- `gtm-agent`.
+See the [design bible](design-bible.md#component-standard).
 
-Do not show all of this in one viewport. Each page section should make one decision easier.
+### Review checklist
 
-## Copy Standard
-
-Write for a serious venture-backed infrastructure company. Plain language is good; childish reduction is not.
-
-Good copy:
-
-- Names the product, value, or decision directly.
-- Explains what changes for the buyer or builder.
-- Uses proof, screenshots, diagrams, or artifacts to carry detail.
-- Leaves breathing room.
-
-Bad copy:
-
-- Adds labels such as "platform loop," "open source substrate," or "proof over positioning."
-- Explains obvious UI mechanics.
-- Repeats internal taxonomy as if it were user value.
-- Turns every section into a card grid.
-- Adds CTAs before the page has earned them.
-
-## Graphic Standard
-
-Every major marketing or brand page needs a visual idea, not just layout.
-
-Acceptable graphics:
-
-- Generated brand atmospheres with deliberate crops.
-- Product screenshots placed in realistic compositions.
-- Trace diagrams that show real data flow.
-- Model-routing diagrams with real providers and product boundaries.
-- Research figures that clarify an argument.
-
-Weak graphics:
-
-- Generic abstract gradients without brand control.
-- Icon rows with short labels.
-- Status rows pretending to be product proof.
-- Decorative cards that contain only copy.
-
-## Component Standard
-
-Only document or showcase components that should influence product design. A component is approved when at least one real app consumes it and the story demonstrates a real state.
-
-For run and tool UI:
-
-- Prefer one canonical row implementation.
-- Keep adapter exports only when consumers still need migration time.
-- Do not teach uppercase status pills, step labels, or traffic-light rows as a brand pattern.
-- Stories should show real transcript states, not fake process theater.
-
-## Review Checklist
-
-Before a brand, marketing, or component PR merges:
-
-- The first viewport has no tiny eyebrow label.
-- Indigo accents and dark product surfaces remain the production mood unless the surface is explicitly editorial.
-- The page has a real visual asset, diagram, screenshot, or composition.
-- Product hierarchy does not mix products, open-source tools, and example agents at equal weight.
-- Component stories do not create new visual precedent for stale UI.
-- Any new token has a cross-app reason.
-- Any new reusable component has at least one consuming product or a named migration target.
-- Token changes regenerate the compatibility stylesheet and pass its generation check; mode changes are exercised in nested and named scopes.
+See the [design bible](design-bible.md#shared-review-requirements).
