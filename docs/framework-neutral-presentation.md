@@ -71,3 +71,13 @@ Button sizes use `buttonVariants({size:"sm"|"lg"})`; fields use `labelVariants` 
 Delete the local classes as each corresponding caller migrates.
 
 Display and operational controls, fields and table hover consume Brand’s `--motion-control`; reduced motion removes their transitions. The optional hero entrance consumes `--motion-arrive`. The shared hero has no ambient knot loop. Skeletons render a still placeholder under reduced motion.
+
+React Dialog, Sheet and Tooltip retain Radix state, refs, focus and dismissal.
+Their shared adapter uses Motion physics springs to retarget current geometry
+and velocity. It derives a critically damped response from the resolved, scoped
+surface/dismiss role duration. Brand's nonvisual CSS presence markers retain the
+Radix lifecycle; they are distinct from the visual spring trajectory. Reduced
+motion settles both paths, including a preference change while open. Application
+state and focus never wait for a JavaScript animation callback. The native-dialog
+adapter remains the Hono semantics owner; it wraps keyboard boundaries and
+returns focus on close.
