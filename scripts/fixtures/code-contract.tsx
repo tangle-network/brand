@@ -18,7 +18,7 @@ function Page(){return <main className="mx-auto min-w-0 max-w-3xl space-y-6 p-6"
  {!before&&<ApiSchema fields={fields}/>}
  <CodeBlock code={sse} label="SSE response" metadata={before?undefined:{kind:"response",contentType:"text/event-stream"}}><CopyButton text={sse}/></CodeBlock>
  <CodeBlock code={binary} label="Binary response" metadata={before?undefined:{kind:"response",status:200,contentType:"audio/wav"}}><CopyButton text={binary}/></CodeBlock>
- <CodeBlock code={errorJson} language="json" label="Error response" metadata={before?undefined:{kind:"error",status:400,contentType:"application/json"}}><CopyButton text={errorJson}/></CodeBlock>
+ <CodeBlock code={errorJson} language="json" label="Error response" metadata={before?undefined:{kind:"error",status:400,contentType:"application/json"}}>{!before&&<CopyButton text={errorJson}/>}</CodeBlock>
  <CodeBlock code={longLine} language="json" label="Long JSON line"><CopyButton text={longLine}/></CodeBlock>
  </main>}
 const target=document.getElementById("root")!;
