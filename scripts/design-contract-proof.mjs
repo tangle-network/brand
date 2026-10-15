@@ -15,7 +15,7 @@ try {
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"reduce"});
   const page=await context.newPage();const errors=[];page.on("pageerror",e=>errors.push(e.message));
   await page.goto(`${url}?renderer=${renderer}&theme=${theme}`,{waitUntil:"networkidle"});
-  await page.locator("h1").waitFor();await page.evaluate(()=>document.fonts.ready);
+  await page.locator("h1").waitFor().catch(async error=>{await page.screenshot({path:`${out}/failed-${renderer}-${width}-${theme}.png`});throw Error(JSON.stringify({errors,body:await page.locator("body").innerText(),cause:error.message}));});await page.evaluate(()=>document.fonts.ready);
   await page.locator(".tangle-control-display").first().waitFor();
   const roles=await page.evaluate(()=>{
    const h=document.querySelector("h1"),b=document.querySelector(".tangle-control-display"),d=document.querySelector(".tangle-intro-description");
