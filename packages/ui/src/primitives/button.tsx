@@ -1,7 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import { buttonVariants } from "../presentation";
 import * as React from "react";
-import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText } from "../lib/control-presentation";
 import { focusRing } from "../lib/focus";
 import { ixControl, ixControlSoft, ixSelected } from "../lib/interaction";
 import { cn } from "../lib/utils";

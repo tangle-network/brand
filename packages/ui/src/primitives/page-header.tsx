@@ -64,7 +64,7 @@ const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
               {title}
             </Heading>
             {hasContent(description) && (
-              <p className={presentation === "expressive" ? "tangle-intro-description" : "mt-1 max-w-prose text-muted-foreground text-sm [overflow-wrap:anywhere]"}>
+              <p className={presentation === "expressive" ? "tangle-intro-description" : presentation ? "tangle-page-description" : "mt-1 max-w-prose text-muted-foreground text-sm [overflow-wrap:anywhere]"}>
                 {description}
               </p>
             )}

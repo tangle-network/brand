@@ -14,7 +14,7 @@ on the server: DOM APIs are used only when its event binding is called in a brow
 | Type and page heading | `Heading`, `PageHeader` with `presentation` | Brand `tangle-display`; UI `tangle-heading` and `tangle-page-header` | Local h1/type classes |
 | Display CTA | `Button size="display"` | `buttonVariants({size:"display"})`, matching `data-variant` | Local CTA sizing |
 | Reading frame | `PageShell navigation article outline` slots | `tangle-reading-shell`, `tangle-reading-nav`, `tangle-reading-article`, `tangle-reading-outline` | Local docs grid/width styles |
-| Field and native select | `Input`, `Textarea`, `SelectTrigger` | `inputVariants`, `fieldPresentation`, `fieldSizes`, `fieldTouchText`; native select uses field classes | Local field fills/sizes/focus |
+| Field and native select | `Input`, `Textarea`, `SelectTrigger` | `inputVariants`, `labelVariants`, `helpPresentation`, `fieldPresentation`, `fieldSizes`, `fieldTouchText`; native select uses field classes | Local field fills/sizes/focus |
 | Table | `Table` family | `tablePresentation` named parts | Generic table styling; retain table data |
 | Dialog | `Dialog`/`Sheet` (Radix) | `dialogPresentation` parts; `tangle-native-dialog`, `bindDialog` for native dialog | Local modal styles and handwritten focus traps |
 | Metrics | `MetricStrip`, `Metric` | `metricPresentation`, `metricLayouts` | Local metric grids/typography; retain data source |

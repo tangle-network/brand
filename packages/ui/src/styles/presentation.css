@@ -25,3 +25,5 @@
 /* Native dialog has the same solid reading surface as React's Dialog/Sheet. */
 .tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
 .tangle-native-dialog::backdrop { background: var(--scrim); }
+
+.tangle-page-description { margin-top: 0.25rem; max-width: 65ch; color: hsl(var(--muted-foreground)); font-size: var(--font-size-label); overflow-wrap: anywhere; }
