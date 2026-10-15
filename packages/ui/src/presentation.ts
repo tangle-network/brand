@@ -143,3 +143,13 @@ export function bindDialog(dialog: HTMLDialogElement, trigger: HTMLElement): () 
   sync();trigger.addEventListener("click",show);dialog.addEventListener("close",close);dialog.addEventListener("click",click);
   return () => {trigger.removeEventListener("click",show);dialog.removeEventListener("close",close);dialog.removeEventListener("click",click);};
 }
+
+export const labelVariants = cva(
+  "font-medium text-[length:var(--font-size-label,0.875rem)] leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+);
+
+export const helpPresentation = {
+ root: "text-[length:var(--font-size-help,0.75rem)] leading-4",
+ error: "font-medium text-[var(--surface-danger-text)]",
+ hint: "text-[var(--text-dim)]",
+};

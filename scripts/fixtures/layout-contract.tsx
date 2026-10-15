@@ -8,7 +8,7 @@ import { Input } from "../../packages/ui/src/primitives/input";
 import { MetricStrip, Metric } from "../../packages/ui/src/primitives/metric-strip";
 import { EmptyState } from "../../packages/ui/src/primitives/empty-state";
 import { Table, TableBody, TableRow, TableHead, TableHeader, TableCell } from "../../packages/ui/src/primitives/table";
-import { bindDialog, inputVariants, buttonVariants, tablePresentation as table, metricPresentation as metric, metricLayouts, emptyStatePresentation as empty } from "../../packages/ui/src/presentation";
+import { bindDialog, labelVariants, helpPresentation, inputVariants, buttonVariants, tablePresentation as table, metricPresentation as metric, metricLayouts, emptyStatePresentation as empty } from "../../packages/ui/src/presentation";
 const params=new URLSearchParams(location.search), before=params.get("phase")==="before";
 const links=["Quickstart","Authentication","Errors"];
 const desc="A shared reading frame. This is an isolated component fixture.";
@@ -30,8 +30,8 @@ if(params.get("renderer")==="react")createRoot(target).render(before?<PageShell>
 else {
  const h=jsx, nav=h("div",{children:[h("button",{id:"sections-trigger",class:buttonVariants(),children:"Sections"}),...links.map(t=>h("a",{href:`#${t.toLowerCase()}`,children:t})),h("dialog",{id:"sections","aria-labelledby":"sections-title",class:"tangle-native-dialog",children:[h("h2",{id:"sections-title",children:"Sections"}),...links.map(t=>h("a",{href:`#${t.toLowerCase()}`,children:t})),h("button",{"data-dialog-close":"",class:buttonVariants(),children:"Close navigation"})]})]});
  const article=h("article",{class:"tangle-reading-article",children:[
- h("header",{class:"tangle-page-header",children:[h("h1",{class:"tangle-heading","data-variant":"page",children:"API keys"}),h("p",{class:"mt-1 max-w-prose text-muted-foreground text-sm",children:desc})]}),
- h("label",{for:"workspace",children:"Workspace name"}),h("input",{id:"workspace",class:inputVariants({size:"lg"}),placeholder:"Example workspace","aria-describedby":"workspace-hint"}),h("p",{id:"workspace-hint",children:"Use a name you can recognize."}),
+ h("header",{class:"tangle-page-header",children:[h("h1",{class:"tangle-heading","data-variant":"page",children:"API keys"}),h("p",{class:"tangle-page-description",children:desc})]}),
+ h("label",{for:"workspace",class:labelVariants(),children:"Workspace name"}),h("input",{id:"workspace",class:inputVariants({size:"lg"}),placeholder:"Example workspace","aria-describedby":"workspace-hint"}),h("p",{id:"workspace-hint",class:`${helpPresentation.root} ${helpPresentation.hint}`,children:"Use a name you can recognize."}),
  h("dl",{class:`${metric.strip} ${metricLayouts[3]}`,children:["Available credit","API keys","Requests"].map(label=>h("div",{class:metric.item,children:[h("dt",{class:metric.label,children:label}),h("dd",{class:metric.value,children:"—"})]}))}),
  h("div",{class:table.wrapper,tabindex:0,"aria-label":"Key examples",children:h("table",{class:table.root,children:[h("thead",{class:table.head,children:h("tr",{class:table.row,children:[h("th",{class:table.columnHeader,children:"Name"}),h("th",{class:table.columnHeader,children:"Access"})]})}),h("tbody",{class:table.body,children:h("tr",{class:table.row,children:[h("td",{class:table.cell,children:"Example key"}),h("td",{class:table.cell,children:"Read only"})]})})]})}),
  h("div",{class:empty.root,children:[h("h3",{class:empty.title,children:"No API keys"}),h("p",{class:empty.description,children:"Create a key to start sending requests."}),h("div",{class:empty.action,children:h("button",{class:buttonVariants(),children:"Create API key"})})]})

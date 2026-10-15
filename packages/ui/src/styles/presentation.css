@@ -36,3 +36,4 @@
 .tangle-api-schema dt { font-family: var(--font-mono); font-size: var(--font-size-label); }
 .tangle-api-schema dt span, .tangle-api-schema dd { color: hsl(var(--muted-foreground)); }
 .tangle-api-schema dd { margin: 0.25rem 0 0; font-size: var(--font-size-label); }
+.tangle-page-description { margin-top: 0.25rem; max-width: 65ch; color: hsl(var(--muted-foreground)); font-size: var(--font-size-label); overflow-wrap: anywhere; }
