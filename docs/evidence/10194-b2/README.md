@@ -37,3 +37,7 @@ Twenty captures and fourteen uncut recordings were retained. Capture contacts an
 - [layout: 1440 / light / hono](layout/videos/page@ab65fc3c100d6d73f2ba92335db313f1.webm)
 - [layout: 1440 / dark / react](layout/videos/page@fffea04f8f19c15db135a6ea16b0593c.webm)
 - [layout: 1440 / dark / hono](layout/videos/page@468c11653556f875bf992ee8b1898243.webm)
+
+## Review corrections
+
+[Red/green outline and radio evidence](review/README.md) records the three review corrections, matched breakpoint captures, passing radio-group journeys and updated packed-export measurement.
