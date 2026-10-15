@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.25.0
+
+### Minor Changes
+
+- 3ed6fb1: Add shared interaction timing roles beside the existing motion vocabulary. Consolidate shared design policy in the design bible; consumer adoption remains separate.
+- 3d3ba7a: Publish opt-in expressive typography and shared introductory presentation. Export canonical knot data and safe static SVG without React, and reuse that geometry in the React mark.
+
 ## 1.24.2
 
 ### Patch Changes
