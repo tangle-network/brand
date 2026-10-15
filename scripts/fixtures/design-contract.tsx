@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { jsx } from "hono/jsx";
+import { jsx } from "hono/jsx/jsx-runtime";
 import { raw } from "hono/html";
 import { TangleKnot } from "../../packages/brand/src/logo";
 import { knotSvg } from "../../packages/brand/src/knot";
