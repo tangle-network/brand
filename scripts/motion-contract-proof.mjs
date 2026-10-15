@@ -1,7 +1,7 @@
 import { designServer } from "./design-contract-server.mjs";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { resolve, basename } from "node:path";
 import { execFileSync } from "node:child_process";
 const out=resolve(process.env.DESIGN_EVIDENCE??"/tmp/brand-motion-evidence");await mkdir(out,{recursive:true});
 const {server,url}=await designServer(),browser=await chromium.launch({headless:true}),cases=[];
@@ -47,7 +47,7 @@ try {
    await page.getByRole("button",{name:"Hint",exact:true}).hover();const hint=page.getByText("Tooltip surface",{exact:true}).first();await hint.waitFor();
    const tooltip=await hint.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction};});
    if(reducedMotion==="reduce"?tooltip.name!=="none":tooltip.name!=="enter"||tooltip.duration!==timing.role.surface.duration||tooltip.easing!==timing.role.surface.easing)throw Error(`Invalid tooltip role: ${JSON.stringify(tooltip)}`);
-   if(errors.length)throw Error(JSON.stringify(errors));cases.push({reducedMotion,timing,tooltip});
+   if(errors.length)throw Error(JSON.stringify(errors));cases.push({reducedMotion,timing,tooltip,video:`videos/${basename(await page.video().path())}`});
   }finally{await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases,interruption:"Not established by timing checks; requires trajectory proof"},null,2));console.log(JSON.stringify(cases));

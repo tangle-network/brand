@@ -1,7 +1,7 @@
 import { designServer } from "./design-contract-server.mjs";
 import { chromium } from "playwright";
 import { mkdir,writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { resolve, basename } from "node:path";
 import { execFileSync } from "node:child_process";
 const out=resolve(process.env.DESIGN_EVIDENCE??"/tmp/brand-layout-evidence");await mkdir(out,{recursive:true});
 const {server,url}=await designServer();const browser=await chromium.launch({headless:true});const cases=[];
@@ -16,10 +16,14 @@ try {
    if(phase==="before")continue;
    const trigger=page.getByRole("button",{name:"Sections",exact:true});await trigger.focus();await page.keyboard.press("Enter");
    const dialog=page.getByRole("dialog");await dialog.waitFor();
-   for(let i=0;i<9;i++) {
-    await page.keyboard.press("Tab");
-    const focus=await page.evaluate(()=>{const d=document.querySelector("dialog"),a=document.activeElement;return {inside:d.contains(a),open:d.open,tag:a?.tagName,id:a?.id,label:a?.getAttribute("aria-label")};});
-    if(!focus.inside){await page.screenshot({path:`${out}/failed-focus-${renderer}-${width}-${theme}.png`});throw Error(JSON.stringify({message:"Focus escaped dialog",width,theme,renderer,tab:i+1,focus}));}
+   await dialog.evaluate(d=>{const hidden=document.createElement("button"),disabled=document.createElement("button");hidden.hidden=true;hidden.textContent="Hidden decoy";disabled.disabled=true;disabled.tabIndex=1;disabled.textContent="Disabled decoy";d.append(hidden,disabled);});
+   const cycle=["Quickstart","Authentication","Errors","Close navigation"];let index=0;
+   if(await page.evaluate(()=>document.activeElement.textContent)!==cycle[0])throw Error("Wrong initial dialog focus");
+   for(const direction of ["Tab","Shift+Tab"])for(let i=0;i<9;i++) {
+    await page.keyboard.press(direction);
+    const focus=await page.evaluate(()=>{const d=document.querySelector("dialog"),a=document.activeElement;return {inside:d.contains(a),open:d.open,tag:a?.tagName,id:a?.id,label:a?.getAttribute("aria-label"),text:a?.textContent};});
+    index=(index+(direction==="Tab"?1:cycle.length-1))%cycle.length;
+    if(!focus.inside||focus.text!==cycle[index]){await page.screenshot({path:`${out}/failed-focus-${renderer}-${width}-${theme}.png`});throw Error(JSON.stringify({message:"Focus escaped dialog",width,theme,renderer,direction,tab:i+1,focus}));}
    }
    await page.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Focus not returned");
    await trigger.click();await page.getByRole("button",{name:"Close navigation",exact:true}).click();await dialog.waitFor({state:"hidden"});
@@ -27,7 +31,7 @@ try {
    const compatibilityHeight=await page.getByRole("button",{name:"Compatibility action"}).evaluate(e=>e.getBoundingClientRect().height);
    if(compatibilityHeight!==36)throw Error(`Compatibility recipe height: ${compatibilityHeight}`);
    const facts=await page.evaluate(()=>{const h=document.querySelector("h1"),input=document.querySelector("input"),s=getComputedStyle(h);return {font:s.fontFamily,size:s.fontSize,inputHeight:input.getBoundingClientRect().height,inputFont:getComputedStyle(input).fontSize,h1:document.querySelectorAll("h1").length,overflow:document.documentElement.scrollWidth>innerWidth,fields:document.querySelectorAll("input").length};});
-   if(errors.length||facts.overflow||facts.h1!==1||facts.inputHeight!==44)throw Error(JSON.stringify({errors,facts}));cases.push({width,theme,renderer,...facts});
+   if(errors.length||facts.overflow||facts.h1!==1||facts.inputHeight!==44)throw Error(JSON.stringify({errors,facts}));cases.push({width,theme,renderer,...facts,video:`videos/${basename(await page.video().path())}`});
   }}finally{await context.close();}
  }
  for(const width of [390,1440])for(const theme of ["light","dark"]){const [a,b]=cases.filter(c=>c.width===width&&c.theme===theme);if(a.font!==b.font||a.size!==b.size||a.inputHeight!==b.inputHeight)throw Error("Renderer role mismatch");}
