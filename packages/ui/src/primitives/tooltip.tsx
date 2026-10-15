@@ -2,6 +2,7 @@
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
+import { surfaceMotion } from "../lib/motion";
 import { cn } from "../lib/utils";
 
 /**
@@ -40,9 +41,9 @@ const TooltipContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         "z-50 max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-md bg-foreground px-2.5 py-1.5 text-background text-xs leading-snug shadow-md",
-        "data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95",
-        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
-        "duration-150 ease-out motion-reduce:animate-none",
+        "data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-[state=instant-open]:fade-in-0 data-[state=instant-open]:zoom-in-95",
+        "data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        surfaceMotion,
         className,
       )}
       {...props}
