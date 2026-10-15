@@ -15,8 +15,8 @@ if(process.argv.includes("--review-only")){
     const page=await context.newPage();
     for(const width of [1024,1279,1280,1440]){
      await page.setViewportSize({width,height:900});await page.goto(`${url}?surface=layout&renderer=${renderer}&theme=light`,{waitUntil:"networkidle"});await page.locator(".tangle-reading-outline").waitFor({state:"attached"});
-     const facts=await page.evaluate(()=>{const outline=document.querySelector(".tangle-reading-outline"),article=document.querySelector(".tangle-reading-article");return {display:getComputedStyle(outline).display,left:outline.getBoundingClientRect().left,top:outline.getBoundingClientRect().top,articleRight:article.getBoundingClientRect().right,articleTop:article.getBoundingClientRect().top};});
-     const pass=width<1280?facts.display==="none":facts.display!=="none"&&facts.left>=facts.articleRight&&Math.abs(facts.top-facts.articleTop)<1;
+     const facts=await page.evaluate(()=>{const outline=document.querySelector(".tangle-reading-outline"),article=document.querySelector(".tangle-reading-article");return {display:getComputedStyle(outline).display,left:outline.getBoundingClientRect().left,top:outline.getBoundingClientRect().top,articleRight:article.getBoundingClientRect().right,articleTop:article.getBoundingClientRect().top,stickyTop:Number.parseFloat(getComputedStyle(outline).top)||0};});
+     const pass=width<1280?facts.display==="none":facts.display!=="none"&&facts.left>=facts.articleRight&&Math.abs(facts.top-Math.max(facts.articleTop,facts.stickyTop))<1;
      reviewCases.push({check:"outline",renderer,width,pass,...facts});await page.screenshot({path:`${out}/outline-${renderer}-${width}.png`});
     }
     for(const selected of [0,1,-1]){
