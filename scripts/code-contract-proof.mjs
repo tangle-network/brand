@@ -69,5 +69,5 @@ try{
    if(errors.length||facts.overflow||!contained||!facts.schema.includes("messages.content"))throw Error(JSON.stringify({errors,contained,facts}));cases.push({width,theme,renderer,reducedMotion,copyTiming,loadingVisible,longVisible,controlledWriteExceededMutationBudget:firstLong.at>budgets.mutation,...facts,exactCopy:true,copyFailure:true,singlePendingWrite:true,failureFocus:true,contained,video:`videos/${basename(await page.video().path())}`});
   }}finally{await context.close();}
  }
- await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},null,2));console.log(JSON.stringify(cases));
+ await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));
 }finally{await browser.close();await server.close();}
