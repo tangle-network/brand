@@ -1,0 +1,16 @@
+{
+  "source_sha": "215e2c12cf6c52c6da725326699388908d71b90b",
+  "at": "2026-10-15T20:35:55.834450+00:00",
+  "inspection": "packed Brand tokens.css",
+  "roles": [
+    "--interaction-feedback-budget",
+    "--interaction-long-work-delay",
+    "--interaction-mutation-budget",
+    "--interaction-pending-delay",
+    "--motion-arrive",
+    "--motion-control",
+    "--motion-dismiss",
+    "--motion-stream",
+    "--motion-surface"
+  ]
+}
