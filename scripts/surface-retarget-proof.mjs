@@ -26,7 +26,7 @@ try {
     const samples=[];let previous=read(),current=previous;
     const deadline=performance.now()+seconds*1000;
     while(performance.now()<deadline){await frame();current=read();samples.push(current);if(current.progress>=0.35&&current.progress<=0.7)break;previous=current;}
-    if(current.progress<0.35||current.progress>0.7)throw Error("No calibrated halfway sample");
+    if(current.progress<0.35||current.progress>0.7)throw Error(`No calibrated halfway sample: ${JSON.stringify({kind,scopedSeconds,first:samples[0],last:current,style:{animation:getComputedStyle(node).animation,transform:getComputedStyle(node).transform,scale:getComputedStyle(node).scale}})}`);
     // A flush can span a compositor frame. Compare displacement with measured
     // elapsed time plus one preceding frame of sampling uncertainty; a reset to
     // an endpoint still exceeds this bound. Keep the velocity checks separate.
@@ -67,6 +67,7 @@ try {
    await page.keyboard.press("Escape");await page.getByRole("dialog").waitFor({state:"hidden"});
    const trigger=page.getByRole("button",{name:`Open ${kind}`,exact:true});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Reduced dismissal failed focus return");
    cases.push({width,kind,...trace,video:`videos/${basename(await page.video().path())}`});
+   await writeFile(`${out}/partial.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));
   }finally{await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));

@@ -74,7 +74,9 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
       run();
       preference?.addEventListener("change", run);
       return () => { preference?.removeEventListener("change", run); cancelRender?.(); };
-    }, [state, kind, side]);
+    // Radix Popper temporarily suppresses animation until placement resolves.
+    // Start the same retained values when that inline override clears.
+    }, [state, kind, side, props.style?.animation]);
     React.useEffect(() => () => controls.current.forEach(control => control.stop()), []);
     const Component = asChild ? Slot : "div";
     return <Component {...props} data-state={state} ref={ref} />;
