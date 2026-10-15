@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.25.1
+
+### Patch Changes
+
+- 19a10d9: Extend PageShell reading slots, Heading and PageHeader opt-in presentation, and Button display size. Publish React-free primitive presentation classes and native-dialog binding for Hono without changing existing control defaults.
+
 ## 1.25.0
 
 ### Minor Changes

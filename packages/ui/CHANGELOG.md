@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.36.0
+
+### Minor Changes
+
+- 19a10d9: Extend PageShell reading slots, Heading and PageHeader opt-in presentation, and Button display size. Publish React-free primitive presentation classes and native-dialog binding for Hono without changing existing control defaults.
+
 ## 11.35.0
 
 ### Minor Changes
