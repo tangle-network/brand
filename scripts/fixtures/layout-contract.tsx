@@ -23,6 +23,7 @@ function Article(){return <>
  <Input size="lg" id="workspace" label="Workspace name" hint="Use a name you can recognize." placeholder="Example workspace"/>
  <MetricStrip columns={3}><Metric label="Available credit" value="—" hint="No account loaded"/><Metric label="API keys" value="—"/><Metric label="Requests" value="—"/></MetricStrip>
  <Table wrapperProps={{tabIndex:0,"aria-label":"Key examples"}}><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Access</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>Example key</TableCell><TableCell>Read only</TableCell></TableRow></TableBody></Table>
+ <div className="card" data-slot="card"><button className="btn btn-primary" type="button">Compatibility action</button></div>
  <EmptyState title="No API keys" description="Create a key to start sending requests." action={<Button>Create API key</Button>}/>
  </>}
 const target=document.getElementById("root")!;
@@ -34,6 +35,7 @@ else {
  h("label",{for:"workspace",class:labelVariants(),children:"Workspace name"}),h("input",{id:"workspace",class:inputVariants({size:"lg"}),placeholder:"Example workspace","aria-describedby":"workspace-hint"}),h("p",{id:"workspace-hint",class:`${helpPresentation.root} ${helpPresentation.hint}`,children:"Use a name you can recognize."}),
  h("dl",{class:`${metric.strip} ${metricLayouts[3]}`,children:["Available credit","API keys","Requests"].map(label=>h("div",{class:metric.item,children:[h("dt",{class:metric.label,children:label}),h("dd",{class:metric.value,children:"—"})]}))}),
  h("div",{class:table.wrapper,tabindex:0,"aria-label":"Key examples",children:h("table",{class:table.root,children:[h("thead",{class:table.head,children:h("tr",{class:table.row,children:[h("th",{class:table.columnHeader,children:"Name"}),h("th",{class:table.columnHeader,children:"Access"})]})}),h("tbody",{class:table.body,children:h("tr",{class:table.row,children:[h("td",{class:table.cell,children:"Example key"}),h("td",{class:table.cell,children:"Read only"})]})})]})}),
+ h("div",{class:"card","data-slot":"card",children:h("button",{class:"btn btn-primary",type:"button",children:"Compatibility action"})}),
  h("div",{class:empty.root,children:[h("h3",{class:empty.title,children:"No API keys"}),h("p",{class:empty.description,children:"Create a key to start sending requests."}),h("div",{class:empty.action,children:h("button",{class:buttonVariants(),children:"Create API key"})})]})
  ]});
  target.innerHTML=h("div",{class:"tangle-reading-shell",children:[h("nav",{class:"tangle-reading-nav","aria-label":"Sections",children:nav}),article,h("aside",{class:"tangle-reading-outline","aria-label":"On this page",children:h("a",{href:"#workspace",children:"Workspace name"})})]}).toString();

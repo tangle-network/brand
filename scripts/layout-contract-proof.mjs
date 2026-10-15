@@ -19,6 +19,8 @@ try {
    await page.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Focus not returned");
    await trigger.click();await page.getByRole("button",{name:"Close navigation",exact:true}).click();await dialog.waitFor({state:"hidden"});
    await page.getByRole("textbox",{name:"Workspace name"}).fill("Example workspace");
+   const compatibilityHeight=await page.getByRole("button",{name:"Compatibility action"}).evaluate(e=>e.getBoundingClientRect().height);
+   if(compatibilityHeight!==36)throw Error(`Compatibility recipe height: ${compatibilityHeight}`);
    const facts=await page.evaluate(()=>{const h=document.querySelector("h1"),input=document.querySelector("input"),s=getComputedStyle(h);return {font:s.fontFamily,size:s.fontSize,inputHeight:input.getBoundingClientRect().height,inputFont:getComputedStyle(input).fontSize,h1:document.querySelectorAll("h1").length,overflow:document.documentElement.scrollWidth>innerWidth,fields:document.querySelectorAll("input").length};});
    if(errors.length||facts.overflow||facts.h1!==1||facts.inputHeight!==44)throw Error(JSON.stringify({errors,facts}));cases.push({width,theme,renderer,...facts});
   }await context.close();

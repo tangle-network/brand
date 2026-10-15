@@ -1,3 +1,4 @@
+@import "../../packages/ui/src/styles/compat.css";
 @import "../../packages/ui/src/styles/presentation.css";
 @import "../../packages/brand/src/styles/index.css";
 @import "tailwindcss";
