@@ -27,7 +27,7 @@ try {
  for (const width of [390,1440]) for (const theme of ["light","dark"]) for (const renderer of ["react","hono"]) {
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"reduce"});
   const page=await context.newPage();const errors=[];page.on("pageerror",e=>errors.push(e.message));
-  await page.goto(`${url}?renderer=${renderer}&theme=${theme}`);
+  await page.goto(`${url}?renderer=${renderer}&theme=${theme}`,{waitUntil:"networkidle"});
   await page.locator("h1").waitFor();await page.evaluate(()=>document.fonts.ready);
   await page.locator(".tangle-control-display").first().waitFor();
   const roles=await page.evaluate(()=>{

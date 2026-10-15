@@ -124,10 +124,11 @@
       "types": "./dist/code-presentation.d.ts",
       "import": "./dist/code-presentation.js",
       "default": "./dist/code-presentation.js"
-    }
+    },
+    "./styles/compat.css": "./src/styles/compat.css"
   },
   "scripts": {
-    "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",
+    "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node scripts/generate-presentation-css.mjs --check && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",
     "gen:openui-schema": "node scripts/generate-openui-validators.mjs",
     "dev": "tsdown --watch"
   },

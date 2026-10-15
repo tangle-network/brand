@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { jsx } from "hono/jsx";
+import { jsx } from "hono/jsx/jsx-runtime";
 import { CodeBlock,CopyButton } from "../../packages/ui/src/markdown/code-block";
 import { ApiSchema } from "../../packages/ui/src/markdown/api-schema";
 import { highlightCode,codePreStyle,codeTextStyle,codePresentation,bindCopyButton,bindCodeTabs,schemaRows,type ApiField } from "../../packages/ui/src/code-presentation";

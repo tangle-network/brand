@@ -153,3 +153,14 @@ export const helpPresentation = {
  error: "font-medium text-[var(--surface-danger-text)]",
  hint: "text-[var(--text-dim)]",
 };
+
+export const cardPresentation = {
+ root: "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow,background-color] duration-[var(--transition-default)]",
+ padding: "p-4",
+ variants: {
+    default: "bg-card border-border shadow-[var(--edge-highlight),var(--shadow-card)]",
+    elevated: "bg-muted/50 border-border shadow-[var(--shadow-card)]",
+    glass: "bg-card/80 backdrop-blur-xl border-border shadow-[var(--shadow-card)]",
+    sandbox: "bg-muted/50 border-primary/20 shadow-[var(--shadow-accent)]",
+  },
+} as const;

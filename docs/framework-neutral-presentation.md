@@ -75,3 +75,15 @@ including trailing newlines. Render `schemaRows` as escaped definition-list cont
 to retain the icon-only control. The shared clipboard owner uses a selection-
 preserving native copy fallback only when the Clipboard API is unavailable;
 permission rejection remains a visible failure, with no repeated permission attempt.
+## Existing application selectors
+
+Platform can import `@tangle-network/ui/styles/compat.css` after Brand and Tailwind
+instead of changing every `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-danger`,
+`.input`, `.card`, `.stat-card`, `.table-header` and `.table-cell` caller. This is an
+explicit opt-in Tailwind stylesheet generated from the same primitive class owners,
+not a second palette or hand-copied component style. Delete the replaced local
+selector definitions. Cards should carry `data-slot="card"` where nested surface
+rebinding matters. The aliases adopt shared default sizing and surface behavior.
+
+`StatusPill` accepts a decorative `icon` slot and `tone="violet"` using Brand's
+existing matched violet surface tokens; visible status text is always required.

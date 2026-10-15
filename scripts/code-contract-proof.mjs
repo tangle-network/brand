@@ -10,7 +10,7 @@ try{
   const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:"reduce",permissions:["clipboard-read","clipboard-write"],recordVideo:{dir:`${out}/videos`,size:{width,height:1000}}});
   const page=await context.newPage(),errors=[];page.on("pageerror",e=>errors.push(e.message));
   for(const phase of renderer==="react"?["before","after"]:["after"]){
-   await page.goto(`${url}?surface=code&phase=${phase}&renderer=${renderer}&theme=${theme}`);await page.getByRole("heading",{name:"API presentation fixture"}).waitFor();
+   await page.goto(`${url}?surface=code&phase=${phase}&renderer=${renderer}&theme=${theme}`,{waitUntil:"networkidle"});await page.getByRole("heading",{name:"API presentation fixture"}).waitFor();
    await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:`${out}/${phase}-${renderer}-${width}-${theme}.png`,fullPage:true});if(phase==="before")continue;
    const tabs=page.getByRole("tab");await tabs.first().focus();await page.keyboard.press("ArrowRight");if(await tabs.nth(1).getAttribute("aria-selected")!=="true")throw Error("Tab selection failed");
    const expected=await page.evaluate(()=>window.fixtureExamples[1].code);

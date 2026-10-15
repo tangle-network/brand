@@ -9,6 +9,7 @@ const TONES: StatusTone[] = [
   "info",
   "running",
   "neutral",
+  "violet",
 ];
 
 describe("StatusPill", () => {
