@@ -56,6 +56,8 @@ try{
    const copyTiming=await page.evaluate(()=>window.fixtureCopyTiming);
    const firstPending=copyTiming.samples.find(s=>s.busy==="true"),firstLoading=copyTiming.samples.find(s=>s.loading==="true"),firstLong=copyTiming.samples.find(s=>s.long==="true");
    if(!firstPending||firstPending.at>budgets.feedback||!firstLoading||firstLoading.at<budgets.pending-5||firstLoading.at>budgets.pending+budgets.feedback||!firstLong||firstLong.at<budgets.longWork-5)throw Error(`Copy timing budget failure: ${JSON.stringify(copyTiming)}`);
+   const loadingVisible=await pending.evaluate(e=>getComputedStyle(e,"::after").content.includes("…"));
+   if(!loadingVisible)throw Error("Contextual loading indicator is not rendered");
    const longVisible=await longStatus.evaluate(e=>getComputedStyle(e).position!=="absolute"&&e.textContent.includes("Cannot cancel")&&/\d+s elapsed/.test(e.textContent));
    if(!longVisible)throw Error("Long write status hidden or missing elapsed/cancellation explanation");
    await page.screenshot({path:`${out}/pending-${renderer}-${width}-${theme}-${reducedMotion}.png`,fullPage:true});
@@ -64,7 +66,7 @@ try{
    const long=page.getByRole("region",{name:"Long JSON line code"});await long.focus();await page.keyboard.press("End");
    const contained=await long.evaluate(e=>e.scrollWidth>e.clientWidth&&e.clientWidth<=innerWidth);
    const facts=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,schema:document.querySelector('.tangle-api-schema').textContent,regions:document.querySelectorAll('[role="region"]').length}));
-   if(errors.length||facts.overflow||!contained||!facts.schema.includes("messages.content"))throw Error(JSON.stringify({errors,contained,facts}));cases.push({width,theme,renderer,reducedMotion,copyTiming,longVisible,controlledWriteExceededMutationBudget:firstLong.at>budgets.mutation,...facts,exactCopy:true,copyFailure:true,singlePendingWrite:true,failureFocus:true,contained,video:`videos/${basename(await page.video().path())}`});
+   if(errors.length||facts.overflow||!contained||!facts.schema.includes("messages.content"))throw Error(JSON.stringify({errors,contained,facts}));cases.push({width,theme,renderer,reducedMotion,copyTiming,loadingVisible,longVisible,controlledWriteExceededMutationBudget:firstLong.at>budgets.mutation,...facts,exactCopy:true,copyFailure:true,singlePendingWrite:true,failureFocus:true,contained,video:`videos/${basename(await page.video().path())}`});
   }}finally{await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},null,2));console.log(JSON.stringify(cases));
