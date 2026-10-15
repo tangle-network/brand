@@ -1,0 +1,142 @@
+{
+  "sha": "189aedf2d76abb778cff0f25bfb3a9a60c9b777c",
+  "at": "2026-10-15T23:19:14.884Z",
+  "cases": [
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "react",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@a2b7625b53075f213078831aa269cc0b.webm"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "hono",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@c8fcd63af5e21a41d5449ac57c5e4174.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "react",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@cbb971c8e761f149453b8d62794eabd4.webm"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "hono",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@b2b7cdb89a0ac1f1af1b5c62c6014773.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "react",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@e54afbd9432ba657f6a44322bf11e8f5.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "hono",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@fabd3f2b096c9a050bc0d05f881d1908.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "react",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@6c29ba08c776a7477d5d8bc1c5668ed6.webm"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "hono",
+      "font": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "size": "30px",
+      "inputHeight": 44,
+      "inputFont": "16px",
+      "h1": 1,
+      "overflow": false,
+      "fields": 1,
+      "backdrop": {
+        "animation": "none",
+        "duration": "0s"
+      },
+      "video": "videos/page@e95c1dc8b650389c885957cf1322d445.webm"
+    }
+  ]
+}
