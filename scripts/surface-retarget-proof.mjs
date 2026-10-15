@@ -26,8 +26,23 @@ try {
     const deadline=performance.now()+seconds*1000;
     while(performance.now()<deadline){await frame();current=read();samples.push(current);if(current.progress>=0.35&&current.progress<=0.7)break;previous=current;}
     if(current.progress<0.35||current.progress>0.7)throw Error("No calibrated halfway sample");
+    // A flush can span a compositor frame. Compare displacement with measured
+    // elapsed time plus one preceding frame of sampling uncertainty; a reset to
+    // an endpoint still exceeds this bound. Keep the velocity checks separate.
+    const boundary=(previous,before,after)=>{
+     const frameMs=before.at-previous.at,elapsedMs=after.at-before.at;
+     if(frameMs<=0||frameMs>50||elapsedMs>50)throw Error(`Uncalibrated boundary timing: ${JSON.stringify({previous,before,after})}`);
+     const axes=["progress","opacity"].map(axis=>{
+      const speed=Math.abs(before[axis]-previous[axis])/frameMs;
+      const allowed=0.002+speed*(elapsedMs+frameMs)*1.25;
+      const displacement=Math.abs(after[axis]-before[axis]);
+      return {axis,speed,allowed,displacement};
+     });
+     if(axes.some(axis=>axis.displacement>axis.allowed))throw Error(`Boundary jumped: ${JSON.stringify({previous,before,after,frameMs,elapsedMs,axes})}`);
+     return {previous,frameMs,elapsedMs,axes};
+    };
     const before=read();intent(false);const after=read();
-    if(Math.abs(after.progress-before.progress)>0.002||Math.abs(after.opacity-before.opacity)>0.002)throw Error(`Close jumped: ${JSON.stringify({before,after})}`);
+    const closeBoundary=boundary(previous,before,after);
     const closing=[];
     for(let i=0;i<3;i++){await frame();closing.push(read());}
     const first=closing.find(s=>s.at-before.at>=12&&s.at-before.at<=45&&Math.abs(s.progress-before.progress)>0.0001);
@@ -36,14 +51,15 @@ try {
     let retreat=closing.at(-1);const closeDeadline=performance.now()+seconds*500;
     while(performance.now()<closeDeadline){await frame();const next=read();samples.push(next);if(next.progress<before.progress-0.1&&next.progress<retreat.progress-0.002){previous=retreat;retreat=next;break;}retreat=next;}
     const reopenBefore=read();intent(true);const reopenAfter=read();
-    if(!node.isConnected||node!==document.querySelector('[role="dialog"]')||Math.abs(reopenAfter.progress-reopenBefore.progress)>0.002)throw Error(`Reopen replaced or jumped: ${JSON.stringify({reopenBefore,reopenAfter})}`);
+    if(!node.isConnected||node!==document.querySelector('[role="dialog"]'))throw Error("Reopen replaced the surface");
+    const reopenBoundary=boundary(previous,reopenBefore,reopenAfter);
     const reopening=[];for(let i=0;i<3;i++){await frame();reopening.push(read());}
     const reverse=reopening.find(s=>s.at-reopenBefore.at>=12&&s.at-reopenBefore.at<=45&&Math.abs(s.progress-reopenBefore.progress)>0.0001);
     if(!reverse||reverse.progress>=reopenBefore.progress)throw Error(`Velocity restarted on reopen: ${JSON.stringify({reopenBefore,reopening})}`);
     const end=performance.now()+seconds*2000;let final=read();while(performance.now()<end&&Math.abs(final.progress-1)>0.001){await frame();final=read();}
     if(Math.abs(final.progress-1)>0.001||!node.contains(document.activeElement))throw Error(`Surface failed to settle/focus: ${JSON.stringify(final)}`);
     const bounds=node.getBoundingClientRect();if(kind==="dialog"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
-    return {scopedSeconds,calibrationMultiplier:16,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
+    return {scopedSeconds,calibrationMultiplier:16,closeBoundary,reopenBoundary,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
    },kind);
    await page.screenshot({path:`${out}/${kind}-${width}.png`});await page.emulateMedia({reducedMotion:"reduce"});
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
