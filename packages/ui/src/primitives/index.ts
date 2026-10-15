@@ -211,6 +211,13 @@ export type { PaginationProps } from "./pagination";
 export { StatusPill } from "./status-pill";
 export type { StatusPillProps, StatusTone } from "./status-pill";
 
+export { ComplianceBadge } from "./compliance-badge";
+export type {
+  ComplianceBadgeProps,
+  ComplianceProduct,
+  ComplianceStatus,
+} from "./compliance-badge";
+
 export { Tag } from "./tag";
 export type { TagProps } from "./tag";
 
