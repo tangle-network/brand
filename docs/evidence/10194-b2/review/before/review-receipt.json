@@ -1,0 +1,456 @@
+{
+  "sha": "fcd473e37a8fe0360348e6746a515e4657a66ed7",
+  "at": "2026-10-15T23:12:06.271Z",
+  "cases": [
+    {
+      "check": "outline",
+      "renderer": "react",
+      "width": 1024,
+      "pass": false,
+      "display": "block",
+      "left": 24,
+      "top": 764,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "react",
+      "width": 1279,
+      "pass": false,
+      "display": "block",
+      "left": 24,
+      "top": 764,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "react",
+      "width": 1280,
+      "pass": false,
+      "display": "block",
+      "left": 1080,
+      "top": 56,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "react",
+      "width": 1440,
+      "pass": false,
+      "display": "block",
+      "left": 1160,
+      "top": 56,
+      "articleRight": 1016,
+      "articleTop": 32,
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "react",
+      "selected": 0,
+      "pass": false,
+      "expected": [
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "react",
+      "selected": 1,
+      "pass": false,
+      "expected": [
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "react",
+      "selected": -1,
+      "pass": false,
+      "expected": [
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-2",
+        "boundary-start",
+        "choice-2",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@f7048ae1e807dac18d57016887576a8f.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "hono",
+      "width": 1024,
+      "pass": false,
+      "display": "block",
+      "left": 24,
+      "top": 744,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "hono",
+      "width": 1279,
+      "pass": false,
+      "display": "block",
+      "left": 24,
+      "top": 744,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "hono",
+      "width": 1280,
+      "pass": false,
+      "display": "block",
+      "left": 1080,
+      "top": 56,
+      "articleRight": 936,
+      "articleTop": 32,
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "outline",
+      "renderer": "hono",
+      "width": 1440,
+      "pass": false,
+      "display": "block",
+      "left": 1160,
+      "top": 56,
+      "articleRight": 1016,
+      "articleTop": 32,
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "hono",
+      "selected": 0,
+      "pass": false,
+      "expected": [
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "hono",
+      "selected": 1,
+      "pass": false,
+      "expected": [
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start",
+        "choice-1",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-1",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    },
+    {
+      "check": "radio",
+      "renderer": "hono",
+      "selected": -1,
+      "pass": false,
+      "expected": [
+        "choice-0",
+        "boundary-start",
+        "choice-0",
+        "boundary-start",
+        "choice-2",
+        "boundary-start",
+        "choice-2",
+        "boundary-start"
+      ],
+      "trace": [
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "",
+          "inside": false
+        },
+        {
+          "direction": "Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Tab",
+          "id": "choice-0",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "choice-2",
+          "inside": true
+        },
+        {
+          "direction": "Shift+Tab",
+          "id": "boundary-start",
+          "inside": true
+        }
+      ],
+      "video": "videos/page@a5b727351f8fce7bdc6709ff11eb9397.webm"
+    }
+  ]
+}

@@ -38,6 +38,7 @@ export interface HeadingProps
   extends Omit<React.HTMLAttributes<HTMLElement>, "role"> {
   /** Visual treatment, independent of the rendered element. Defaults to section. */
   variant?: HeadingVariant;
+  presentation?: "operational" | "expressive";
   /** Semantic element; changing it does not change the visual variant. */
   as?: React.ElementType;
   /**
@@ -53,7 +54,7 @@ export interface HeadingProps
  * display/page h1 per page; choose `as` according to the document hierarchy.
  */
 const Heading = React.forwardRef<HTMLElement, HeadingProps>(
-  ({ variant, role, as, className, ...props }, ref) => {
+  ({ variant, role, as, className, presentation, ...props }, ref) => {
     const legacyVariant =
       role && Object.prototype.hasOwnProperty.call(VARIANT_CLASS, role)
         ? (role as HeadingVariant)
@@ -64,7 +65,8 @@ const Heading = React.forwardRef<HTMLElement, HeadingProps>(
     return (
       <Tag
         ref={ref}
-        className={cn("[overflow-wrap:anywhere]", VARIANT_CLASS[visualVariant], className)}
+        className={cn("[overflow-wrap:anywhere]", presentation ? (presentation === "expressive" ? "tangle-display" : "tangle-heading") : VARIANT_CLASS[visualVariant], className)}
+        data-variant={presentation ? visualVariant : undefined}
         role={legacyVariant ? undefined : role}
         {...props}
       />

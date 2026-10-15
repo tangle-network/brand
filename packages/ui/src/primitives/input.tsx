@@ -1,45 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { controlRadius, controlSizes, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "../lib/control-presentation";
+import { controlRadius, controlSizes, controlText, fieldPresentation, fieldTouchText } from "../lib/control-presentation";
 import { focusFieldInvalid } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { HelpText } from "./help-text";
 import { Label } from "./label";
 
-import { cva, type VariantProps } from "class-variance-authority";
+import { inputVariants } from "../presentation";
+import { type VariantProps } from "class-variance-authority";
 
 // Sizes follow the shared control scale (control-presentation.ts), so an Input
 // and a Button at the same size share a height, text size and corner.
-const inputVariants = cva(
-  cn(
-    "flex w-full border py-1 placeholder:text-[var(--text-dim)] disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium",
-    fieldPresentation,
-    fieldTouchText,
-  ),
-  {
-    variants: {
-      // `default` and `sandbox` render the same field; both names stay valid.
-      variant: {
-        default: "",
-        sandbox: "",
-        error: focusFieldInvalid,
-      },
-      size: {
-        default: fieldSizes.md,
-        md: fieldSizes.md,
-        sm: fieldSizes.sm,
-        lg: fieldSizes.lg,
-        compact: cn(fieldSizes.md, controlSizes.compact),
-        touch: cn(fieldSizes.md, controlSizes.touch),
-      }
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
 
 // Only rendered descriptions are added; caller IDs and their order are retained.
 function descriptionIds(...ids: Array<string | undefined>) {

@@ -1,7 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
-import { cva } from "class-variance-authority";
+import { buttonVariants } from "../presentation";
 import * as React from "react";
-import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText } from "../lib/control-presentation";
 import { focusRing } from "../lib/focus";
 import { ixControl, ixControlSoft, ixSelected } from "../lib/interaction";
 import { cn } from "../lib/utils";
@@ -14,43 +13,6 @@ import { cn } from "../lib/utils";
 // `ixControl` (green edge and glow on hover, press and after a click); ghost,
 // link and bare take `ixControlSoft`, a wash that never glows. A toggle button
 // (any `aria-pressed`) adds `ixControl` + `ixSelected` whatever its variant.
-const buttonVariants = cva(
-  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-[color,background-color,border-color,box-shadow,transform,scale] ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
-  {
-    variants: {
-      variant: {
-        default:
-          `bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97] ${ixControl}`,
-        destructive:
-          `bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97] ${ixControl}`,
-        outline:
-          `border border-border bg-card hover:bg-muted active:scale-[0.97] text-foreground ${ixControl}`,
-        secondary:
-          `bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97] ${ixControl}`,
-        ghost:
-          `hover:text-foreground text-muted-foreground border border-transparent ${ixControlSoft}`,
-        link: `text-[var(--accent-text)] underline-offset-4 hover:underline ${ixControlSoft}`,
-        sandbox:
-          `bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97] ${ixControl}`,
-      },
-      size: {
-        default: `${controlHeight.md} ${controlText.md} ${controlRadius.md} px-4 py-2`,
-        md: `${controlHeight.md} ${controlText.md} ${controlRadius.md} px-4 py-2`,
-        sm: `${controlHeight.sm} ${controlText.sm} ${controlRadius.sm} px-3`,
-        lg: `${controlHeight.lg} ${controlText.lg} ${controlRadius.lg} px-7`,
-        xl: "h-13 rounded-xl px-9 text-base",
-        icon: `${controlSquare.md} ${controlText.md} ${controlRadius.md}`,
-        "icon-sm": `${controlSquare.sm} ${controlText.sm} ${controlRadius.sm}`,
-        "icon-lg": `${controlSquare.lg} ${controlText.lg} ${controlRadius.lg}`,
-        ...controlSizes,
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
 
 // `bare` keeps the shared focus ring, disabled and loading behavior and drops
 // every surface, size and type class. It is for pressable rows, tiles and pills
@@ -75,7 +37,7 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | "bare" | null;
   /** sm 32px, default/md 36px (`--control-height`), lg 44px; icon sizes are squares on the same heights. */
-  size?: "default" | "md" | "sm" | "lg" | "xl" | "icon" | "icon-sm" | "icon-lg" | "compact" | "touch" | null;
+  size?: "default" | "md" | "sm" | "lg" | "xl" | "display" | "icon" | "icon-sm" | "icon-lg" | "compact" | "touch" | null;
   asChild?: boolean;
   loading?: boolean;
   children?: React.ReactNode;
@@ -136,6 +98,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         <Slot
           className={buttonClassName(variant, size, props["aria-pressed"], className)}
           ref={ref}
+          data-variant={size === "display" ? variant ?? "default" : undefined}
           {...props}
           {...(isDisabled ? disabledHandlers(props) : {})}
         >
@@ -161,6 +124,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         className={buttonClassName(variant, size, props["aria-pressed"], className)}
         ref={ref}
+        data-variant={size === "display" ? variant ?? "default" : undefined}
         {...props}
         disabled={disabled || loading}
         aria-busy={loading || props["aria-busy"]}

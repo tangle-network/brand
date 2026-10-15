@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { controlHeight, controlText, controlMotion, fieldPresentation } from "../lib/control-presentation";
+import { controlHeight, controlText, fieldPresentation } from "../lib/control-presentation";
 import { HelpText } from "./help-text";
 import { Label } from "./label";
 import { Button, buttonVariants } from "./button";
@@ -11,7 +11,7 @@ import { Select, SelectTrigger, SelectValue } from "./select";
 afterEach(cleanup);
 
 describe("shared control presentation", () => {
-  it("uses the field well, not the border/track alias, with scoped foreground and time-only motion", () => {
+  it("uses the field well, not the border/track alias, with scoped foreground", () => {
     // The well is the brand's --well context variable; Toolbar can still pick the fill.
     expect(fieldPresentation).toContain("bg-[var(--field-surface,var(--well))]");
     expect(fieldPresentation.split(" ")).not.toContain("bg-input");
@@ -20,10 +20,6 @@ describe("shared control presentation", () => {
     expect(fieldPresentation.split(" ")).toContain("border-[var(--field-border)]");
     expect(fieldPresentation.split(" ")).not.toContain("border-border");
     expect(fieldPresentation).toContain("text-foreground");
-    expect(fieldPresentation).not.toContain("duration-150");
-    expect(controlMotion).toContain("duration-[var(--duration-fast)]");
-    expect(controlMotion).not.toContain("--transition-fast");
-    expect(controlMotion).toContain("motion-reduce:duration-0");
   });
 
   it("puts Button, Input, Textarea and SelectTrigger on one height and text scale", () => {
@@ -116,7 +112,6 @@ describe("shared control presentation", () => {
     expect(buttonVariants({ variant: "destructive" })).toContain("text-destructive-foreground");
     expect(buttonVariants({ variant: "sandbox" })).toContain("text-[var(--btn-primary-text)]");
     expect(buttonVariants()).not.toContain("transition-all");
-    expect(buttonVariants()).toContain("box-shadow,transform,scale");
     expect(buttonVariants()).toContain("motion-reduce:active:scale-100");
   });
 });

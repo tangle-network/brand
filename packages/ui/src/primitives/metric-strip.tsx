@@ -1,16 +1,7 @@
+import { metricPresentation, metricLayouts } from "../presentation";
 import * as React from "react";
 import { cn } from "../lib/utils";
 import { StatusPill, type StatusTone } from "./status-pill";
-
-// Each finite preset owns its grid AND its row-start rules. Keep the strings
-// literal so host Tailwind consumers scanning the published source emit them.
-// Ranges do not overlap: no drawn border is subsequently suppressed.
-const layouts = {
-  3: "grid-cols-2 sm:grid-cols-3 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(3n+1))]:border-l",
-  4: "grid-cols-2 sm:grid-cols-4 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(4n+1))]:border-l",
-  5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(5n+1))]:border-l",
-  6: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(6n+1))]:border-l",
-} as const;
 
 /** Headline readings on one plane, with native definition-list semantics. */
 export interface MetricStripProps
@@ -26,8 +17,8 @@ const MetricStrip = React.forwardRef<HTMLDListElement, MetricStripProps>(
     <dl
       ref={ref}
       className={cn(
-        "grid min-w-0 rounded-[var(--radius-lg)] border border-border bg-card shadow-[var(--shadow-card)]",
-        layouts[columns],
+        metricPresentation.strip,
+        metricLayouts[columns],
         className,
       )}
       {...props}
@@ -55,10 +46,10 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
   ({ className, label, value, hint, attention, icon, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("min-w-0 border-border p-4 sm:p-5", className)}
+      className={cn(metricPresentation.item, className)}
       {...props}
     >
-      <dt className="flex min-w-0 flex-wrap items-center gap-2 text-muted-foreground text-sm">
+      <dt className={metricPresentation.label}>
         {icon != null && icon !== false && (
           <span
             aria-hidden="true"
@@ -67,7 +58,7 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
             {icon}
           </span>
         )}
-        <span className="min-w-0 whitespace-normal [overflow-wrap:anywhere]">{label}</span>
+        <span className={metricPresentation.labelText}>{label}</span>
         {attention && (
           <StatusPill tone={attention.tone}>{attention.label}</StatusPill>
         )}
@@ -76,7 +67,7 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
           title. Wrap even unbroken values without making the grid wider. */}
       <dd
         className={cn(
-          "mt-1 whitespace-normal [overflow-wrap:anywhere] font-semibold text-xl tabular-nums tracking-tight lg:text-2xl",
+          metricPresentation.value,
           attention?.tone === "danger" && "text-[var(--surface-danger-text)]",
         )}
         title={typeof value === "string" ? value : undefined}
@@ -85,7 +76,7 @@ const Metric = React.forwardRef<HTMLDivElement, MetricProps>(
       </dd>
       {hint !== undefined && hint !== null && hint !== false && hint !== "" && (
         <dd
-          className="mt-0.5 whitespace-normal [overflow-wrap:anywhere] text-[var(--text-dim)] text-xs"
+          className={metricPresentation.hint}
           title={typeof hint === "string" ? hint : undefined}
         >
           {hint}

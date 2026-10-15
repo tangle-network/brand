@@ -1,3 +1,4 @@
+import { helpPresentation } from "../presentation";
 import * as React from "react";
 import { cn } from "../lib/utils";
 
@@ -17,8 +18,8 @@ const HelpText = React.forwardRef<HTMLParagraphElement, HelpTextProps>(
       ref={ref}
       data-tone={tone}
       className={cn(
-        "text-[length:var(--font-size-help,0.75rem)] leading-4",
-        tone === "error" ? "font-medium text-[var(--surface-danger-text)]" : "text-[var(--text-dim)]",
+        helpPresentation.root,
+        helpPresentation[tone],
         className,
       )}
       {...props}

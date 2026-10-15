@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/utils";
 
 export interface PageShellProps {
-  children: ReactNode;
+  children?: ReactNode;
+  /** Optional reading layout. Content, routing and navigation interaction stay caller-owned. */
+  navigation?: ReactNode;
+  article?: ReactNode;
+  outline?: ReactNode;
+  navigationLabel?: string;
+  outlineLabel?: string;
   className?: string;
 }
 
@@ -12,7 +18,12 @@ export interface PageShellProps {
  * The caller owns landmarks, routing, auth, navigation and data state. Use
  * className to override the bound/gutters, or omit it for a workbench layout.
  */
-export function PageShell({ children, className }: PageShellProps) {
+export function PageShell({ children, className, navigation, article, outline, navigationLabel = "Sections", outlineLabel = "On this page" }: PageShellProps) {
+  if (navigation || article || outline) return <div className={cn("tangle-reading-shell",className)}>
+    {navigation && <nav aria-label={navigationLabel} className="tangle-reading-nav">{navigation}</nav>}
+    <article className="tangle-reading-article">{article ?? children}</article>
+    {outline && <aside aria-label={outlineLabel} className="tangle-reading-outline">{outline}</aside>}
+  </div>;
   return (
     <div
       className={cn(

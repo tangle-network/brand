@@ -74,15 +74,14 @@
   padding: 0 1.5rem;
   border: 1px solid transparent;
   border-radius: var(--display-control-radius);
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
   font: 600 var(--display-control-font-size)/1 var(--font-sans);
   text-decoration: none;
   white-space: nowrap;
   box-shadow: var(--display-control-shadow);
   cursor: pointer;
-  transition: transform var(--duration-fast) ease-out;
+  transition: transform var(--motion-control);
 }
+.tangle-control-display:not([data-variant]), .tangle-control-display[data-variant="default"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
 .tangle-control-display[data-variant="outline"] {
   background: hsl(var(--card));
   color: hsl(var(--card-foreground));
@@ -107,10 +106,8 @@
   rotate: -14deg;
 }
 .tangle-intro-knot > svg { width: 100%; height: auto; }
-.tangle-intro[data-motion] { animation: tangle-intro-enter var(--duration-expressive-entrance) var(--ease-expressive) both; }
-.tangle-intro[data-motion] .tangle-intro-knot { animation: tangle-intro-drift var(--duration-expressive-ambient) ease-in-out infinite; }
+.tangle-intro[data-motion] { animation: tangle-intro-enter var(--motion-arrive) both; }
 @keyframes tangle-intro-enter { from { opacity: 0; transform: translateY(var(--arrive-distance)); } to { opacity: 1; transform: none; } }
-@keyframes tangle-intro-drift { 50% { transform: translateY(-0.75rem) scale(1.04); } }
 @media (prefers-reduced-motion: reduce) {
   .tangle-intro, .tangle-intro *, .tangle-control-display { animation: none !important; transition: none !important; transform: none !important; }
 }
@@ -118,3 +115,8 @@
   .tangle-display[data-gradient] { background: none; color: CanvasText; }
   .tangle-intro::before, .tangle-intro::after { display: none; }
 }
+
+/* Nonvisual presence markers let Radix retain its lifecycle while the shared
+ * surface adapter retargets geometry. Distinct names preserve interrupted exit. */
+@keyframes tangle-surface-present { from { --tangle-presence: 0; } to { --tangle-presence: 1; } }
+@keyframes tangle-surface-absent { from { --tangle-presence: 1; } to { --tangle-presence: 0; } }

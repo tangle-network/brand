@@ -1,0 +1,34 @@
+{
+  "sha": "189aedf2d76abb778cff0f25bfb3a9a60c9b777c",
+  "at": "2026-10-15T23:19:16.562Z",
+  "name": "@tangle-network/ui",
+  "version": "11.35.0",
+  "tarball": "tangle-network-ui-11.35.0.tgz",
+  "dependencySource": "frozen workspace graph; actual packed exports bundled by esbuild",
+  "entries": [
+    {
+      "entry": "presentation",
+      "bytes": 40833,
+      "gzipBytes": 12520,
+      "inputs": [
+        "node_modules/@tangle-network/ui/dist/lib/motion.js",
+        "node_modules/@tangle-network/ui/dist/lib/interaction.js",
+        "node_modules/@tangle-network/ui/dist/lib/focus.js",
+        "node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+        "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+        "node_modules/@tangle-network/ui/dist/lib/utils.js",
+        "node_modules/@tangle-network/ui/dist/lib/control-presentation.js",
+        "node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs",
+        "node_modules/@tangle-network/ui/dist/presentation.js",
+        "../../../../../../..packed-consumer/presentation-entry.mjs"
+      ],
+      "smoke": "Packed presentation bundle imports with React unavailable"
+    }
+  ],
+  "surfaces": {
+    "bytes": 193970,
+    "gzipBytes": 67079,
+    "motionBytes": 64666,
+    "meaning": "Motion-attributed minified bytes; not a before/after gzip delta"
+  }
+}
