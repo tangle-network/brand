@@ -76,7 +76,7 @@ Read elapsed-time thresholds from Brand’s `--interaction-*` roles; convert CSS
 |---|---|
 | Local feedback | Aim for next frame; p95 must meet `--interaction-feedback-budget`. |
 | Pending | Mark immediately; show contextual loading after `--interaction-pending-delay`, without resizing or minimum spinner duration. |
-| Long work | At `--interaction-long-work-delay`, show observed phase or honest unknown, elapsed time and cancellation. |
+| Long work | At `--interaction-long-work-delay`, show observed phase or honest unknown and elapsed time. Offer available cancellation; otherwise explain that work cannot be cancelled and provide status/reconciliation. |
 | Mutation | Target p95 committed acknowledgment within `--interaction-mutation-budget`; otherwise agree a workflow target and retain pending state. |
 | Useful output | Freeze usefulness; measure request-to-useful-artifact and completion separately, including failures. |
 
