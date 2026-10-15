@@ -37,7 +37,10 @@ try {
     await dialog.waitFor({state:"hidden"});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error(`${kind} failed focus return`);
     // Changing preference while open must not strand focus or dismissal.
     await trigger.click();await dialog.waitFor();await page.emulateMedia({reducedMotion:"reduce"});
-    if(await dialog.evaluate(e=>getComputedStyle(e).animationName)!=="none")throw Error("Live reduced-motion change ignored");
+    await page.waitForFunction(()=>matchMedia("(prefers-reduced-motion: reduce)").matches);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const live=await dialog.evaluate(e=>({animation:getComputedStyle(e).animationName,state:e.getAttribute("data-state"),reduce:matchMedia("(prefers-reduced-motion: reduce)").matches,focus:e.contains(document.activeElement)}));
+    if(live.animation!=="none"||!live.focus)throw Error(`Live reduced-motion failure: ${JSON.stringify(live)}`);
     await page.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Preference change stranded focus");
     await page.emulateMedia({reducedMotion});
    }
