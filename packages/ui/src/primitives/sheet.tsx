@@ -4,6 +4,7 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 import * as React from "react";
+import { SurfaceMotion } from "../lib/surface-motion";
 import { controlMotion, surfaceMotion } from "../lib/motion";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
@@ -20,17 +21,17 @@ const SheetPortal = SheetPrimitive.Portal;
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
->(({ className, ...props }, ref) => (
+>(({ className, asChild, children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     ref={ref}
     className={cn(
       "fixed inset-0 z-50 bg-black/40",
       surfaceMotion,
-      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
-  />
+    asChild
+  ><SurfaceMotion kind="overlay" asChild={asChild}>{children}</SurfaceMotion></SheetPrimitive.Overlay>
 ));
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
@@ -43,11 +44,11 @@ const sheetVariants = cva(
     variants: {
       side: {
         right:
-          "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        top: "inset-x-0 top-0 h-auto border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+          "inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+        top: "inset-x-0 top-0 h-auto border-b",
         bottom:
-          "inset-x-0 bottom-0 h-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          "inset-x-0 bottom-0 h-auto border-t",
       },
     },
     defaultVariants: { side: "right" },
@@ -61,14 +62,16 @@ const SheetContent = React.forwardRef<
       /** Hide only the built-in close button; Escape and outside clicks still dismiss. */
       hideCloseButton?: boolean;
     }
->(({ className, children, side = "right", hideCloseButton = false, ...props }, ref) => (
+>(({ className, children, side = "right", hideCloseButton = false, asChild, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
       {...props}
+      asChild
     >
+      <SurfaceMotion kind="sheet" side={side ?? "right"} asChild={asChild}>
       {children}
       {!hideCloseButton && (
         <SheetPrimitive.Close
@@ -82,6 +85,7 @@ const SheetContent = React.forwardRef<
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>
       )}
+      </SurfaceMotion>
     </SheetPrimitive.Content>
   </SheetPortal>
 ));

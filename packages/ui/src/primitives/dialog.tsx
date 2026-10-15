@@ -1,3 +1,4 @@
+import { SurfaceMotion } from "../lib/surface-motion";
 import { dialogPresentation } from "../presentation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -16,17 +17,17 @@ const DialogClose = DialogPrimitive.Close;
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
+>(({ className, asChild, children, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
       dialogPresentation.overlay,
       dialogPresentation.transition,
-      dialogPresentation.fade,
       className,
     )}
     {...props}
-  />
+    asChild
+  ><SurfaceMotion kind="overlay" asChild={asChild}>{children}</SurfaceMotion></DialogPrimitive.Overlay>
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
@@ -41,7 +42,7 @@ const DialogContent = React.forwardRef<
      */
     hideCloseButton?: boolean;
   }
->(({ className, children, variant = "default", hideCloseButton = false, ...props }, ref) => {
+>(({ className, children, variant = "default", hideCloseButton = false, asChild, ...props }, ref) => {
   const variants = {
     default: "border-border",
     sandbox: "border-[var(--border-accent)] shadow-[var(--shadow-accent)]",
@@ -56,15 +57,13 @@ const DialogContent = React.forwardRef<
           dialogPresentation.position,
           dialogPresentation.surface,
           dialogPresentation.transition,
-          dialogPresentation.fade,
-          dialogPresentation.zoom,
-          dialogPresentation.closedPosition,
-          dialogPresentation.openPosition,
           variants[variant],
           className,
         )}
         {...props}
+        asChild
       >
+        <SurfaceMotion kind="dialog" asChild={asChild}>
         {children}
         {!hideCloseButton && (
           <DialogPrimitive.Close
@@ -77,6 +76,7 @@ const DialogContent = React.forwardRef<
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
+        </SurfaceMotion>
       </DialogPrimitive.Content>
     </DialogPortal>
   );

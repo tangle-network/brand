@@ -2,6 +2,7 @@
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
+import { SurfaceMotion } from "../lib/surface-motion";
 import { surfaceMotion } from "../lib/motion";
 import { cn } from "../lib/utils";
 
@@ -34,20 +35,19 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 6, ...props }, ref) => (
+>(({ className, sideOffset = 6, asChild, children, ...props }, ref) => (
   <TooltipPrimitive.Portal>
     <TooltipPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
         "z-50 max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-md bg-foreground px-2.5 py-1.5 text-background text-xs leading-snug shadow-md",
-        "data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-[state=instant-open]:fade-in-0 data-[state=instant-open]:zoom-in-95",
-        "data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
         surfaceMotion,
         className,
       )}
       {...props}
-    />
+      asChild
+    ><SurfaceMotion kind="tooltip" asChild={asChild}>{children}</SurfaceMotion></TooltipPrimitive.Content>
   </TooltipPrimitive.Portal>
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
