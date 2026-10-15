@@ -10,7 +10,7 @@ try {
   const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:"reduce",recordVideo:{dir:`${out}/videos`,size:{width,height:1000}}});
   const page=await context.newPage();const errors=[];page.on("pageerror",e=>errors.push(e.message));
   for(const phase of renderer==="react"?["before","after"]:["after"]){
-   await page.goto(`${url}?surface=layout&phase=${phase}&renderer=${renderer}&theme=${theme}`);await page.getByRole("heading",{name:"API keys",exact:true}).waitFor();
+   await page.goto(`${url}?surface=layout&phase=${phase}&renderer=${renderer}&theme=${theme}`,{waitUntil:"networkidle"});await page.getByRole("heading",{name:"API keys",exact:true}).waitFor();
    await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:`${out}/${phase}-${renderer}-${width}-${theme}.png`,fullPage:true});
    if(phase==="before")continue;
    const trigger=page.getByRole("button",{name:"Sections",exact:true});await trigger.focus();await page.keyboard.press("Enter");

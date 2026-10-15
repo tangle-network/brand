@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { jsx } from "hono/jsx";
+import { jsx } from "hono/jsx/jsx-runtime";
 import { PageShell } from "../../packages/ui/src/primitives/page-shell";
 import { PageHeader } from "../../packages/ui/src/primitives/page-header";
 import { Button } from "../../packages/ui/src/primitives/button";
