@@ -560,6 +560,13 @@
   --motion-dismiss: var(--duration-instant) var(--ease-exit);
   --motion-stream: var(--duration-stream) var(--ease-expo);
   --motion-arrive: var(--duration-arrive) var(--ease-expo);
+
+  /* Elapsed interaction thresholds, not animation durations. See
+   * docs/design-bible.md#interaction. Reduced motion leaves these unchanged. */
+  --interaction-feedback-budget: 100ms;
+  --interaction-pending-delay: 200ms;
+  --interaction-long-work-delay: 1000ms;
+  --interaction-mutation-budget: 500ms;
   --stagger-step: 50ms;
   --stagger-index: 0;
   --arrive-distance: 8px;
