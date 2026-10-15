@@ -10,6 +10,7 @@ import { Heading } from "./heading";
 export interface PageHeaderProps
   extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   title: React.ReactNode;
+  presentation?: "operational" | "expressive";
   description?: React.ReactNode;
   /** Canonical action slot. If supplied (even null), takes precedence over action. */
   actions?: React.ReactNode;
@@ -31,6 +32,7 @@ const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   (
     {
       className,
+      presentation,
       title,
       description,
       actions,
@@ -46,28 +48,29 @@ const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   ) => {
     const resolvedActions = actions === undefined ? action : actions;
     return (
-      <header ref={ref} className={cn("mb-6 min-w-0", className)} {...props}>
-        <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3">
+      <header ref={ref} className={cn(presentation === "expressive" ? "tangle-intro" : presentation === "operational" ? "tangle-page-header" : "mb-6 min-w-0", className)} {...props}>
+        <div className={presentation ? "tangle-page-header-main" : "flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3"}>
           <div className="min-w-0 flex-[1_1_16rem]">
             {hasContent(eyebrow) && (
               <Heading variant="eyebrow" className="mb-1.5">{eyebrow}</Heading>
             )}
             <Heading
               id={titleId}
-              variant={level === 1 ? "page" : "section"}
+              variant={presentation === "expressive" ? "display" : level === 1 ? "page" : "section"}
+              presentation={presentation}
               as={titleAs ?? (level === 1 ? "h1" : "h2")}
               className="text-balance"
             >
               {title}
             </Heading>
             {hasContent(description) && (
-              <p className="mt-1 max-w-prose text-muted-foreground text-sm [overflow-wrap:anywhere]">
+              <p className={presentation === "expressive" ? "tangle-intro-description" : "mt-1 max-w-prose text-muted-foreground text-sm [overflow-wrap:anywhere]"}>
                 {description}
               </p>
             )}
           </div>
           {hasContent(resolvedActions) && (
-            <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 [overflow-wrap:anywhere] [&>*]:min-w-0 [&>*]:max-w-full">
+            <div className={presentation === "expressive" ? "tangle-intro-actions" : "flex min-w-0 max-w-full flex-wrap items-center gap-2 [overflow-wrap:anywhere] [&>*]:min-w-0 [&>*]:max-w-full"}>
               {resolvedActions}
             </div>
           )}

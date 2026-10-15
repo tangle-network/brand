@@ -1,0 +1,27 @@
+/* Requires Brand styles; the same contracts serve React and Hono. */
+.tangle-heading { color: hsl(var(--foreground)); font-family: var(--font-display); font-weight: 600; line-height: var(--line-height-heading); letter-spacing: var(--tracking-tight); }
+.tangle-heading[data-variant="display"] { font-size: var(--font-size-display); line-height: var(--line-height-display); }
+.tangle-heading[data-variant="hero"] { font-size: var(--font-size-hero); line-height: var(--line-height-display); }
+.tangle-heading[data-variant="page"] { font-size: var(--font-size-3xl); }
+.tangle-heading[data-variant="section"] { font-size: var(--font-size-xl); }
+.tangle-heading[data-variant="subsection"] { font-size: var(--font-size-lg); }
+.tangle-heading[data-variant="eyebrow"] { font-size: var(--font-size-sm); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: hsl(var(--muted-foreground)); }
+.tangle-page-header { min-width: 0; margin-bottom: 1.5rem; }
+.tangle-page-header-main { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; }
+.tangle-intro .tangle-page-header-main { display: block; }
+.tangle-reading-shell { display: grid; grid-template-columns: minmax(0,1fr); gap: 2rem; padding: 2rem var(--hero-gutter); max-width: var(--content-max-width); margin: auto; min-width: 0; }
+.tangle-reading-shell > * { min-width: 0; }
+.tangle-reading-article { width: 100%; max-width: var(--reading-max-width); overflow-wrap: anywhere; }
+.tangle-reading-nav a, .tangle-reading-outline a { display: block; padding: 0.5rem 0; color: hsl(var(--muted-foreground)); text-decoration: none; }
+.tangle-reading-nav a[aria-current], .tangle-reading-outline a[aria-current] { color: var(--accent-text); font-weight: 600; }
+@media(min-width: 64rem) {
+  .tangle-reading-shell { grid-template-columns: 13rem minmax(0,1fr); }
+  .tangle-reading-nav { position: sticky; top: var(--shell-header-height); align-self: start; max-height: calc(100dvh - var(--shell-header-height)); overflow: auto; }
+}
+@media(min-width: 80rem) {
+  .tangle-reading-shell:has(.tangle-reading-outline) { grid-template-columns: 13rem minmax(0,1fr) 11rem; }
+  .tangle-reading-outline { position: sticky; top: var(--shell-header-height); align-self: start; }
+}
+/* Native dialog has the same solid reading surface as React's Dialog/Sheet. */
+.tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
+.tangle-native-dialog::backdrop { background: var(--scrim); }

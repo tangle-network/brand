@@ -1,7 +1,7 @@
 {
   "name": "@tangle-network/ui",
   "version": "11.35.0",
-  "description": "Generic React UI components for Tangle products — primitives, chat, run, files, editor, markdown.",
+  "description": "Generic React UI components for Tangle products \u2014 primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -13,7 +13,9 @@
     "url": "https://github.com/tangle-network/brand/issues"
   },
   "homepage": "https://github.com/tangle-network/brand",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/styles/*.css"
+  ],
   "files": [
     "dist",
     "src",
@@ -111,7 +113,13 @@
       "types": "./dist/redaction.d.ts",
       "import": "./dist/redaction.js",
       "default": "./dist/redaction.js"
-    }
+    },
+    "./presentation": {
+      "types": "./dist/presentation.d.ts",
+      "import": "./dist/presentation.js",
+      "default": "./dist/presentation.js"
+    },
+    "./styles/presentation.css": "./src/styles/presentation.css"
   },
   "scripts": {
     "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",

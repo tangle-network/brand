@@ -1,3 +1,4 @@
+import { emptyStatePresentation } from "../presentation";
 import * as React from "react";
 import { cn } from "../lib/utils";
 
@@ -17,23 +18,23 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       <div
         ref={ref}
         className={cn(
-          "flex flex-col items-center justify-center px-4 py-16 text-center",
+          emptyStatePresentation.root,
           className,
         )}
         {...props}
       >
         {icon && (
-          <div className="mb-4 rounded-full bg-muted p-4 text-muted-foreground">
+          <div className={emptyStatePresentation.icon}>
             {icon}
           </div>
         )}
-        <Title className="font-semibold text-lg">{title}</Title>
+        <Title className={emptyStatePresentation.title}>{title}</Title>
         {description && (
-          <p className="mt-2 max-w-sm text-muted-foreground text-sm">
+          <p className={emptyStatePresentation.description}>
             {description}
           </p>
         )}
-        {action && <div className="mt-6">{action}</div>}
+        {action && <div className={emptyStatePresentation.action}>{action}</div>}
       </div>
     );
   },
