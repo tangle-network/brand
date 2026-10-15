@@ -27,7 +27,7 @@ try {
     const dialog=page.getByRole("dialog");await dialog.waitFor();
     const opening=await dialog.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction,focus:e.contains(document.activeElement)};});
     if(!opening.focus)throw Error(`${kind} did not own focus`);
-    if(reducedMotion==="reduce"?opening.name!=="none":opening.name!=="enter"||opening.duration!==timing.role.surface.duration||opening.easing!==timing.role.surface.easing)throw Error(`Invalid ${kind} opening role: ${JSON.stringify(opening)}`);
+    if(reducedMotion==="reduce"?opening.name!=="none":opening.name!=="tangle-surface-present"||opening.duration!==timing.role.surface.duration||opening.easing!==timing.role.surface.easing)throw Error(`Invalid ${kind} opening role: ${JSON.stringify(opening)}`);
     const overlays=await page.evaluate(()=>[...document.querySelectorAll('[data-state="open"]')].map(e=>getComputedStyle(e)).filter(s=>s.position==="fixed"&&[s.top,s.right,s.bottom,s.left].every(v=>v==="0px")).map(s=>({animation:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction})));
     if(overlays.length!==1)throw Error(`Expected one modal overlay, got ${overlays.length}`);
     if(reducedMotion==="reduce"?overlays[0].animation!=="none":overlays[0].duration!==timing.role.surface.duration)throw Error(`Invalid modal overlay motion: ${JSON.stringify(overlays)}`);
@@ -35,7 +35,7 @@ try {
     await page.keyboard.press("Escape");
     if(reducedMotion!=="reduce"){
      const closing=await dialog.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction};});
-     if(closing.name!=="exit"||closing.duration!==timing.role.dismiss.duration||closing.easing!==timing.role.dismiss.easing)throw Error(`Invalid ${kind} dismissal role: ${JSON.stringify(closing)}`);
+     if(closing.name!=="tangle-surface-absent"||closing.duration!==timing.role.dismiss.duration||closing.easing!==timing.role.dismiss.easing)throw Error(`Invalid ${kind} dismissal role: ${JSON.stringify(closing)}`);
     }
     await dialog.waitFor({state:"hidden"});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error(`${kind} failed focus return`);
     // Changing preference while open must not strand focus or dismissal.
@@ -49,7 +49,7 @@ try {
    }
    await page.getByRole("button",{name:"Hint",exact:true}).hover();const hint=page.getByText("Tooltip surface",{exact:true}).first();await hint.waitFor();
    const tooltip=await hint.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction};});
-   if(reducedMotion==="reduce"?tooltip.name!=="none":tooltip.name!=="enter"||tooltip.duration!==timing.role.surface.duration||tooltip.easing!==timing.role.surface.easing)throw Error(`Invalid tooltip role: ${JSON.stringify(tooltip)}`);
+   if(reducedMotion==="reduce"?tooltip.name!=="none":tooltip.name!=="tangle-surface-present"||tooltip.duration!==timing.role.surface.duration||tooltip.easing!==timing.role.surface.easing)throw Error(`Invalid tooltip role: ${JSON.stringify(tooltip)}`);
    if(errors.length)throw Error(JSON.stringify(errors));cases.push({reducedMotion,timing,tooltip,video:`videos/${basename(await page.video().path())}`});
   }finally{await context.close();}
  }

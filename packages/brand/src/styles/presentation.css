@@ -115,3 +115,8 @@
   .tangle-display[data-gradient] { background: none; color: CanvasText; }
   .tangle-intro::before, .tangle-intro::after { display: none; }
 }
+
+/* Nonvisual presence markers let Radix retain its lifecycle while the shared
+ * surface adapter retargets geometry. Distinct names preserve interrupted exit. */
+@keyframes tangle-surface-present { from { --tangle-presence: 0; } to { --tangle-presence: 1; } }
+@keyframes tangle-surface-absent { from { --tangle-presence: 1; } to { --tangle-presence: 0; } }
