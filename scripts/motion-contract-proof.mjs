@@ -53,5 +53,5 @@ try {
    if(errors.length)throw Error(JSON.stringify(errors));cases.push({reducedMotion,timing,tooltip,video:`videos/${basename(await page.video().path())}`});
   }finally{await context.close();}
  }
- await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases,interruption:"Not established by timing checks; requires trajectory proof"},null,2));console.log(JSON.stringify(cases));
+ await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases,interruption:"Not established by timing checks; requires trajectory proof"},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));
 }finally{await browser.close();await server.close();}
