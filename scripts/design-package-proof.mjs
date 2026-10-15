@@ -63,15 +63,29 @@ export async function provePublishedKnot(out, registry, sourceSha) {
 }
 
 /** Prove the packed presentation entry's graph, not the workspace import alias. */
-export async function provePresentationPackage(out) {
+export async function provePresentationPackage(out, published) {
  const [{build},{gzipSync},{resolve,join},{default:assert}]=await Promise.all([import("esbuild"),import("node:zlib"),import("node:path"),import("node:assert/strict")]);
  const packed=await mkdtemp(`${tmpdir()}/brand-ui-proof-`),repo=process.cwd();
  try {
-  execFileSync("pnpm",["--filter","@tangle-network/ui","pack","--pack-destination",packed],{stdio:"inherit"});
+  let integrity;
+  if(published){
+   assert.match(published.sourceSha??"",/^[a-f0-9]{40}$/, "DESIGN_UI_RELEASE_SHA must pin the released source");
+   const response=await fetch(published.registry.dist.tarball);assert.ok(response.ok,`UI tarball response ${response.status}`);
+   const bytes=Buffer.from(await response.arrayBuffer());integrity=`sha512-${createHash("sha512").update(bytes).digest("base64")}`;
+   assert.equal(integrity,published.registry.dist.integrity);await writeFile(join(packed,"published-ui.tgz"),bytes);
+  }else execFileSync("pnpm",["--filter","@tangle-network/ui","pack","--pack-destination",packed],{stdio:"inherit"});
   const tarballs=(await readdir(packed)).filter(name=>name.endsWith(".tgz"));assert.equal(tarballs.length,1);
   const packageRoot=join(packed,"node_modules/@tangle-network/ui");await mkdir(packageRoot,{recursive:true});
   execFileSync("tar",["-xzf",join(packed,tarballs[0]),"-C",packageRoot,"--strip-components=1"]);
   const manifest=JSON.parse(await readFile(join(packageRoot,"package.json"),"utf8"));
+  let sources;
+  if(published){
+   assert.equal(manifest.name,published.registry.name);assert.equal(manifest.version,published.registry.version);
+   assert.ok(manifest.exports["./presentation"],"Published UI presentation export missing");
+   sources=["src/presentation.ts","src/lib/surface-motion.tsx","src/styles/presentation.css","src/styles/compat.css",
+    ...(manifest.exports["./code-presentation"]?["src/code-presentation.ts","src/lib/code-presentation.ts","src/markdown/code-block.tsx","src/markdown/api-schema.tsx"]:[])];
+   for(const path of sources)assert.deepEqual(await readFile(join(packageRoot,path)),execFileSync("git",["show",`${published.sourceSha}:packages/ui/${path}`]),`Published UI source differs: ${path}`);
+  }
   const nodePaths=[resolve("packages/ui/node_modules"),resolve("node_modules")],entries=[];
   const forbidden=/\/node_modules\/(?:react(?:-dom)?|@radix-ui\/react[^/]*|framer-motion|motion(?:-dom|-utils)?)\//;
   const graphPath=path=>path.includes("node_modules/")?path.slice(path.indexOf("node_modules/")):path.replace(packed,"packed-consumer").replace(repo,"workspace");
@@ -96,7 +110,7 @@ export async function provePresentationPackage(out) {
   const motionBytes=Object.values(bundle.metafile.outputs).flatMap(output=>Object.entries(output.inputs)).filter(([path])=>motion.test(`/${path}`)).reduce((sum,[,input])=>sum+input.bytesInOutput,0);
   assert.ok(motionBytes>0,"Surface bundle did not include the motion adapter runtime");
   for(const asset of ["./styles/presentation.css","./styles/compat.css"])assert.ok((await readFile(join(packageRoot,manifest.exports[asset]))).length);
-  const receipt={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),name:manifest.name,version:manifest.version,tarball:tarballs[0],dependencySource:"frozen workspace graph; actual packed exports bundled by esbuild",entries,surfaces:{bytes:bundle.outputFiles[0].contents.length,gzipBytes:gzipSync(bundle.outputFiles[0].contents).length,motionBytes,meaning:"Motion-attributed minified bytes; not a before/after gzip delta"}};
+  const receipt={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),name:manifest.name,version:manifest.version,tarball:tarballs[0],dependencySource:"frozen workspace graph; actual packed exports bundled by esbuild",published:!!published,integrity,sourceSha:published?.sourceSha,sources,registryGitHead:published?.registry.gitHead??null,entries,surfaces:{bytes:bundle.outputFiles[0].contents.length,gzipBytes:gzipSync(bundle.outputFiles[0].contents).length,motionBytes,meaning:"Motion-attributed minified bytes; not a before/after gzip delta"}};
   await writeFile(join(out,tarballs[0]),await readFile(join(packed,tarballs[0])));await writeFile(join(out,"presentation-package.json"),JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
   return receipt;
  } finally {await rm(packed,{recursive:true,force:true});}
