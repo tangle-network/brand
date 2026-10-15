@@ -39,3 +39,16 @@ Duplicate counts are scoped to migrated roles. Hono fixtures contain markup and
 bindings only: no copied primitive classes or palette/size declarations. Downstream
 lanes record the exact deleted paths; no downstream application is declared adopted
 by this package release.
+
+## Existing application selectors
+
+Platform can import `@tangle-network/ui/styles/compat.css` after Brand and Tailwind
+instead of changing every `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-danger`,
+`.input`, `.card`, `.stat-card`, `.table-header` and `.table-cell` caller. This is an
+explicit opt-in Tailwind stylesheet generated from the same primitive class owners,
+not a second palette or hand-copied component style. Delete the replaced local
+selector definitions. Cards should carry `data-slot="card"` where nested surface
+rebinding matters. The aliases adopt shared default sizing and surface behavior.
+
+`StatusPill` accepts a decorative `icon` slot and `tone="violet"` using Brand's
+existing matched violet surface tokens; visible status text is always required.

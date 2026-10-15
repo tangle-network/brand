@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ixControl } from "../lib/interaction";
+import { cardPresentation } from "../presentation";
 import { cn } from "../lib/utils";
 import { Heading } from "./heading";
 
@@ -24,20 +25,14 @@ const Card = React.forwardRef<
     interactive?: boolean;
   }
 >(({ className, variant = "default", hover = false, interactive = false, ...props }, ref) => {
-  const variants = {
-    default: "bg-card border-border shadow-[var(--edge-highlight),var(--shadow-card)]",
-    elevated: "bg-muted/50 border-border shadow-[var(--shadow-card)]",
-    glass: "bg-card/80 backdrop-blur-xl border-border shadow-[var(--shadow-card)]",
-    sandbox: "bg-muted/50 border-primary/20 shadow-[var(--shadow-accent)]",
-  };
+
 
   return (
     <div
       ref={ref}
       className={cn(
-        "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow,background-color]",
-        "duration-[var(--transition-default)]",
-        variants[variant],
+        cardPresentation.root,
+        cardPresentation.variants[variant],
         (hover || interactive) && ixControl,
         className,
       )}
@@ -98,7 +93,7 @@ const CardContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("p-4 [&:not(:first-child)]:pt-0", className)}
+    className={cn(cardPresentation.padding, "[&:not(:first-child)]:pt-0", className)}
     {...props}
   />
 ));
