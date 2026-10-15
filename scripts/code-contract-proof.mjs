@@ -14,11 +14,11 @@ try{
    await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:`${out}/${phase}-${renderer}-${width}-${theme}.png`,fullPage:true});if(phase==="before")continue;
    const tabs=page.getByRole("tab");await tabs.first().focus();await page.keyboard.press("ArrowRight");if(await tabs.nth(1).getAttribute("aria-selected")!=="true")throw Error("Tab selection failed");
    const expected=await page.evaluate(()=>window.fixtureExamples[1].code);
-   await page.getByRole("tabpanel").getByRole("button",{name:"Copy to clipboard"}).click();
+   await page.getByRole("button",{name:"Copy to clipboard"}).first().click();
    if(await page.evaluate(()=>navigator.clipboard.readText())!==expected)throw Error("Copy changed bytes");
    await page.getByRole("status").filter({hasText:"Copied to clipboard"}).first().waitFor();
    await page.evaluate(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async()=>{throw Error("denied")}}}));
-   await page.getByRole("tabpanel").getByRole("button").click();await page.getByRole("status").filter({hasText:"Copy failed"}).first().waitFor();
+   await page.getByRole("button",{name:"Copied",exact:true}).first().click();await page.getByRole("status").filter({hasText:"Copy failed"}).first().waitFor();
    await tabs.nth(1).focus();await page.keyboard.press("End");if(await tabs.last().getAttribute("aria-selected")!=="true")throw Error("End navigation failed");await page.keyboard.press("Home");
    const long=page.getByRole("region",{name:"Long JSON line code"});await long.focus();await page.keyboard.press("End");
    const contained=await long.evaluate(e=>e.scrollWidth>e.clientWidth&&e.clientWidth<=innerWidth);

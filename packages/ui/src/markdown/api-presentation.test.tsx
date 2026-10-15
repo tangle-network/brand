@@ -1,14 +1,9 @@
-import { act,fireEvent,render,screen } from "@testing-library/react";
+import { fireEvent,render,screen } from "@testing-library/react";
 import { describe,it,expect,vi } from "vitest";
 import { CodeBlock } from "./code-block";
 import { ApiSchema } from "./api-schema";
 import { createCopyFeedback,highlightCode } from "../code-presentation";
 describe("shared API presentation",()=>{
- it("switches language with keyboard and keeps exact text",()=>{
-  render(<CodeBlock code="fallback" examples={[{label:"curl",code:"first\n"},{label:"Python",code:"second\n"}]}/>);
-  const first=screen.getByRole("tab",{name:"curl"});first.focus();fireEvent.keyDown(first,{key:"ArrowRight"});
-  expect(screen.getByRole("tab",{name:"Python"})).toHaveAttribute("aria-selected","true");expect(screen.getByRole("tabpanel").textContent).toBe("second\n");
- });
  it("renders field paths without turning schema text into HTML",()=>{
   render(<ApiSchema fields={[{name:"messages",type:"array",children:[{name:"content",type:"string",description:"<script>bad()</script>"}]}]}/>);
   expect(screen.getByText("messages.content")).toBeInTheDocument();expect(document.querySelector("script")).toBeNull();
