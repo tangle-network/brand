@@ -79,7 +79,7 @@
   white-space: nowrap;
   box-shadow: var(--display-control-shadow);
   cursor: pointer;
-  transition: transform var(--duration-fast) ease-out;
+  transition: transform var(--motion-control) var(--ease-standard);
 }
 .tangle-control-display:not([data-variant]), .tangle-control-display[data-variant="default"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
 .tangle-control-display[data-variant="outline"] {
@@ -106,10 +106,8 @@
   rotate: -14deg;
 }
 .tangle-intro-knot > svg { width: 100%; height: auto; }
-.tangle-intro[data-motion] { animation: tangle-intro-enter var(--duration-expressive-entrance) var(--ease-expressive) both; }
-.tangle-intro[data-motion] .tangle-intro-knot { animation: tangle-intro-drift var(--duration-expressive-ambient) ease-in-out infinite; }
+.tangle-intro[data-motion] { animation: tangle-intro-enter var(--motion-arrive) var(--ease-expressive) both; }
 @keyframes tangle-intro-enter { from { opacity: 0; transform: translateY(var(--arrive-distance)); } to { opacity: 1; transform: none; } }
-@keyframes tangle-intro-drift { 50% { transform: translateY(-0.75rem) scale(1.04); } }
 @media (prefers-reduced-motion: reduce) {
   .tangle-intro, .tangle-intro *, .tangle-control-display { animation: none !important; transition: none !important; transform: none !important; }
 }

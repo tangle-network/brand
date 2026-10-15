@@ -83,7 +83,7 @@ export const tablePresentation = {
   head: "[&_tr]:border-b",
   body: "[&_tr:last-child]:border-0",
   footer: "border-t bg-card font-medium [&>tr]:last:border-b-0",
-  row: "border-border border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted/50",
+  row: `border-border border-b transition-colors ${controlMotion} hover:bg-muted/50 data-[state=selected]:bg-muted/50`,
   columnHeader: "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
   cell: "p-4 align-middle [&:has([role=checkbox])]:pr-0",
   caption: "mt-4 text-muted-foreground text-sm",
