@@ -212,3 +212,7 @@ A consumer runs both.
 
 The website surface reads `src` only. Its other scanned files were `.evolve/multi-pursue/variants/*.astro` and the archived rejected prototypes under `docs/delivery/`, which no route ships; `drift.py` counted them (560 of the 1110 hex literals in the first baseline).
 The hex pattern counts `#rgb` and `#rrggbb` only, as `drift.py` did; `#rgba` and `#rrggbbaa` literals are not counted.
+
+## What a pass proves
+
+A pass bounds aggregate source counts for recorded metrics. Removals can offset additions; unrecorded metrics do not fail. Record installed Brand revision, registered surface, scanned commit, baseline revision, roots, exclusions and changed-file findings in consumer evidence. Missing coverage stays UNCHECKED. Router registration and baseline belong to its adoption change, alongside runtime proof. See the [design bible](design-bible.md#quality-loop-and-authority) and [evidence contract](design-evidence-contract.md#drift-accountability-and-release).

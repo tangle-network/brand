@@ -1,0 +1,179 @@
+{
+  "bible_path": "docs/design-bible.md",
+  "merge_or_retire": [
+    {
+      "path": "brand/docs/brand-guidelines.md",
+      "action": "Merge only reconciled shared policy after journey and example approval. Keep a forwarding index, implementation links and all unmapped rules until clause coverage and incoming-link checks pass."
+    },
+    {
+      "path": "brand/docs/control-scale.md",
+      "action": "Retain the control/type implementation contract and executable-value ownership; link shared acceptance to the bible."
+    },
+    {
+      "path": "brand/docs/surfaces-and-states.md",
+      "action": "Retain semantic color, category/status separation, planes and control states; link craft and runtime acceptance to the bible."
+    },
+    {
+      "path": "brand/docs/drift-ratchet.md",
+      "action": "Retain scanner/migration procedures; document aggregate-count and unrecorded-metric limits. Record installed revision, surface, scanned commit and baseline coverage; include Router in the existing registry during adoption."
+    },
+    {
+      "path": "brand/docs/component-audit.md",
+      "action": "Preserve dated audit and migration evidence; redirect only explicitly superseded policy."
+    },
+    {
+      "path": "brand/docs/shared-form-metric-presentation.md",
+      "action": "Preserve historical size/presentation evidence and its superseded warning; link current values to the control-scale owner."
+    },
+    {
+      "path": "brand/README.md",
+      "action": "Link the bible and its reviewed examples as the first policy entry only after authority and consumer proof are acknowledged."
+    },
+    {
+      "path": "brand/packages/brand/README.md",
+      "action": "Retain package/theme APIs, generation and nested/named-mode contracts. Reconcile agent-app migration wording against its current projection owner."
+    },
+    {
+      "path": "brand/packages/ui/README.md",
+      "action": "Retain component APIs and real-consumer/story approval requirements; link behavioral examples and shared acceptance to the bible."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/SKILL.md",
+      "action": "Retain procedures; bind Tangle precedence and the bible reading order. Reuse existing variants, critique and evidence workflows without another command suite."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/motion.md",
+      "action": "Retain generic motion methods; replace conflicting Tangle values/easing with executable-owner links and approved shared behavior examples."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/motion-recipes.md",
+      "action": "Move proven Tangle recipes into shared UI stories after consumer proof; retain generic techniques and licensing attribution."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/polish.md",
+      "action": "Retain polish procedures and source examples; link shared Tangle policy and values rather than copying them."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/audit-matrix.md",
+      "action": "Retain audit coverage procedure; distinguish assertions, independent craft judgment, user evidence and UNCHECKED outcomes."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/adversarial-patterns.md",
+      "action": "Retain boundary-case methods; include disposable disconnect/cancellation/retry fixtures with provider receipts through the existing evidence owner."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/worst-case-data.md",
+      "action": "Retain stress fixtures; link declared environment, reflow, zoom and overflow acceptance to the evidence contract."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/variants.md",
+      "action": "Retain variants procedure; require materially different models for major redesigns before direction selection and shared extraction."
+    },
+    {
+      "path": "dotfiles/claude/skills/product-design/references/editorial-surfaces.md",
+      "action": "Retain editorial methods and reading-specific composition; link Brand typography, paper/ink and acceptance."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/principles.md",
+      "action": "Move only reconciled shared Tangle doctrine; preserve scoped rejection examples and every unclassified rule in its current owner."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/product-design.md",
+      "action": "Reconcile shared acceptance rule by rule. Replace only categorical no-wrap wording with responsive fit/reflow; preserve unrelated rules and examples."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/marketing-pages.md",
+      "action": "Retain marketing procedure and real-product proof requirements; preserve the visual-idea standard and allow necessary responsive wrapping."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/copywriting.md",
+      "action": "Retain writing methods and rejected examples; reconcile shared direct-copy standards without losing claims/proof requirements."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/world-class-site.md",
+      "action": "Retain dated rationale and examples; move only reconciled current shared direction after the complete journey proves it."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/README.md",
+      "action": "Retain general index; point Tangle policy to Brand after adoption and preserve links for historical evidence."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/review-gates.md",
+      "action": "Retain existing gates; link shared design verdicts and require separate functional/craft acceptance without adding hosted gates."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/reference-systems.md",
+      "action": "Retain reference-selection procedure; require exact examples and transferable properties, with Tangle policy precedence."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/source-quality.md",
+      "action": "Retain evidence methods; distinguish observation, judgment and projection and link shared acceptance."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/ai-agent-work.md",
+      "action": "Retain general agent workflow; defer design procedure to product-design and shared policy to Brand."
+    },
+    {
+      "path": "dotfiles/docs/anti-patterns/ui-evidence.md",
+      "action": "Retain capture/privacy procedure. Static and copy-only changes use screenshots; changed interactions use video; production-flow claims require production video and served revision."
+    },
+    {
+      "path": "agent-app/docs/product-surfaces.md",
+      "action": "Retain agent composition, streaming and recovery semantics. Move only reconciled shared doctrine; replace copied motion tables with token-owner links and preserve callback-independent semantic completion."
+    },
+    {
+      "path": "agent-app/docs/legibility-rubric.md",
+      "action": "Retain agent-specific questions and historical calibration; scope vocabulary restrictions to the audience and separate craft review from user-study results."
+    },
+    {
+      "path": "sandbox-ui/UI-DIRECTION.md",
+      "action": "Retain Sandbox runtime model, domain vocabulary and composition; link shared Brand acceptance."
+    },
+    {
+      "path": "sandbox-ui/docs/design-reference-teardown.md",
+      "action": "Preserve dated reference evidence; move only reconciled common doctrine after consumer proof."
+    },
+    {
+      "path": "sandbox-ui/docs/component-quality-audit.md",
+      "action": "Preserve findings and coverage limits; link common evidence types and independent craft judgment."
+    },
+    {
+      "path": "sandbox-ui/docs/ui-ownership.md",
+      "action": "Retain domain ownership and current consumers; link shared behavior and require named acknowledged adoption reviewers."
+    },
+    {
+      "path": "skills/plugins/tangle-branded-designer/skills/tangle-branded-designer/SKILL.md",
+      "action": "Retire conflicting legacy recipes only after counting live readers, mapping every clause and migrating incoming links; preserve history and a Brand pointer."
+    },
+    {
+      "path": "skills-internal/tangle-branded-designer/SKILL.md",
+      "action": "Retire conflicting legacy recipes only after counting live readers, mapping every clause and migrating incoming links; preserve history and a Brand pointer."
+    },
+    {
+      "path": "tangle-router/app/globals.css",
+      "action": "Retain Router composition. Consume Brand shared decisions through existing owners; prove mobile-menu continuity, press feedback, Back behavior and registry coverage before declaring adoption."
+    },
+    {
+      "path": "dotfiles/claude/skills/voice-ledger/SKILL.md",
+      "action": "Resolve the artifact-design installed owner before changing this reference; update to the verified owner or remove a proven dead instruction. Do not assume web-artifacts-builder is an alias."
+    }
+  ],
+  "first_moves": [
+    {
+      "move": "Prove one complete authenticated GTM journey and its visual direction. Existing maintainers must name a product designer, engineer and independent craft reviewer before adoption; scope and estimate follow the frozen baseline.",
+      "owner_repo": "tangle-network/gtm-agent",
+      "acceptance": "Explore three materially different models with the same task/content; select and review five paired examples and complete motion sequences. Record request, streaming, approval, interruption, seeded failure, safe retry, artifact use and reopening with provenance and provider receipts. Counterbalance ten target users across equivalent frozen tasks. At least nine identify state/next action within five seconds and nine recover unaided without duplicate effects. Target half baseline all-assigned median active time, with unchanged correctness and no lower completion; count incomplete tasks at the frozen timeout and report failures, completion and successful-task times separately. Independent craft verdicts and deidentified recognition results remain separate. No 10x claim from this study."
+    },
+    {
+      "move": "Extract proven shared interaction recipes and validate them in Router. Named Brand UI maintainer and Router consumer engineer own adoption through existing packages.",
+      "owner_repo": "tangle-network/brand",
+      "acceptance": "Real consumer stories and matched recordings establish distinct press feedback, anchored/interruptible mobile navigation without the recorded 306 px content jump, artifact continuity where applicable and no routine docs entrance on Back. Add Router to the existing drift registry/baseline and record installed revision, scanned commit and coverage limits. Pass keyboard, physical-touch, manual screen-reader, reflow/zoom, reduced CSS/JavaScript motion and callback-independent completion checks; source counts alone cannot pass."
+    },
+    {
+      "move": "Consolidate the authority that the journey proves. Existing Brand maintainers acknowledge named policy/exception authority, UI ownership and review cadence; estimate remaining work from actual reader and clause coverage.",
+      "owner_repo": "tangle-network/brand",
+      "acceptance": "Package the bible, human-approved examples, recordings, evidence definitions and rule reconciliation with accessible links. Resolve eight conflicts; map each moved/retired clause, count live readers and update incoming references before retirement. Retain unmapped rules, history and unresolved artifact-design ownership. Record exception rule/scope/evidence/mitigation/independent approver/expiry; expired exceptions need renewal or fix, and invariants remain nonwaivable. A fresh task follows the guide and shared owner without copying values; independent craft and consumer proof decide adoption. Determine staffing from measured ownership/capacity gaps."
+    }
+  ],
+  "scope": "October 15 source consolidation in Brand and dotfiles. Future actions below are retained inventory, not prerequisites or claims of consumer adoption. See design-rule-reconciliation.md for applied handoffs."
+}
