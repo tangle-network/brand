@@ -1,5 +1,5 @@
 import { designServer } from "./design-contract-server.mjs";
-import { proveKnotPackage } from "./design-package-proof.mjs";
+import { proveKnotPackage, provePublishedKnot } from "./design-package-proof.mjs";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -8,16 +8,19 @@ const out = resolve(process.env.DESIGN_EVIDENCE ?? "/tmp/brand-design-evidence")
 await mkdir(out, {recursive:true});
 if(process.argv.includes("--registry") || process.argv.includes("--published")) {
  const packages=[];
+ let brandRegistry;
  for(const name of ["brand","ui"]) {
   const response=await fetch(`https://registry.npmjs.org/@tangle-network/${name}/latest`);
   if(!response.ok)throw Error(`Registry ${name}: ${response.status}`);
   const manifest=await response.json();
+  if(name==="brand")brandRegistry=manifest;
   const expected=name==="brand"?["./knot"]:["./presentation","./code-presentation"];
   packages.push({name:manifest.name,version:manifest.version,integrity:manifest.dist.integrity,contracts:expected.map(path=>({path,published:Boolean(manifest.exports?.[path])}))});
  }
  const published=packages.flatMap(p=>p.contracts).filter(c=>c.published).length;
  const receipt={at:new Date().toISOString(),source:"npm registry latest manifests",published,target:3,packages};
  await writeFile(`${out}/registry.json`,JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
+ if(process.argv.includes("--verify-knot"))await provePublishedKnot(out,brandRegistry,process.env.DESIGN_RELEASE_SHA);
  if(process.argv.includes("--published")&&published!==3)throw Error("Requested contracts are not all published");
  process.exit(0);
 }
