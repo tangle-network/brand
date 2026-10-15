@@ -1,5 +1,7 @@
 # Surfaces and interaction states
 
+Shared principles and craft/runtime acceptance live in the [design bible](design-bible.md). This document owns the implementation contract.
+
 A page reads as a hierarchy only when each plane steps off the one it sits on, and every interactive thing answers the pointer the same way.
 Brand owns the ladder and the state palette (`tokens.css`, `named-themes.css`); `@tangle-network/ui` owns the primitives that apply them (`lib/interaction.ts`).
 A product uses the primitives; it never paints a plane or a hover by hand.
