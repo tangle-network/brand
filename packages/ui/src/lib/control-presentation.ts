@@ -2,10 +2,8 @@ import { focusField } from "./focus";
 import { ixField } from "./interaction";
 import { cn } from "./utils";
 
-// Time-valued tokens only: --transition-fast is a legacy duration + easing
-// shorthand, not a valid transition-duration. Reuse Brand's scoped vocabulary.
-export const controlMotion =
-  "duration-[var(--motion-control)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:duration-0";
+import { controlMotion } from "./motion";
+export { controlMotion } from "./motion";
 
 /**
  * The control scale. Button, Input, Textarea and SelectTrigger take the same

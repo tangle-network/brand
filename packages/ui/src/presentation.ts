@@ -1,4 +1,5 @@
 /** React-free presentation. Consumers scan this published source with Tailwind. */
+import { surfaceMotion } from "./lib/motion";
 import { cva } from "class-variance-authority";
 import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "./lib/control-presentation";
 import { focusRing, focusFieldInvalid } from "./lib/focus";
@@ -7,7 +8,7 @@ import { cn } from "./lib/utils";
 export { controlHeight, controlMotion, controlRadius, controlSizes, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "./lib/control-presentation";
 
 export const buttonVariants = cva(
-  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-[color,background-color,border-color,box-shadow,transform,scale] ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
+  `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
     variants: {
       variant: {
@@ -83,7 +84,7 @@ export const tablePresentation = {
   head: "[&_tr]:border-b",
   body: "[&_tr:last-child]:border-0",
   footer: "border-t bg-card font-medium [&>tr]:last:border-b-0",
-  row: `border-border border-b transition-colors ${controlMotion} hover:bg-muted/50 data-[state=selected]:bg-muted/50`,
+  row: `border-border border-b ${controlMotion} hover:bg-muted/50 data-[state=selected]:bg-muted/50`,
   columnHeader: "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
   cell: "p-4 align-middle [&:has([role=checkbox])]:pr-0",
   caption: "mt-4 text-muted-foreground text-sm",
@@ -115,14 +116,14 @@ export const metricLayouts = {
 
 export const dialogPresentation = {
   overlay: "fixed inset-0 z-50 bg-black/40",
-  transition: "data-[state=closed]:animate-out data-[state=open]:animate-in",
+  transition: surfaceMotion,
   fade: "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
   position: "fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-  surface: "gap-4 rounded-lg border bg-card p-6 shadow-lg duration-200",
+  surface: "gap-4 rounded-lg border bg-card p-6 shadow-lg",
   zoom: "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
   closedPosition: "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
   openPosition: "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
-  close: "absolute top-4 right-4 rounded-sm opacity-70 transition-[opacity,box-shadow] hover:opacity-100 focus-visible:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+  close: `absolute top-4 right-4 rounded-sm opacity-70 ${controlMotion} hover:opacity-100 focus-visible:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground`,
   header: "flex flex-col space-y-1.5 text-center sm:text-left",
   footer: "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
   title: "font-semibold text-lg leading-none tracking-tight",
@@ -155,7 +156,7 @@ export const helpPresentation = {
 };
 
 export const cardPresentation = {
- root: "rounded-[var(--radius-lg)] border text-card-foreground transition-[border-color,box-shadow,background-color] duration-[var(--transition-default)]",
+ root: `rounded-[var(--radius-lg)] border text-card-foreground ${controlMotion}`,
  padding: "p-4",
  variants: {
     default: "bg-card border-border shadow-[var(--edge-highlight),var(--shadow-card)]",
@@ -175,11 +176,11 @@ list: {
   },
 trigger: {
     default:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 ${ixControlSoft} ${ixSelected}`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 ${ixControlSoft} ${ixSelected}`,
     pills:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=inactive]:text-muted-foreground ${ixControlSoft} ${ixSelected}`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 data-[state=inactive]:text-muted-foreground ${ixControlSoft} ${ixSelected}`,
     underline:
-      `inline-flex items-center justify-center whitespace-nowrap rounded-t-md pb-3 text-sm font-medium transition-all ${focusRing} disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent data-[state=inactive]:text-muted-foreground ${ixTabUnderline}`,
+      `inline-flex items-center justify-center whitespace-nowrap rounded-t-md pb-3 text-sm font-medium ${controlMotion} ${focusRing} disabled:pointer-events-none disabled:opacity-50 border-b-2 border-transparent data-[state=inactive]:text-muted-foreground ${ixTabUnderline}`,
   }
 } as const;
 export { ixControlSoft, ixSelected, ixTabUnderline } from "./lib/interaction";

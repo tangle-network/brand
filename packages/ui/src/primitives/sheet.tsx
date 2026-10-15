@@ -4,6 +4,7 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 import * as React from "react";
+import { controlMotion, surfaceMotion } from "../lib/motion";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
@@ -24,7 +25,7 @@ const SheetOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       "fixed inset-0 z-50 bg-black/40",
-      "data-[state=closed]:animate-out data-[state=open]:animate-in",
+      surfaceMotion,
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
@@ -36,8 +37,7 @@ SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 const sheetVariants = cva(
   [
     "fixed z-50 flex flex-col gap-4 border-border bg-card shadow-lg",
-    "data-[state=closed]:animate-out data-[state=open]:animate-in",
-    "data-[state=closed]:duration-200 data-[state=open]:duration-300 ease-out motion-reduce:animate-none",
+    surfaceMotion,
   ],
   {
     variants: {
@@ -74,6 +74,7 @@ const SheetContent = React.forwardRef<
         <SheetPrimitive.Close
           className={cn(
             "absolute top-4 right-4 rounded-sm text-muted-foreground opacity-70 transition-[opacity,box-shadow] hover:opacity-100 focus-visible:opacity-100 disabled:pointer-events-none",
+            controlMotion,
             focusRing,
           )}
         >
