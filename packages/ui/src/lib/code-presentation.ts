@@ -1,3 +1,4 @@
+import { tabsPresentation } from "../presentation";
 import type { HighlighterCore, LanguageRegistration, ThemedToken } from "shiki/core";
 // Leave variables unresolved: the browser resolves them on each token span,
 // including nested themes, inline overrides and CSS/media changes. No document
@@ -138,6 +139,8 @@ export const codePreStyle = {
 } as const;
 export const codeTextStyle = {fontFamily: "var(--font-mono, 'JetBrains Mono', ui-monospace, monospace)",whiteSpace:"pre"} as const;
 export const codePresentation = {
+  tabs: `tangle-code-tabs ${tabsPresentation.list.underline}`,
+  tab: tabsPresentation.trigger.underline,
   root: "group relative min-w-0 overflow-hidden rounded-lg border font-mono bg-card border-border",
   header: "flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-1.5 bg-[var(--code-header-bg,hsl(var(--background)))]",
   copy: "flex items-center justify-center min-w-8 min-h-8 pointer-coarse:min-w-11 pointer-coarse:min-h-11 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors",
@@ -192,7 +195,7 @@ export function bindCodeTabs(list:HTMLElement,onSelect?:(index:number)=>void) {
  const select=(index:number,focus:boolean)=>{
   const tabs=buttons(),tab=tabs[index];if(!tab)return;
   for(const panel of new Set(tabs.map(t=>document.getElementById(t.getAttribute("aria-controls")??""))))if(panel)panel.hidden=true;
-  tabs.forEach((t,i)=>{t.setAttribute("aria-selected",String(i===index));t.tabIndex=i===index?0:-1;});
+  tabs.forEach((t,i)=>{t.setAttribute("aria-selected",String(i===index));t.dataset.state=i===index?"active":"inactive";t.tabIndex=i===index?0:-1;});
   const panel=document.getElementById(tab.getAttribute("aria-controls")??"");if(panel){panel.hidden=false;panel.setAttribute("aria-labelledby",tab.id);}
   if(focus)tab.focus();onSelect?.(index);
  };

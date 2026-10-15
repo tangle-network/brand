@@ -100,8 +100,8 @@ export const CodeBlock = memo(
             {children}
           </div>
         )}
-        {examples && examples.length > 1 && <div role="tablist" aria-label="Code examples" ref={tabList} className="tangle-code-tabs">
-          {examples.map((item,index)=><button key={index} id={`${tabId}-tab-${index}`} type="button" role="tab" aria-selected={index===selectedIndex} tabIndex={index===selectedIndex?0:-1} aria-controls={`${tabId}-panel`}>{item.label}</button>)}
+        {examples && examples.length > 1 && <div role="tablist" aria-label="Code examples" ref={tabList} className={codePresentation.tabs}>
+          {examples.map((item,index)=><button key={index} id={`${tabId}-tab-${index}`} type="button" role="tab" className={codePresentation.tab} data-state={index===selectedIndex?"active":"inactive"} aria-selected={index===selectedIndex} tabIndex={index===selectedIndex?0:-1} aria-controls={`${tabId}-panel`}>{item.label}</button>)}
         </div>}
         <div id={`${tabId}-panel`} role={examples?.length ? "tabpanel" : undefined} aria-labelledby={examples?.length ? `${tabId}-tab-${selectedIndex}` : undefined}>
         {/* A long line scrolls the block sideways, which a keyboard reaches only
