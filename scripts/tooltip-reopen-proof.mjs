@@ -21,6 +21,7 @@ try {
    await context.tracing.start({screenshots:true,snapshots:true,sources:true});
    await page.addInitScript(()=>{
     const ids=new WeakMap();let nextId=0;window.tooltipRows=[];window.tooltipPhase="preparation";
+    window.addEventListener("error",event=>{window.tooltipFatalError=event.message;});
     const snap=()=>{const trigger=document.querySelector('[data-tooltip-trigger="Primary"]'),content=document.querySelector('[data-tooltip-content="Primary"]');if(content&&!ids.has(content))ids.set(content,++nextId);return {focused:document.activeElement===trigger,triggerState:trigger?.dataset.state,description:trigger?.getAttribute("aria-describedby"),contentState:content?.dataset.state,node:content?ids.get(content):null,oldConnected:!!window.oldTooltipNode?.isConnected};};
     window.recordTooltip=(kind,extra={})=>{const row={kind,at:performance.now(),phase:window.tooltipPhase,...extra,...snap()};window.tooltipRows.push(row);if(kind==="focusout"&&row.phase==="reopen"&&extra.primary)window.tooltipFocusoutAt??=row.at;};
     for(const type of ["focusin","focusout","keydown","tooltip.open","animationend","animationcancel"])document.addEventListener(type,event=>{
@@ -35,8 +36,8 @@ try {
    if(pageErrors.length)throw Error(`Fixture page error: ${pageErrors.join("; ")}`);
    await before.focus();await page.keyboard.press("Tab");
    if(pageErrors.length)throw Error(`Tooltip open page error: ${pageErrors.join("; ")}`);
-   await page.waitForFunction(()=>document.querySelector('[data-tooltip-trigger="Primary"]')?.getAttribute("aria-describedby")&&document.querySelector('[data-tooltip-content="Primary"]')?.dataset.state!=="closed");
-   await page.waitForFunction(()=>{const node=document.querySelector('[data-tooltip-content="Primary"]');return node&&node.dataset.side&&Number(getComputedStyle(node).opacity)>.99;},null,{timeout:1500});
+   await page.waitForFunction(()=>{if(window.tooltipFatalError)throw Error(window.tooltipFatalError);return document.querySelector('[data-tooltip-trigger="Primary"]')?.getAttribute("aria-describedby")&&document.querySelector('[data-tooltip-content="Primary"]')?.dataset.state!=="closed";});
+   await page.waitForFunction(()=>{if(window.tooltipFatalError)throw Error(window.tooltipFatalError);const node=document.querySelector('[data-tooltip-content="Primary"]');return node&&node.dataset.side&&Number(getComputedStyle(node).opacity)>.99;},null,{timeout:1500});
    const anatomy=await page.evaluate(()=>{
     const node=document.querySelector('[data-tooltip-content="Primary"]'),trigger=document.querySelector('[data-tooltip-trigger="Primary"]'),local=document.querySelector('[data-tooltip-local="Primary"]');
     const c=node.getBoundingClientRect(),t=trigger.getBoundingClientRect(),side=node.dataset.side;
