@@ -1,5 +1,13 @@
 # @tangle-network/ui
 
+## 11.39.0
+
+### Minor Changes
+
+- f10bf8a: Support TooltipContent portal={false} for content that belongs to its local container. Keep the default portal, shared Content/SurfaceMotion owner, positioning, forwarded refs, asChild and Root state APIs.
+  
+  Preserve the caller as the asChild slot target when Radix adds accessibility content.
+
 ## 11.38.2
 
 ### Patch Changes
