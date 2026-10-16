@@ -44,8 +44,12 @@ try {
    const accepted=trace.rows.filter(r=>r.phase==="reopen"&&r.at>=trace.focusoutAt&&(r.kind==="accepted"&&r.name==="Primary"&&r.open||r.kind==="tooltip.open")&&r.focused);
    const openBeforeDeadline=trace.rows.some(r=>r.phase==="reopen"&&r.at>=trace.focusoutAt&&r.at-trace.focusoutAt<trace.dismissMs&&r.focused&&r.contentState&&r.contentState!=="closed"&&r.oldConnected);
    const trustedFocus=trace.rows.some(r=>r.phase==="reopen"&&r.kind==="focusin"&&r.primary&&r.isTrusted);
-   const valid=trustedFocus&&(reducedMotion==="reduce"?accepted.length>0:openBeforeDeadline&&accepted.length>0);
-   result={...result,preparation,valid,trace,pass:valid&&trace.finalOpen&&trace.descriptionRestored&&trace.disabled&&trace.disabledActions===0&&(reducedMotion==="reduce"?!trace.finalNodeSame:trace.finalNodeSame)};
+   // A controlled Root accepts through onOpenChange before DOM publication.
+   // Keep the same role deadline; record acceptance and publication separately.
+   const rootAcceptances=accepted.filter(r=>r.kind==="accepted"&&r.name==="Primary"&&r.open);
+   const acceptedBeforeDeadline=rootAcceptances.some(r=>r.at-trace.focusoutAt<trace.dismissMs&&r.oldConnected);
+   const valid=trustedFocus&&(reducedMotion==="reduce"?accepted.length>0:acceptedBeforeDeadline||openBeforeDeadline&&accepted.length>0);
+   result={...result,preparation,valid,acceptance:{rootAt:rootAcceptances[0]?.at,withinDeadline:acceptedBeforeDeadline,domOpenWithinDeadline:openBeforeDeadline},trace,pass:valid&&trace.finalOpen&&trace.descriptionRestored&&trace.disabled&&trace.disabledActions===0&&(reducedMotion==="reduce"?!trace.finalNodeSame:trace.finalNodeSame)};
    if(!valid)result.failure="No accepted before-deadline reopen captured; instrumentation is inconclusive, not a product defect.";
    else if(!result.pass)result.failure="Accepted Tooltip reopen does not survive the old owner deadline.";
    if(result.pass){
