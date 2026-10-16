@@ -12,7 +12,7 @@ The initial compatible-cohort DOM animation showed an opacity displacement0.0984
 
 ## Accessibility regressions
 
-Five new cases fail against the merged B3 runtime and pass with this source ([red log](accessibility-red.log)): retained copy bindings restore original label/status during pending/success/failure and silence late completion; absent labels stay absent; a single example keeps readable code without an orphaned tab relationship. Current72-test green includes these cases.
+Five new cases fail against the merged B3 runtime and pass with this source ([red log](accessibility-red.txt)): retained copy bindings restore original label/status during pending/success/failure and silence late completion; absent labels stay absent; a single example keeps readable code without an orphaned tab relationship. Current72-test green includes these cases.
 
 ## Inspected media
 
