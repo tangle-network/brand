@@ -30,7 +30,7 @@ function Fixture() {
   <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button>Open dialog</Button></DialogTrigger><DialogContent aria-describedby={undefined}><DialogTitle>Dialog surface</DialogTitle><Input aria-label="Dialog field"/></DialogContent></Dialog>
   <Sheet open={sheetOpen} onOpenChange={setSheetOpen}><SheetTrigger asChild><Button>Open sheet</Button></SheetTrigger><SheetContent aria-describedby={undefined}><SheetTitle>Sheet surface</SheetTitle><Input aria-label="Sheet field"/></SheetContent></Sheet>
   <Popover open={popoverOpen} onOpenChange={setPopoverOpen}><PopoverTrigger asChild><Button>Open popover</Button></PopoverTrigger><PopoverContent aria-label="Popover surface"><Input aria-label="Popover field"/></PopoverContent></Popover>
-  <TooltipProvider delayDuration={0}><DisabledTooltip name="Primary" mode={new URLSearchParams(location.search).get("tooltipMode")??"uncontrolled"}/><DisabledTooltip name="Sibling" mode="uncontrolled"/></TooltipProvider>
+  {new URLSearchParams(location.search).has("tooltipMode")&&<TooltipProvider delayDuration={0}><DisabledTooltip name="Primary" mode={new URLSearchParams(location.search).get("tooltipMode")!}/><DisabledTooltip name="Sibling" mode="uncontrolled"/></TooltipProvider>}
   <TooltipProvider delayDuration={0}><Tooltip><TooltipTrigger asChild><Button>Hint</Button></TooltipTrigger><TooltipContent>Tooltip surface</TooltipContent></Tooltip></TooltipProvider>
  </main>;
 }
