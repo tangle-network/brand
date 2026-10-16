@@ -1,0 +1,3312 @@
+{
+  "sha": "13b84c16b1becf8be3fd4fbb34c08b95fabf8519",
+  "at": "2026-10-16T01:58:43.754Z",
+  "cases": [
+    {
+      "width": 390,
+      "kind": "dialog",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 2768.6,
+          "value": 0.986883,
+          "progress": 0.34415,
+          "opacity": 0.344139,
+          "connected": true
+        },
+        "frameMs": 16.8,
+        "elapsedMs": 24.7,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001065,
+            "allowed": 0.057272,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.001067,
+            "allowed": 0.057355,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 3419.7,
+          "value": 0.985273,
+          "progress": 0.26365,
+          "opacity": 0.26367,
+          "connected": true
+        },
+        "frameMs": 19.7,
+        "elapsedMs": 36.6,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000513,
+            "allowed": 0.038081,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.000513,
+            "allowed": 0.038116,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 3419.7,
+        "value": 0.985273,
+        "progress": 0.26365,
+        "opacity": 0.26367,
+        "connected": true
+      },
+      "before": {
+        "at": 2785.4,
+        "value": 0.987241,
+        "progress": 0.36205,
+        "opacity": 0.362066,
+        "connected": true
+      },
+      "after": {
+        "at": 2810.1,
+        "value": 0.987241,
+        "progress": 0.36205,
+        "opacity": 0.362066,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 2820,
+          "value": 0.987991,
+          "progress": 0.39955,
+          "opacity": 0.399548,
+          "connected": true
+        },
+        {
+          "at": 2832.4,
+          "value": 0.988221,
+          "progress": 0.41105,
+          "opacity": 0.411033,
+          "connected": true
+        },
+        {
+          "at": 2845.5,
+          "value": 0.988419,
+          "progress": 0.42095,
+          "opacity": 0.42097,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 3439.4,
+        "value": 0.985071,
+        "progress": 0.25355,
+        "opacity": 0.25356,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 3476,
+        "value": 0.985071,
+        "progress": 0.25355,
+        "opacity": 0.25356,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 3484.5,
+          "value": 0.984695,
+          "progress": 0.23475,
+          "opacity": 0.234746,
+          "connected": true
+        },
+        {
+          "at": 3489.2,
+          "value": 0.984671,
+          "progress": 0.23355,
+          "opacity": 0.233563,
+          "connected": true
+        },
+        {
+          "at": 3504.8,
+          "value": 0.984626,
+          "progress": 0.2313,
+          "opacity": 0.231312,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 4934.4,
+        "value": 1,
+        "progress": 1,
+        "opacity": 0.950379,
+        "connected": true
+      },
+      "bounds": {
+        "left": 0,
+        "right": 390
+      },
+      "samples": [
+        {
+          "at": 2410.3,
+          "value": 0.980088,
+          "progress": 0.0044,
+          "opacity": 0.0044,
+          "connected": true
+        },
+        {
+          "at": 2422.5,
+          "value": 0.980165,
+          "progress": 0.00825,
+          "opacity": 0.008259,
+          "connected": true
+        },
+        {
+          "at": 2440.3,
+          "value": 0.980282,
+          "progress": 0.0141,
+          "opacity": 0.014101,
+          "connected": true
+        },
+        {
+          "at": 2451.5,
+          "value": 0.980436,
+          "progress": 0.0218,
+          "opacity": 0.021818,
+          "connected": true
+        },
+        {
+          "at": 2468.1,
+          "value": 0.980644,
+          "progress": 0.0322,
+          "opacity": 0.032201,
+          "connected": true
+        },
+        {
+          "at": 2484.7,
+          "value": 0.980883,
+          "progress": 0.04415,
+          "opacity": 0.044128,
+          "connected": true
+        },
+        {
+          "at": 2502.2,
+          "value": 0.981148,
+          "progress": 0.0574,
+          "opacity": 0.057412,
+          "connected": true
+        },
+        {
+          "at": 2518.4,
+          "value": 0.98142,
+          "progress": 0.071,
+          "opacity": 0.070999,
+          "connected": true
+        },
+        {
+          "at": 2535.3,
+          "value": 0.981729,
+          "progress": 0.08645,
+          "opacity": 0.086437,
+          "connected": true
+        },
+        {
+          "at": 2551.8,
+          "value": 0.982055,
+          "progress": 0.10275,
+          "opacity": 0.102764,
+          "connected": true
+        },
+        {
+          "at": 2567.9,
+          "value": 0.982376,
+          "progress": 0.1188,
+          "opacity": 0.118824,
+          "connected": true
+        },
+        {
+          "at": 2585.7,
+          "value": 0.98273,
+          "progress": 0.1365,
+          "opacity": 0.136507,
+          "connected": true
+        },
+        {
+          "at": 2603.5,
+          "value": 0.983138,
+          "progress": 0.1569,
+          "opacity": 0.156892,
+          "connected": true
+        },
+        {
+          "at": 2618.9,
+          "value": 0.983445,
+          "progress": 0.17225,
+          "opacity": 0.172252,
+          "connected": true
+        },
+        {
+          "at": 2634.7,
+          "value": 0.983824,
+          "progress": 0.1912,
+          "opacity": 0.191208,
+          "connected": true
+        },
+        {
+          "at": 2651,
+          "value": 0.984186,
+          "progress": 0.2093,
+          "opacity": 0.209282,
+          "connected": true
+        },
+        {
+          "at": 2667.7,
+          "value": 0.984573,
+          "progress": 0.22865,
+          "opacity": 0.228661,
+          "connected": true
+        },
+        {
+          "at": 2684.3,
+          "value": 0.984963,
+          "progress": 0.24815,
+          "opacity": 0.248152,
+          "connected": true
+        },
+        {
+          "at": 2701.9,
+          "value": 0.985354,
+          "progress": 0.2677,
+          "opacity": 0.26769,
+          "connected": true
+        },
+        {
+          "at": 2717.9,
+          "value": 0.985721,
+          "progress": 0.28605,
+          "opacity": 0.286072,
+          "connected": true
+        },
+        {
+          "at": 2734.9,
+          "value": 0.986111,
+          "progress": 0.30555,
+          "opacity": 0.305545,
+          "connected": true
+        },
+        {
+          "at": 2751.3,
+          "value": 0.986476,
+          "progress": 0.3238,
+          "opacity": 0.323779,
+          "connected": true
+        },
+        {
+          "at": 2768.6,
+          "value": 0.986883,
+          "progress": 0.34415,
+          "opacity": 0.344139,
+          "connected": true
+        },
+        {
+          "at": 2785.4,
+          "value": 0.987241,
+          "progress": 0.36205,
+          "opacity": 0.362066,
+          "connected": true
+        },
+        {
+          "at": 2856.4,
+          "value": 0.988565,
+          "progress": 0.42825,
+          "opacity": 0.428247,
+          "connected": true
+        },
+        {
+          "at": 2869.2,
+          "value": 0.988702,
+          "progress": 0.4351,
+          "opacity": 0.435079,
+          "connected": true
+        },
+        {
+          "at": 2887.4,
+          "value": 0.988866,
+          "progress": 0.4433,
+          "opacity": 0.443319,
+          "connected": true
+        },
+        {
+          "at": 2903.2,
+          "value": 0.98897,
+          "progress": 0.4485,
+          "opacity": 0.448493,
+          "connected": true
+        },
+        {
+          "at": 2918.8,
+          "value": 0.989053,
+          "progress": 0.45265,
+          "opacity": 0.452666,
+          "connected": true
+        },
+        {
+          "at": 2938.4,
+          "value": 0.989106,
+          "progress": 0.4553,
+          "opacity": 0.455309,
+          "connected": true
+        },
+        {
+          "at": 2954.2,
+          "value": 0.989125,
+          "progress": 0.45625,
+          "opacity": 0.456274,
+          "connected": true
+        },
+        {
+          "at": 2972.6,
+          "value": 0.989117,
+          "progress": 0.45585,
+          "opacity": 0.455837,
+          "connected": true
+        },
+        {
+          "at": 2988.3,
+          "value": 0.989089,
+          "progress": 0.45445,
+          "opacity": 0.454434,
+          "connected": true
+        },
+        {
+          "at": 3004.1,
+          "value": 0.989041,
+          "progress": 0.45205,
+          "opacity": 0.452028,
+          "connected": true
+        },
+        {
+          "at": 3024,
+          "value": 0.988957,
+          "progress": 0.44785,
+          "opacity": 0.44784,
+          "connected": true
+        },
+        {
+          "at": 3044,
+          "value": 0.988867,
+          "progress": 0.44335,
+          "opacity": 0.443369,
+          "connected": true
+        },
+        {
+          "at": 3059.1,
+          "value": 0.98875,
+          "progress": 0.4375,
+          "opacity": 0.437505,
+          "connected": true
+        },
+        {
+          "at": 3072.7,
+          "value": 0.988661,
+          "progress": 0.43305,
+          "opacity": 0.433026,
+          "connected": true
+        },
+        {
+          "at": 3084.6,
+          "value": 0.988572,
+          "progress": 0.4286,
+          "opacity": 0.428592,
+          "connected": true
+        },
+        {
+          "at": 3102.9,
+          "value": 0.988429,
+          "progress": 0.42145,
+          "opacity": 0.421461,
+          "connected": true
+        },
+        {
+          "at": 3120.8,
+          "value": 0.988285,
+          "progress": 0.41425,
+          "opacity": 0.414264,
+          "connected": true
+        },
+        {
+          "at": 3140.9,
+          "value": 0.988097,
+          "progress": 0.40485,
+          "opacity": 0.40485,
+          "connected": true
+        },
+        {
+          "at": 3151.5,
+          "value": 0.987994,
+          "progress": 0.3997,
+          "opacity": 0.399723,
+          "connected": true
+        },
+        {
+          "at": 3168.4,
+          "value": 0.987832,
+          "progress": 0.3916,
+          "opacity": 0.391576,
+          "connected": true
+        },
+        {
+          "at": 3185.1,
+          "value": 0.987674,
+          "progress": 0.3837,
+          "opacity": 0.383701,
+          "connected": true
+        },
+        {
+          "at": 3201.3,
+          "value": 0.987513,
+          "progress": 0.37565,
+          "opacity": 0.375662,
+          "connected": true
+        },
+        {
+          "at": 3218,
+          "value": 0.98734,
+          "progress": 0.367,
+          "opacity": 0.366981,
+          "connected": true
+        },
+        {
+          "at": 3235.5,
+          "value": 0.987153,
+          "progress": 0.35765,
+          "opacity": 0.357673,
+          "connected": true
+        },
+        {
+          "at": 3251,
+          "value": 0.986997,
+          "progress": 0.34985,
+          "opacity": 0.349853,
+          "connected": true
+        },
+        {
+          "at": 3267.6,
+          "value": 0.986819,
+          "progress": 0.34095,
+          "opacity": 0.340952,
+          "connected": true
+        },
+        {
+          "at": 3287.4,
+          "value": 0.986641,
+          "progress": 0.33205,
+          "opacity": 0.332034,
+          "connected": true
+        },
+        {
+          "at": 3302.3,
+          "value": 0.986452,
+          "progress": 0.3226,
+          "opacity": 0.322604,
+          "connected": true
+        },
+        {
+          "at": 3317.6,
+          "value": 0.986295,
+          "progress": 0.31475,
+          "opacity": 0.314774,
+          "connected": true
+        },
+        {
+          "at": 3335.5,
+          "value": 0.986119,
+          "progress": 0.30595,
+          "opacity": 0.305949,
+          "connected": true
+        },
+        {
+          "at": 3354.3,
+          "value": 0.985934,
+          "progress": 0.2967,
+          "opacity": 0.296683,
+          "connected": true
+        },
+        {
+          "at": 3368.1,
+          "value": 0.985781,
+          "progress": 0.28905,
+          "opacity": 0.289035,
+          "connected": true
+        },
+        {
+          "at": 3385,
+          "value": 0.985609,
+          "progress": 0.28045,
+          "opacity": 0.280463,
+          "connected": true
+        },
+        {
+          "at": 3401.9,
+          "value": 0.98544,
+          "progress": 0.272,
+          "opacity": 0.272004,
+          "connected": true
+        },
+        {
+          "at": 3419.7,
+          "value": 0.985273,
+          "progress": 0.26365,
+          "opacity": 0.26367,
+          "connected": true
+        },
+        {
+          "at": 3439.4,
+          "value": 0.985071,
+          "progress": 0.25355,
+          "opacity": 0.25356,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@ae18dca67dcb074114f6b6c1ec6c9f7d.webm"
+    },
+    {
+      "width": 390,
+      "kind": "sheet",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 1567,
+          "value": 193.158,
+          "progress": 0.339631,
+          "opacity": 1,
+          "connected": true
+        },
+        "frameMs": 15.3,
+        "elapsedMs": 35.2,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001174,
+            "allowed": 0.076138,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0,
+            "allowed": 0.002,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 2215.4,
+          "value": 214.796,
+          "progress": 0.265655,
+          "opacity": 1,
+          "connected": true
+        },
+        "frameMs": 19.3,
+        "elapsedMs": 15.7,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000427,
+            "allowed": 0.020662,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0,
+            "allowed": 0.002,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 2215.4,
+        "value": 214.796,
+        "progress": 0.265655,
+        "opacity": 1,
+        "connected": true
+      },
+      "before": {
+        "at": 1582.3,
+        "value": 187.902,
+        "progress": 0.3576,
+        "opacity": 1,
+        "connected": true
+      },
+      "after": {
+        "at": 1617.5,
+        "value": 187.902,
+        "progress": 0.3576,
+        "opacity": 1,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 1622.3,
+          "value": 175.348,
+          "progress": 0.40052,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1634.3,
+          "value": 172.263,
+          "progress": 0.411067,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1652.1,
+          "value": 168.352,
+          "progress": 0.424438,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 2234.7,
+        "value": 217.204,
+        "progress": 0.257422,
+        "opacity": 1,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 2250.4,
+        "value": 217.204,
+        "progress": 0.257422,
+        "opacity": 1,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 2252.4,
+          "value": 219.884,
+          "progress": 0.24826,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2265.1,
+          "value": 221.05,
+          "progress": 0.244274,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2285,
+          "value": 222.153,
+          "progress": 0.240503,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 5165.3,
+        "value": 0.285028,
+        "progress": 0.999026,
+        "opacity": 1,
+        "connected": true
+      },
+      "bounds": {
+        "left": 97.785027,
+        "right": 390.285027
+      },
+      "samples": [
+        {
+          "at": 1221.3,
+          "value": 290.191,
+          "progress": 0.007894,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1226.2,
+          "value": 289.752,
+          "progress": 0.009395,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1234.1,
+          "value": 289.032,
+          "progress": 0.011856,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1252.9,
+          "value": 285.953,
+          "progress": 0.022383,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1272.7,
+          "value": 283.463,
+          "progress": 0.030896,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1284.4,
+          "value": 280.451,
+          "progress": 0.041193,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1299.1,
+          "value": 276.654,
+          "progress": 0.054174,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1332.6,
+          "value": 269.11,
+          "progress": 0.079966,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1339.7,
+          "value": 266.392,
+          "progress": 0.089258,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1353.8,
+          "value": 262.441,
+          "progress": 0.102766,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1368.1,
+          "value": 258.043,
+          "progress": 0.117802,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1383.3,
+          "value": 253.189,
+          "progress": 0.134397,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1401.6,
+          "value": 247.562,
+          "progress": 0.153634,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1417.1,
+          "value": 242.763,
+          "progress": 0.170041,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1437,
+          "value": 236.243,
+          "progress": 0.192332,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1454.1,
+          "value": 230.953,
+          "progress": 0.210417,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1468.9,
+          "value": 225.617,
+          "progress": 0.22866,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1483.7,
+          "value": 220.587,
+          "progress": 0.245856,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1501,
+          "value": 214.873,
+          "progress": 0.265391,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1517.2,
+          "value": 209.496,
+          "progress": 0.283774,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1537.2,
+          "value": 202.794,
+          "progress": 0.306687,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1553.1,
+          "value": 197.462,
+          "progress": 0.324916,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1567,
+          "value": 193.158,
+          "progress": 0.339631,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1582.2,
+          "value": 187.902,
+          "progress": 0.3576,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1668.9,
+          "value": 165.382,
+          "progress": 0.434591,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1690,
+          "value": 162.59,
+          "progress": 0.444137,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1704.8,
+          "value": 161.133,
+          "progress": 0.449118,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1733.3,
+          "value": 159.473,
+          "progress": 0.454793,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1748.2,
+          "value": 159.227,
+          "progress": 0.455634,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1759.3,
+          "value": 159.01,
+          "progress": 0.456376,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1776.8,
+          "value": 159.215,
+          "progress": 0.455675,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1798.4,
+          "value": 159.927,
+          "progress": 0.453241,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1802.7,
+          "value": 160.165,
+          "progress": 0.452427,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1818.6,
+          "value": 160.834,
+          "progress": 0.45014,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1836.4,
+          "value": 162.312,
+          "progress": 0.445087,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1852.7,
+          "value": 163.762,
+          "progress": 0.44013,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1865.9,
+          "value": 165.006,
+          "progress": 0.435877,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1884.3,
+          "value": 166.9,
+          "progress": 0.429402,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1904.9,
+          "value": 169.328,
+          "progress": 0.421101,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1925.8,
+          "value": 171.697,
+          "progress": 0.413002,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1945,
+          "value": 174.472,
+          "progress": 0.403515,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1982.6,
+          "value": 179.528,
+          "progress": 0.386229,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2002,
+          "value": 182.605,
+          "progress": 0.375709,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2016.3,
+          "value": 184.694,
+          "progress": 0.368568,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2033.6,
+          "value": 187.412,
+          "progress": 0.359275,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2057.7,
+          "value": 190.92,
+          "progress": 0.347282,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2074.5,
+          "value": 193.219,
+          "progress": 0.339422,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2085.7,
+          "value": 194.907,
+          "progress": 0.333651,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2100,
+          "value": 197.514,
+          "progress": 0.324738,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2116.5,
+          "value": 199.959,
+          "progress": 0.316379,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2136.8,
+          "value": 202.392,
+          "progress": 0.308062,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2149.1,
+          "value": 204.959,
+          "progress": 0.299285,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2166.4,
+          "value": 207.5,
+          "progress": 0.290598,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2182.9,
+          "value": 210.014,
+          "progress": 0.282003,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2203.5,
+          "value": 212.639,
+          "progress": 0.273029,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2215.4,
+          "value": 214.796,
+          "progress": 0.265655,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2234.7,
+          "value": 217.204,
+          "progress": 0.257422,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@3e24ddb9f14b3f6a402055b732cee7b3.webm"
+    },
+    {
+      "width": 390,
+      "kind": "popover",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 1413.3,
+          "value": 0.98695,
+          "progress": 0.3475,
+          "opacity": 0.347513,
+          "connected": true
+        },
+        "frameMs": 19.5,
+        "elapsedMs": 10.8,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001146,
+            "allowed": 0.045411,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.001146,
+            "allowed": 0.045389,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 2060.9,
+          "value": 0.985526,
+          "progress": 0.2763,
+          "opacity": 0.276305,
+          "connected": true
+        },
+        "frameMs": 19.6,
+        "elapsedMs": 18,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000436,
+            "allowed": 0.022503,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.000436,
+            "allowed": 0.022469,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 2060.9,
+        "value": 0.985526,
+        "progress": 0.2763,
+        "opacity": 0.276305,
+        "connected": true
+      },
+      "before": {
+        "at": 1432.8,
+        "value": 0.987397,
+        "progress": 0.36985,
+        "opacity": 0.369852,
+        "connected": true
+      },
+      "after": {
+        "at": 1443.6,
+        "value": 0.987397,
+        "progress": 0.36985,
+        "opacity": 0.369852,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 1448.1,
+          "value": 0.988077,
+          "progress": 0.40385,
+          "opacity": 0.403862,
+          "connected": true
+        },
+        {
+          "at": 1462,
+          "value": 0.988161,
+          "progress": 0.40805,
+          "opacity": 0.408049,
+          "connected": true
+        },
+        {
+          "at": 1477.5,
+          "value": 0.988428,
+          "progress": 0.4214,
+          "opacity": 0.421415,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 2080.5,
+        "value": 0.985355,
+        "progress": 0.26775,
+        "opacity": 0.267769,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 2098.5,
+        "value": 0.985355,
+        "progress": 0.26775,
+        "opacity": 0.267769,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 2102.1,
+          "value": 0.98498,
+          "progress": 0.249,
+          "opacity": 0.249004,
+          "connected": true
+        },
+        {
+          "at": 2112.7,
+          "value": 0.98495,
+          "progress": 0.2475,
+          "opacity": 0.247516,
+          "connected": true
+        },
+        {
+          "at": 2127.4,
+          "value": 0.984857,
+          "progress": 0.24285,
+          "opacity": 0.242843,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 3594.6,
+        "value": 1,
+        "progress": 1,
+        "opacity": 0.95091,
+        "connected": true
+      },
+      "bounds": {
+        "left": 0,
+        "right": 288
+      },
+      "samples": [
+        {
+          "at": 1016.5,
+          "value": 0.980002,
+          "progress": 0.0001,
+          "opacity": 0.000121,
+          "connected": true
+        },
+        {
+          "at": 1027.2,
+          "value": 0.980024,
+          "progress": 0.0012,
+          "opacity": 0.001209,
+          "connected": true
+        },
+        {
+          "at": 1044.1,
+          "value": 0.980067,
+          "progress": 0.00335,
+          "opacity": 0.003366,
+          "connected": true
+        },
+        {
+          "at": 1062.5,
+          "value": 0.980173,
+          "progress": 0.00865,
+          "opacity": 0.00863,
+          "connected": true
+        },
+        {
+          "at": 1078.1,
+          "value": 0.98033,
+          "progress": 0.0165,
+          "opacity": 0.016512,
+          "connected": true
+        },
+        {
+          "at": 1094.6,
+          "value": 0.980506,
+          "progress": 0.0253,
+          "opacity": 0.025294,
+          "connected": true
+        },
+        {
+          "at": 1111,
+          "value": 0.980725,
+          "progress": 0.03625,
+          "opacity": 0.036244,
+          "connected": true
+        },
+        {
+          "at": 1130.7,
+          "value": 0.980958,
+          "progress": 0.0479,
+          "opacity": 0.047903,
+          "connected": true
+        },
+        {
+          "at": 1144.7,
+          "value": 0.981265,
+          "progress": 0.06325,
+          "opacity": 0.063236,
+          "connected": true
+        },
+        {
+          "at": 1160.5,
+          "value": 0.981509,
+          "progress": 0.07545,
+          "opacity": 0.075439,
+          "connected": true
+        },
+        {
+          "at": 1179.5,
+          "value": 0.981804,
+          "progress": 0.0902,
+          "opacity": 0.090204,
+          "connected": true
+        },
+        {
+          "at": 1194.4,
+          "value": 0.982174,
+          "progress": 0.1087,
+          "opacity": 0.108714,
+          "connected": true
+        },
+        {
+          "at": 1210.6,
+          "value": 0.982479,
+          "progress": 0.12395,
+          "opacity": 0.123964,
+          "connected": true
+        },
+        {
+          "at": 1232.9,
+          "value": 0.982815,
+          "progress": 0.14075,
+          "opacity": 0.140749,
+          "connected": true
+        },
+        {
+          "at": 1243.8,
+          "value": 0.983291,
+          "progress": 0.16455,
+          "opacity": 0.16454,
+          "connected": true
+        },
+        {
+          "at": 1260.8,
+          "value": 0.983534,
+          "progress": 0.1767,
+          "opacity": 0.176685,
+          "connected": true
+        },
+        {
+          "at": 1277.3,
+          "value": 0.983914,
+          "progress": 0.1957,
+          "opacity": 0.195708,
+          "connected": true
+        },
+        {
+          "at": 1294,
+          "value": 0.984299,
+          "progress": 0.21495,
+          "opacity": 0.214966,
+          "connected": true
+        },
+        {
+          "at": 1312.6,
+          "value": 0.984688,
+          "progress": 0.2344,
+          "opacity": 0.234385,
+          "connected": true
+        },
+        {
+          "at": 1328.5,
+          "value": 0.985101,
+          "progress": 0.25505,
+          "opacity": 0.255045,
+          "connected": true
+        },
+        {
+          "at": 1344.9,
+          "value": 0.985469,
+          "progress": 0.27345,
+          "opacity": 0.273437,
+          "connected": true
+        },
+        {
+          "at": 1360.6,
+          "value": 0.985836,
+          "progress": 0.2918,
+          "opacity": 0.291807,
+          "connected": true
+        },
+        {
+          "at": 1377.7,
+          "value": 0.986202,
+          "progress": 0.3101,
+          "opacity": 0.310114,
+          "connected": true
+        },
+        {
+          "at": 1393.9,
+          "value": 0.986589,
+          "progress": 0.32945,
+          "opacity": 0.329452,
+          "connected": true
+        },
+        {
+          "at": 1413.3,
+          "value": 0.98695,
+          "progress": 0.3475,
+          "opacity": 0.347513,
+          "connected": true
+        },
+        {
+          "at": 1432.8,
+          "value": 0.987397,
+          "progress": 0.36985,
+          "opacity": 0.369852,
+          "connected": true
+        },
+        {
+          "at": 1494.1,
+          "value": 0.988688,
+          "progress": 0.4344,
+          "opacity": 0.434381,
+          "connected": true
+        },
+        {
+          "at": 1512.9,
+          "value": 0.988902,
+          "progress": 0.4451,
+          "opacity": 0.445081,
+          "connected": true
+        },
+        {
+          "at": 1538.7,
+          "value": 0.989102,
+          "progress": 0.4551,
+          "opacity": 0.455103,
+          "connected": true
+        },
+        {
+          "at": 1544.9,
+          "value": 0.989292,
+          "progress": 0.4646,
+          "opacity": 0.464604,
+          "connected": true
+        },
+        {
+          "at": 1564.7,
+          "value": 0.989323,
+          "progress": 0.46615,
+          "opacity": 0.466169,
+          "connected": true
+        },
+        {
+          "at": 1579.3,
+          "value": 0.989397,
+          "progress": 0.46985,
+          "opacity": 0.46985,
+          "connected": true
+        },
+        {
+          "at": 1596.6,
+          "value": 0.989423,
+          "progress": 0.47115,
+          "opacity": 0.471128,
+          "connected": true
+        },
+        {
+          "at": 1614.7,
+          "value": 0.989427,
+          "progress": 0.47135,
+          "opacity": 0.471357,
+          "connected": true
+        },
+        {
+          "at": 1627.3,
+          "value": 0.989403,
+          "progress": 0.47015,
+          "opacity": 0.470151,
+          "connected": true
+        },
+        {
+          "at": 1644.2,
+          "value": 0.989373,
+          "progress": 0.46865,
+          "opacity": 0.468628,
+          "connected": true
+        },
+        {
+          "at": 1661.1,
+          "value": 0.989312,
+          "progress": 0.4656,
+          "opacity": 0.465582,
+          "connected": true
+        },
+        {
+          "at": 1680.3,
+          "value": 0.989232,
+          "progress": 0.4616,
+          "opacity": 0.461596,
+          "connected": true
+        },
+        {
+          "at": 1700.9,
+          "value": 0.989123,
+          "progress": 0.45615,
+          "opacity": 0.456159,
+          "connected": true
+        },
+        {
+          "at": 1713.8,
+          "value": 0.988982,
+          "progress": 0.4491,
+          "opacity": 0.4491,
+          "connected": true
+        },
+        {
+          "at": 1727.8,
+          "value": 0.988885,
+          "progress": 0.44425,
+          "opacity": 0.444248,
+          "connected": true
+        },
+        {
+          "at": 1744.4,
+          "value": 0.988773,
+          "progress": 0.43865,
+          "opacity": 0.438659,
+          "connected": true
+        },
+        {
+          "at": 1763.7,
+          "value": 0.988637,
+          "progress": 0.43185,
+          "opacity": 0.431863,
+          "connected": true
+        },
+        {
+          "at": 1778.4,
+          "value": 0.988457,
+          "progress": 0.42285,
+          "opacity": 0.422839,
+          "connected": true
+        },
+        {
+          "at": 1796.7,
+          "value": 0.988324,
+          "progress": 0.4162,
+          "opacity": 0.416224,
+          "connected": true
+        },
+        {
+          "at": 1810.9,
+          "value": 0.988138,
+          "progress": 0.4069,
+          "opacity": 0.406919,
+          "connected": true
+        },
+        {
+          "at": 1829.4,
+          "value": 0.987997,
+          "progress": 0.39985,
+          "opacity": 0.39986,
+          "connected": true
+        },
+        {
+          "at": 1844.7,
+          "value": 0.987801,
+          "progress": 0.39005,
+          "opacity": 0.390059,
+          "connected": true
+        },
+        {
+          "at": 1860.7,
+          "value": 0.987644,
+          "progress": 0.3822,
+          "opacity": 0.382179,
+          "connected": true
+        },
+        {
+          "at": 1877.8,
+          "value": 0.987473,
+          "progress": 0.37365,
+          "opacity": 0.373667,
+          "connected": true
+        },
+        {
+          "at": 1896.5,
+          "value": 0.987291,
+          "progress": 0.36455,
+          "opacity": 0.364538,
+          "connected": true
+        },
+        {
+          "at": 1910.7,
+          "value": 0.987096,
+          "progress": 0.3548,
+          "opacity": 0.354811,
+          "connected": true
+        },
+        {
+          "at": 1927.6,
+          "value": 0.986934,
+          "progress": 0.3467,
+          "opacity": 0.346684,
+          "connected": true
+        },
+        {
+          "at": 1949,
+          "value": 0.986749,
+          "progress": 0.33745,
+          "opacity": 0.337475,
+          "connected": true
+        },
+        {
+          "at": 1961.2,
+          "value": 0.986523,
+          "progress": 0.32615,
+          "opacity": 0.326136,
+          "connected": true
+        },
+        {
+          "at": 1977.8,
+          "value": 0.986394,
+          "progress": 0.3197,
+          "opacity": 0.319689,
+          "connected": true
+        },
+        {
+          "at": 1996.7,
+          "value": 0.986212,
+          "progress": 0.3106,
+          "opacity": 0.310614,
+          "connected": true
+        },
+        {
+          "at": 2013.7,
+          "value": 0.986011,
+          "progress": 0.30055,
+          "opacity": 0.30057,
+          "connected": true
+        },
+        {
+          "at": 2029.5,
+          "value": 0.985834,
+          "progress": 0.2917,
+          "opacity": 0.29169,
+          "connected": true
+        },
+        {
+          "at": 2043.9,
+          "value": 0.985679,
+          "progress": 0.28395,
+          "opacity": 0.283949,
+          "connected": true
+        },
+        {
+          "at": 2060.9,
+          "value": 0.985526,
+          "progress": 0.2763,
+          "opacity": 0.276305,
+          "connected": true
+        },
+        {
+          "at": 2080.4,
+          "value": 0.985355,
+          "progress": 0.26775,
+          "opacity": 0.267769,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@ed39862540299fc5c2365fa7f7b4ccac.webm"
+    },
+    {
+      "width": 1440,
+      "kind": "dialog",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 1437.7,
+          "value": 0.986973,
+          "progress": 0.34865,
+          "opacity": 0.348637,
+          "connected": true
+        },
+        "frameMs": 19.4,
+        "elapsedMs": 23.7,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001093,
+            "allowed": 0.060874,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.001094,
+            "allowed": 0.060915,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 2076,
+          "value": 0.985485,
+          "progress": 0.27425,
+          "opacity": 0.274229,
+          "connected": true
+        },
+        "frameMs": 16.5,
+        "elapsedMs": 16.8,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000512,
+            "allowed": 0.023317,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.000511,
+            "allowed": 0.023267,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 2076,
+        "value": 0.985485,
+        "progress": 0.27425,
+        "opacity": 0.274229,
+        "connected": true
+      },
+      "before": {
+        "at": 1457.1,
+        "value": 0.987397,
+        "progress": 0.36985,
+        "opacity": 0.369852,
+        "connected": true
+      },
+      "after": {
+        "at": 1480.8,
+        "value": 0.987397,
+        "progress": 0.36985,
+        "opacity": 0.369852,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 1494.7,
+          "value": 0.988182,
+          "progress": 0.4091,
+          "opacity": 0.409084,
+          "connected": true
+        },
+        {
+          "at": 1508.1,
+          "value": 0.988421,
+          "progress": 0.42105,
+          "opacity": 0.421075,
+          "connected": true
+        },
+        {
+          "at": 1518.1,
+          "value": 0.988571,
+          "progress": 0.42855,
+          "opacity": 0.428544,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 2092.5,
+        "value": 0.985316,
+        "progress": 0.2658,
+        "opacity": 0.265799,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 2109.3,
+        "value": 0.985316,
+        "progress": 0.2658,
+        "opacity": 0.265799,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 2111.1,
+          "value": 0.985143,
+          "progress": 0.25715,
+          "opacity": 0.25715,
+          "connected": true
+        },
+        {
+          "at": 2133.6,
+          "value": 0.985022,
+          "progress": 0.2511,
+          "opacity": 0.251123,
+          "connected": true
+        },
+        {
+          "at": 2145.2,
+          "value": 0.984993,
+          "progress": 0.24965,
+          "opacity": 0.249673,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 3580.3,
+        "value": 1,
+        "progress": 1,
+        "opacity": 0.952148,
+        "connected": true
+      },
+      "bounds": {
+        "left": 464,
+        "right": 976
+      },
+      "samples": [
+        {
+          "at": 1077.2,
+          "value": 0.980099,
+          "progress": 0.00495,
+          "opacity": 0.004966,
+          "connected": true
+        },
+        {
+          "at": 1093.9,
+          "value": 0.98022,
+          "progress": 0.011,
+          "opacity": 0.011007,
+          "connected": true
+        },
+        {
+          "at": 1109.1,
+          "value": 0.980361,
+          "progress": 0.01805,
+          "opacity": 0.018038,
+          "connected": true
+        },
+        {
+          "at": 1129.8,
+          "value": 0.980555,
+          "progress": 0.02775,
+          "opacity": 0.027727,
+          "connected": true
+        },
+        {
+          "at": 1144.9,
+          "value": 0.980809,
+          "progress": 0.04045,
+          "opacity": 0.040471,
+          "connected": true
+        },
+        {
+          "at": 1159,
+          "value": 0.98102,
+          "progress": 0.051,
+          "opacity": 0.051003,
+          "connected": true
+        },
+        {
+          "at": 1179.1,
+          "value": 0.98135,
+          "progress": 0.0675,
+          "opacity": 0.067512,
+          "connected": true
+        },
+        {
+          "at": 1193,
+          "value": 0.981599,
+          "progress": 0.07995,
+          "opacity": 0.079965,
+          "connected": true
+        },
+        {
+          "at": 1208.9,
+          "value": 0.9819,
+          "progress": 0.095,
+          "opacity": 0.094979,
+          "connected": true
+        },
+        {
+          "at": 1227.8,
+          "value": 0.982275,
+          "progress": 0.11375,
+          "opacity": 0.11374,
+          "connected": true
+        },
+        {
+          "at": 1247.3,
+          "value": 0.982667,
+          "progress": 0.13335,
+          "opacity": 0.133345,
+          "connected": true
+        },
+        {
+          "at": 1264.5,
+          "value": 0.983051,
+          "progress": 0.15255,
+          "opacity": 0.152553,
+          "connected": true
+        },
+        {
+          "at": 1283.1,
+          "value": 0.983445,
+          "progress": 0.17225,
+          "opacity": 0.172252,
+          "connected": true
+        },
+        {
+          "at": 1304.2,
+          "value": 0.983914,
+          "progress": 0.1957,
+          "opacity": 0.195708,
+          "connected": true
+        },
+        {
+          "at": 1321.9,
+          "value": 0.984322,
+          "progress": 0.2161,
+          "opacity": 0.216105,
+          "connected": true
+        },
+        {
+          "at": 1330.2,
+          "value": 0.984505,
+          "progress": 0.22525,
+          "opacity": 0.225231,
+          "connected": true
+        },
+        {
+          "at": 1346.6,
+          "value": 0.984871,
+          "progress": 0.24355,
+          "opacity": 0.243559,
+          "connected": true
+        },
+        {
+          "at": 1365.9,
+          "value": 0.985331,
+          "progress": 0.26655,
+          "opacity": 0.26654,
+          "connected": true
+        },
+        {
+          "at": 1383,
+          "value": 0.985721,
+          "progress": 0.28605,
+          "opacity": 0.286072,
+          "connected": true
+        },
+        {
+          "at": 1397.9,
+          "value": 0.986065,
+          "progress": 0.30325,
+          "opacity": 0.303259,
+          "connected": true
+        },
+        {
+          "at": 1437.7,
+          "value": 0.986973,
+          "progress": 0.34865,
+          "opacity": 0.348637,
+          "connected": true
+        },
+        {
+          "at": 1457.1,
+          "value": 0.987397,
+          "progress": 0.36985,
+          "opacity": 0.369852,
+          "connected": true
+        },
+        {
+          "at": 1533.5,
+          "value": 0.988775,
+          "progress": 0.43875,
+          "opacity": 0.43873,
+          "connected": true
+        },
+        {
+          "at": 1549.8,
+          "value": 0.988938,
+          "progress": 0.4469,
+          "opacity": 0.446902,
+          "connected": true
+        },
+        {
+          "at": 1566.3,
+          "value": 0.989058,
+          "progress": 0.4529,
+          "opacity": 0.45289,
+          "connected": true
+        },
+        {
+          "at": 1606.2,
+          "value": 0.989241,
+          "progress": 0.46205,
+          "opacity": 0.462035,
+          "connected": true
+        },
+        {
+          "at": 1625.2,
+          "value": 0.989264,
+          "progress": 0.4632,
+          "opacity": 0.463177,
+          "connected": true
+        },
+        {
+          "at": 1634,
+          "value": 0.989263,
+          "progress": 0.46315,
+          "opacity": 0.463125,
+          "connected": true
+        },
+        {
+          "at": 1653.2,
+          "value": 0.989235,
+          "progress": 0.46175,
+          "opacity": 0.461772,
+          "connected": true
+        },
+        {
+          "at": 1673,
+          "value": 0.989198,
+          "progress": 0.4599,
+          "opacity": 0.459899,
+          "connected": true
+        },
+        {
+          "at": 1686,
+          "value": 0.989125,
+          "progress": 0.45625,
+          "opacity": 0.456272,
+          "connected": true
+        },
+        {
+          "at": 1701,
+          "value": 0.989058,
+          "progress": 0.4529,
+          "opacity": 0.452882,
+          "connected": true
+        },
+        {
+          "at": 1715.2,
+          "value": 0.988973,
+          "progress": 0.44865,
+          "opacity": 0.448644,
+          "connected": true
+        },
+        {
+          "at": 1734.2,
+          "value": 0.988856,
+          "progress": 0.4428,
+          "opacity": 0.442824,
+          "connected": true
+        },
+        {
+          "at": 1754.2,
+          "value": 0.988726,
+          "progress": 0.4363,
+          "opacity": 0.436298,
+          "connected": true
+        },
+        {
+          "at": 1772,
+          "value": 0.988567,
+          "progress": 0.42835,
+          "opacity": 0.428334,
+          "connected": true
+        },
+        {
+          "at": 1811.3,
+          "value": 0.988221,
+          "progress": 0.41105,
+          "opacity": 0.41107,
+          "connected": true
+        },
+        {
+          "at": 1826.8,
+          "value": 0.988069,
+          "progress": 0.40345,
+          "opacity": 0.403465,
+          "connected": true
+        },
+        {
+          "at": 1843.1,
+          "value": 0.987912,
+          "progress": 0.3956,
+          "opacity": 0.395623,
+          "connected": true
+        },
+        {
+          "at": 1862.9,
+          "value": 0.987711,
+          "progress": 0.38555,
+          "opacity": 0.385552,
+          "connected": true
+        },
+        {
+          "at": 1877.7,
+          "value": 0.987557,
+          "progress": 0.37785,
+          "opacity": 0.377843,
+          "connected": true
+        },
+        {
+          "at": 1896.7,
+          "value": 0.987359,
+          "progress": 0.36795,
+          "opacity": 0.367934,
+          "connected": true
+        },
+        {
+          "at": 1911.6,
+          "value": 0.987201,
+          "progress": 0.36005,
+          "opacity": 0.360029,
+          "connected": true
+        },
+        {
+          "at": 1930.7,
+          "value": 0.986999,
+          "progress": 0.34995,
+          "opacity": 0.34995,
+          "connected": true
+        },
+        {
+          "at": 1949.5,
+          "value": 0.986807,
+          "progress": 0.34035,
+          "opacity": 0.34037,
+          "connected": true
+        },
+        {
+          "at": 1965.8,
+          "value": 0.986626,
+          "progress": 0.3313,
+          "opacity": 0.331322,
+          "connected": true
+        },
+        {
+          "at": 1982.7,
+          "value": 0.986446,
+          "progress": 0.3223,
+          "opacity": 0.322299,
+          "connected": true
+        },
+        {
+          "at": 1994.2,
+          "value": 0.986319,
+          "progress": 0.31595,
+          "opacity": 0.315957,
+          "connected": true
+        },
+        {
+          "at": 2011.5,
+          "value": 0.986161,
+          "progress": 0.30805,
+          "opacity": 0.308073,
+          "connected": true
+        },
+        {
+          "at": 2027.9,
+          "value": 0.985995,
+          "progress": 0.29975,
+          "opacity": 0.299729,
+          "connected": true
+        },
+        {
+          "at": 2043.3,
+          "value": 0.985819,
+          "progress": 0.29095,
+          "opacity": 0.290953,
+          "connected": true
+        },
+        {
+          "at": 2058.9,
+          "value": 0.985656,
+          "progress": 0.2828,
+          "opacity": 0.282789,
+          "connected": true
+        },
+        {
+          "at": 2076,
+          "value": 0.985485,
+          "progress": 0.27425,
+          "opacity": 0.274229,
+          "connected": true
+        },
+        {
+          "at": 2092.2,
+          "value": 0.985316,
+          "progress": 0.2658,
+          "opacity": 0.265799,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@2b7f4757677bd078c58470de50881dc0.webm"
+    },
+    {
+      "width": 1440,
+      "kind": "sheet",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 1392.6,
+          "value": 250.123,
+          "progress": 0.348638,
+          "opacity": 1,
+          "connected": true
+        },
+        "frameMs": 21.4,
+        "elapsedMs": 39.6,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001095,
+            "allowed": 0.085491,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0,
+            "allowed": 0.002,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 2067.1,
+          "value": 278.007,
+          "progress": 0.276023,
+          "opacity": 1,
+          "connected": true
+        },
+        "frameMs": 9.3,
+        "elapsedMs": 20.3,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000548,
+            "allowed": 0.022276,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0,
+            "allowed": 0.002,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 2067.1,
+        "value": 278.007,
+        "progress": 0.276023,
+        "opacity": 1,
+        "connected": true
+      },
+      "before": {
+        "at": 1414,
+        "value": 241.125,
+        "progress": 0.37207,
+        "opacity": 1,
+        "connected": true
+      },
+      "after": {
+        "at": 1453.6,
+        "value": 241.125,
+        "progress": 0.37207,
+        "opacity": 1,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 1461.6,
+          "value": 221.045,
+          "progress": 0.424362,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1481.5,
+          "value": 214.485,
+          "progress": 0.441445,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1524.6,
+          "value": 204.062,
+          "progress": 0.468589,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 2076.4,
+        "value": 279.964,
+        "progress": 0.270927,
+        "opacity": 1,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 2096.7,
+        "value": 279.964,
+        "progress": 0.270927,
+        "opacity": 1,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 2107.6,
+          "value": 285.422,
+          "progress": 0.256714,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2112.2,
+          "value": 286.028,
+          "progress": 0.255135,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2125.3,
+          "value": 287.203,
+          "progress": 0.252076,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 5011.1,
+        "value": 0.374641,
+        "progress": 0.999024,
+        "opacity": 1,
+        "connected": true
+      },
+      "bounds": {
+        "left": 1056.374634,
+        "right": 1440.374634
+      },
+      "samples": [
+        {
+          "at": 1030,
+          "value": 382.203,
+          "progress": 0.00468,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1082.9,
+          "value": 372.872,
+          "progress": 0.028979,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1115.4,
+          "value": 364.113,
+          "progress": 0.051789,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1134.8,
+          "value": 358.076,
+          "progress": 0.06751,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1152.3,
+          "value": 351.881,
+          "progress": 0.083643,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1175.4,
+          "value": 343.781,
+          "progress": 0.104737,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1182,
+          "value": 340.712,
+          "progress": 0.112729,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1232.9,
+          "value": 319.973,
+          "progress": 0.166737,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1249.1,
+          "value": 313.158,
+          "progress": 0.184484,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1264.9,
+          "value": 306.247,
+          "progress": 0.202482,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1286.6,
+          "value": 296.633,
+          "progress": 0.227518,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1300.2,
+          "value": 290.473,
+          "progress": 0.24356,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1319.2,
+          "value": 282.09,
+          "progress": 0.265391,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1337.9,
+          "value": 274.149,
+          "progress": 0.28607,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1353.6,
+          "value": 267.11,
+          "progress": 0.304401,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1373.5,
+          "value": 258.361,
+          "progress": 0.327185,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1381.9,
+          "value": 256.62,
+          "progress": 0.331719,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1392.6,
+          "value": 250.123,
+          "progress": 0.348638,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1414,
+          "value": 241.125,
+          "progress": 0.37207,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1534.8,
+          "value": 202.794,
+          "progress": 0.471891,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1562.8,
+          "value": 199.514,
+          "progress": 0.480432,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1593.2,
+          "value": 198.272,
+          "progress": 0.483667,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1649.5,
+          "value": 200.273,
+          "progress": 0.478456,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1682.4,
+          "value": 203.374,
+          "progress": 0.47038,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1701.5,
+          "value": 205.873,
+          "progress": 0.463872,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1722.8,
+          "value": 209.036,
+          "progress": 0.455635,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1742.8,
+          "value": 212.231,
+          "progress": 0.447315,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1766.7,
+          "value": 215.503,
+          "progress": 0.438794,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1775.4,
+          "value": 217.855,
+          "progress": 0.432669,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1792.4,
+          "value": 221.05,
+          "progress": 0.424349,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1810.1,
+          "value": 224.557,
+          "progress": 0.415216,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1824.6,
+          "value": 227.56,
+          "progress": 0.407396,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1843.6,
+          "value": 231.447,
+          "progress": 0.397273,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1858.5,
+          "value": 234.567,
+          "progress": 0.389148,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1880,
+          "value": 238.991,
+          "progress": 0.377628,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1898.5,
+          "value": 243.029,
+          "progress": 0.367112,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1917.4,
+          "value": 246.87,
+          "progress": 0.357109,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1939.2,
+          "value": 251.566,
+          "progress": 0.34488,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1959.9,
+          "value": 256.031,
+          "progress": 0.333253,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1980.2,
+          "value": 260.253,
+          "progress": 0.322258,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 1999.3,
+          "value": 264.225,
+          "progress": 0.311914,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2019.9,
+          "value": 268.561,
+          "progress": 0.300622,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2042.4,
+          "value": 272.426,
+          "progress": 0.290557,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2052.4,
+          "value": 275.035,
+          "progress": 0.283763,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2067.1,
+          "value": 278.007,
+          "progress": 0.276023,
+          "opacity": 1,
+          "connected": true
+        },
+        {
+          "at": 2076.4,
+          "value": 279.964,
+          "progress": 0.270927,
+          "opacity": 1,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@d8661e9c4ca93e0c4c1acf7f6a387f8a.webm"
+    },
+    {
+      "width": 1440,
+      "kind": "popover",
+      "scopedSeconds": 0.24,
+      "calibrationMultiplier": 16,
+      "temporalResolutionMs": 120,
+      "closeBoundary": {
+        "previous": {
+          "at": 1441.4,
+          "value": 0.986883,
+          "progress": 0.34415,
+          "opacity": 0.344139,
+          "connected": true
+        },
+        "frameMs": 16.8,
+        "elapsedMs": 10,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.001065,
+            "allowed": 0.037693,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.001067,
+            "allowed": 0.037747,
+            "displacement": 0
+          }
+        ]
+      },
+      "reopenBoundary": {
+        "previous": {
+          "at": 2112.7,
+          "value": 0.985245,
+          "progress": 0.26225,
+          "opacity": 0.262274,
+          "connected": true
+        },
+        "frameMs": 29.3,
+        "elapsedMs": 20.8,
+        "axes": [
+          {
+            "axis": "progress",
+            "speed": 0.000346,
+            "allowed": 0.023694,
+            "displacement": 0
+          },
+          {
+            "axis": "opacity",
+            "speed": 0.000346,
+            "allowed": 0.023694,
+            "displacement": 0
+          }
+        ]
+      },
+      "previous": {
+        "at": 2112.7,
+        "value": 0.985245,
+        "progress": 0.26225,
+        "opacity": 0.262274,
+        "connected": true
+      },
+      "before": {
+        "at": 1458.2,
+        "value": 0.987241,
+        "progress": 0.36205,
+        "opacity": 0.362066,
+        "connected": true
+      },
+      "after": {
+        "at": 1468.2,
+        "value": 0.987241,
+        "progress": 0.36205,
+        "opacity": 0.362066,
+        "connected": true
+      },
+      "closing": [
+        {
+          "at": 1475.1,
+          "value": 0.98786,
+          "progress": 0.393,
+          "opacity": 0.393012,
+          "connected": true
+        },
+        {
+          "at": 1491.8,
+          "value": 0.987987,
+          "progress": 0.39935,
+          "opacity": 0.399366,
+          "connected": true
+        },
+        {
+          "at": 1508.6,
+          "value": 0.988308,
+          "progress": 0.4154,
+          "opacity": 0.415391,
+          "connected": true
+        }
+      ],
+      "reopenBefore": {
+        "at": 2142,
+        "value": 0.985042,
+        "progress": 0.2521,
+        "opacity": 0.252124,
+        "connected": true
+      },
+      "reopenAfter": {
+        "at": 2162.8,
+        "value": 0.985042,
+        "progress": 0.2521,
+        "opacity": 0.252124,
+        "connected": true
+      },
+      "reopening": [
+        {
+          "at": 2169.3,
+          "value": 0.984542,
+          "progress": 0.2271,
+          "opacity": 0.22712,
+          "connected": true
+        },
+        {
+          "at": 2180.6,
+          "value": 0.984474,
+          "progress": 0.2237,
+          "opacity": 0.223705,
+          "connected": true
+        },
+        {
+          "at": 2197.4,
+          "value": 0.984369,
+          "progress": 0.21845,
+          "opacity": 0.218457,
+          "connected": true
+        }
+      ],
+      "final": {
+        "at": 3674.7,
+        "value": 1,
+        "progress": 1,
+        "opacity": 0.95069,
+        "connected": true
+      },
+      "bounds": {
+        "left": 174,
+        "right": 462
+      },
+      "samples": [
+        {
+          "at": 1047,
+          "value": 0.980002,
+          "progress": 0.0001,
+          "opacity": 0.000121,
+          "connected": true
+        },
+        {
+          "at": 1058,
+          "value": 0.980014,
+          "progress": 0.0007,
+          "opacity": 0.000686,
+          "connected": true
+        },
+        {
+          "at": 1075.1,
+          "value": 0.980049,
+          "progress": 0.00245,
+          "opacity": 0.002463,
+          "connected": true
+        },
+        {
+          "at": 1091.7,
+          "value": 0.980144,
+          "progress": 0.0072,
+          "opacity": 0.007191,
+          "connected": true
+        },
+        {
+          "at": 1108.2,
+          "value": 0.980282,
+          "progress": 0.0141,
+          "opacity": 0.014101,
+          "connected": true
+        },
+        {
+          "at": 1125.2,
+          "value": 0.980448,
+          "progress": 0.0224,
+          "opacity": 0.022382,
+          "connected": true
+        },
+        {
+          "at": 1141.6,
+          "value": 0.980657,
+          "progress": 0.03285,
+          "opacity": 0.032862,
+          "connected": true
+        },
+        {
+          "at": 1158,
+          "value": 0.980897,
+          "progress": 0.04485,
+          "opacity": 0.044874,
+          "connected": true
+        },
+        {
+          "at": 1174.9,
+          "value": 0.981148,
+          "progress": 0.0574,
+          "opacity": 0.057412,
+          "connected": true
+        },
+        {
+          "at": 1191.8,
+          "value": 0.981438,
+          "progress": 0.0719,
+          "opacity": 0.07188,
+          "connected": true
+        },
+        {
+          "at": 1207.9,
+          "value": 0.981748,
+          "progress": 0.0874,
+          "opacity": 0.087374,
+          "connected": true
+        },
+        {
+          "at": 1224.5,
+          "value": 0.982055,
+          "progress": 0.10275,
+          "opacity": 0.102764,
+          "connected": true
+        },
+        {
+          "at": 1244.7,
+          "value": 0.982376,
+          "progress": 0.1188,
+          "opacity": 0.118824,
+          "connected": true
+        },
+        {
+          "at": 1258,
+          "value": 0.982815,
+          "progress": 0.14075,
+          "opacity": 0.140749,
+          "connected": true
+        },
+        {
+          "at": 1274.7,
+          "value": 0.983094,
+          "progress": 0.1547,
+          "opacity": 0.154719,
+          "connected": true
+        },
+        {
+          "at": 1291.4,
+          "value": 0.983467,
+          "progress": 0.17335,
+          "opacity": 0.173359,
+          "connected": true
+        },
+        {
+          "at": 1307.9,
+          "value": 0.983824,
+          "progress": 0.1912,
+          "opacity": 0.191208,
+          "connected": true
+        },
+        {
+          "at": 1325,
+          "value": 0.984208,
+          "progress": 0.2104,
+          "opacity": 0.210418,
+          "connected": true
+        },
+        {
+          "at": 1341.7,
+          "value": 0.984596,
+          "progress": 0.2298,
+          "opacity": 0.229805,
+          "connected": true
+        },
+        {
+          "at": 1358.2,
+          "value": 0.984986,
+          "progress": 0.2493,
+          "opacity": 0.2493,
+          "connected": true
+        },
+        {
+          "at": 1374.9,
+          "value": 0.985354,
+          "progress": 0.2677,
+          "opacity": 0.26769,
+          "connected": true
+        },
+        {
+          "at": 1391.6,
+          "value": 0.985744,
+          "progress": 0.2872,
+          "opacity": 0.287219,
+          "connected": true
+        },
+        {
+          "at": 1408.3,
+          "value": 0.986134,
+          "progress": 0.3067,
+          "opacity": 0.306688,
+          "connected": true
+        },
+        {
+          "at": 1424.8,
+          "value": 0.986498,
+          "progress": 0.3249,
+          "opacity": 0.324915,
+          "connected": true
+        },
+        {
+          "at": 1441.4,
+          "value": 0.986883,
+          "progress": 0.34415,
+          "opacity": 0.344139,
+          "connected": true
+        },
+        {
+          "at": 1458.2,
+          "value": 0.987241,
+          "progress": 0.36205,
+          "opacity": 0.362066,
+          "connected": true
+        },
+        {
+          "at": 1525.9,
+          "value": 0.988574,
+          "progress": 0.4287,
+          "opacity": 0.428689,
+          "connected": true
+        },
+        {
+          "at": 1541.3,
+          "value": 0.98879,
+          "progress": 0.4395,
+          "opacity": 0.439498,
+          "connected": true
+        },
+        {
+          "at": 1558.1,
+          "value": 0.988943,
+          "progress": 0.44715,
+          "opacity": 0.447148,
+          "connected": true
+        },
+        {
+          "at": 1576.1,
+          "value": 0.989077,
+          "progress": 0.45385,
+          "opacity": 0.453863,
+          "connected": true
+        },
+        {
+          "at": 1591.5,
+          "value": 0.989178,
+          "progress": 0.4589,
+          "opacity": 0.458915,
+          "connected": true
+        },
+        {
+          "at": 1608.1,
+          "value": 0.989236,
+          "progress": 0.4618,
+          "opacity": 0.461796,
+          "connected": true
+        },
+        {
+          "at": 1624.6,
+          "value": 0.989266,
+          "progress": 0.4633,
+          "opacity": 0.463304,
+          "connected": true
+        },
+        {
+          "at": 1641.4,
+          "value": 0.989271,
+          "progress": 0.46355,
+          "opacity": 0.463544,
+          "connected": true
+        },
+        {
+          "at": 1658.9,
+          "value": 0.98925,
+          "progress": 0.4625,
+          "opacity": 0.462519,
+          "connected": true
+        },
+        {
+          "at": 1676.5,
+          "value": 0.989207,
+          "progress": 0.46035,
+          "opacity": 0.46036,
+          "connected": true
+        },
+        {
+          "at": 1691.8,
+          "value": 0.989139,
+          "progress": 0.45695,
+          "opacity": 0.45697,
+          "connected": true
+        },
+        {
+          "at": 1708.4,
+          "value": 0.989067,
+          "progress": 0.45335,
+          "opacity": 0.453371,
+          "connected": true
+        },
+        {
+          "at": 1727.3,
+          "value": 0.988971,
+          "progress": 0.44855,
+          "opacity": 0.448536,
+          "connected": true
+        },
+        {
+          "at": 1748.5,
+          "value": 0.988853,
+          "progress": 0.44265,
+          "opacity": 0.44264,
+          "connected": true
+        },
+        {
+          "at": 1769.3,
+          "value": 0.98869,
+          "progress": 0.4345,
+          "opacity": 0.434498,
+          "connected": true
+        },
+        {
+          "at": 1783.8,
+          "value": 0.988527,
+          "progress": 0.42635,
+          "opacity": 0.426335,
+          "connected": true
+        },
+        {
+          "at": 1791.4,
+          "value": 0.988396,
+          "progress": 0.4198,
+          "opacity": 0.419809,
+          "connected": true
+        },
+        {
+          "at": 1808.2,
+          "value": 0.988333,
+          "progress": 0.41665,
+          "opacity": 0.41666,
+          "connected": true
+        },
+        {
+          "at": 1825.3,
+          "value": 0.988175,
+          "progress": 0.40875,
+          "opacity": 0.408769,
+          "connected": true
+        },
+        {
+          "at": 1842,
+          "value": 0.987992,
+          "progress": 0.3996,
+          "opacity": 0.399598,
+          "connected": true
+        },
+        {
+          "at": 1859.3,
+          "value": 0.987843,
+          "progress": 0.39215,
+          "opacity": 0.392142,
+          "connected": true
+        },
+        {
+          "at": 1874.8,
+          "value": 0.98767,
+          "progress": 0.3835,
+          "opacity": 0.383507,
+          "connected": true
+        },
+        {
+          "at": 1891.8,
+          "value": 0.987505,
+          "progress": 0.37525,
+          "opacity": 0.375235,
+          "connected": true
+        },
+        {
+          "at": 1908.5,
+          "value": 0.987327,
+          "progress": 0.36635,
+          "opacity": 0.366332,
+          "connected": true
+        },
+        {
+          "at": 1924.6,
+          "value": 0.987147,
+          "progress": 0.35735,
+          "opacity": 0.357346,
+          "connected": true
+        },
+        {
+          "at": 1941.2,
+          "value": 0.986977,
+          "progress": 0.34885,
+          "opacity": 0.348842,
+          "connected": true
+        },
+        {
+          "at": 1958.1,
+          "value": 0.986806,
+          "progress": 0.3403,
+          "opacity": 0.340317,
+          "connected": true
+        },
+        {
+          "at": 1980.6,
+          "value": 0.986625,
+          "progress": 0.33125,
+          "opacity": 0.331261,
+          "connected": true
+        },
+        {
+          "at": 1991.9,
+          "value": 0.986381,
+          "progress": 0.31905,
+          "opacity": 0.319056,
+          "connected": true
+        },
+        {
+          "at": 2008.1,
+          "value": 0.986265,
+          "progress": 0.31325,
+          "opacity": 0.31325,
+          "connected": true
+        },
+        {
+          "at": 2024.7,
+          "value": 0.986097,
+          "progress": 0.30485,
+          "opacity": 0.304858,
+          "connected": true
+        },
+        {
+          "at": 2041.2,
+          "value": 0.98592,
+          "progress": 0.296,
+          "opacity": 0.296021,
+          "connected": true
+        },
+        {
+          "at": 2058.9,
+          "value": 0.985756,
+          "progress": 0.2878,
+          "opacity": 0.287794,
+          "connected": true
+        },
+        {
+          "at": 2077.8,
+          "value": 0.985573,
+          "progress": 0.27865,
+          "opacity": 0.278657,
+          "connected": true
+        },
+        {
+          "at": 2091.4,
+          "value": 0.985383,
+          "progress": 0.26915,
+          "opacity": 0.269163,
+          "connected": true
+        },
+        {
+          "at": 2112.7,
+          "value": 0.985245,
+          "progress": 0.26225,
+          "opacity": 0.262274,
+          "connected": true
+        },
+        {
+          "at": 2142,
+          "value": 0.985042,
+          "progress": 0.2521,
+          "opacity": 0.252124,
+          "connected": true
+        }
+      ],
+      "video": "videos/page@751d016ee2ce3a2f9fbb4e03be347dd8.webm"
+    }
+  ]
+}
