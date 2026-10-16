@@ -1,5 +1,19 @@
 # @tangle-network/ui
 
+## 11.37.0
+
+### Minor Changes
+
+- c01503e: Share canonical syntax highlighting, exact-copy feedback and accessible code-tab behavior with Hono. Extend CodeBlock with language examples and request/response/error metadata; add API schema presentation without API-specific data.
+
+### Patch Changes
+
+- 6087148: Pin the shared surface motion runtime to the compatible maintained dependency chain so consumers can retain their existing package-age policies.
+  
+  Route Popover through the shared interruptible surface owner and apply the shared control transition to bare buttons.
+  
+  Restore native copy announcements on binding cleanup and omit orphaned tab relationships for a single example.
+
 ## 11.36.0
 
 ### Minor Changes
