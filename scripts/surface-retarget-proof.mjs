@@ -9,6 +9,7 @@ try {
  for(const width of [390,1440])for(const kind of ["dialog","sheet","popover"]){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"no-preference",recordVideo:{dir:`${out}/videos`}});
   try {
+   await context.tracing.start({screenshots:true,snapshots:true,sources:true});
    const page=await context.newPage();await page.goto(`${url}?surface=motion&theme=light`,{waitUntil:"networkidle"});await page.getByRole("button",{name:`Open ${kind}`,exact:true}).waitFor();
    const trace=await page.evaluate(async(kind)=>{
     const root=document.documentElement,probe=document.createElement("i");root.append(probe);probe.style.animation="noop var(--motion-surface)";
@@ -68,7 +69,7 @@ try {
    const trigger=page.getByRole("button",{name:`Open ${kind}`,exact:true});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Reduced dismissal failed focus return");
    cases.push({width,kind,...trace,video:`videos/${basename(await page.video().path())}`});
    await writeFile(`${out}/partial.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));
-  }finally{await context.close();}
+  }finally{await context.tracing.stop({path:`${out}/${kind}-${width}-trace.zip`});await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));
 }finally{await browser.close();await server.close();}

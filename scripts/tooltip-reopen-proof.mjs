@@ -13,8 +13,9 @@ const cohort={react:version("react"),tooltip:version("@radix-ui/react-tooltip")}
 const json=value=>JSON.stringify(value,(_k,v)=>typeof v==="number"?Number(v.toFixed(6)):v,2);
 try {
  for(const width of [390,1440])for(const reducedMotion of ["no-preference","reduce"])for(const mode of ["uncontrolled","controlled","default"]){
-  const context=await browser.newContext({viewport:{width,height:900},reducedMotion,recordVideo:{dir:`${out}/videos`}}),page=await context.newPage();let result={width,reducedMotion,mode,pass:false};
+  const context=await browser.newContext({viewport:{width,height:900},reducedMotion,recordVideo:{dir:`${out}/videos`}}),page=await context.newPage();let result={width,reducedMotion,mode,pass:false,valid:false};
   try {
+   await context.tracing.start({screenshots:true,snapshots:true,sources:true});
    await page.addInitScript(()=>{
     const ids=new WeakMap();let nextId=0;window.tooltipRows=[];window.tooltipPhase="preparation";
     const snap=()=>{const trigger=document.querySelector('[data-tooltip-trigger="Primary"]'),content=document.querySelector('[data-tooltip-content="Primary"]');if(content&&!ids.has(content))ids.set(content,++nextId);return {focused:document.activeElement===trigger,triggerState:trigger?.dataset.state,description:trigger?.getAttribute("aria-describedby"),contentState:content?.dataset.state,node:content?ids.get(content):null,oldConnected:!!window.oldTooltipNode?.isConnected};};
@@ -74,7 +75,7 @@ try {
    }
    await page.screenshot({path:`${out}/${mode}-${width}-${reducedMotion}-final.png`});
   }catch(error){result.failure=String(error);result.pass=false;result.rows=await page.evaluate(()=>window.tooltipRows??[]).catch(()=>[]);}
-  finally{result.video=`videos/${basename(await page.video().path())}`;await context.close();cases.push(result);await writeFile(`${out}/partial.json`,json({cases}));}
+  finally{await context.tracing.stop({path:`${out}/${mode}-${width}-${reducedMotion}-trace.zip`});result.video=`videos/${basename(await page.video().path())}`;await context.close();cases.push(result);await writeFile(`${out}/partial.json`,json({cases}));}
  }
  const receipt={cohort,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),scope:"Real Tooltip Root/Content and labelled focusable group with disabled native child; Native Tab departure and fresh keyboard control; browser-local native DOM focus restoration after published close. Actual trusted focus and internal CustomEvent distinguished. Earlier native Shift+Tab attempts retained separately. No production or calibrated latency claim.",cases};
  await writeFile(`${out}/receipt.json`,json(receipt));console.log(json({sha:receipt.sha,passed:cases.filter(r=>r.pass).length,failed:cases.filter(r=>!r.pass).length,invalid:cases.filter(r=>r.valid===false).length}));if(cases.some(r=>!r.pass))process.exitCode=1;
