@@ -1,6 +1,7 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { Slottable } from "@radix-ui/react-slot";
 import * as React from "react";
 import { SurfaceMotion } from "../lib/surface-motion";
 import { surfaceMotion } from "../lib/motion";
@@ -64,7 +65,10 @@ const TooltipContent = React.forwardRef<
       )}
       {...props}
       asChild
-    ><SurfaceMotion kind="tooltip" asChild={asChild}>{children}</SurfaceMotion></TooltipPrimitive.Content>
+    ><SurfaceMotion kind="tooltip" asChild={asChild}>
+      {/* Keep the caller as the slot target when Radix adds accessibility children. */}
+      {asChild ? <Slottable>{children}</Slottable> : children}
+    </SurfaceMotion></TooltipPrimitive.Content>
   );
   return portal ? <TooltipPrimitive.Portal>{content}</TooltipPrimitive.Portal> : content;
 });
