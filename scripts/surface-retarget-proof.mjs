@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 const out=resolve(process.env.DESIGN_EVIDENCE??"/tmp/brand-retarget-evidence");await mkdir(out,{recursive:true});
 const {server,url}=await designServer(),browser=await chromium.launch({headless:true}),cases=[];
 try {
- for(const width of [390,1440])for(const kind of ["dialog","sheet"]){
+ for(const width of [390,1440])for(const kind of ["dialog","sheet","popover"]){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"no-preference",recordVideo:{dir:`${out}/videos`}});
   try {
    const page=await context.newPage();await page.goto(`${url}?surface=motion&theme=light`,{waitUntil:"networkidle"});await page.getByRole("button",{name:`Open ${kind}`,exact:true}).waitFor();
@@ -26,7 +26,7 @@ try {
     const samples=[];let previous=read(),current=previous;
     const deadline=performance.now()+seconds*1000;
     while(performance.now()<deadline){await frame();current=read();samples.push(current);if(current.progress>=0.35&&current.progress<=0.7)break;previous=current;}
-    if(current.progress<0.35||current.progress>0.7)throw Error("No calibrated halfway sample");
+    if(current.progress<0.35||current.progress>0.7)throw Error(`No calibrated halfway sample: ${JSON.stringify({kind,scopedSeconds,first:samples[0],last:current,style:{animation:getComputedStyle(node).animation,transform:getComputedStyle(node).transform,scale:getComputedStyle(node).scale}})}`);
     // A flush can span a compositor frame. Compare displacement with measured
     // elapsed time plus one preceding frame of sampling uncertainty; a reset to
     // an endpoint still exceeds this bound. Keep the velocity checks separate.
@@ -59,7 +59,7 @@ try {
     if(!reverse||reverse.progress>=reopenBefore.progress)throw Error(`Velocity restarted on reopen: ${JSON.stringify({reopenBefore,reopening})}`);
     const end=performance.now()+seconds*2000;let final=read();while(performance.now()<end&&Math.abs(final.progress-1)>0.001){await frame();final=read();}
     if(Math.abs(final.progress-1)>0.001||!node.contains(document.activeElement))throw Error(`Surface failed to settle/focus: ${JSON.stringify(final)}`);
-    const bounds=node.getBoundingClientRect();if(kind==="dialog"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
+    const bounds=node.getBoundingClientRect();if(kind!=="sheet"&&(bounds.left< -1||bounds.right>innerWidth+1))throw Error("Anchored dialog crossed viewport");
     return {scopedSeconds,calibrationMultiplier:16,temporalResolutionMs,closeBoundary,reopenBoundary,previous,before,after,closing,reopenBefore,reopenAfter,reopening,final,bounds:{left:bounds.left,right:bounds.right},samples};
    },kind);
    await page.screenshot({path:`${out}/${kind}-${width}.png`});await page.emulateMedia({reducedMotion:"reduce"});
@@ -67,6 +67,7 @@ try {
    await page.keyboard.press("Escape");await page.getByRole("dialog").waitFor({state:"hidden"});
    const trigger=page.getByRole("button",{name:`Open ${kind}`,exact:true});if(!await trigger.evaluate(e=>e===document.activeElement))throw Error("Reduced dismissal failed focus return");
    cases.push({width,kind,...trace,video:`videos/${basename(await page.video().path())}`});
+   await writeFile(`${out}/partial.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));
   }finally{await context.close();}
  }
  await writeFile(`${out}/receipt.json`,JSON.stringify({sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),cases},(_key,value)=>typeof value==="number"?Number(value.toFixed(6)):value,2));console.log(JSON.stringify(cases));

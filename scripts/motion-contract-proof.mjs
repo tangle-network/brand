@@ -15,22 +15,22 @@ try {
     const read=(selector)=>{const s=getComputedStyle(document.querySelector(selector));return {transition:s.transition,property:s.transitionProperty,duration:s.transitionDuration,easing:s.transitionTimingFunction,animation:s.animationName,animationDuration:s.animationDuration,animationEasing:s.animationTimingFunction};};
     const probe=document.createElement("i");document.body.append(probe);const role={};
     for(const name of ["control","surface","dismiss","arrive"]){probe.style.transition=`opacity var(--motion-${name})`;const s=getComputedStyle(probe);role[name]={duration:s.transitionDuration,easing:s.transitionTimingFunction};}
-    probe.remove();return {role,controls:[read("button"),read("input"),read(".tangle-control-display")],arrival:read(".tangle-intro")};
+    probe.remove();return {role,controls:[read("button"),read("[data-testid=bare-control]"),read("input"),read(".tangle-control-display")],arrival:read(".tangle-intro")};
    });
    for(const control of timing.controls){
     if(reducedMotion==="reduce"){if(control.property!=="none")throw Error(`Reduced control still transitions: ${JSON.stringify(control)}`);}
     else if(control.property==="all"||control.duration.split(", ").some(d=>d!==timing.role.control.duration)||control.easing.split(/, (?=[a-z])/).some(e=>e!==timing.role.control.easing))throw Error(`Invalid role transition: ${JSON.stringify({control,role:timing.role.control})}`);
    }
    if(reducedMotion==="reduce"?timing.arrival.animation!=="none":timing.arrival.animationDuration!==timing.role.arrive.duration||timing.arrival.animationEasing!==timing.role.arrive.easing)throw Error(`Invalid arrival role: ${JSON.stringify(timing)}`);
-   for(const kind of ["dialog","sheet"]){
+   for(const kind of ["dialog","sheet","popover"]){
     const trigger=page.getByRole("button",{name:`Open ${kind}`,exact:true});await trigger.focus();await page.keyboard.press("Enter");
     const dialog=page.getByRole("dialog");await dialog.waitFor();
     const opening=await dialog.evaluate(e=>{const s=getComputedStyle(e);return {name:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction,focus:e.contains(document.activeElement)};});
     if(!opening.focus)throw Error(`${kind} did not own focus`);
     if(reducedMotion==="reduce"?opening.name!=="none":opening.name!=="tangle-surface-present"||opening.duration!==timing.role.surface.duration||opening.easing!==timing.role.surface.easing)throw Error(`Invalid ${kind} opening role: ${JSON.stringify(opening)}`);
     const overlays=await page.evaluate(()=>[...document.querySelectorAll('[data-state="open"]')].map(e=>getComputedStyle(e)).filter(s=>s.position==="fixed"&&[s.top,s.right,s.bottom,s.left].every(v=>v==="0px")).map(s=>({animation:s.animationName,duration:s.animationDuration,easing:s.animationTimingFunction})));
-    if(overlays.length!==1)throw Error(`Expected one modal overlay, got ${overlays.length}`);
-    if(reducedMotion==="reduce"?overlays[0].animation!=="none":overlays[0].duration!==timing.role.surface.duration)throw Error(`Invalid modal overlay motion: ${JSON.stringify(overlays)}`);
+    if(overlays.length!==(kind==="popover"?0:1))throw Error(`Expected one modal overlay, got ${overlays.length}`);
+    if(kind!=="popover"&&(reducedMotion==="reduce"?overlays[0].animation!=="none":overlays[0].duration!==timing.role.surface.duration))throw Error(`Invalid modal overlay motion: ${JSON.stringify(overlays)}`);
     await page.screenshot({path:`${out}/${kind}-${reducedMotion}.png`});
     await page.keyboard.press("Escape");
     if(reducedMotion!=="reduce"){

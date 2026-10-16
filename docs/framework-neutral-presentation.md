@@ -105,9 +105,9 @@ Button sizes use `buttonVariants({size:"sm"|"lg"})`; fields use `labelVariants` 
 `helpPresentation`; tables use `tablePresentation`; panels use `cardPresentation`.
 Delete the local classes as each corresponding caller migrates.
 
-Display and operational controls, fields and table hover consume Brand’s `--motion-control`; reduced motion removes their transitions. The optional hero entrance consumes `--motion-arrive`. The shared hero has no ambient knot loop. Skeletons render a still placeholder under reduced motion.
+Display and operational controls (including `Button variant="bare"`), fields and table hover consume Brand’s `--motion-control`; reduced motion removes their transitions. The optional hero entrance consumes `--motion-arrive`. The shared hero has no ambient knot loop. Skeletons render a still placeholder under reduced motion.
 
-React Dialog, Sheet and Tooltip retain Radix state, refs, focus and dismissal.
+React Dialog, Sheet, Popover and Tooltip retain Radix state, refs, focus and dismissal.
 Their shared adapter uses Motion physics springs to retarget current geometry
 and velocity. It derives a critically damped response from the resolved, scoped
 surface/dismiss role duration. Brand's nonvisual CSS presence markers retain the
@@ -122,3 +122,5 @@ returns focus on close.
 `createCopyFeedback` and `bindCopyButton` accept one write until the browser settles it. The React CopyButton uses that same controller. The controller reads scoped Brand `--interaction-*` roles from the button, resolving CSS durations into milliseconds; it never copies their values. Pending and duplicate-write suppression begin synchronously. The contextual ellipsis appears at the pending delay. At the long-work delay, the shared status reports elapsed time, unknown remaining time and that an accepted clipboard write cannot be cancelled. Success requires browser confirmation. Disposal suppresses later updates without claiming cancellation.
 
 Use `codePresentation.copy` on native copy buttons and `codePresentation.copyStatus` on the live status element. Reduced motion uses the same static indicator. The optional settlement `measurement` reports elapsed/feedback milliseconds, the resolved budgets and whether the local mutation exceeded its budget; missing CSS roles remain unknown. Consumers retain ownership of external operation identity, cancellation acknowledgment and reconciliation.
+
+The shared surface owner retains explicit [Motion values](https://motion.dev/docs/animate#motion-values) for opacity and geometry and binds them with [styleEffect](https://motion.dev/docs/style-effect). Reversal retargets those values on one frame clock; no channel starts from a separately sampled compositor animation. Reduced motion settles the same values synchronously.

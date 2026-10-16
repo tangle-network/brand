@@ -220,7 +220,7 @@ export function createCopyFeedback(change:(state:CopyFeedback)=>void,write:(text
  };
 }
 export function bindCopyButton(button:HTMLButtonElement,status:HTMLElement,text:()=>string) {
- const previous={disabled:button.getAttribute("aria-disabled"),busy:button.getAttribute("aria-busy"),loading:button.getAttribute("data-copy-loading"),long:status.getAttribute("data-copy-long-work")};
+ const previous={label:button.getAttribute("aria-label"),status:status.textContent,disabled:button.getAttribute("aria-disabled"),busy:button.getAttribute("aria-busy"),loading:button.getAttribute("data-copy-loading"),long:status.getAttribute("data-copy-long-work")};
  const restore=(element:HTMLElement,name:string,value:string|null)=>{if(value===null)element.removeAttribute(name);else element.setAttribute(name,value);};
  const feedback=createCopyFeedback(state=>{
   status.textContent=state.status;status.setAttribute("data-copy-long-work",String(!!state.longRunning));
@@ -230,7 +230,7 @@ export function bindCopyButton(button:HTMLButtonElement,status:HTMLElement,text:
   else {restore(button,"aria-disabled",previous.disabled);restore(button,"aria-busy",previous.busy);}
  },writeClipboard,button);
  const click=()=>{if(!button.disabled&&button.getAttribute("aria-disabled")!=="true")void feedback.copy(text());};button.addEventListener("click",click);
- return ()=>{button.removeEventListener("click",click);feedback.dispose();restore(button,"aria-disabled",previous.disabled);restore(button,"aria-busy",previous.busy);restore(button,"data-copy-loading",previous.loading);restore(status,"data-copy-long-work",previous.long);};
+ return ()=>{button.removeEventListener("click",click);feedback.dispose();restore(button,"aria-label",previous.label);status.textContent=previous.status;restore(button,"aria-disabled",previous.disabled);restore(button,"aria-busy",previous.busy);restore(button,"data-copy-loading",previous.loading);restore(status,"data-copy-long-work",previous.long);};
 }
 /** Native tabs adapter. The consumer owns labels, IDs and escaped panel content. */
 export function bindCodeTabs(list:HTMLElement,onSelect?:(index:number)=>void) {
