@@ -16,6 +16,7 @@ const json=value=>JSON.stringify(value,(_k,v)=>typeof v==="number"?Number(v.toFi
 try {
  for(const width of [390,1440])for(const reducedMotion of ["no-preference","reduce"])for(const mode of ["uncontrolled","controlled","default"])for(const contentMode of contentModes){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion,recordVideo:{dir:`${out}/videos`}}),page=await context.newPage();let result={width,reducedMotion,mode,contentMode,pass:false,valid:false};
+  const pageErrors=[];page.on("pageerror",error=>pageErrors.push(error.message));
   try {
    await context.tracing.start({screenshots:true,snapshots:true,sources:true});
    await page.addInitScript(()=>{
@@ -31,7 +32,9 @@ try {
    });
    await page.goto(`${url}?surface=motion&theme=light&tooltipMode=${mode}&tooltipContent=${contentMode}`,{waitUntil:"networkidle"});
    const trigger=page.locator('[data-tooltip-trigger="Primary"]'),before=page.locator('[data-tooltip-before="Primary"]');
+   if(pageErrors.length)throw Error(`Fixture page error: ${pageErrors.join("; ")}`);
    await before.focus();await page.keyboard.press("Tab");
+   if(pageErrors.length)throw Error(`Tooltip open page error: ${pageErrors.join("; ")}`);
    await page.waitForFunction(()=>document.querySelector('[data-tooltip-trigger="Primary"]')?.getAttribute("aria-describedby")&&document.querySelector('[data-tooltip-content="Primary"]')?.dataset.state!=="closed");
    await page.waitForFunction(()=>{const node=document.querySelector('[data-tooltip-content="Primary"]');return node&&node.dataset.side&&Number(getComputedStyle(node).opacity)>.99;},null,{timeout:1500});
    const anatomy=await page.evaluate(()=>{
@@ -85,7 +88,7 @@ try {
     result.siblingClose=true;result.pass=await page.evaluate(()=>(window.disabledActions??0)===0);
    }
    await page.screenshot({path:`${out}/${contentMode}-${mode}-${width}-${reducedMotion}-final.png`});
-  }catch(error){result.failure=String(error);result.pass=false;result.rows=await page.evaluate(()=>window.tooltipRows??[]).catch(()=>[]);}
+  }catch(error){result.failure=String(error);result.pass=false;result.pageErrors=pageErrors;result.rows=await page.evaluate(()=>window.tooltipRows??[]).catch(()=>[]);}
   finally{await context.tracing.stop({path:`${out}/${contentMode}-${mode}-${width}-${reducedMotion}-trace.zip`});result.video=`videos/${basename(await page.video().path())}`;await context.close();cases.push(result);await writeFile(`${out}/partial.json`,json({cases}));}
  }
  const receipt={cohort,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),scope:"Real Tooltip Root/Content; portal/inline locality,ref/asChild,24px sideOffset/viewport and labelled focusable group with disabled native child; Native Tab departure and fresh keyboard control; browser-local native DOM focus restoration after published close. Actual trusted focus and internal CustomEvent distinguished. Earlier native Shift+Tab attempts retained separately. No production or calibrated latency claim.",cases};
