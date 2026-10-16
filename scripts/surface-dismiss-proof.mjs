@@ -16,11 +16,12 @@ try {
       await page.goto(`${url}?surface=motion&theme=light`, { waitUntil: "networkidle" });
       const trigger = page.getByRole("button", { name: kind === "tooltip" ? "Hint" : `Open ${kind}`, exact: true });
       await trigger.focus();
+      await trigger.evaluate(node => { window.dismissTrigger = node; });
       if (kind === "tooltip") await trigger.hover(); else await trigger.press("Enter");
       const content = kind === "tooltip" ? page.getByText("Tooltip surface", { exact: true }).first() : page.getByRole("dialog");
       await content.waitFor();
       await content.evaluate(node => {
-        window.dismissProbe = { node, trigger: document.activeElement, events: [] };
+        window.dismissProbe = { node, trigger: window.dismissTrigger, events: [] };
         // Keep the real CSS/Motion running; withhold lifecycle events from Radix.
         for (const type of ["animationend", "animationcancel"]) document.addEventListener(type, event => {
           if (event.target === node) { window.dismissProbe.events.push({ type, at: performance.now(), withheld: true }); event.stopImmediatePropagation(); }
@@ -30,8 +31,6 @@ try {
         });
         observer.observe(document.body, { childList: true, subtree: true });
       });
-      // The opener, rather than the focused field, is the expected return target.
-      await trigger.evaluate(node => { window.dismissProbe.trigger = node; });
       await page.screenshot({ path: `${out}/${kind}-${width}-${reducedMotion}-open.png` });
       await page.keyboard.press("Escape");
       try {
