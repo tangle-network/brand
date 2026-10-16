@@ -13,12 +13,13 @@ function DisabledTooltip({ mode, name, contentMode }: { mode: string; name: stri
  const changed=(next:boolean)=>{(window as any).recordTooltip?.("accepted",{name,open:next});if(mode==="controlled")setOpen(next);};
  const state=mode==="controlled"?{open,onOpenChange:changed}:{defaultOpen:mode==="default",onOpenChange:changed};
  const contentRef=React.useCallback((node:HTMLElement|null)=>{((window as any).tooltipContentRefs??={})[name]=node;},[name]);
+ const explanation=`${name} action unavailable`;
  const contentProps={...(contentMode.startsWith("inline")?{portal:false}:{}),asChild:contentMode.endsWith("child"),side:"right" as const,sideOffset:24};
  return <div data-tooltip-local={name} className="flex flex-col items-start gap-3">
   <Button data-tooltip-before={name}>Before {name}</Button>
   <Tooltip {...state} delayDuration={100}><TooltipTrigger asChild><span tabIndex={0} role="group" aria-labelledby={`disabled-${name}`} data-tooltip-trigger={name}>
    <button id={`disabled-${name}`} disabled onClick={()=>{(window as any).disabledActions=((window as any).disabledActions??0)+1;}}>Unavailable {name}</button>
-  </span></TooltipTrigger><TooltipContent {...contentProps} ref={contentRef} data-tooltip-content={name}>{contentProps.asChild?<div data-tooltip-child>Unavailable {name} explanation</div>:<>Unavailable {name} explanation</>}</TooltipContent></Tooltip>
+  </span></TooltipTrigger><TooltipContent {...contentProps} ref={contentRef} data-tooltip-content={name}>{contentProps.asChild?<div data-tooltip-child>{explanation}</div>:explanation}</TooltipContent></Tooltip>
   <Button data-tooltip-after={name}>After {name}</Button>
  </div>;
 }

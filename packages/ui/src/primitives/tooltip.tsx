@@ -48,9 +48,12 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
  */
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 6, asChild, children, ...props }, ref) => (
-  <TooltipPrimitive.Portal>
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+    /** Render through a portal; use false to keep content in its local owner. */
+    portal?: boolean;
+  }
+>(({ className, sideOffset = 6, asChild, children, portal = true, ...props }, ref) => {
+  const content = (
     <TooltipPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
@@ -62,8 +65,9 @@ const TooltipContent = React.forwardRef<
       {...props}
       asChild
     ><SurfaceMotion kind="tooltip" asChild={asChild}>{children}</SurfaceMotion></TooltipPrimitive.Content>
-  </TooltipPrimitive.Portal>
-));
+  );
+  return portal ? <TooltipPrimitive.Portal>{content}</TooltipPrimitive.Portal> : content;
+});
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
