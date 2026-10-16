@@ -83,8 +83,9 @@ export async function provePresentationPackage(out, published) {
    assert.equal(manifest.name,published.registry.name);assert.equal(manifest.version,published.registry.version);
    assert.ok(manifest.exports["./presentation"],"Published UI presentation export missing");
    const releasedManifest=JSON.parse(execFileSync("git",["show",`${published.sourceSha}:packages/ui/package.json`],{encoding:"utf8"}));
+   assert.equal(manifest.version,releasedManifest.version,"Published UI version differs from released source");
    assert.deepEqual(manifest.dependencies,releasedManifest.dependencies,"Published UI dependency declarations differ from released source");
-   sources=["src/presentation.ts","src/lib/surface-motion.tsx","src/lib/motion.ts","src/primitives/button.tsx","src/primitives/popover.tsx","src/styles/presentation.css","src/styles/compat.css",
+   sources=["src/presentation.ts","src/lib/surface-motion.tsx","src/lib/motion.ts","src/primitives/button.tsx","src/primitives/popover.tsx","src/primitives/tooltip.tsx","src/styles/presentation.css","src/styles/compat.css",
     ...(manifest.exports["./code-presentation"]?["src/code-presentation.ts","src/lib/code-presentation.ts","src/markdown/code-block.tsx","src/markdown/api-schema.tsx"]:[])];
    for(const path of sources)assert.deepEqual(await readFile(join(packageRoot,path)),execFileSync("git",["show",`${published.sourceSha}:packages/ui/${path}`]),`Published UI source differs: ${path}`);
   }
