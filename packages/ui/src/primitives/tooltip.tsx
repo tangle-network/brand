@@ -24,7 +24,21 @@ const TooltipProvider = ({
 );
 TooltipProvider.displayName = "TooltipProvider";
 
-const Tooltip = TooltipPrimitive.Root;
+// Keep Radix on its controlled path even for the public uncontrolled API.
+// Its global tooltip.open event then runs before the new open state commits:
+// a retained content listener cannot turn its own accepted reopen into Close.
+const Tooltip = ({ open, defaultOpen = false, onOpenChange, ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) => {
+  const [localOpen, setLocalOpen] = React.useState(defaultOpen);
+  return <TooltipPrimitive.Root
+    {...props}
+    open={open ?? localOpen}
+    onOpenChange={(next) => {
+      if (open === undefined) setLocalOpen(next);
+      onOpenChange?.(next);
+    }}
+  />;
+};
+Tooltip.displayName = "Tooltip";
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
