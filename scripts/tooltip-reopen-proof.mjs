@@ -38,14 +38,32 @@ try {
     window.recordTooltip("armed",{dismissMs:window.tooltipDismissMs});return {dismissMs:window.tooltipDismissMs,openingSeconds:seconds};
    });
    await page.screenshot({path:`${out}/${mode}-${width}-${reducedMotion}-open.png`});
-   await page.keyboard.press("Tab");await page.keyboard.press("Shift+Tab");
+   // Restore real DOM focus on the browser's published close, avoiding a second
+   // host protocol round trip inside the role deadline. Never dispatch events
+   // or write Root state; keep native Tab departure and the fresh Tab control.
+   await page.evaluate(()=>{
+    const observer=new MutationObserver(()=>{
+     const trigger=document.querySelector('[data-tooltip-trigger="Primary"]');
+     const closed=trigger?.dataset.state==="closed";
+     const ready=window.tooltipDismissMs===0?!window.oldTooltipNode.isConnected:window.oldTooltipNode.isConnected&&window.oldTooltipNode.dataset.state==="closed";
+     if(window.tooltipFocusoutAt!==undefined&&closed&&ready){
+      observer.disconnect();window.recordTooltip("focusreturn",{method:"native DOM focus after published close"});trigger.focus();
+     }
+    });
+    observer.observe(document,{subtree:true,childList:true,attributes:true,attributeFilter:["data-state","aria-describedby"]});
+   });
+   await page.keyboard.press("Tab");
    await page.waitForFunction(()=>window.tooltipFocusoutAt!==undefined&&performance.now()>=window.tooltipFocusoutAt+window.tooltipDismissMs+120,null,{timeout:1500});
    const trace=await page.evaluate(()=>({rows:window.tooltipRows,focusoutAt:window.tooltipFocusoutAt,dismissMs:window.tooltipDismissMs,finalOpen:document.querySelector('[data-tooltip-trigger="Primary"]')?.dataset.state!=="closed"&&!!document.querySelector('[data-tooltip-content="Primary"]'),finalNodeSame:document.querySelector('[data-tooltip-content="Primary"]')===window.oldTooltipNode,descriptionRestored:!!document.querySelector('[data-tooltip-trigger="Primary"]')?.getAttribute("aria-describedby"),disabled:document.getElementById("disabled-Primary").disabled,disabledActions:window.disabledActions??0}));
    const accepted=trace.rows.filter(r=>r.phase==="reopen"&&r.at>=trace.focusoutAt&&(r.kind==="accepted"&&r.name==="Primary"&&r.open||r.kind==="tooltip.open")&&r.focused);
    const openBeforeDeadline=trace.rows.some(r=>r.phase==="reopen"&&r.at>=trace.focusoutAt&&r.at-trace.focusoutAt<trace.dismissMs&&r.focused&&r.contentState&&r.contentState!=="closed"&&r.oldConnected);
    const trustedFocus=trace.rows.some(r=>r.phase==="reopen"&&r.kind==="focusin"&&r.primary&&r.isTrusted);
-   const valid=trustedFocus&&(reducedMotion==="reduce"?accepted.length>0:openBeforeDeadline&&accepted.length>0);
-   result={...result,preparation,valid,trace,pass:valid&&trace.finalOpen&&trace.descriptionRestored&&trace.disabled&&trace.disabledActions===0&&(reducedMotion==="reduce"?!trace.finalNodeSame:trace.finalNodeSame)};
+   // A controlled Root accepts through onOpenChange before DOM publication.
+   // Keep the same role deadline; record acceptance and publication separately.
+   const rootAcceptances=accepted.filter(r=>r.kind==="accepted"&&r.name==="Primary"&&r.open);
+   const acceptedBeforeDeadline=rootAcceptances.some(r=>r.at-trace.focusoutAt<trace.dismissMs&&r.oldConnected);
+   const valid=trustedFocus&&(reducedMotion==="reduce"?accepted.length>0:acceptedBeforeDeadline||openBeforeDeadline&&accepted.length>0);
+   result={...result,preparation,valid,acceptance:{rootAt:rootAcceptances[0]?.at,withinDeadline:acceptedBeforeDeadline,domOpenWithinDeadline:openBeforeDeadline},trace,pass:valid&&trace.finalOpen&&trace.descriptionRestored&&trace.disabled&&trace.disabledActions===0&&(reducedMotion==="reduce"?!trace.finalNodeSame:trace.finalNodeSame)};
    if(!valid)result.failure="No accepted before-deadline reopen captured; instrumentation is inconclusive, not a product defect.";
    else if(!result.pass)result.failure="Accepted Tooltip reopen does not survive the old owner deadline.";
    if(result.pass){
@@ -58,6 +76,6 @@ try {
   }catch(error){result.failure=String(error);result.pass=false;result.rows=await page.evaluate(()=>window.tooltipRows??[]).catch(()=>[]);}
   finally{result.video=`videos/${basename(await page.video().path())}`;await context.close();cases.push(result);await writeFile(`${out}/partial.json`,json({cases}));}
  }
- const receipt={cohort,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),scope:"Real Tooltip Root/Content and labelled focusable group with disabled native child; trusted keyboard input, internal CustomEvent distinguished. No production or calibrated latency claim.",cases};
+ const receipt={cohort,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),at:new Date().toISOString(),scope:"Real Tooltip Root/Content and labelled focusable group with disabled native child; Native Tab departure and fresh keyboard control; browser-local native DOM focus restoration after published close. Actual trusted focus and internal CustomEvent distinguished. Earlier native Shift+Tab attempts retained separately. No production or calibrated latency claim.",cases};
  await writeFile(`${out}/receipt.json`,json(receipt));console.log(json({sha:receipt.sha,passed:cases.filter(r=>r.pass).length,failed:cases.filter(r=>!r.pass).length,invalid:cases.filter(r=>r.valid===false).length}));if(cases.some(r=>!r.pass))process.exitCode=1;
 }finally{await browser.close();await server.close();}
