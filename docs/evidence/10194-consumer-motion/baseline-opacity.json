@@ -1,0 +1,45 @@
+{
+  "sourceSha": "4c8209cd8f876bb6bf0132cd119a5dc74799c961",
+  "kind": "dialog",
+  "width": 390,
+  "boundary": "reopen",
+  "trace": {
+    "previous": {
+      "at": 2380.7,
+      "value": 0.98541,
+      "progress": 0.2705,
+      "opacity": 0.16701,
+      "connected": true
+    },
+    "before": {
+      "at": 2397.4,
+      "value": 0.985245,
+      "progress": 0.26225,
+      "opacity": 0.161465,
+      "connected": true
+    },
+    "after": {
+      "at": 2404.8,
+      "value": 0.985245,
+      "progress": 0.26225,
+      "opacity": 0.259924,
+      "connected": true
+    },
+    "frameMs": 16.7,
+    "elapsedMs": 7.4,
+    "axes": [
+      {
+        "axis": "progress",
+        "speed": 0.000494,
+        "allowed": 0.016882,
+        "displacement": 0
+      },
+      {
+        "axis": "opacity",
+        "speed": 0.000332,
+        "allowed": 0.012003,
+        "displacement": 0.098459
+      }
+    ]
+  }
+}
