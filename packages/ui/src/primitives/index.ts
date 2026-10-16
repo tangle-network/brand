@@ -217,6 +217,9 @@ export type { TagProps } from "./tag";
 export { Chip } from "./chip";
 export type { ChipProps } from "./chip";
 
+export { Wizard, WizardStep } from "./wizard";
+export type { WizardProps, WizardStepProps } from "./wizard";
+
 export { IconTile, initialsOf } from "./icon-tile";
 export type { IconTileProps } from "./icon-tile";
 
