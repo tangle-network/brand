@@ -12,10 +12,11 @@ type SurfaceProps = React.HTMLAttributes<HTMLDivElement> & {
   "data-state"?: string;
 };
 
-/** Radix owns state, focus and presence; Motion only retargets the visible object. */
+/** Radix owns state and focus; visual retirement cannot wait for a CSS event. */
 export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
   ({ kind, side = "right", asChild, "data-state": state, ...props }, forwardedRef) => {
     const element = React.useRef<HTMLDivElement | null>(null);
+    const [retired, setRetired] = React.useState(false);
     const values = React.useRef<Record<"opacity" | "scale" | "x" | "y", MotionValue<number>> | null>(null);
     const controls = React.useRef<Array<ReturnType<typeof animate>>>([]);
     const ref = React.useCallback<React.RefCallback<HTMLDivElement>>((node) => {
@@ -31,7 +32,10 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
       if (!node) return;
       const preference = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : undefined;
       let cancelRender: (() => void) | undefined;
+      let retirement: ReturnType<typeof setTimeout> | undefined;
       const run = () => {
+        clearTimeout(retirement);
+        setRetired(false);
         const closed = state === "closed";
         const bounds = node.getBoundingClientRect();
         const hidden = {
@@ -49,6 +53,14 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
           node.style.opacity = String(value.opacity);
           node.style.transform = `translateX(${value.x}px) translateY(${value.y}px) scale(${value.scale})`;
         };
+        // Radix may retain an exit until animationend. Retire this DOM node at
+        // the scoped deadline even when keyframes/events are missing or paused;
+        // its null ref lets Radix release presence, focus and modal resources.
+        // Reopen cancels retirement and keeps the same node and Motion values.
+        if (closed) {
+          if (preference?.matches || seconds <= 0 || style.animationName === "none") setRetired(true);
+          else retirement = setTimeout(() => setRetired(true), seconds * 1000);
+        }
         // Missing styles and reduced motion settle synchronously. No semantic
         // transition waits for a JavaScript completion callback.
         if (preference?.matches || seconds <= 0 || style.animationName === "none") {
@@ -73,13 +85,13 @@ export const SurfaceMotion = React.forwardRef<HTMLDivElement, SurfaceProps>(
       };
       run();
       preference?.addEventListener("change", run);
-      return () => { preference?.removeEventListener("change", run); cancelRender?.(); };
+      return () => { clearTimeout(retirement); preference?.removeEventListener("change", run); cancelRender?.(); };
     // Radix Popper temporarily suppresses animation until placement resolves.
     // Start the same retained values when that inline override clears.
     }, [state, kind, side, props.style?.animation]);
     React.useEffect(() => () => controls.current.forEach(control => control.stop()), []);
     const Component = asChild ? Slot : "div";
-    return <Component {...props} data-state={state} ref={ref} />;
+    return state === "closed" && retired ? null : <Component {...props} data-state={state} ref={ref} />;
   },
 );
 SurfaceMotion.displayName = "SurfaceMotion";
