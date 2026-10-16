@@ -13,6 +13,7 @@ try {
     page.on("pageerror", error => errors.push(error.message));
     let failure;
     try {
+      await context.tracing.start({screenshots:true,snapshots:true,sources:true});
       await page.goto(`${url}?surface=motion&theme=light`, { waitUntil: "networkidle" });
       const trigger = page.getByRole("button", { name: kind === "tooltip" ? "Hint" : `Open ${kind}`, exact: true });
       await trigger.focus();
@@ -41,6 +42,7 @@ try {
       await page.screenshot({ path: `${out}/${kind}-${width}-${reducedMotion}-closed.png` });
       cases.push({ width, reducedMotion, kind, pass: !failure, failure, actual, video: `videos/${basename(await page.video().path())}` });
     } finally {
+      await context.tracing.stop({path:`${out}/${kind}-${width}-${reducedMotion}-trace.zip`});
       await context.close();
       await writeFile(`${out}/partial.json`, JSON.stringify({ cases }, null, 2));
     }

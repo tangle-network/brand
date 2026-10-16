@@ -1,0 +1,366 @@
+{
+  "sha": "4ffd27539417ae714f4112b8eac729ea18eb5ff4",
+  "at": "2026-10-16T03:24:38.292Z",
+  "scope": "Isolated real Radix/Motion fixture; CSS end/cancel delivery withheld. No presented-frame latency or production claim.",
+  "cases": [
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 3471.2,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 3563.3
+          }
+        ]
+      },
+      "video": "videos/page@38d84d3d07867781169f9d17d6d5e6d6.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1524.2,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1600.1,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1610.7
+          }
+        ]
+      },
+      "video": "videos/page@7ba9bb56d038d118deb78f3379af45c3.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1567.2,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1655.7
+          }
+        ]
+      },
+      "video": "videos/page@577bec8be4db24abda411de2ef02a4d6.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationend",
+            "at": 1440.5,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1617.7
+          }
+        ]
+      },
+      "video": "videos/page@b4e7e4894d82b5e32233de160cce3ecc.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1309.2
+          }
+        ]
+      },
+      "video": "videos/page@c5123e2384fbc4119e66a64aeb25b604.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1206.2
+          }
+        ]
+      },
+      "video": "videos/page@7fa6410c131780d9ffaa11eddf2697af.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1378
+          }
+        ]
+      },
+      "video": "videos/page@699d4404bd49fe8764afc5a922d894cc.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1740.4
+          }
+        ]
+      },
+      "video": "videos/page@6ada2f178552bbb554aa1117cead2fd0.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1464.8,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1557,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1561.6
+          }
+        ]
+      },
+      "video": "videos/page@292b667aca75a8bba97e315783be6e97.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1399.8,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1485.3,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1491.4
+          }
+        ]
+      },
+      "video": "videos/page@caf8cdbf65be770670cedb117c8a8de9.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1306.9,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1398.9
+          }
+        ]
+      },
+      "video": "videos/page@3628765f48fce075106faaaacf02bfe4.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1286.8,
+            "withheld": true
+          },
+          {
+            "type": "detach",
+            "at": 1376.3
+          }
+        ]
+      },
+      "video": "videos/page@df73b831f3a63f4c71d1281e50409de8.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1222.9
+          }
+        ]
+      },
+      "video": "videos/page@2447e79c33245239f8591616371c09e9.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1195.3
+          }
+        ]
+      },
+      "video": "videos/page@30e53350c44b571b717162908682c663.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1215.6
+          }
+        ]
+      },
+      "video": "videos/page@06dc6e1891e78391ae8185efa9309b6a.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1224.5
+          }
+        ]
+      },
+      "video": "videos/page@562053f775872ee7fe87c4516f70d9c0.webm"
+    }
+  ]
+}
