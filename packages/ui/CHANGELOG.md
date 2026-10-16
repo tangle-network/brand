@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.38.1
+
+### Patch Changes
+
+- c049dc4: Bound shared surface dismissal by its scoped role deadline so missing CSS animation events cannot strand Radix cleanup or focus return. Preserve retained motion values on reopen.
+
 ## 11.38.0
 
 ### Minor Changes
