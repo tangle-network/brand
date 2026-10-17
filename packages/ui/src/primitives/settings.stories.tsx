@@ -1,0 +1,231 @@
+import { Bell, Bot, Check, CreditCard, Inbox, Loader2, Settings, Users, Workflow } from "lucide-react";
+import { useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+import { Avatar, AvatarFallback } from "./avatar";
+import { Button } from "./button";
+import { Card } from "./card";
+import { Field, fieldMessageId } from "./field";
+import { Input, Textarea } from "./input";
+import { PageHeader } from "./page-header";
+import { PageShell } from "./page-shell";
+import { SegmentedControl } from "./segmented-control";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
+import { SettingsList, SettingsListItem, SettingsRow, SettingsSection } from "./settings";
+import { Switch } from "./switch";
+
+/** Example data only: no routing, persistence or fetching. Every state is drawn at once so one screenshot shows them all. */
+
+const SECTIONS = [
+  { id: "general", label: "General", icon: Settings },
+  { id: "agent", label: "Agent", icon: Bot },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "automations", label: "Automations", icon: Workflow },
+  { id: "leads", label: "Inbound leads", icon: Inbox },
+  { id: "team", label: "Team", icon: Users, count: 4 },
+  { id: "billing", label: "Ad spend", icon: CreditCard },
+] as const;
+
+function Saving() {
+  return <><Loader2 aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />Saving…</>;
+}
+
+function Saved() {
+  return <span className="inline-flex items-center gap-1 text-[var(--surface-success-text)]"><Check aria-hidden="true" className="size-4" />Saved</span>;
+}
+
+const automations = [
+  { name: "Weekly competitor scan", meta: "Mondays at 09:00", state: "Active", verb: "Pause" },
+  { name: "Inbound lead triage", meta: "When a signed webhook arrives", state: "Paused", verb: "Resume", ownerOnly: true },
+  { name: "Daily brief", meta: "Every day at 08:00 · Europe/Berlin", state: "Couldn't start", verb: "Try again", error: "Platform didn't respond. Nothing ran; try again." },
+];
+
+const members = [
+  { name: "Priya Raman", email: "priya@fieldnote.example", role: "owner" },
+  { name: "Jonas Weber", email: "jonas@fieldnote.example", role: "admin" },
+  { name: "Ana Lima", email: "ana.lima.growth-operations-team@fieldnote-analytics.example", role: "editor" },
+];
+
+const roles = [
+  { value: "owner", label: "Owner" },
+  { value: "admin", label: "Can manage settings and people" },
+  { value: "editor", label: "Can edit and chat" },
+  { value: "viewer", label: "Can only view" },
+];
+
+function SettingsPage() {
+  const [current, setCurrent] = useState("team");
+  const [name, setName] = useState("Fieldnote GTM");
+  const [digest, setDigest] = useState(true);
+  const [approval, setApproval] = useState("each");
+  const [roleOf, setRoleOf] = useState<Record<string, string>>(Object.fromEntries(members.map((m) => [m.email, m.role])));
+
+  const navigation = SECTIONS.map((section) => {
+    const Icon = section.icon;
+    return (
+      <a key={section.id} href={`#${section.id}`} aria-current={current === section.id ? "page" : undefined} onClick={() => setCurrent(section.id)}>
+        <Icon aria-hidden="true" />
+        <span>{section.label}</span>
+        {"count" in section && <span data-count="">{section.count}</span>}
+      </a>
+    );
+  });
+
+  return (
+    <PageShell
+      measure="settings"
+      navigationLabel="Settings sections"
+      header={<PageHeader title="Project settings" description="Fieldnote GTM" />}
+      navigation={navigation}
+      article={<>
+        <SettingsSection id="general" title="General">
+          <SettingsRow label="Project name" htmlFor="project-name" status={<Saved />}>
+            <Input id="project-name" value={name} onChange={(event) => setName(event.target.value)} />
+          </SettingsRow>
+          <SettingsRow label="Timezone" htmlFor="timezone" description="Moves the digest hour; scheduled posts never move." info="Dates in chats, emails and exports use this zone.">
+            <Select defaultValue="berlin">
+              <SelectTrigger id="timezone" aria-describedby={fieldMessageId("timezone")}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="berlin">Europe/Berlin (UTC+2)</SelectItem>
+                <SelectItem value="new-york">America/New_York (UTC−4)</SelectItem>
+              </SelectContent>
+            </Select>
+          </SettingsRow>
+          <SettingsRow label="Business brief" layout="compact">
+            <Button type="button" variant="outline">Edit brief</Button>
+          </SettingsRow>
+          <SettingsRow label="Custom instructions" htmlFor="instructions" layout="stacked" status={<Saving />} description="Applies to new chats and the next automation run.">
+            <Textarea id="instructions" defaultValue="Write in plain English. Never promise delivery dates." />
+          </SettingsRow>
+        </SettingsSection>
+
+        <SettingsSection id="notifications" title="Notifications" description="Daily digest and approval notices go to the owner.">
+          <SettingsRow label="Daily digest" htmlFor="digest" layout="compact">
+            <Switch id="digest" checked={digest} onCheckedChange={setDigest} />
+          </SettingsRow>
+          <SettingsRow label="Approval notices" htmlFor="approval-mode">
+            <SegmentedControl
+              id="approval-mode"
+              aria-label="Approval notices"
+              value={approval}
+              onValueChange={setApproval}
+              options={[{ value: "each", label: "Each request" }, { value: "daily", label: "Once a day" }, { value: "never", label: "Never" }]}
+            />
+          </SettingsRow>
+          <SettingsRow label="Digest hour" htmlFor="digest-hour" error="Couldn't save the digest hour." onRetry={() => undefined}>
+            <Input id="digest-hour" defaultValue="08:00" />
+          </SettingsRow>
+          <SettingsRow label="Texting phone" htmlFor="texting-phone" disabledReason="Only Priya, the owner, can change the texting phone.">
+            <Input id="texting-phone" defaultValue="+1 (555) 010-0199" disabled />
+          </SettingsRow>
+          <SettingsRow label="Send today's digest" layout="compact">
+            <Button type="button" variant="outline">Send now</Button>
+          </SettingsRow>
+        </SettingsSection>
+
+        <SettingsSection id="automations" title="Automations" info="Automations run on the project's agent and are billed as compute." actions={<Button type="button" variant="outline">New automation</Button>}>
+          <SettingsList aria-label="Automations" columns={{ status: "8rem", actions: "8rem" }}>
+            {automations.map((job) => (
+              <SettingsListItem
+                key={job.name}
+                title={<a href={`#${job.name}`}>{job.name}</a>}
+                meta={job.meta}
+                status={job.error ? <span className="font-medium text-[var(--surface-danger-text)]">{job.state}</span> : job.state}
+                error={job.error}
+                actions={<Button type="button" variant="ghost">{job.verb}</Button>}
+                menu={[
+                  { label: "Duplicate", onSelect: () => undefined },
+                  job.ownerOnly
+                    ? { label: "Delete", tone: "danger", onSelect: () => undefined, disabledReason: "Only the owner can delete it." }
+                    : { label: "Delete", tone: "danger", onSelect: () => undefined },
+                ]}
+              />
+            ))}
+          </SettingsList>
+        </SettingsSection>
+
+        <SettingsSection id="team" title="Members" actions={<Button type="button">Invite</Button>}>
+          <SettingsList aria-label="Members" columns={{ leading: "32px", status: "18rem", menu: "36px" }}>
+            {members.map((member) => {
+              const roleId = `role-${member.email}`;
+              return (
+                <SettingsListItem
+                  key={member.email}
+                  leading={<Avatar className="size-8"><AvatarFallback>{member.name.split(" ").map((part) => part[0]).join("")}</AvatarFallback></Avatar>}
+                  title={member.name}
+                  meta={member.email}
+                  status={member.role === "owner" ? <span className="text-foreground">Owner</span> : (
+                    <Select value={roleOf[member.email]} onValueChange={(role) => setRoleOf((all) => ({ ...all, [member.email]: role }))}>
+                      <SelectTrigger id={roleId} aria-label={`Role for ${member.name}`}><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {roles.filter((role) => role.value !== "owner").map((role) => <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  menu={member.role === "owner" ? undefined : [{ label: "Remove from project", tone: "danger", onSelect: () => undefined }]}
+                />
+              );
+            })}
+          </SettingsList>
+        </SettingsSection>
+
+        <SettingsSection
+          id="billing"
+          title="Ad spend caps"
+          description="Ads pause when a cap is reached."
+          footer={<>
+            <span className="text-muted-foreground">2 unsaved changes</span>
+            <span className="ml-auto flex gap-2">
+              <Button type="button" variant="ghost">Discard</Button>
+              <Button type="button">Save caps</Button>
+            </span>
+          </>}
+        >
+          <SettingsRow label="Daily cap" htmlFor="daily-cap"><Input id="daily-cap" defaultValue="$40" /></SettingsRow>
+          <SettingsRow label="Monthly cap" htmlFor="monthly-cap"><Input id="monthly-cap" defaultValue="$900" /></SettingsRow>
+        </SettingsSection>
+
+        <SettingsSection id="delete" tone="danger" title="Delete project" description="Deletes every chat, vault file and automation for everyone." actions={<Button type="button" variant="outline">Delete project…</Button>} />
+      </>}
+    />
+  );
+}
+
+function FieldsExample() {
+  const [model, setModel] = useState("claude-sonnet");
+  return (
+    <div className="mx-auto max-w-xl p-6">
+      <Card className="space-y-4 p-4">
+        <Field label="Display name" htmlFor="display-name" hint="Shown in the sidebar and in emails.">
+          <Input id="display-name" defaultValue="Research agent" aria-describedby={fieldMessageId("display-name")} />
+        </Field>
+        <Field label="Default model" htmlFor="default-model" info="Replaces the profile's model for new chats." aside={<Button type="button" variant="ghost">Use default</Button>}
+          error={model.startsWith("claude") ? "This project's catalog refuses Anthropic models. Pick another." : undefined}>
+          <Select value={model} onValueChange={setModel}>
+            <SelectTrigger id="default-model" aria-invalid={model.startsWith("claude") || undefined} aria-describedby={fieldMessageId("default-model")}><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="claude-sonnet">claude-sonnet</SelectItem>
+              <SelectItem value="gpt-6.1-sol">gpt-6.1-sol</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Webhook URL" htmlFor="webhook" status="Reachable: the last check returned 200.">
+          <Input id="webhook" defaultValue="https://hooks.fieldnote.example/gtm/leads" aria-describedby={fieldMessageId("webhook")} />
+        </Field>
+      </Card>
+    </div>
+  );
+}
+
+const meta = {
+  title: "Primitives/Settings",
+  component: SettingsSection,
+  parameters: { layout: "fullscreen" },
+} satisfies Meta<typeof SettingsSection>;
+export default meta;
+type Story = StoryObj<typeof SettingsSection>;
+
+/** Every settings atom state on one page in PageShell measure="settings"; resize to see the nav switch at 60rem and rows stack at 34rem. */
+export const Page: Story = { render: () => <SettingsPage /> };
+
+/** The promoted Field: hint, info tip with an aside action, a live error, and a status. */
+export const Fields: Story = { render: () => <FieldsExample /> };

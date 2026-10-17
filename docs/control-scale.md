@@ -56,6 +56,17 @@ Fields fill with the well for the level they sit on (`--well`, re-declared by ea
 `Input` and `Textarea` render their `hint` and `error` props with `HelpText` and point `aria-describedby` at them.
 A field composed by hand uses `Label` and `HelpText` and sets `aria-describedby` itself.
 
+## Settings pages
+
+Settings compose four primitives from `@tangle-network/ui/primitives`, all at the 14px floor (section titles 16px) with controls at `md`:
+
+- `SettingsSection` is one card per group (at most four per page section), with an anchor `id`, an optional one-line description, top-right actions, a `danger` tone and a footer.
+- `SettingsRow` is one setting: label left, control right (`inline`), on the label's line (`compact`, for switches and single buttons) or under it (`stacked`). Its status sits after the label; an `error` or `disabledReason` replaces the description and is wired to the control through `fieldMessageId(htmlFor)`.
+- `SettingsList` and `SettingsListItem` are comparable rows with aligned state and action columns; destructive actions live only in the item's ⋯ menu.
+- `Field` is a labelled field for forms that are not rows, with the same message wiring.
+
+Rows and lists respond to their card's width, not the viewport's. `PageShell measure="settings"` frames the page: a 13rem section column beside a 48rem article from 60rem of frame width, and a 56px tab strip below that.
+
 ## Utilities
 
 Brand's Tailwind theme registers the scale for product code that is not a primitive:

@@ -23,6 +23,41 @@
   .tangle-reading-shell:has(.tangle-reading-outline) { grid-template-columns: 13rem minmax(0,1fr) 11rem; }
   .tangle-reading-outline { display: block; position: sticky; top: var(--shell-header-height); align-self: start; }
 }
+.tangle-reading-header { grid-column: 1 / -1; min-width: 0; }
+/* PageShell measure="settings". The frame is the query container, so the layout follows the content area's width, not the viewport's.
+   Below 60rem the navigation is a sticky tab strip whose track is the divider; from 60rem it is a sticky 13rem column beside a 48rem article. */
+.tangle-settings-frame { container: tangle-settings / inline-size; width: 100%; min-width: 0; }
+.tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 1.5rem; grid-template-columns: minmax(0,1fr); gap: 0; max-width: calc(13rem + 2.5rem + 48rem + 4rem); padding: 1.5rem var(--tangle-settings-gutter) 3rem; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-header { margin-bottom: 0.5rem; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-header > * { margin-bottom: 0; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-outline { display: none; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-article { max-width: 48rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav { position: sticky; top: 0; z-index: 3; display: flex; align-items: flex-end; gap: 0.25rem; height: var(--shell-header-height); max-height: none; margin: 0 calc(-1 * var(--tangle-settings-gutter)) 1.25rem; padding: 0 var(--tangle-settings-gutter); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; background: hsl(var(--background)); box-shadow: inset 0 -1px 0 hsl(var(--border)); }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav::-webkit-scrollbar { display: none; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav > :is(ul, ol) { display: flex; flex: none; align-items: flex-end; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a { flex: none; display: flex; align-items: center; gap: 0.5rem; min-height: var(--control-height-lg, 2.75rem); padding: 0 0.75rem; color: hsl(var(--muted-foreground)); font-size: var(--font-size-label, 0.875rem); font-weight: 500; line-height: 1.25rem; white-space: nowrap; text-decoration: none; transition: color var(--motion-control), background-color var(--motion-control), box-shadow var(--motion-control); }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a > svg { display: none; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a > [data-count] { color: var(--text-dim); font-weight: 400; font-variant-numeric: tabular-nums; }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a:hover { color: hsl(var(--foreground)); box-shadow: inset 0 -2px 0 hsl(var(--hsl-ring) / 0.4); }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a[aria-current="page"] { color: var(--accent-text); font-weight: 500; background: hsl(var(--hsl-ring) / 0.07); box-shadow: inset 0 -2px 0 var(--ix-sel-ring); }
+.tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a:focus-visible { outline: 1px solid var(--focus-border); outline-offset: -1px; box-shadow: inset 0 0 0 4px var(--focus-halo); }
+@container tangle-settings (max-width: 40rem) {
+  .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 1rem; padding: 1rem var(--tangle-settings-gutter) 2.5rem; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav { margin-bottom: 1rem; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-article { gap: 1rem; }
+}
+@container tangle-settings (min-width: 60rem) {
+  .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 2rem; grid-template-columns: 13rem minmax(0,48rem); column-gap: 2.5rem; align-items: start; padding: 2rem; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-header { margin-bottom: 1.75rem; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav { top: 2rem; flex-direction: column; align-items: stretch; gap: 2px; height: auto; margin: 0; padding: 0; overflow: visible; background: none; box-shadow: none; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav > :is(ul, ol) { flex-direction: column; align-items: stretch; gap: 2px; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a { min-height: var(--control-height, 2.25rem); gap: 0.625rem; padding: 0 0.625rem; border-radius: var(--radius-md); }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a > svg { display: block; flex: none; width: 1rem; height: 1rem; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a > [data-count] { margin-inline-start: auto; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a:hover { background: var(--ix-hover-bg); box-shadow: none; }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a[aria-current="page"] { background: var(--ix-sel-bg); box-shadow: inset 0 0 0 1px var(--ix-sel-ring); }
+  .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav a:focus-visible { outline-offset: 0; box-shadow: 0 0 0 4px var(--focus-halo); }
+}
 /* Native dialog has the same solid reading surface as React's Dialog/Sheet. */
 .tangle-native-dialog { max-width: min(32rem,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); background: hsl(var(--card)); color: hsl(var(--card-foreground)); }
 .tangle-native-dialog::backdrop { background: var(--scrim); }
