@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises"
 import { expect, test } from "playwright/test"
 
 const coverName = "cover-image-with-a-long-filename-for-project-review.png"
@@ -15,6 +16,49 @@ async function openStory(page, id, theme) {
   await page.locator("#storybook-root").waitFor()
   await page.evaluate(() => document.fonts.ready)
   return errors
+}
+
+
+// Chromium's beyond-viewport capture can temporarily clear touch emulation.
+// Playwright restores it after capture, but the resulting pixels may depict
+// fine-pointer controls: https://github.com/microsoft/playwright/issues/42607.
+// Keep coarse-pointer evidence inside the viewport and record its actual state.
+async function captureTouchControls(page, testInfo, name, selector) {
+  const scope = page.locator(selector)
+  await scope.scrollIntoViewIfNeeded()
+  await expect(scope).toBeInViewport({ ratio: 1 })
+  const measure = () => scope.evaluate((node) => ({
+    coarse: matchMedia("(pointer: coarse)").matches,
+    fine: matchMedia("(pointer: fine)").matches,
+    maxTouchPoints: navigator.maxTouchPoints,
+    viewport: { width: innerWidth, height: innerHeight, scale: visualViewport.scale },
+    scrollY,
+    controls: [...node.querySelectorAll("input, button")].map((control) => {
+      const { x, y, width, height } = control.getBoundingClientRect()
+      return { name: control.getAttribute("aria-label") || control.textContent.trim(), x, y, width, height, fontSize: getComputedStyle(control).fontSize }
+    }),
+  }))
+  const assertTouch = (state) => {
+    expect(state.coarse).toBe(true)
+    expect(state.fine).toBe(false)
+    expect(state.maxTouchPoints).toBeGreaterThan(0)
+    expect(state.controls.length).toBeGreaterThan(0)
+    for (const control of state.controls) {
+      expect(control.height, `${control.name} capture height`).toBeGreaterThanOrEqual(44)
+      expect(control.width, `${control.name} capture width`).toBeGreaterThanOrEqual(44)
+    }
+  }
+  const before = await measure()
+  assertTouch(before)
+  const screenshot = testInfo.outputPath(`${name}.png`)
+  await page.screenshot({ path: screenshot, fullPage: false })
+  const after = await measure()
+  const statePath = testInfo.outputPath(`${name}-state.json`)
+  await writeFile(statePath, JSON.stringify({ capture: "viewport-only", selector, before, after }, null, 2))
+  await testInfo.attach(name, { path: screenshot, contentType: "image/png" })
+  await testInfo.attach(`${name} state`, { path: statePath, contentType: "application/json" })
+  assertTouch(after)
+  expect(after, "capture preserves the measured input mode and geometry").toEqual(before)
 }
 
 for (const theme of ["light", "dark"]) {
@@ -61,7 +105,16 @@ for (const theme of ["light", "dark"]) {
         await expect(page.locator("[data-action-count]")).toHaveText("1")
         expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
         expect(errors).toEqual([])
-        await page.screenshot({ path: testInfo.outputPath("controls.png"), fullPage: true })
+        if (coarse) {
+          for (const size of Object.keys(fineHeights)) {
+            await captureTouchControls(page, testInfo, `controls-${size}`, `[data-size-row="${size}"]`)
+          }
+          await captureTouchControls(page, testInfo, "controls-icons", 'section[aria-label="Icon controls"]')
+          await captureTouchControls(page, testInfo, "controls-density", "[data-density]")
+          await captureTouchControls(page, testInfo, "controls-nested-themes", '[data-scope="light"]')
+        } else {
+          await page.screenshot({ path: testInfo.outputPath("controls.png"), fullPage: true })
+        }
       })
 
       test("upload actions have file-specific names, shared focus and repeatable recovery", async ({ page }, testInfo) => {
