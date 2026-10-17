@@ -123,7 +123,7 @@ function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection id="automations" title="Automations" info="Automations run on the project's agent and are billed as compute." actions={<Button type="button" variant="outline">New automation</Button>}>
-          <SettingsList aria-label="Automations" columns={{ status: "8rem", actions: "8rem" }}>
+          <SettingsList aria-label="Automations" columns={{ status: "8rem", actions: "9rem" }}>
             {automations.map((job) => (
               <SettingsListItem
                 key={job.name}
@@ -150,7 +150,7 @@ function SettingsPage() {
               return (
                 <SettingsListItem
                   key={member.email}
-                  leading={<Avatar className="size-8"><AvatarFallback>{member.name.split(" ").map((part) => part[0]).join("")}</AvatarFallback></Avatar>}
+                  leading={<Avatar className="h-8 w-8"><AvatarFallback>{member.name.split(" ").map((part) => part[0]).join("")}</AvatarFallback></Avatar>}
                   title={member.name}
                   meta={member.email}
                   status={member.role === "owner" ? <span className="text-foreground">Owner</span> : (

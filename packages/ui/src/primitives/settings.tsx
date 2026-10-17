@@ -219,7 +219,7 @@ export interface SettingsListColumns {
   leading?: string;
   /** The title column; `minmax(0,1fr)` by default. */
   main?: string;
-  /** A fixed state column, such as `"8rem"`. Below 34rem the state moves under the title. */
+  /** A fixed state column, such as `"8rem"`. Below 34rem the state moves under the title, full width. */
   status?: string;
   /** A fixed column for row actions, such as `"11rem"`. Below 34rem it shrinks to its content. */
   actions?: string;
@@ -229,12 +229,21 @@ export interface SettingsListColumns {
 
 const LIST_SLOTS = ["leading", "main", "status", "actions", "menu"] as const;
 
+const LENGTH = /^[\d.]+(?:px|rem|em|ch)$/;
+
 function listTracks(columns: SettingsListColumns, narrow: boolean) {
-  return LIST_SLOTS.flatMap((slot) => {
-    if (slot === "main") return [`[main] ${columns.main ?? "minmax(0,1fr)"}`];
+  const tracks = LIST_SLOTS.flatMap((slot): Array<[string, string]> => {
+    if (slot === "main") return [[slot, columns.main ?? "minmax(0,1fr)"]];
     const width = columns[slot];
     if (!width || (narrow && slot === "status")) return [];
-    return [`[${slot}] ${narrow && slot === "actions" ? "auto" : width}`];
+    return [[slot, narrow && slot === "actions" ? "auto" : width]];
+  });
+  // A subgrid item's inline padding (px-5, px-4 when narrow) lands on its edge
+  // cells as extra margin, so a fixed edge track grows by it to keep its width.
+  const pad = narrow ? "1rem" : "1.25rem";
+  return tracks.map(([slot, width], index) => {
+    const edge = index === 0 || index === tracks.length - 1;
+    return `[${slot}] ${edge && LENGTH.test(width) ? `calc(${width} + ${pad})` : width}`;
   }).join(" ");
 }
 
@@ -249,8 +258,8 @@ export interface SettingsListProps {
 
 /**
  * Comparable rows whose status and action columns line up across items (CSS
- * subgrid). Below 34rem each item becomes two lines: the title and meta, then
- * the state under them, with actions on the right.
+ * subgrid). Below 34rem each item becomes two lines: the title and meta with
+ * actions on the right, then the state under them at full width.
  */
 export function SettingsList({ columns, children, "aria-label": ariaLabel, "data-testid": testId }: SettingsListProps) {
   const style = {
@@ -335,7 +344,8 @@ function ItemMenu({ items, titleId }: { items: SettingsListMenuItem[]; titleId: 
   );
 }
 
-const NARROW_STATUS = "@max-[34rem]/settings-section:col-start-[main] @max-[34rem]/settings-section:row-start-2 @max-[34rem]/settings-section:mt-2";
+// Below 34rem the state takes a second line from the title to the card edge, so a role select gets the full width.
+const NARROW_STATUS = "@max-[34rem]/settings-section:col-start-[main] @max-[34rem]/settings-section:col-end-[-1] @max-[34rem]/settings-section:row-start-2 @max-[34rem]/settings-section:mt-2";
 
 /** One item in a {@link SettingsList}. Slots go to the list's columns; a slot without a column flows into the title cell. */
 export function SettingsListItem({ leading, title, meta, status, error, actions, menu, "data-testid": testId }: SettingsListItemProps) {
@@ -375,7 +385,7 @@ export function SettingsListItem({ leading, title, meta, status, error, actions,
         <div className={cn("col-start-[status] row-start-1 min-w-0 text-sm leading-5 text-muted-foreground", NARROW_STATUS)}>{status}</div>
       )}
       {actionCell && columns.actions && (
-        <div className="col-start-[actions] row-start-1 flex min-w-0 items-center justify-end gap-1 @max-[34rem]/settings-section:row-[1/span_2]">{actionCell}</div>
+        <div className="col-start-[actions] row-start-1 flex min-w-0 items-center justify-end gap-1">{actionCell}</div>
       )}
       {menuNode && columns.menu && <div className="col-start-[menu] row-start-1 flex justify-end">{menuNode}</div>}
     </li>

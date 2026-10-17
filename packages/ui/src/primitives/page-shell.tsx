@@ -17,7 +17,7 @@ export interface PageShellProps {
    * column. `settings` is a 48rem column of cards whose navigation is a sticky
    * 13rem column of rows when the shell's own width is at least 60rem, and a
    * sticky 56px tab strip under the header below that; the current link
-   * (`aria-current="page"`) is kept in view by scrolling the strip only. Put
+   * (`aria-current="page"`) is centred by scrolling the strip only. Put
    * links (or a list of links) in `navigation`; an `svg` in a link shows only
    * in the column, and an element with `data-count` sits at its end.
    */
@@ -27,7 +27,10 @@ export interface PageShellProps {
   className?: string;
 }
 
-/** Keep the current link of a horizontally scrolling nav in view, moving the strip and never the page. */
+/**
+ * Centre the current link of a horizontally scrolling nav, so the links on
+ * both sides show that the strip scrolls. It moves the strip, never the page.
+ */
 function useCurrentLinkInView(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
   React.useEffect(() => {
     const nav = ref.current;
@@ -36,11 +39,9 @@ function useCurrentLinkInView(ref: React.RefObject<HTMLElement | null>, enabled:
       if (nav.scrollWidth <= nav.clientWidth) return;
       const current = nav.querySelector<HTMLElement>('[aria-current="page"]');
       if (!current) return;
-      const inset = Number.parseFloat(getComputedStyle(nav).paddingInlineStart) || 0;
       const strip = nav.getBoundingClientRect();
       const link = current.getBoundingClientRect();
-      if (link.left < strip.left + inset) nav.scrollLeft -= strip.left + inset - link.left;
-      else if (link.right > strip.right - inset) nav.scrollLeft += link.right - (strip.right - inset);
+      nav.scrollLeft += link.left + link.width / 2 - (strip.left + strip.width / 2);
     };
     reveal();
     const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reveal);

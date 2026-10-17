@@ -111,9 +111,11 @@ for (const theme of ["light", "dark"]) {
     // List columns line up across items, and the title is the link.
     const jobs = page.getByRole("list", { name: "Automations" }).locator(":scope > li")
     await expect(jobs).toHaveCount(3)
-    const menuLefts = []
-    for (let i = 0; i < 3; i++) menuLefts.push(Math.round((await box(jobs.nth(i).getByRole("button", { name: /More actions/ }))).left))
-    expect(new Set(menuLefts).size, "menu buttons share a column").toBe(1)
+    const menuRights = []
+    for (let i = 0; i < 3; i++) menuRights.push(Math.round((await box(jobs.nth(i).getByRole("button", { name: /More actions/ }))).right))
+    expect(new Set(menuRights).size, "menu buttons end on one line").toBe(1)
+    const card = await box(page.getByRole("region", { name: "Automations" }))
+    expect(card.right - menuRights[0], "the last column keeps the card's 20px inset").toBeCloseTo(21, 0)
     await expect(jobs.first().getByRole("link", { name: "Weekly competitor scan" })).toBeVisible()
     await expect(jobs.nth(2).getByRole("alert")).toContainText("Platform didn't respond")
     const statusLefts = []
@@ -174,8 +176,9 @@ for (const theme of ["light", "dark"]) {
     expect(metrics.scrollLeft, "the strip scrolled to the current tab").toBeGreaterThan(0)
     const current = nav.locator('a[aria-current="page"]')
     const tab = await box(current)
-    expect(tab.left, "current tab fully in view").toBeGreaterThanOrEqual(navBox.left)
-    expect(tab.right).toBeLessThanOrEqual(navBox.right)
+    expect(tab.left, "current tab in view, clear of the edge").toBeGreaterThanOrEqual(navBox.left + 16)
+    expect(tab.right).toBeLessThanOrEqual(navBox.right - 16)
+    expect(Math.abs((tab.left + tab.right) / 2 - (navBox.left + navBox.right) / 2), "current tab centred").toBeLessThan(2)
     expect(tab.height, "tabs are 44px").toBe(44)
     expect(await page.evaluate(() => [window.scrollX, window.scrollY]), "only the strip scrolled, never the page").toEqual([0, 0])
     await expect(nav.locator("svg").first(), "icons show only in the column").toBeHidden()
@@ -204,6 +207,8 @@ for (const theme of ["light", "dark"]) {
     const roleBox = await box(role)
     expect(roleBox.top, "role select under the name").toBeGreaterThan(nameLine.bottom)
     expect(roleBox.left, "role select starts at the name").toBeCloseTo(nameLine.left, 0)
+    const memberCard = await box(page.getByRole("region", { name: "Members" }))
+    expect(roleBox.right, "role select runs to the card's inset").toBeCloseTo(memberCard.right - 17, 0)
     const value = role.locator(":scope > span").first()
     expect(await value.evaluate((node) => node.scrollWidth <= node.clientWidth), "the role name is not cut off").toBe(true)
     const email = await box(page.getByText("ana.lima.growth-operations-team@fieldnote-analytics.example"))
