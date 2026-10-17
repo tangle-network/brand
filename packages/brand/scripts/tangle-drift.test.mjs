@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
-import { GATED, UsageError, compare, DEFAULT_BASELINE, localSource, main, measure, readBaseline, remoteSource, risenFiles, updateBaseline } from "../bin/tangle-drift.mjs";
+import { GATED, UsageError, DEFAULT_BASELINE, localSource, main, measure, readBaseline, remoteSource, risenFiles, updateBaseline, writeBaseline } from "../bin/tangle-drift.mjs";
 
 const tmp = mkdtempSync(join(tmpdir(), "tangle-drift-"));
 after(() => rmSync(tmp, { recursive: true, force: true }));
@@ -195,30 +195,64 @@ test("hex ignores issue references in comments but counts colours in code and CS
   assert.equal(row.hex, 2);
 });
 
-test("compare reports rises and falls on gated metrics only", () => {
-  const base = { raw_palette: 3, hex: 4, arbitrary_color: 2, css_var_defs: 2, local_primitive_count: 3, font_size_literal: 1, size_literal: 0, native_control: 2, control_override: 0, page_heading: 0, shell_override: 0, header_height_literal: 0, transcript_type_override: 0, importing_files: { ui: 9 } };
-  assert.deepEqual(compare(base, { ...base, importing_files: { ui: 0 } }), { rises: [], falls: [], unrecorded: [] });
-  const { rises, falls } = compare(base, { ...base, raw_palette: 4, hex: 1 });
-  assert.deepEqual(rises, [{ metric: "raw_palette", base: 3, now: 4 }]);
-  assert.deepEqual(falls, [{ metric: "hex", base: 4, now: 1 }]);
-});
+test("settings_layout counts settings pages that do not compose settings-react, and gates new ones", () => {
+  const dir = join(tmp, "settings");
+  mkdirSync(dir);
+  git(dir, "init", "-q", "-b", "main");
+  const shared = 'import { SettingsLayout } from "@tangle-network/agent-app/settings-react";\n';
+  write(dir, {
+    "src/routes/app.workspace.settings.tsx": shared, // composes, so its section routes are covered
+    "src/routes/app.workspace.settings.team.tsx": "export default function Team() {}\n",
+    "src/routes/app.workspace.settings_.export.tsx": "export default function Export() {}\n", // 1: leaves the layout
+    "src/routes/app.account.settings.tsx": `// ${shared}`, // 1: a comment composes nothing
+    "app/org/settings/layout.tsx": shared, // a Next.js layout covers the pages beneath it
+    "app/org/settings/billing/page.tsx": "export default function Billing() {}\n",
+    "app/settings/page.tsx": shared, // a page covers only itself
+    "app/settings/team/page.tsx": "export default function Team() {}\n", // 1
+    "src/pages/settings/index.astro": `---\n${shared}---\n`, // an index covers only itself
+    "src/pages/settings/team.astro": "<div />\n", // 1
+    "src/web/SSOSettings.tsx": "export function SSOSettings() {}\n", // 1: named for its settings
+    "src/pages/dashboard/settings/DangerZoneSection.tsx": "export function DangerZoneSection() {}\n", // a part of a page
+    "src/components/settings/Toggle.tsx": "export function Toggle() {}\n", // neither a page nor named for settings
+    "src/hooks/useSettings.tsx": "export function useSettings() {}\n", // a hook, not a page
+    "src/components/header/SettingsMenu.tsx": "export function SettingsMenu() {}\n", // a control, not a page
+    "src/routes/app.settings.test.tsx": "export {};\n", // tests are excluded
+  });
+  commit(dir, "settings");
+  const { row } = measure("gtm", localSource(dir));
+  assert.deepEqual(Object.keys(row.by_file.settings_layout),
+    ["app/settings/team/page.tsx", "src/pages/settings/team.astro", "src/routes/app.account.settings.tsx",
+      "src/routes/app.workspace.settings_.export.tsx", "src/web/SSOSettings.tsx"]);
 
-test("a metric the baseline row has not recorded is reported, not gated, and is recorded on update", () => {
-  const old = { raw_palette: 3, hex: 4, arbitrary_color: 0, css_var_defs: 0, local_primitive_count: 0, by_file: { raw_palette: { "a.tsx": 3 } } };
-  const now = { ...old, font_size_literal: 7, size_literal: 2, native_control: 5, control_override: 1, page_heading: 3, shell_override: 2, header_height_literal: 4, transcript_type_override: 1,
-    by_file: { ...old.by_file, font_size_literal: { "a.tsx": 7 }, size_literal: { "a.tsx": 2 }, native_control: { "a.tsx": 5 }, control_override: { "a.tsx": 1 }, page_heading: { "a.tsx": 3 }, shell_override: { "a.tsx": 2 }, header_height_literal: { "a.css": 4 }, transcript_type_override: { "a.css": 1 } } };
-  const { rises, unrecorded } = compare(old, now);
-  assert.deepEqual(rises, []);
-  assert.deepEqual(unrecorded.map((u) => u.metric), ["font_size_literal", "size_literal", "native_control", "control_override", "page_heading", "shell_override", "header_height_literal", "transcript_type_override"]);
-  assert.deepEqual(updateBaseline({ gtm: old }, { gtm: now }).next.gtm, now);
-  // A row refused for a rise keeps its old counts but still records the new metrics.
-  const risen = { ...now, raw_palette: 9 };
-  const { next, refused } = updateBaseline({ gtm: old }, { gtm: risen });
-  assert.equal(refused[0].surface, "gtm");
-  assert.equal(next.gtm.raw_palette, 3);
-  assert.equal(next.gtm.font_size_literal, 7);
-  assert.deepEqual(next.gtm.by_file.font_size_literal, { "a.tsx": 7 });
-  assert.deepEqual(next.gtm.by_file.raw_palette, { "a.tsx": 3 });
+  // A consumer baseline written before the metric existed reports it without gating it.
+  const baselinePath = join(tmp, "settings-baseline.json");
+  const older = { ...row, by_file: { ...row.by_file } };
+  delete older.settings_layout;
+  delete older.by_file.settings_layout;
+  writeBaseline(baselinePath, { gtm: older });
+  const run = (...args) => {
+    const lines = [];
+    const code = main(["check", "--surface", "gtm", "--repo-dir", dir, "--baseline", baselinePath, ...args], (s) => lines.push(s));
+    return { code, out: lines.join("\n") };
+  };
+  const unrecorded = run();
+  assert.equal(unrecorded.code, 0);
+  assert.match(unrecorded.out, /not yet in this baseline \(not gated\): settings_layout=5/);
+  assert.equal(run("--update-baseline").code, 0);
+  assert.equal(readBaseline(baselinePath).gtm.settings_layout, 5);
+
+  write(dir, { "src/routes/app.billing-settings.tsx": "export default function Billing() {}\n" });
+  commit(dir, "a new local settings page");
+  const planted = run();
+  assert.equal(planted.code, 1);
+  assert.match(planted.out, /FAIL settings_layout: 6 > baseline 5/);
+  assert.match(planted.out, /src\/routes\/app\.billing-settings\.tsx:1: imports nothing from @tangle-network\/agent-app\/settings-react/);
+
+  write(dir, { "src/routes/app.billing-settings.tsx": shared, "src/routes/app.workspace.settings_.export.tsx": shared });
+  commit(dir, "compose both from settings-react");
+  const adopted = run();
+  assert.equal(adopted.code, 0);
+  assert.match(adopted.out, /lower than baseline: settings_layout 5 -> 4/);
 });
 
 test("risenFiles names the files above their own baseline count", () => {
