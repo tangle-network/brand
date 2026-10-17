@@ -4,6 +4,14 @@
 
 Tangle makes delegated work visible, usable and controllable. A cropped canonical knot, concentrated display typography and restrained indigo atmosphere establish identity. Atmosphere recedes inside work: quiet, aligned planes give artifacts room to read, compare and use. Approval foregrounds consequences; completion foregrounds the artifact. Marketing makes a memorable argument backed by product proof. Editorial pages use paper, ink and sustained reading.
 
+## From intent to a working product
+
+Before composing screens, name the user's job, the first useful artifact and what makes completion trustworthy. Choose a strong default path for that task; reveal advanced choices when they become useful. Ask only for information or decisions the product cannot safely infer. Explain consequential defaults and keep them reversible where possible. Defaults never replace required consent for spending, publishing, permissions or other consequential actions.
+
+Encode this judgment in existing templates, starters and shared compositions with runnable examples. Skills link to this policy and teach its application. Verify that an instantiated template or generated app inherits the intended experience; updated instructions alone do not establish adoption. Label sample data and simulated outcomes.
+
+Use the [reference-journey brief](design-refresh.md) to apply this vision across products. It adds no role, approval service or merge gate; detailed measurement remains in the [evidence contract](design-evidence-contract.md).
+
 ## Visual grammar
 
 Keep the canonical knot intact; crop or scale supplied assets. Router’s grid, centered composition, badges and loops are choices for that page. Use supplied smooth waves for launches and light wave/paper assets for editorial work.
@@ -45,7 +53,7 @@ Tokens need a cross-app reason; reusable components need a consumer or migration
 1. Hierarchy follows the task. Keep one primary action per view; a modal temporarily owns priority.
 2. Artifacts carry value. Show useful partial results and controls during execution, exact consequences during approval, and artifact use after completion.
 3. Trust requires provenance. Distinguish proposals, attempts, observations and verified results; reasoning summaries cannot establish correctness.
-4. Delegation preserves control. Interruption, approval, failure, reconciliation and return belong in the workflow. Preserve work.
+4. Delegation preserves control. Design the complete journey from intent and first useful result through correction, completion and return. Interruption, approval, failure and reconciliation belong in that journey. Preserve work.
 5. Density serves comparison. Align comparable rows, expose necessary fields together and give documents a reading measure. Containers and smaller type do not establish density.
 6. Motion gives objects coherent behavior. Response, tactility, continuity and recognition justify it; frequency and attention determine its amount.
 7. Shared behavior builds recognition. Preserve action names, semantics, keyboard behavior and consequences across products.
@@ -99,4 +107,4 @@ Optimism requires reversibility, pending identity and rollback. Acknowledge exte
 | Survive real content | Empty, long, large, slow and failed fixtures. |
 | Spend motion deliberately | Purposeful continuity, immediate reversal and reduced-motion behavior. |
 
-For major redesigns compare three distinct approaches on the same real task. Judge craft separately from task success, using [Apple’s fluid interfaces](https://developer.apple.com/videos/play/wwdc2018/803/) and shipped products. Drew approves design direction. The [evidence contract](design-evidence-contract.md) owns measurement and study protocols. Brand owns shared policy, tokens and recipes; product docs own composition/recovery, skills own procedures. The [reconciliation](design-rule-reconciliation.md) records rule ownership.
+For major redesigns compare three materially different compositions or interaction models on the same real task, content and constraints. Change hierarchy, density or interaction emphasis, not only decoration. Critique the running product while performing the journey; use matched evidence to identify what to keep, change and verify, and repeat the affected path after revisions. Small fixes can reuse unaffected evidence without a new exploration exercise. Judge craft separately from task success, using [Apple’s fluid interfaces](https://developer.apple.com/videos/play/wwdc2018/803/) and shipped products. Drew approves design direction. The [evidence contract](design-evidence-contract.md) owns measurement and study protocols. Brand owns shared policy, tokens and recipes; product docs own composition/recovery, skills own procedures. The [reconciliation](design-rule-reconciliation.md) records rule ownership.
