@@ -108,6 +108,15 @@ for (const theme of ["light", "dark"]) {
     // A description describes its control too.
     await expectDescribedBy(page.locator("#instructions"), page.locator("#instructions-message"))
 
+    // The info tip opens on focus with 14px text.
+    const tip = row(page, "Timezone").getByRole("button", { name: "About Timezone" })
+    await tip.focus()
+    const tooltip = page.getByRole("tooltip")
+    await expect(tooltip).toContainText("Dates in chats")
+    expect(await page.locator("[data-radix-popper-content-wrapper] > *").first().evaluate((node) => getComputedStyle(node).fontSize)).toBe("14px")
+    await shot(page, testInfo, `info-tip-1280-${theme}.png`)
+    await page.keyboard.press("Escape")
+
     // List columns line up across items, and the title is the link.
     const jobs = page.getByRole("list", { name: "Automations" }).locator(":scope > li")
     await expect(jobs).toHaveCount(3)
@@ -148,14 +157,6 @@ for (const theme of ["light", "dark"]) {
     expect(colors.border).not.toBe(await page.getByRole("region", { name: "General" }).evaluate((node) => getComputedStyle(node).borderTopColor))
     expect(colors.title).not.toBe(await page.getByRole("region", { name: "General" }).evaluate((node) => getComputedStyle(node.querySelector("h2")).color))
 
-    // The info tip opens on focus with 14px text.
-    const tip = row(page, "Timezone").getByRole("button", { name: "About Timezone" })
-    await tip.focus()
-    const tooltip = page.getByRole("tooltip")
-    await expect(tooltip).toContainText("Dates in chats")
-    expect(await page.locator("[data-radix-popper-content-wrapper] > *").first().evaluate((node) => getComputedStyle(node).fontSize)).toBe("14px")
-    await shot(page, testInfo, `info-tip-1280-${theme}.png`)
-    await page.keyboard.press("Escape")
 
     expect(await smallText(page), "no visible text under 14px").toEqual([])
     expect(await pageOverflow(page), "no sideways page scroll").toBeLessThanOrEqual(1)
@@ -251,4 +252,21 @@ test("settings page in an 820 px pane: tab strip with side-by-side rows", async 
   expect((await box(page.locator("#project-name"))).left, "rows stay side by side above 34rem").toBeGreaterThan((await box(name.locator("label"))).right)
   await shot(page, testInfo, "page-820-light.png", { fullPage: true })
   expect(errors).toEqual([])
+})
+
+test("the info tip toggles on tap and keeps a 44px touch target", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 1 })
+  const page = await context.newPage()
+  const errors = await openStory(page, "primitives-settings--page", "light", PHONE)
+  const tip = row(page, "Timezone").getByRole("button", { name: "About Timezone" })
+  const glyph = await box(tip)
+  expect(glyph.width, "the visible glyph stays 20px").toBe(20)
+  const hit = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest("button")?.getAttribute("aria-label"), { x: glyph.left - 10, y: glyph.top + glyph.height / 2 })
+  expect(hit, "a tap 10px outside the glyph still lands on it").toBe("About Timezone")
+  await tip.tap()
+  await expect(page.getByRole("tooltip")).toContainText("Dates in chats")
+  await tip.tap()
+  await expect(page.getByRole("tooltip")).toHaveCount(0)
+  expect(errors).toEqual([])
+  await context.close()
 })
