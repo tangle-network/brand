@@ -130,13 +130,15 @@ export const RULE_PATTERNS = {
 /**
  * Metrics that count page files rather than matches. A candidate is a page file under the surface's
  * pathspecs whose path names `name` (in any case). A page file is a route or page module (under a
- * `routes`, `pages` or `views` directory, or a Next.js `page` or `layout` file) or a file named for
- * `name` (`BusinessSettings.tsx`, `settings-usage.tsx`), unless its name ends in a part word: a
- * card, section or dialog is drawn inside a page and is not one. A candidate is counted unless it
- * imports `composes`, or its route sits under a candidate that does: a section route rendered
- * inside a composing layout route. Nesting is read from the path, at `/` and at the dots of flat
- * route file names, so `app.settings.tsx` holds `app.settings.team.tsx` and `app.settings/Billing.tsx`
- * but not `app.settings_.team.tsx`, which leaves its parent's layout.
+ * `routes`, `pages` or `views` directory, unless its name ends in a part word: a card, section or
+ * dialog is drawn inside a page and is not one), a Next.js `page` or `layout` file, or a file
+ * elsewhere named for `name` whose last word is `name` or a page word (`BusinessSettings.tsx`,
+ * `SettingsTab.tsx`; not a `useSettings` hook or a `SettingsMenu`). A candidate is counted unless it
+ * imports `composes`, or it sits under a composing layout, the one kind of module that renders the
+ * routes beneath it: a Next.js `layout`, or a `routes` module other than an index. A composing
+ * `page` or `index` covers only itself. Nesting is read from the path, at `/` and at the dots of
+ * flat route file names, so `app.settings.tsx` holds `app.settings.team.tsx` and
+ * `app.settings/Billing.tsx` but not `app.settings_.team.tsx`, which leaves its parent's layout.
  */
 export const PAGE_PATTERNS = {
   // A settings page drawn locally. agent-app's settings-react owns the settings composition: the
@@ -148,7 +150,9 @@ export const PAGE_PATTERNS = {
   },
 };
 const PAGE_DIR = /(?:^|\/)(?:routes|pages|views)\//i;
+const ROUTES_DIR = /(?:^|\/)routes\//i;
 const PAGE_PARTS = ["card", "cards", "section", "sections", "dialog", "modal", "sheet", "drawer", "panel", "form", "row", "field"];
+const PAGE_WORDS = ["page", "tab", "view", "screen"];
 
 const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`);
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
@@ -261,10 +265,15 @@ export function ruleMatches(source, roots, metric, exts) {
   return rows.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : a.line - b.line));
 }
 
-/** The words of a file name without its extension: `SettingsPortsCard.tsx` is settings, ports, card. */
+/** A file name without its directory or extension. */
+function baseName(path) {
+  return path.slice(path.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "");
+}
+
+/** The words of a file name: `SettingsPortsCard.tsx` is settings, ports, card; `SSOSettings.tsx` is sso, settings. */
 function fileWords(path) {
-  return path.slice(path.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "")
-    .split(/(?<=[a-z0-9])(?=[A-Z])|[^A-Za-z0-9]+/).filter(Boolean).map((w) => w.toLowerCase());
+  return baseName(path).split(/(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|[^A-Za-z0-9]+/)
+    .filter(Boolean).map((w) => w.toLowerCase());
 }
 
 /** A page file's route as path segments: no extension or trailing route, index, page or layout name. */
@@ -272,20 +281,29 @@ function routeSegments(path) {
   return path.toLowerCase().replace(/\.[^./]+$/, "").replace(/\/(?:route|index|page|layout)$/, "").split(/[/.]/);
 }
 
+/** Whether a page module renders the routes beneath it: a Next.js layout, or a routes module other than an index. */
+function wrapsChildren(path) {
+  const base = baseName(path).toLowerCase();
+  if (/(?:^|\.)(?:_?index|page)$/.test(base)) return false;
+  return base === "layout" || ROUTES_DIR.test(path);
+}
+
 /** Every page a page metric counts: [{ path, line: 1, match }], `match` saying why it counts. */
 export function pageMatches(source, roots, metric, exts) {
   const { name, composes, reason } = PAGE_PATTERNS[metric];
   const isPage = (f) => {
     const words = fileWords(f);
-    const routeOrPage = PAGE_DIR.test(f) || (words.length === 1 && ["page", "layout"].includes(words[0]));
-    return (routeOrPage || words.includes(name)) && !PAGE_PARTS.includes(words.at(-1));
+    if (PAGE_DIR.test(f)) return !PAGE_PARTS.includes(words.at(-1));
+    if (words.length === 1 && ["page", "layout"].includes(words[0])) return true;
+    return words.includes(name) && words[0] !== "use" && [name, ...PAGE_WORDS].includes(words.at(-1));
   };
   const specs = pathspecs(roots, exts.map((e) => `*${name}${e}`)).map((s) => `:(icase)${s}`);
   const pages = grepFiles(source, "^", specs).filter(isPage).sort();
-  const composing = pages.filter((f) => new RegExp(composes).test(codeText(source, f))).map(routeSegments);
+  const composing = new Set(pages.filter((f) => new RegExp(composes).test(codeText(source, f))));
+  const layouts = [...composing].filter(wrapsChildren).map(routeSegments);
   const covered = (f) => {
     const route = routeSegments(f);
-    return composing.some((layout) => layout.every((segment, i) => route[i] === segment));
+    return composing.has(f) || layouts.some((layout) => layout.every((segment, i) => route[i] === segment));
   };
   return pages.filter((f) => !covered(f)).map((path) => ({ path, line: 1, match: reason }));
 }

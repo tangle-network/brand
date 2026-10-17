@@ -205,15 +205,24 @@ test("settings_layout counts settings pages that do not compose settings-react, 
     "src/routes/app.workspace.settings.team.tsx": "export default function Team() {}\n",
     "src/routes/app.workspace.settings_.export.tsx": "export default function Export() {}\n", // 1: leaves the layout
     "src/routes/app.account.settings.tsx": `// ${shared}`, // 1: a comment composes nothing
-    "src/web/BusinessSettings.tsx": "export function BusinessSettings() {}\n", // 1: named for its settings
+    "app/org/settings/layout.tsx": shared, // a Next.js layout covers the pages beneath it
+    "app/org/settings/billing/page.tsx": "export default function Billing() {}\n",
+    "app/settings/page.tsx": shared, // a page covers only itself
+    "app/settings/team/page.tsx": "export default function Team() {}\n", // 1
+    "src/pages/settings/index.astro": `---\n${shared}---\n`, // an index covers only itself
+    "src/pages/settings/team.astro": "<div />\n", // 1
+    "src/web/SSOSettings.tsx": "export function SSOSettings() {}\n", // 1: named for its settings
     "src/pages/dashboard/settings/DangerZoneSection.tsx": "export function DangerZoneSection() {}\n", // a part of a page
     "src/components/settings/Toggle.tsx": "export function Toggle() {}\n", // neither a page nor named for settings
+    "src/hooks/useSettings.tsx": "export function useSettings() {}\n", // a hook, not a page
+    "src/components/header/SettingsMenu.tsx": "export function SettingsMenu() {}\n", // a control, not a page
     "src/routes/app.settings.test.tsx": "export {};\n", // tests are excluded
   });
   commit(dir, "settings");
   const { row } = measure("gtm", localSource(dir));
   assert.deepEqual(Object.keys(row.by_file.settings_layout),
-    ["src/routes/app.account.settings.tsx", "src/routes/app.workspace.settings_.export.tsx", "src/web/BusinessSettings.tsx"]);
+    ["app/settings/team/page.tsx", "src/pages/settings/team.astro", "src/routes/app.account.settings.tsx",
+      "src/routes/app.workspace.settings_.export.tsx", "src/web/SSOSettings.tsx"]);
 
   // A consumer baseline written before the metric existed reports it without gating it.
   const baselinePath = join(tmp, "settings-baseline.json");
@@ -228,22 +237,22 @@ test("settings_layout counts settings pages that do not compose settings-react, 
   };
   const unrecorded = run();
   assert.equal(unrecorded.code, 0);
-  assert.match(unrecorded.out, /not yet in this baseline \(not gated\): settings_layout=3/);
+  assert.match(unrecorded.out, /not yet in this baseline \(not gated\): settings_layout=5/);
   assert.equal(run("--update-baseline").code, 0);
-  assert.equal(readBaseline(baselinePath).gtm.settings_layout, 3);
+  assert.equal(readBaseline(baselinePath).gtm.settings_layout, 5);
 
   write(dir, { "src/routes/app.billing-settings.tsx": "export default function Billing() {}\n" });
   commit(dir, "a new local settings page");
   const planted = run();
   assert.equal(planted.code, 1);
-  assert.match(planted.out, /FAIL settings_layout: 4 > baseline 3/);
+  assert.match(planted.out, /FAIL settings_layout: 6 > baseline 5/);
   assert.match(planted.out, /src\/routes\/app\.billing-settings\.tsx:1: imports nothing from @tangle-network\/agent-app\/settings-react/);
 
   write(dir, { "src/routes/app.billing-settings.tsx": shared, "src/routes/app.workspace.settings_.export.tsx": shared });
   commit(dir, "compose both from settings-react");
   const adopted = run();
   assert.equal(adopted.code, 0);
-  assert.match(adopted.out, /lower than baseline: settings_layout 3 -> 2/);
+  assert.match(adopted.out, /lower than baseline: settings_layout 5 -> 4/);
 });
 
 test("risenFiles names the files above their own baseline count", () => {
