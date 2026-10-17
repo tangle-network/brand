@@ -6,7 +6,8 @@
  * CSS custom-property definitions, locally defined primitives, and the sizing and
  * type deviations that bypass the shared control scale (literal font sizes and
  * heights, native controls, restyled shared controls, hand-written page titles),
- * and local re-drawings of the shared conversation shell in a surface's source,
+ * local re-drawings of the shared conversation shell, and settings pages drawn
+ * without the shared settings layout in a surface's source,
  * reading a git tree with `git grep` (no checkout of the tree needed).
  * The counts committed in drift-baseline.json beside this file may only fall.
  *
@@ -126,12 +127,36 @@ export const RULE_PATTERNS = {
   },
 };
 
+/**
+ * Metrics that count page files rather than matches. A candidate is a page file under the surface's
+ * pathspecs whose path names `name` (in any case). A page file is a route or page module (under a
+ * `routes`, `pages` or `views` directory, or a Next.js `page` or `layout` file) or a file named for
+ * `name` (`BusinessSettings.tsx`, `settings-usage.tsx`), unless its name ends in a part word: a
+ * card, section or dialog is drawn inside a page and is not one. A candidate is counted unless it
+ * imports `composes`, or its route sits under a candidate that does: a section route rendered
+ * inside a composing layout route. Nesting is read from the path, at `/` and at the dots of flat
+ * route file names, so `app.settings.tsx` holds `app.settings.team.tsx` and `app.settings/Billing.tsx`
+ * but not `app.settings_.team.tsx`, which leaves its parent's layout.
+ */
+export const PAGE_PATTERNS = {
+  // A settings page drawn locally. agent-app's settings-react owns the settings composition: the
+  // section nav, frame, rows and save behaviour.
+  settings_layout: {
+    name: "settings",
+    composes: String.raw`(?:\bfrom|\bimport)\s*\(?\s*["']@tangle-network/agent-app/settings-react(?:/[^"']*)?["']`,
+    reason: "imports nothing from @tangle-network/agent-app/settings-react",
+  },
+};
+const PAGE_DIR = /(?:^|\/)(?:routes|pages|views)\//i;
+const PAGE_PARTS = ["card", "cards", "section", "sections", "dialog", "modal", "sheet", "drawer", "panel", "form", "row", "field"];
+
 const LOCAL_PRIM_NAME = new RegExp(String.raw`(?:function|const)\s+(${PRIMS})\b`);
 const SHARED = ["@tangle-network/brand", "@tangle-network/ui", "@tangle-network/sandbox-ui", "@tangle-network/agent-app"];
 
 /** The counts the gate ratchets. Everything else in a row is informational. */
 const LINE_METRICS = Object.keys(PATTERNS);
-export const GATED = [LINE_METRICS[0], "hex", ...LINE_METRICS.slice(1), ...Object.keys(RULE_PATTERNS).filter((m) => m !== "hex")];
+export const GATED = [LINE_METRICS[0], "hex", ...LINE_METRICS.slice(1), ...Object.keys(RULE_PATTERNS).filter((m) => m !== "hex"),
+  ...Object.keys(PAGE_PATTERNS)];
 
 function extensions(surface, metric) {
   const extra = SURFACES[surface]?.extraExt ?? [];
@@ -149,6 +174,7 @@ function extensions(surface, metric) {
     case "shell_override": return ["*.tsx", "*.jsx", "*.css", ...extra];
     case "header_height_literal": return ["*.tsx", "*.jsx", "*.astro", "*.css", "*.vue", "*.svelte"];
     case "transcript_type_override": return ["*.tsx", "*.jsx", "*.css"];
+    case "settings_layout": return ["*.tsx", "*.jsx", "*.astro"];
     case "imports": return ["*.tsx", "*.ts", "*.astro", "*.jsx"];
     default: return SRC_EXT;
   }
@@ -195,25 +221,35 @@ export function grepMatches(source, roots, pattern, exts) {
   return rows;
 }
 
+/** Files under `specs`, less the excluded paths, with a line matching the PCRE `pattern`. */
+function grepFiles(source, pattern, specs) {
+  const args = ["grep", "-I", "-P", "-l", "--null", "-e", pattern];
+  if (source.rev) args.push(source.rev);
+  else args.push("--untracked");
+  args.push("--", ...specs, ...EXCLUDE);
+  const prefix = source.rev ? `${source.rev}:` : "";
+  return git(source.dir, args, { allowExit1: true }).split("\0").filter(Boolean)
+    .map((f) => (f.startsWith(prefix) ? f.slice(prefix.length) : f).trim()).filter(Boolean);
+}
+
+/**
+ * A file's text with its comments blanked, keeping offsets and newlines. Comments name things
+ * without styling or importing them (a CSS note that mentions "transcript" or "header").
+ */
+function codeText(source, path) {
+  const blank = (comment) => comment.replace(/[^\n]/g, " ");
+  return readFile(source, path)
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    .replace(/<!--[\s\S]*?-->/g, blank)
+    .replace(/(^|[\s;{}(])\/\/[^\n]*/gm, (m, lead) => lead + blank(m.slice(lead.length)));
+}
+
 /** Every match of a multi-line metric: [{ path, line, match }], `line` being where the match starts. */
 export function ruleMatches(source, roots, metric, exts) {
   const { prefilter, patterns } = RULE_PATTERNS[metric];
-  const args = ["grep", "-I", "-P", "-l", "--null", "-e", prefilter];
-  if (source.rev) args.push(source.rev);
-  else args.push("--untracked");
-  args.push("--", ...pathspecs(roots, exts), ...EXCLUDE);
-  const prefix = source.rev ? `${source.rev}:` : "";
-  const files = git(source.dir, args, { allowExit1: true }).split("\0").filter(Boolean)
-    .map((f) => (f.startsWith(prefix) ? f.slice(prefix.length) : f).trim()).filter(Boolean);
   const rows = [];
-  for (const path of files) {
-    // Comments name things without styling them (a CSS note that mentions "transcript" or
-    // "header"); blank them, keeping offsets and newlines, so only real rules count.
-    const blank = (comment) => comment.replace(/[^\n]/g, " ");
-    const text = readFile(source, path)
-      .replace(/\/\*[\s\S]*?\*\//g, blank)
-      .replace(/<!--[\s\S]*?-->/g, blank)
-      .replace(/(^|[\s;{}(])\/\/[^\n]*/gm, (m, lead) => lead + blank(m.slice(lead.length)));
+  for (const path of grepFiles(source, prefilter, pathspecs(roots, exts))) {
+    const text = codeText(source, path);
     const found = new Map();
     for (const pattern of patterns) {
       for (const m of text.matchAll(new RegExp(pattern, "g"))) found.set(m.index, m[0]);
@@ -223,6 +259,35 @@ export function ruleMatches(source, roots, metric, exts) {
     }
   }
   return rows.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : a.line - b.line));
+}
+
+/** The words of a file name without its extension: `SettingsPortsCard.tsx` is settings, ports, card. */
+function fileWords(path) {
+  return path.slice(path.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "")
+    .split(/(?<=[a-z0-9])(?=[A-Z])|[^A-Za-z0-9]+/).filter(Boolean).map((w) => w.toLowerCase());
+}
+
+/** A page file's route as path segments: no extension or trailing route, index, page or layout name. */
+function routeSegments(path) {
+  return path.toLowerCase().replace(/\.[^./]+$/, "").replace(/\/(?:route|index|page|layout)$/, "").split(/[/.]/);
+}
+
+/** Every page a page metric counts: [{ path, line: 1, match }], `match` saying why it counts. */
+export function pageMatches(source, roots, metric, exts) {
+  const { name, composes, reason } = PAGE_PATTERNS[metric];
+  const isPage = (f) => {
+    const words = fileWords(f);
+    const routeOrPage = PAGE_DIR.test(f) || (words.length === 1 && ["page", "layout"].includes(words[0]));
+    return (routeOrPage || words.includes(name)) && !PAGE_PARTS.includes(words.at(-1));
+  };
+  const specs = pathspecs(roots, exts.map((e) => `*${name}${e}`)).map((s) => `:(icase)${s}`);
+  const pages = grepFiles(source, "^", specs).filter(isPage).sort();
+  const composing = pages.filter((f) => new RegExp(composes).test(codeText(source, f))).map(routeSegments);
+  const covered = (f) => {
+    const route = routeSegments(f);
+    return composing.some((layout) => layout.every((segment, i) => route[i] === segment));
+  };
+  return pages.filter((f) => !covered(f)).map((path) => ({ path, line: 1, match: reason }));
 }
 
 /** Full text of matching lines in the named files, for failure reports. */
@@ -305,9 +370,10 @@ export function measure(surface, source) {
   }
   row.by_file = {};
   for (const metric of GATED) {
-    const hits = RULE_PATTERNS[metric]
-      ? ruleMatches(source, roots, metric, extensions(surface, metric))
-      : grepMatches(source, roots, PATTERNS[metric], extensions(surface, metric));
+    const exts = extensions(surface, metric);
+    const hits = RULE_PATTERNS[metric] ? ruleMatches(source, roots, metric, exts)
+      : PAGE_PATTERNS[metric] ? pageMatches(source, roots, metric, exts)
+        : grepMatches(source, roots, PATTERNS[metric], exts);
     matches[metric] = hits;
     row[metric] = hits.length;
     row.by_file[metric] = sortedObject(countBy(hits.map((h) => h.path)));
@@ -546,7 +612,7 @@ export function main(argv = process.argv.slice(2), log = (s) => process.stdout.w
       log(files.length ? "  files above their baseline count:" : "  no single file rose (moved or renamed?); largest files:");
       for (const f of shown.slice(0, 10)) log(`    ${f.path}: ${f.base} -> ${f.now}`);
       const shownPaths = shown.slice(0, 10).map((f) => f.path);
-      const lines = RULE_PATTERNS[metric]
+      const lines = RULE_PATTERNS[metric] || PAGE_PATTERNS[metric]
         ? matches[metric].filter((m) => shownPaths.includes(m.path)).map((m) => ({ path: m.path, line: m.line, text: m.match.replace(/\s+/g, " ") }))
         : grepLines(source, PATTERNS[metric], shownPaths);
       for (const l of lines.slice(0, opts.top)) log(`    ${l.path}:${l.line}: ${l.text.slice(0, 160)}`);
