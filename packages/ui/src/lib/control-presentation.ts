@@ -46,22 +46,24 @@ export const controlSquare = {
 export const fieldTouchText = "pointer-coarse:text-base";
 
 /**
- * A control that is shorter than 44px on a fine pointer still gets a 44px hit
- * height on a coarse one (WCAG 2.5.5, Apple HIG). Same floor as `touch`.
+ * A control smaller than 44px on a fine pointer still gets a 44px target
+ * in both dimensions on a coarse one (WCAG 2.5.5, Apple HIG). Same floor as `touch`.
+ * Follow the primary pointer, matching SegmentedControl; a secondary touch
+ * input alone does not inflate a fine-pointer desktop layout.
  */
-export const touchTarget = "pointer-coarse:min-h-11";
+export const touchTarget = "pointer-coarse:min-h-11 pointer-coarse:min-w-11";
 
 /** Field sizes: the control scale with field padding. */
 export const fieldSizes = {
-  sm: cn(controlHeight.sm, controlText.sm, controlRadius.sm, "px-2.5"),
-  md: cn(controlHeight.md, controlText.md, controlRadius.md, "px-3"),
-  lg: cn(controlHeight.lg, controlText.lg, controlRadius.lg, "px-4"),
+  sm: cn(controlHeight.sm, controlText.sm, controlRadius.sm, touchTarget, "px-2.5"),
+  md: cn(controlHeight.md, controlText.md, controlRadius.md, touchTarget, "px-3"),
+  lg: cn(controlHeight.lg, controlText.lg, controlRadius.lg, touchTarget, "px-4"),
 } as const satisfies Record<ControlSize, string>;
 
 // Explicit opt-in sizes kept for existing callers. Compact follows the
 // consumer's density token (md); touch is lg with a guaranteed 44px minimum.
 export const controlSizes = {
-  compact: "h-[var(--control-height)] px-3 py-1 text-sm",
+  compact: `h-[var(--control-height)] px-3 py-1 text-sm ${touchTarget}`,
   touch: "h-11 min-h-11 min-w-11 px-4 py-2 text-base",
 } as const;
 
