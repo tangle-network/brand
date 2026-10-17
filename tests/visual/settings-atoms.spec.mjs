@@ -204,6 +204,8 @@ for (const theme of ["light", "dark"]) {
     const title = await box(jobs.first().getByRole("link"))
     const state = await box(jobs.first().getByText("Active", { exact: true }))
     expect(state.top, "state under the title").toBeGreaterThan(title.bottom)
+    const brief = jobs.nth(2)
+    expect((await box(brief.getByRole("alert"))).top, "the failure reason follows its state").toBeGreaterThan((await box(brief.getByText("Couldn't start", { exact: true }))).bottom)
     const jonas = page.getByRole("list", { name: "Members" }).locator(":scope > li").nth(1)
     const nameLine = await box(jonas.getByText("Jonas Weber"))
     const role = jonas.getByRole("combobox", { name: "Role for Jonas Weber" })

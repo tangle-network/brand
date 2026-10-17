@@ -74,7 +74,6 @@ export interface SettingsRowProps {
   /** Why the control is unavailable, naming who can change it. Replaces the description after a lock glyph. */
   disabledReason?: React.ReactNode;
   children?: React.ReactNode;
-  "data-testid"?: string;
 }
 
 const ROW_COLUMNS: Record<SettingsRowLayout, string> = {
@@ -109,16 +108,13 @@ function describeControl(children: React.ReactNode, htmlFor: string | undefined,
  */
 export function SettingsRow({
   id, label, description, info, htmlFor, status, error, onRetry, layout = "inline", disabledReason, children,
-  "data-testid": testId,
 }: SettingsRowProps) {
-  const generatedId = React.useId();
-  const messageId = htmlFor ? fieldMessageId(htmlFor) : `${generatedId}-message`;
+  const messageId = htmlFor ? fieldMessageId(htmlFor) : undefined;
   const hasMessage = error != null || disabledReason != null || description != null;
   const control = describeControl(children, htmlFor, hasMessage ? messageId : undefined, error != null);
   return (
     <div
       id={id}
-      data-testid={testId}
       data-layout={layout}
       className={cn(
         "grid min-w-0 items-center gap-x-8 gap-y-3 px-5 py-4 @max-[34rem]/settings-section:px-4",
@@ -169,7 +165,6 @@ export interface SettingsSectionProps {
   footer?: React.ReactNode;
   /** Rows, lists and any other blocks of the section. */
   children?: React.ReactNode;
-  "data-testid"?: string;
 }
 
 /**
@@ -178,7 +173,7 @@ export interface SettingsSectionProps {
  * width container its rows and lists respond to.
  */
 export function SettingsSection({
-  id, title, description, info, actions, tone = "default", footer, children, "data-testid": testId,
+  id, title, description, info, actions, tone = "default", footer, children,
 }: SettingsSectionProps) {
   const titleId = `${id}-title`;
   const danger = tone === "danger";
@@ -187,7 +182,6 @@ export function SettingsSection({
       id={id}
       role="region"
       aria-labelledby={titleId}
-      data-testid={testId}
       data-tone={tone}
       className={cn("@container/settings-section min-w-0", SCROLL_OFFSET, danger && "border-[color:var(--surface-danger-border)]")}
     >
@@ -213,7 +207,7 @@ export function SettingsSection({
   );
 }
 
-/** Track widths for a {@link SettingsList}. Each slot an item uses needs its column. */
+/** Track widths for a {@link SettingsList}. Every slot its items use needs a column, except status and menu, which have fallbacks. */
 export interface SettingsListColumns {
   /** A logo or avatar column, such as `"36px"`. */
   leading?: string;
@@ -253,7 +247,6 @@ export interface SettingsListProps {
   columns: SettingsListColumns;
   "aria-label"?: string;
   children?: React.ReactNode;
-  "data-testid"?: string;
 }
 
 /**
@@ -261,7 +254,7 @@ export interface SettingsListProps {
  * subgrid). Below 34rem each item becomes two lines: the title and meta with
  * actions on the right, then the state under them at full width.
  */
-export function SettingsList({ columns, children, "aria-label": ariaLabel, "data-testid": testId }: SettingsListProps) {
+export function SettingsList({ columns, children, "aria-label": ariaLabel }: SettingsListProps) {
   const style = {
     "--settings-list-columns": listTracks(columns, false),
     "--settings-list-columns-narrow": listTracks(columns, true),
@@ -271,7 +264,6 @@ export function SettingsList({ columns, children, "aria-label": ariaLabel, "data
       <ul
         role="list"
         aria-label={ariaLabel}
-        data-testid={testId}
         style={style}
         className={cn(
           "grid min-w-0 gap-x-4 [grid-template-columns:var(--settings-list-columns)] @max-[34rem]/settings-section:[grid-template-columns:var(--settings-list-columns-narrow)]",
@@ -308,7 +300,6 @@ export interface SettingsListItemProps {
   actions?: React.ReactNode;
   /** Everything else, including destructive actions, behind a ⋯ button. */
   menu?: SettingsListMenuItem[];
-  "data-testid"?: string;
 }
 
 function ItemMenu({ items, titleId }: { items: SettingsListMenuItem[]; titleId: string }) {
@@ -347,44 +338,43 @@ function ItemMenu({ items, titleId }: { items: SettingsListMenuItem[]; titleId: 
 // Below 34rem the state takes a second line from the title to the card edge, so a role select gets the full width.
 const NARROW_STATUS = "@max-[34rem]/settings-section:col-start-[main] @max-[34rem]/settings-section:col-end-[-1] @max-[34rem]/settings-section:row-start-2 @max-[34rem]/settings-section:mt-2";
 
-/** One item in a {@link SettingsList}. Slots go to the list's columns; a slot without a column flows into the title cell. */
-export function SettingsListItem({ leading, title, meta, status, error, actions, menu, "data-testid": testId }: SettingsListItemProps) {
+/**
+ * One item in a {@link SettingsList}; each slot goes to the list's column of
+ * that name. Without a status column the state follows the meta, and without
+ * a menu column the ⋯ menu ends the actions cell.
+ */
+export function SettingsListItem({ leading, title, meta, status, error, actions, menu }: SettingsListItemProps) {
   const columns = React.useContext(SettingsListContext);
   const titleId = React.useId();
   const menuNode = menu && menu.length > 0 ? <ItemMenu items={menu} titleId={titleId} /> : null;
   const actionCell = (actions != null || (menuNode && !columns.menu)) && (
     <>{actions}{!columns.menu && menuNode}</>
   );
-  const titleNode = (
-    <div
-      id={titleId}
-      className="min-w-0 font-medium text-sm leading-5 text-foreground [overflow-wrap:anywhere] [&_a]:rounded-sm [&_a]:text-foreground [&_a]:underline-offset-4 [&_a:hover]:underline [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[var(--focus-border)]"
-    >
-      {title}
-    </div>
-  );
   return (
     <li
-      data-testid={testId}
       className={cn(
         "col-span-full grid grid-cols-subgrid items-center px-5 py-3 @max-[34rem]/settings-section:px-4",
         DIVIDED,
       )}
     >
-      {leading != null && columns.leading && <div className="col-start-[leading] row-start-1 flex">{leading}</div>}
+      {leading != null && <div className="col-start-[leading] row-start-1 flex">{leading}</div>}
       <div className="col-start-[main] row-start-1 min-w-0">
-        {leading != null && !columns.leading
-          ? <div className="flex min-w-0 items-center gap-3">{leading}{titleNode}</div>
-          : titleNode}
+        <div
+          id={titleId}
+          className="font-medium text-sm leading-5 text-foreground [overflow-wrap:anywhere] [&_a]:rounded-sm [&_a]:text-foreground [&_a]:underline-offset-4 [&_a:hover]:underline [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[var(--focus-border)]"
+        >
+          {title}
+        </div>
         {meta != null && <div className="text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]">{meta}</div>}
-        {error != null && <ErrorLine className="mt-1">{error}</ErrorLine>}
         {status != null && !columns.status && <div className="mt-1 text-sm leading-5 text-muted-foreground">{status}</div>}
-        {actionCell && !columns.actions && <div className="mt-2 flex flex-wrap items-center gap-1">{actionCell}</div>}
       </div>
+      {error != null && (
+        <ErrorLine className="col-start-[main] row-start-2 mt-1 @max-[34rem]/settings-section:col-end-[-1] @max-[34rem]/settings-section:row-start-3">{error}</ErrorLine>
+      )}
       {status != null && columns.status && (
         <div className={cn("col-start-[status] row-start-1 min-w-0 text-sm leading-5 text-muted-foreground", NARROW_STATUS)}>{status}</div>
       )}
-      {actionCell && columns.actions && (
+      {actionCell && (
         <div className="col-start-[actions] row-start-1 flex min-w-0 items-center justify-end gap-1">{actionCell}</div>
       )}
       {menuNode && columns.menu && <div className="col-start-[menu] row-start-1 flex justify-end">{menuNode}</div>}
