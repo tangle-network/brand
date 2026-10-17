@@ -1,0 +1,367 @@
+{
+  "sha": "bc1fa70e1431ea6cfa55c4339b049c14ea390114",
+  "at": "2026-10-16T01:56:07.439Z",
+  "scope": "Isolated real Radix/Motion fixture; CSS end/cancel delivery withheld. No presented-frame latency or production claim.",
+  "cases": [
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "dialog",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 4376.5,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 4466.4,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@2d05930c8dd6dedba8d8e3f75ba873f0.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "sheet",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1258.4,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1341.6,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@7e5ddc0d3473d0f3237ef95d54c13521.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "popover",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1194.4,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1274.2,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@457cbe4e25fa56a9c5de045d0e9be036.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "no-preference",
+      "kind": "tooltip",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationend",
+            "at": 1237,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1404.8,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@12c8696c74dd42bf8b1e4117e006d01b.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1372.3
+          }
+        ]
+      },
+      "video": "videos/page@5ab7c1dbdea23cd25f9a145e1a13ba65.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1282.2
+          }
+        ]
+      },
+      "video": "videos/page@f38ce7b2c9f4f39ee38c516a9f9bf1e8.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1218.9
+          }
+        ]
+      },
+      "video": "videos/page@e8f96e1d9883f425d998c6de50bb8f8d.webm"
+    },
+    {
+      "width": 390,
+      "reducedMotion": "reduce",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1101.9
+          }
+        ]
+      },
+      "video": "videos/page@12050af1449101b91731f24cab16104f.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "dialog",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1364.4,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1454.7,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@91ca5cfd69d0aadb8d612d9408ca553c.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "sheet",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1754,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1798.7,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@afaf8ecca2e04e6d820c8683f432f0fc.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "popover",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": false,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationcancel",
+            "at": 1427.1,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 1507.5,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@4ecf65f5646db2544dba1a259c3250d8.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "no-preference",
+      "kind": "tooltip",
+      "pass": false,
+      "failure": "Dismissal/focus stranded when CSS end/cancel events are withheld (1s diagnostic ceiling, not a latency budget).",
+      "actual": {
+        "connected": true,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "animationend",
+            "at": 1831.5,
+            "withheld": true
+          },
+          {
+            "type": "animationend",
+            "at": 2059.7,
+            "withheld": true
+          }
+        ]
+      },
+      "video": "videos/page@16377325470106cf7fe166252378a6b4.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "dialog",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1344.7
+          }
+        ]
+      },
+      "video": "videos/page@1ccb4f2f512d582cbb1bce9b07e5e945.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "sheet",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1417.3
+          }
+        ]
+      },
+      "video": "videos/page@7c6fb84f1b88cb022a036c86810d4240.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "popover",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1627.7
+          }
+        ]
+      },
+      "video": "videos/page@bc074d8cf98b244468e3668a8f770880.webm"
+    },
+    {
+      "width": 1440,
+      "reducedMotion": "reduce",
+      "kind": "tooltip",
+      "pass": true,
+      "actual": {
+        "connected": false,
+        "state": "closed",
+        "focusReturned": true,
+        "pointerEvents": "",
+        "events": [
+          {
+            "type": "detach",
+            "at": 1532.1
+          }
+        ]
+      },
+      "video": "videos/page@c06241a356ff5f9c588a151cf23df4d4.webm"
+    }
+  ]
+}

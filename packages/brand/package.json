@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/brand",
-  "version": "1.24.2",
+  "version": "1.26.0",
   "description": "Tangle brand system \u2014 design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
   "type": "module",
   "license": "MIT",
@@ -44,7 +44,13 @@
     "./styles/named-themes.css": "./src/styles/named-themes.css",
     "./styles/ladders.css": "./src/styles/ladders.css",
     "./styles/system.css": "./src/styles/system.css",
-    "./styles/legacy-light.css": "./src/styles/legacy-light.css"
+    "./styles/legacy-light.css": "./src/styles/legacy-light.css",
+    "./knot": {
+      "types": "./dist/knot.d.ts",
+      "import": "./dist/knot.js",
+      "default": "./dist/knot.js"
+    },
+    "./styles/presentation.css": "./src/styles/presentation.css"
   },
   "scripts": {
     "build": "node scripts/gen-ladders.mjs --check && node scripts/gen-compat.mjs --check && node scripts/gen-palette.mjs --check && tsdown",

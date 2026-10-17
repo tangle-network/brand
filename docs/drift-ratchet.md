@@ -22,9 +22,9 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `control_override` | `Button`, `Input`, `Textarea` or `SelectTrigger` with a `className` height, padding, text size, corner or weight on the tag's line | `.tsx .jsx` |
 | `page_heading` | A hand-written `<h1>`; `PageHeader` owns page titles | `.tsx .jsx .astro` |
 | `shell_override` | Product code re-drawing the conversation shell `AgentWorkspaceCompanion` owns: the `md3-surface-dim` backdrop, `PanelLeft`/`PanelRight` toggle icons (with or without `Open`/`Close`), the `collapsedControlsPlacement` or `centerHeaderVisibility` layout seams, or `surface="flat"` | `.tsx .jsx .css` |
-
 | `header_height_literal` | A header row given its own height: a CSS rule whose last compound is `header` or a class ending in `-header`, `-head`, `-bar`, `-toolbar` (not a progress, scroll, side or meter bar) with a literal `height`, `min-height` or `max-height`; a `<header>` or header-row class with `h-16`, `min-h-[58px]` | `.css .tsx .jsx .astro .vue .svelte` |
 | `transcript_type_override` | Product CSS setting `font-size`, `line-height`, `font-family` or `font` on `.tangle-prose`, `.tangle-transcript-text` or a timeline step, or a `tangle-prose` className with a text size or leading | `.css .tsx .jsx` |
+| `settings_layout` | A settings page file that imports nothing from `@tangle-network/agent-app/settings-react` and sits under no settings layout that does | `.tsx .jsx .astro` |
 
 `font_size_literal` through `page_heading` measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
 `shell_override` keeps products inside the shared chat shell: the companion draws the conversation's raised surface, gutter and header, and the header's top-right corner holds the tools toggle.
@@ -32,6 +32,16 @@ A product that draws its own card or gutter around the conversation, floats or a
 `control_override` reads one line, so a `className` on a later line of the tag is not counted.
 `header_height_literal` and `transcript_type_override` read whole files, because a CSS rule spans lines: a `git grep -l` prefilter with the same pathspecs picks candidate files, and the patterns run over each file's text. Each match is one rule or element, reported at the line where it starts.
 `header_height_literal` keeps the shell's one header height (`--shell-header-height`, Sandbox UI `ShellHeader`) from being re-set by a product; Hospitality's 66px and 50px inbox heads put their dividers off the sidebar's 56px line. A height inside a header row (`.x-header .avatar`, `.x-header-avatar`) is not counted.
+`settings_layout` counts files, not matches, and stops new local settings pages: agent-app's `settings-react` owns the settings composition (section nav, frame, rows and save behaviour), and a product composes its settings page from it.
+A settings page file is a file whose path names `settings` and that is a route or page module under a `routes`, `pages` or `views` directory, a Next.js `page` or `layout` file, or a file elsewhere named for its settings: its name's last word is `Settings` or a page word (`Page`, `Tab`, `View`, `Screen`), as in `BusinessSettings.tsx`, `SSOSettings.tsx` and `SettingsTab.tsx`.
+A hook (`useSettings.tsx`) and a control or provider named for settings (`SettingsMenu.tsx`, `SettingsButton.tsx`, `SettingsProvider.tsx`) are not pages.
+A route or page module whose name ends in a part word (`Card`, `Section`, `Dialog`, `Modal`, `Sheet`, `Drawer`, `Panel`, `Form`, `Row`, `Field`) is drawn inside a page and is not one.
+A page is not counted when it imports from `settings-react`, or when it sits under a layout that does.
+Only a layout covers its children: a Next.js `layout` file, or a `routes` module other than an index (a flat route parent or a `route.tsx` folder route), because only these render the routes nested beneath them.
+A composing Next.js `page`, or a pages-router or Astro `index`, covers only itself: it does not wrap the files beside or beneath it, so `app/settings/team/page.tsx` beneath a composing `app/settings/page.tsx`, or `src/pages/settings/billing.tsx` beside a composing `src/pages/settings/index.tsx`, still counts.
+Nesting is read from the path at `/` and at the dots of flat route names, so a composing `app.workspace.settings.tsx` covers `app.workspace.settings.team.tsx` and `app.workspace.settings/billing.tsx`, but not `app.workspace.settings_.team.tsx`, which leaves its parent's layout, and a composing `app/settings/layout.tsx` covers `app/settings/team/page.tsx`.
+A wrapper that re-exports `settings-react` from inside the product does not count as composing; a section page outside a composing layout (Hospitality's `BusinessSettings.tsx` beside its `SettingsNav` frame) imports what it uses from `settings-react` itself.
+A settings interface in component files that are neither pages nor named for settings (Blueprint's `components/@settings` control panel) is not counted.
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
 Tests, stories, fixtures, `dist`, `node_modules`, `.d.ts`, generated, proof and evidence paths are excluded.
@@ -65,6 +75,32 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
+
+## Settings layout baseline, 2026-10-17
+
+Recorded from each default branch when `settings_layout` was added; each surface ratchets to 0 as its settings pages compose from agent-app `settings-react`.
+The same refresh lowered counts that had fallen since their rows were written: gtm `css_var_defs` 58 to 56 and `page_heading` 18 to 17, insurance `hex` 148 to 137, physim `font_size_literal` 285 to 276 and `native_control` 52 to 51, builder `font_size_literal` 50 to 32.
+website's `page_heading` (16 to 17), sandbox's `native_control` (54 to 55) and platform's `arbitrary_color` (21 to 22) and `native_control` (444 to 457) rose, so those rows kept their earlier counts and head and only recorded `settings_layout`, read at the head the table names.
+Router is not in the shipped baseline; its registration and baseline belong to its adoption change. Its default branch (`0666df3b8`) counts 4: the left-nav `SettingsShell` views `settings-a`, `settings-b`, `settings-endpoints` and `settings-usage`.
+
+| Surface | Head | Settings layout | Counted files |
+| --- | --- | ---: | --- |
+| website | `054d3250f` | 0 | |
+| sandbox | `315aa3675` | 2 | `pages/dashboard/Settings.tsx`, `pages/dashboard/sandbox-session/SettingsTab.tsx` |
+| platform | `315aa3675` | 0 | |
+| intelligence | `315aa3675` | 1 | `pages/Settings.tsx` (the tab strip over Settings, Webhooks and Alerts) |
+| gtm | `4dbeabd99` | 1 | `routes/app.workspace.settings.tsx` |
+| tax | `3ede28010` | 1 | `routes/app.settings.tsx` |
+| legal | `a4d952d0e` | 1 | `routes/app.workspace.settings.tsx` |
+| insurance | `5ce0764e4` | 1 | `routes/app.workspace.settings.tsx` |
+| creative | `45ed1c289` | 1 | `routes/app.workspace.settings.tsx` |
+| physim | `4a2216442` | 0 | |
+| hospitality | `9d7faf8d8` | 5 | `web/AgentProfileSettings.tsx`, `BusinessSettings.tsx`, `GuestGuidebookSettings.tsx`, `PhoneLineSettings.tsx`, `SummarySettings.tsx` (the ShellHeader segmented sections) |
+| audits | `24f56e7de` | 0 | |
+| browser | `3b55174f8` | 1 | `pages/settings.tsx` |
+| builder | `e0c8ed540` | 1 | `routes/app.$agentId.settings.tsx` |
+| blueprint | `e7367c104` | 4 | `routes/settings.partner.$partnerId.tsx`, `routes/settings.partner._index.tsx`, `components/@settings/tabs/settings/SettingsTab.tsx`, `components/@settings/tabs/partner-dashboard/PartnerSettingsTab.tsx` |
+| super | `ebb6d8a1a` | 0 | |
 
 ## Shell header ratchet, 2026-10-11
 
@@ -212,3 +248,7 @@ A consumer runs both.
 
 The website surface reads `src` only. Its other scanned files were `.evolve/multi-pursue/variants/*.astro` and the archived rejected prototypes under `docs/delivery/`, which no route ships; `drift.py` counted them (560 of the 1110 hex literals in the first baseline).
 The hex pattern counts `#rgb` and `#rrggbb` only, as `drift.py` did; `#rgba` and `#rrggbbaa` literals are not counted.
+
+## What a pass proves
+
+A pass bounds aggregate source counts for recorded metrics. Removals can offset additions; unrecorded metrics do not fail. Record installed Brand revision, registered surface, scanned commit, baseline revision, roots, exclusions and changed-file findings in consumer evidence. Missing coverage stays UNCHECKED. Router registration and baseline belong to its adoption change, alongside runtime proof. See the [design bible](design-bible.md#principles-and-evidence) and [evidence contract](design-evidence-contract.md#drift-accountability-and-release).

@@ -26,7 +26,8 @@ export type StatusTone =
   | "danger"
   | "info"
   | "neutral"
-  | "running";
+  | "running"
+  | "violet";
 
 export interface StatusPillProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
@@ -46,10 +47,13 @@ export interface StatusPillProps
    * For a control that supplies its own surface (a chip, a selected row).
    */
   bare?: boolean;
+  /** Decorative caller glyph; the visible text remains the accessible status. */
+  icon?: React.ReactNode;
   size?: "sm" | "md";
 }
 
 const TONE_SURFACE: Record<StatusTone, string> = {
+  violet: "bg-[var(--surface-violet-bg)] text-[var(--surface-violet-text)] border-[var(--surface-violet-border)]",
   success:
     "bg-[var(--surface-success-bg)] text-[var(--surface-success-text)] border-[var(--surface-success-border)]",
   warning:
@@ -77,6 +81,7 @@ const TONE_SURFACE: Record<StatusTone, string> = {
  * has left — the glyph — with nothing to signal that it happened.
  */
 const TONE_TEXT: Record<StatusTone, string> = {
+  violet: "text-[var(--surface-violet-text)]",
   success: "text-[var(--surface-success-text)]",
   warning: "text-[var(--surface-warning-text)]",
   danger: "text-[var(--surface-danger-text)]",
@@ -100,6 +105,7 @@ function ToneGlyph({ tone }: { tone: StatusTone }) {
     className: "size-2 shrink-0",
   };
   switch (tone) {
+    case "violet": return <svg {...common} aria-hidden="true" fill="currentColor"><path d="M4 .5 7.5 4 4 7.5 .5 4Z"/></svg>;
     // Settled and good: a solid disc.
     case "success":
       return (
@@ -165,7 +171,7 @@ function ToneGlyph({ tone }: { tone: StatusTone }) {
 }
 
 const StatusPill = React.forwardRef<HTMLSpanElement, StatusPillProps>(
-  ({ className, tone, children, bare = false, size = "sm", ...props }, ref) => (
+  ({ className, tone, children, icon, bare = false, size = "sm", ...props }, ref) => (
     <span
       ref={ref}
       className={cn(
@@ -180,8 +186,8 @@ const StatusPill = React.forwardRef<HTMLSpanElement, StatusPillProps>(
     >
       {/* In `bare` mode the tone rides on the glyph alone, so it is scoped to
           the wrapper the glyph sits in rather than applied to the whole pill. */}
-      <span className={cn("inline-flex", bare && TONE_TEXT[tone])}>
-        <ToneGlyph tone={tone} />
+      <span aria-hidden="true" className={cn("inline-flex [&>svg]:size-3 [&>svg]:shrink-0", bare && TONE_TEXT[tone])}>
+        {icon ?? <ToneGlyph tone={tone} />}
       </span>
       {children}
     </span>

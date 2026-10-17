@@ -1,0 +1,159 @@
+{
+  "sha": "f822fb5cfd35dd2851db4ee19853b97abe7c48fe",
+  "at": "2026-10-15T23:58:37.312Z",
+  "cases": [
+    {
+      "reducedMotion": "no-preference",
+      "timing": {
+        "role": {
+          "control": {
+            "duration": "0.15s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+          },
+          "surface": {
+            "duration": "0.24s",
+            "easing": "cubic-bezier(0.22, 1, 0.36, 1)"
+          },
+          "dismiss": {
+            "duration": "0.09s",
+            "easing": "cubic-bezier(0.4, 0, 1, 1)"
+          },
+          "arrive": {
+            "duration": "0.6s",
+            "easing": "cubic-bezier(0.23, 1, 0.32, 1)"
+          }
+        },
+        "controls": [
+          {
+            "transition": "color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), scale 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "color, background-color, border-color, box-shadow, transform, scale, opacity",
+            "duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), scale 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "color, background-color, border-color, box-shadow, transform, scale, opacity",
+            "duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), scale 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "color, background-color, border-color, box-shadow, transform, scale, opacity",
+            "duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "transform",
+            "duration": "0.15s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          }
+        ],
+        "arrival": {
+          "transition": "all",
+          "property": "all",
+          "duration": "0s",
+          "easing": "ease",
+          "animation": "tangle-intro-enter",
+          "animationDuration": "0.6s",
+          "animationEasing": "cubic-bezier(0.23, 1, 0.32, 1)"
+        }
+      },
+      "tooltip": {
+        "name": "tangle-surface-present",
+        "duration": "0.24s",
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)"
+      },
+      "video": "videos/page@b03ffcbeb55c6843c60cf5711d05cd81.webm"
+    },
+    {
+      "reducedMotion": "reduce",
+      "timing": {
+        "role": {
+          "control": {
+            "duration": "0s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+          },
+          "surface": {
+            "duration": "0s",
+            "easing": "cubic-bezier(0.22, 1, 0.36, 1)"
+          },
+          "dismiss": {
+            "duration": "0s",
+            "easing": "cubic-bezier(0.4, 0, 1, 1)"
+          },
+          "arrive": {
+            "duration": "0s",
+            "easing": "cubic-bezier(0.23, 1, 0.32, 1)"
+          }
+        },
+        "controls": [
+          {
+            "transition": "none cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "none",
+            "duration": "0s, 0s, 0s, 0s, 0s, 0s, 0s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "none cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "none",
+            "duration": "0s, 0s, 0s, 0s, 0s, 0s, 0s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "none cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "property": "none",
+            "duration": "0s, 0s, 0s, 0s, 0s, 0s, 0s",
+            "easing": "cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1), cubic-bezier(0.2, 0.8, 0.2, 1)",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          },
+          {
+            "transition": "none",
+            "property": "none",
+            "duration": "0s",
+            "easing": "ease",
+            "animation": "none",
+            "animationDuration": "0s",
+            "animationEasing": "ease"
+          }
+        ],
+        "arrival": {
+          "transition": "none",
+          "property": "none",
+          "duration": "0s",
+          "easing": "ease",
+          "animation": "none",
+          "animationDuration": "0s",
+          "animationEasing": "ease"
+        }
+      },
+      "tooltip": {
+        "name": "none",
+        "duration": "0s",
+        "easing": "ease"
+      },
+      "video": "videos/page@e8563bf19d897d5948bd7d0f9cf5bf5e.webm"
+    }
+  ],
+  "interruption": "Not established by timing checks; requires trajectory proof"
+}

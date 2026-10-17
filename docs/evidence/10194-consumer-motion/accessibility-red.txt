@@ -1,0 +1,122 @@
+
+ RUN  v5.0.2 /home/drew/.cache/beelink-gate/github.com/tangle-network/brand
+
+ ❯  @tangle-network/ui  src/markdown/api-presentation.test.tsx (9 tests | 5 failed) 251ms
+   ✓ shared API presentation (4)
+     ✓ renders field paths without turning schema text into HTML 38ms
+     ✓ keeps stale clipboard completions and disposed feedback silent 1ms
+     ✓ blocks duplicate writes until the accepted operation settles 1ms
+     ✓ retains exact newlines and plain binary/SSE text 1ms
+   ❯ copy binding cleanup (5)
+     × restores retained DOM after pending 73ms
+     × restores retained DOM after success 56ms
+     × restores retained DOM after failure 55ms
+     × restores an originally absent accessible label 2ms
+     × gives a single code example no orphaned tab relationship 22ms
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 4 passed (9)
+   Start at  17:44:10
+   Duration  1.44s (environment 41%, transform 22%, tests 19%, import 11%, setup 7%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   @tangle-network/ui  src/markdown/api-presentation.test.tsx > copy binding cleanup > restores retained DOM after pending
+AssertionError: expected 'Copying to clipboard' to be 'Copy request' // Object.is equality
+
+Expected: "Copy request"
+Received: "Copying to clipboard"
+
+ ❯ src/markdown/api-presentation.test.tsx:48:46
+     46|    }
+     47|    cleanup();
+     48|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+       |                                              ^
+     49|    resolve();await Promise.resolve();await Promise.resolve();
+     50|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL   @tangle-network/ui  src/markdown/api-presentation.test.tsx > copy binding cleanup > restores retained DOM after success
+AssertionError: expected 'Copied' to be 'Copy request' // Object.is equality
+
+Expected: "Copy request"
+Received: "Copied"
+
+ ❯ src/markdown/api-presentation.test.tsx:48:46
+     46|    }
+     47|    cleanup();
+     48|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+       |                                              ^
+     49|    resolve();await Promise.resolve();await Promise.resolve();
+     50|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL   @tangle-network/ui  src/markdown/api-presentation.test.tsx > copy binding cleanup > restores retained DOM after failure
+AssertionError: expected 'Copy to clipboard' to be 'Copy request' // Object.is equality
+
+Expected: "Copy request"
+Received: "Copy to clipboard"
+
+ ❯ src/markdown/api-presentation.test.tsx:48:46
+     46|    }
+     47|    cleanup();
+     48|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+       |                                              ^
+     49|    resolve();await Promise.resolve();await Promise.resolve();
+     50|    expect(button.getAttribute("aria-label")).toBe("Copy request");expe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL   @tangle-network/ui  src/markdown/api-presentation.test.tsx > copy binding cleanup > restores an originally absent accessible label
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/markdown/api-presentation.test.tsx:57:154
+     55|  it("restores an originally absent accessible label",()=>{
+     56|   const button=document.createElement("button"),status=document.create…
+     57|   const cleanup=bindCopyButton(button,status,()=>"bytes");button.setAt…
+       |                                                                                                                                                          ^
+     58|  });
+     59|  it("gives a single code example no orphaned tab relationship",()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL   @tangle-network/ui  src/markdown/api-presentation.test.tsx > copy binding cleanup > gives a single code example no orphaned tab relationship
+AssertionError: expected <div id="_r_0_-panel" …(2)>…(1)</div> to be null
+
+- Expected:
+null
+
++ Received:
+<div
+  aria-labelledby="_r_0_-tab-0"
+  id="_r_0_-panel"
+  role="tabpanel"
+>
+  <pre
+    aria-label="Code"
+    class="focus-visible:outline-1 focus-visible:outline-[var(--focus-border)] focus-visible:ring-4 focus-visible:ring-[var(--focus-halo)] focus-visible:-outline-offset-1 focus-visible:ring-inset"
+    role="region"
+    style="margin: 0px; padding: var(--code-padding-y, 0.625rem) var(--code-padding-x, 0.75rem); background: transparent; color: var(--syntax-foreground, currentColor); font-size: var(--code-font-size, 0.8125rem); line-height: var(--code-line-height, 1.5); overflow-x: auto;"
+    tabindex="0"
+  >
+    <code
+      style="font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); white-space: pre;"
+    >
+      one
+    </code>
+  </pre>
+</div>
+
+ ❯ src/markdown/api-presentation.test.tsx:61:120
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯

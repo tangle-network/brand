@@ -1,0 +1,87 @@
+{
+  "sha": "4919c826c0b594b36eedd66fba455557b5963ecc",
+  "at": "2026-10-15T19:51:30.591Z",
+  "url": "http://127.0.0.1:44373/design-contract",
+  "cases": [
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "react",
+      "font": "\"Inter Variable\", Inter, Geist, sans-serif",
+      "size": "40px",
+      "color": "rgb(26, 24, 47)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "renderer": "hono",
+      "font": "\"Inter Variable\", Inter, Geist, ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "size": "30px",
+      "color": "rgb(26, 24, 47)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "react",
+      "font": "\"Inter Variable\", Inter, Geist, sans-serif",
+      "size": "40px",
+      "color": "rgb(230, 230, 230)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "renderer": "hono",
+      "font": "\"Inter Variable\", Inter, Geist, ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "size": "30px",
+      "color": "rgb(230, 230, 230)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "react",
+      "font": "\"Inter Variable\", Inter, Geist, sans-serif",
+      "size": "64px",
+      "color": "rgb(26, 24, 47)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "renderer": "hono",
+      "font": "\"Inter Variable\", Inter, Geist, ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "size": "30px",
+      "color": "rgb(26, 24, 47)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "react",
+      "font": "\"Inter Variable\", Inter, Geist, sans-serif",
+      "size": "64px",
+      "color": "rgb(230, 230, 230)",
+      "overflow": false,
+      "h1": 1
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "renderer": "hono",
+      "font": "\"Inter Variable\", Inter, Geist, ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "size": "30px",
+      "color": "rgb(230, 230, 230)",
+      "overflow": false,
+      "h1": 1
+    }
+  ]
+}

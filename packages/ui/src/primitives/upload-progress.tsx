@@ -7,6 +7,7 @@
 
 import { AlertCircle, CheckCircle2, FileText, Loader2, RefreshCw, X } from "lucide-react";
 import { cn } from "../lib/utils";
+import { Button } from "./button";
 
 export interface UploadFile {
   id: string;
@@ -85,22 +86,26 @@ export function UploadProgress({ files, onRemove, onRetry, className }: UploadPr
           {/* Actions */}
           <div className="flex shrink-0 items-center gap-1">
             {file.status === "error" && onRetry && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => onRetry(file.id)}
-                className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                aria-label={`Retry ${file.name}`}
               >
-                <RefreshCw className="h-3.5 w-3.5" />
-              </button>
+                <RefreshCw aria-hidden="true" />
+              </Button>
             )}
             {onRemove && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => onRemove(file.id)}
-                className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                aria-label={`Remove ${file.name}`}
               >
-                <X className="h-3.5 w-3.5" />
-              </button>
+                <X aria-hidden="true" />
+              </Button>
             )}
           </div>
         </div>

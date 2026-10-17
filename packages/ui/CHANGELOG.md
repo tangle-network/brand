@@ -1,5 +1,78 @@
 # @tangle-network/ui
 
+## 11.40.1
+
+### Patch Changes
+
+- af0c788: Give Button, Input and SelectTrigger a shared 44px minimum in both dimensions on coarse primary pointers, including compact density. Icon buttons keep a square 44px touch target. Fine-pointer sizes and the existing field text floor are unchanged.
+  
+  Name UploadProgress retry and remove actions after their file, and render them with the shared ghost icon Button for consistent focus and hit areas. Actions remain non-submitting buttons; retry is available only for failed files.
+
+## 11.40.0
+
+### Minor Changes
+
+- 63e1e7e: Add the settings atoms to `@tangle-network/ui/primitives`, so every product's settings page draws from one owner:
+  
+  - `Field` and `fieldMessageId`, promoted from Agent App's profile form with the same API. The info tip is a bare `Button` with a 44px hit area on coarse pointers.
+  - `SettingsRow`: `inline`, `compact` and `stacked` layouts; a save status after the label, announced politely; an error (with optional Retry) or a lock reason that replaces the description, describes the control and marks it invalid. No className sizing hooks.
+  - `SettingsSection`: a `Card` with a 16px title, an anchor `id`, a `danger` tone, top-right actions and a footer on the muted plane.
+  - `SettingsList` and `SettingsListItem`: subgrid-aligned leading, state, action and menu columns. The item's one at-rest `action` is an outline button, so it never reads as the state; with a `disabledReason` it stays focusable, does nothing and shows the reason under the meta. Destructive actions go in the ⋯ menu, where an unavailable item stays focusable with its reason.
+  
+  `Button` gains `variant="destructive-outline"` for a destructive action at rest, such as a danger section's "Delete project…". `Avatar` gains `size` (`sm` 32px, `md` 40px by default). `Switch` keeps its 36 x 20 track and gets a 44px hit area on coarse pointers, like the info tip.
+  
+  Rows and lists answer to their card's width: below 34rem rows stack and list items become two lines with the state under the title.
+  
+  `PageShell` gains `measure="settings"` and a `header` slot. The settings measure is a 48rem column of cards with a sticky 13rem section column once its frame is 60rem wide, and a sticky 56px tab strip below that which keeps the current tab in view by scrolling the strip only, including when the links are replaced or the web font swaps. Without navigation it is the 48rem column alone. Its `className` goes on the frame, so a `max-w-*` bounds the width the layout answers to.
+  
+  The reading layout adds its 13rem navigation track only when it has a navigation, so an article with a header or an outline but no navigation no longer drops into that track. Every existing export is unchanged.
+
+## 11.39.0
+
+### Minor Changes
+
+- f10bf8a: Support TooltipContent portal={false} for content that belongs to its local container. Keep the default portal, shared Content/SurfaceMotion owner, positioning, forwarded refs, asChild and Root state APIs.
+  
+  Preserve the caller as the asChild slot target when Radix adds accessibility content.
+
+## 11.38.2
+
+### Patch Changes
+
+- b33914e: Keep accepted Tooltip reopens open while exit content is retained. Preserve controlled/defaultOpen APIs, native disabled-trigger descriptions and sibling-tooltip dismissal through the shared Root owner.
+
+## 11.38.1
+
+### Patch Changes
+
+- c049dc4: Bound shared surface dismissal by its scoped role deadline so missing CSS animation events cannot strand Radix cleanup or focus return. Preserve retained motion values on reopen.
+
+## 11.38.0
+
+### Minor Changes
+
+- f115dda: Wizard: the shared multi-step flow primitive. Compound composition (`<Wizard.Step>`), uncontrolled by default with a controlled escape hatch, per-step primary actions with async gating, mobile-first progress, themed by the existing semantic tokens. The end of bespoke stepper markup across products.
+
+## 11.37.0
+
+### Minor Changes
+
+- c01503e: Share canonical syntax highlighting, exact-copy feedback and accessible code-tab behavior with Hono. Extend CodeBlock with language examples and request/response/error metadata; add API schema presentation without API-specific data.
+
+### Patch Changes
+
+- 6087148: Pin the shared surface motion runtime to the compatible maintained dependency chain so consumers can retain their existing package-age policies.
+  
+  Route Popover through the shared interruptible surface owner and apply the shared control transition to bare buttons.
+  
+  Restore native copy announcements on binding cleanup and omit orphaned tab relationships for a single example.
+
+## 11.36.0
+
+### Minor Changes
+
+- 19a10d9: Extend PageShell reading slots, Heading and PageHeader opt-in presentation, and Button display size. Publish React-free primitive presentation classes and native-dialog binding for Hono without changing existing control defaults.
+
 ## 11.35.0
 
 ### Minor Changes

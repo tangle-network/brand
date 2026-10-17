@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./button";
+import { X } from "lucide-react";
 import { HelpText } from "./help-text";
 import { Input, Textarea } from "./input";
 import { Label } from "./label";
@@ -13,7 +14,7 @@ function Contract() {
   return (
     <main className="mx-auto max-w-5xl space-y-6 bg-background p-4 text-foreground" data-presentation-contract>
       <h1 className="text-xl font-semibold">Field and metric presentation</h1>
-      {(["sm", "md", "lg", "compact", "touch"] as const).map((size) => (
+      {(["default", "sm", "md", "lg", "compact", "touch"] as const).map((size) => (
         <section key={size} data-size-row={size} className="space-y-2">
           <h2 className="font-semibold">{size}</h2>
           <div className="flex flex-wrap items-end gap-3">
@@ -27,10 +28,16 @@ function Contract() {
             </Select>
             <Button size={size} onClick={() => setActions((value) => value + 1)}>Save</Button>
             <Button size={size} variant="outline">Cancel</Button>
+            <Button size={size} aria-label={`${size} short action`}>+</Button>
           </div>
           <Textarea size={size} aria-label={`${size} notes`} placeholder="Details" />
         </section>
       ))}
+      <section className="flex flex-wrap gap-3" aria-label="Icon controls">
+        {(["icon-sm", "icon", "icon-lg"] as const).map((size) => (
+          <Button key={size} size={size} aria-label={`${size} action`} onClick={() => setActions((value) => value + 1)}><X aria-hidden="true" /></Button>
+        ))}
+      </section>
       <section className="max-w-sm space-y-1.5" data-form-text>
         <Label htmlFor="workspace-name">Workspace name</Label>
         <Input id="workspace-name" aria-describedby="workspace-name-hint" placeholder="Acme" />

@@ -1,7 +1,10 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { Slottable } from "@radix-ui/react-slot";
 import * as React from "react";
+import { SurfaceMotion } from "../lib/surface-motion";
+import { surfaceMotion } from "../lib/motion";
 import { cn } from "../lib/utils";
 
 /**
@@ -22,7 +25,21 @@ const TooltipProvider = ({
 );
 TooltipProvider.displayName = "TooltipProvider";
 
-const Tooltip = TooltipPrimitive.Root;
+// Keep Radix on its controlled path even for the public uncontrolled API.
+// Its global tooltip.open event then runs before the new open state commits:
+// a retained content listener cannot turn its own accepted reopen into Close.
+const Tooltip = ({ open, defaultOpen = false, onOpenChange, ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) => {
+  const [localOpen, setLocalOpen] = React.useState(defaultOpen);
+  return <TooltipPrimitive.Root
+    {...props}
+    open={open ?? localOpen}
+    onOpenChange={(next) => {
+      if (open === undefined) setLocalOpen(next);
+      onOpenChange?.(next);
+    }}
+  />;
+};
+Tooltip.displayName = "Tooltip";
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
@@ -32,23 +49,29 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
  */
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 6, ...props }, ref) => (
-  <TooltipPrimitive.Portal>
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+    /** Render through a portal; use false to keep content in its local owner. */
+    portal?: boolean;
+  }
+>(({ className, sideOffset = 6, asChild, children, portal = true, ...props }, ref) => {
+  const content = (
     <TooltipPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
         "z-50 max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-md bg-foreground px-2.5 py-1.5 text-background text-xs leading-snug shadow-md",
-        "data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95",
-        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
-        "duration-150 ease-out motion-reduce:animate-none",
+        surfaceMotion,
         className,
       )}
       {...props}
-    />
-  </TooltipPrimitive.Portal>
-));
+      asChild
+    ><SurfaceMotion kind="tooltip" asChild={asChild}>
+      {/* Keep the caller as the slot target when Radix adds accessibility children. */}
+      {asChild ? <Slottable>{children}</Slottable> : children}
+    </SurfaceMotion></TooltipPrimitive.Content>
+  );
+  return portal ? <TooltipPrimitive.Portal>{content}</TooltipPrimitive.Portal> : content;
+});
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };

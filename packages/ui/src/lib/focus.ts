@@ -1,3 +1,4 @@
+import { controlMotion } from "./motion";
 import { ixField } from "./interaction";
 
 /**
@@ -30,7 +31,7 @@ import { ixField } from "./interaction";
  * Tailwind emits `focus:` after `hover:`.
  */
 export const focusField =
-  "border-border transition-[border-color,box-shadow] duration-150 ease-out hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]";
+  `border-border ${controlMotion} hover:border-[var(--border-strong)] focus:outline-hidden focus:border-[var(--focus-border)] focus:ring-3 focus:ring-[var(--focus-halo)]`;
 
 /**
  * The field treatment for a container that wraps a borderless field, such as a
@@ -50,7 +51,7 @@ export const focusField =
  * borderless field inside stays transparent.
  */
 export const focusFieldWithin =
-  `focus-field-within transition-[border-color,box-shadow] duration-150 ease-out ${ixField} has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:border-[var(--focus-border)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-3 has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-[var(--focus-halo)]`;
+  `focus-field-within ${controlMotion} ${ixField} has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:border-[var(--focus-border)] has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-3 has-[:is(textarea,select,[contenteditable]:not([contenteditable=false]),input:not([type=button],[type=submit],[type=reset],[type=image],[type=checkbox],[type=radio],[type=range],[type=color],[type=file])):focus]:ring-[var(--focus-halo)]`;
 
 /** Error state for a field: a danger hairline and the same focus shape in danger. Compose after `focusField`. */
 export const focusFieldInvalid =

@@ -1,6 +1,6 @@
 # Tangle product design refresh
 
-Proposed delivery brief, 2026-10-15. Tracks [#384](https://github.com/tangle-network/brand/issues/384). [Brand guidelines](brand-guidelines.md) remain the visual authority; this brief describes how to improve and adopt that system, not a second palette or component library. Product positioning remains with the company and product owners.
+Delivery brief, updated 2026-10-17. Tracks [#384](https://github.com/tangle-network/brand/issues/384). The [design bible](design-bible.md) owns shared vision and creation principles, [Brand guidelines](brand-guidelines.md) own visual implementation guidance, and the [evidence contract](design-evidence-contract.md) owns verification. This brief applies those sources to concrete journeys; it is not a second palette or component library. Product positioning stays in the relevant product.
 
 ## Why this work exists
 
@@ -45,13 +45,17 @@ Use [Charts](../packages/charts/README.md), existing controls and surfaces as th
 
 **Explore.** Compare the three compositions side by side with identical representative content. Use real, permissioned artifacts where possible; label illustrative data. Judge recognition, comprehension, visual hierarchy and task flow—not an average model-generated beauty score.
 
-**Choose and build.** One accountable design owner resolves trade-offs with the product owner. Agents can explore, critique, map consumers and implement; they do not independently set different product-wide visual policies. Build the selected direction through one complete journey in a real consumer. Use an existing preview or feature flag when available; do not create a design-review service.
+**Choose and build.** Record the selected direction and its trade-offs in the existing PR, following the design bible's existing direction-approval policy. Exploration, critique and implementation use the same shared visual policy. Build the selected direction through one complete journey in a real consumer. Use an existing preview or feature flag when available; do not create a design-review service.
+
+**Encode the starting point.** Put the chosen defaults and complete examples into the existing template, starter or shared composition. For a workflow, preview its purpose, supply safe defaults, ask only for missing information or decisions that cannot safely be inferred, and save a paused draft before activation. For an agent app, make its first useful work product and correction path clear. Optional notifications and advanced controls stay optional; spend and external actions retain their required consent. Instantiate the template or generate the app and exercise that result. A documentation edit alone does not establish that new products start well.
 
 **Extract and adopt.** Move only repeated, demonstrated improvements into their existing owner: Brand tokens, UI primitives, Charts, Sandbox UI widgets, or Agent App compositions. Publish needed package changes, pin the real version in the consumer, verify the rendered flow, then migrate additional products. Package publication is not consumer adoption. Keep domain content and confidential customer material out of shared packages.
 
 **Critique and finish.** Compare old/new while performing the task. Ask what the product is, what happened, what to do next, and what cannot safely be assumed. Collect direct feedback from the founder and relevant users; low traffic is not a reason to invent an A/B-test result. Retain remaining defects by owner. Do not freeze unrelated development or add broad mocked suites to certify visual taste.
 
 ## Useful references and limits
+
+- [Katie Dill: How to scale intent, quality, and artistry with AI](https://www.youtube.com/watch?v=GLvFTMtw4Jk): encode a clear point of view in the creation tools, review complete experiences and explore beyond the first plausible output. These are design practices to test, not evidence of a guaranteed numerical improvement or a mandate to replace one tool interface with another.
 
 - [Linear's March 2026 refresh](https://linear.app/now/behind-the-latest-design-refresh): attention hierarchy, consistent chrome, in-product comparison and coding agents used under a coherent direction. Adopt the method, not Linear's palette.
 - [Apple chart guidance](https://developer.apple.com/design/human-interface-guidelines/charts): make the key information legible and provide accessible detail. Do not equate polish with glass effects.

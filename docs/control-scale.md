@@ -1,5 +1,7 @@
 # Control and type scale
 
+Shared principles and craft/runtime acceptance live in the [design bible](design-bible.md). This document owns the implementation contract.
+
 One scale sizes every control and form text in Tangle products.
 Brand owns the tokens; `@tangle-network/ui` owns the primitives that read them; Sandbox UI and Agent App re-export or compose those primitives.
 A product picks a size name, never a pixel value.
@@ -15,7 +17,8 @@ A product picks a size name, never a pixel value.
 | `lg` | 44px | 16px | `rounded-lg` | `--control-height-lg`, `--control-text-lg` |
 
 - Every control defaults to `md`. Before this scale, a default `Input` was 44px beside a 36px default `Button` and `SelectTrigger`.
-- Icon-only buttons use `icon-sm`, `icon` and `icon-lg`: squares on the same three heights.
+- On a coarse primary pointer, `Button`, `Input` and `SelectTrigger` have a 44px minimum in both dimensions at every scale size, including `compact`. Density tokens can increase this height but cannot shrink the touch floor. Fine-primary-pointer devices, including hybrids with a secondary touch input, retain the table above, matching the existing SegmentedControl policy.
+- Icon-only buttons use `icon-sm`, `icon` and `icon-lg`: squares on the same three heights, with a 44px minimum in both dimensions on coarse pointers.
 - `md` reads `--control-height`, the density knob; set it on a subtree to make that region denser or roomier.
 - Fields (`Input`, `Textarea`, `SelectTrigger`) render 16px text on a coarse pointer at every size, because iOS Safari zooms the page when a field under 16px takes focus.
 - `compact` and `touch` remain for existing callers: `compact` is `md` with tighter padding; `touch` is at least 44px with 16px text. `Button` keeps `xl` (52px) for a display call to action outside the scale.
@@ -53,6 +56,17 @@ Fields fill with the well for the level they sit on (`--well`, re-declared by ea
 
 `Input` and `Textarea` render their `hint` and `error` props with `HelpText` and point `aria-describedby` at them.
 A field composed by hand uses `Label` and `HelpText` and sets `aria-describedby` itself.
+
+## Settings pages
+
+Settings compose four primitives from `@tangle-network/ui/primitives`, all at the 14px floor (section titles 16px) with controls at `md`:
+
+- `SettingsSection` is one card per group (at most four per page section), with an anchor `id`, an optional one-line description, top-right actions, a `danger` tone and a footer. A danger section's action at rest is `Button variant="destructive-outline"`; the confirmation it opens uses `destructive`.
+- `SettingsRow` is one setting: label left, control right (`inline`), on the label's line (`compact`, for switches and single buttons) or under it (`stacked`). Its status sits after the label; an `error` or `disabledReason` replaces the description and is wired to the control through `fieldMessageId(htmlFor)`.
+- `SettingsList` and `SettingsListItem` are comparable rows with aligned state and action columns. The item draws its one at-rest `action` as an outline button, so it never reads as the state; a `disabledReason` locks it and shows the reason under the meta. Destructive actions live only in the item's ⋯ menu.
+- `Field` is a labelled field for forms that are not rows, with the same message wiring.
+
+Rows and lists respond to their card's width, not the viewport's. `PageShell measure="settings"` frames the page: a 13rem section column beside a 48rem article from 60rem of frame width, and a 56px tab strip below that.
 
 ## Utilities
 

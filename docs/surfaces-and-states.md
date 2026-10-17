@@ -1,5 +1,7 @@
 # Surfaces and interaction states
 
+Shared principles and craft/runtime acceptance live in the [design bible](design-bible.md). This document owns the implementation contract.
+
 A page reads as a hierarchy only when each plane steps off the one it sits on, and every interactive thing answers the pointer the same way.
 Brand owns the ladder and the state palette (`tokens.css`, `named-themes.css`); `@tangle-network/ui` owns the primitives that apply them (`lib/interaction.ts`).
 A product uses the primitives; it never paints a plane or a hover by hand.
@@ -70,7 +72,7 @@ A soft wash, `--ix-hover-bg` (.07 light, .08 dark), replaces the glow where a gl
 
 | Primitive | Helper |
 | --- | --- |
-| `Button` default, destructive, secondary, outline, sandbox | `ixControl` |
+| `Button` default, destructive, destructive-outline, secondary, outline, sandbox | `ixControl` |
 | `Button` ghost, link, bare | `ixControlSoft` (wash, never the glow) |
 | `Button` with `aria-pressed` | `ixControl` + `ixSelected` |
 | `Input`, `Textarea` | `ixField` + focusField's `:focus` border and halo |

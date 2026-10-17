@@ -1,6 +1,5 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
-import type { StatusTone } from "./status-pill";
 
 /**
  * An inline message that stays on the page: a policy note above a form, a
@@ -14,7 +13,7 @@ import type { StatusTone } from "./status-pill";
  * `danger` and `warning` announce themselves (`role="alert"`); the quieter
  * tones are `role="status"` so a screen reader is not interrupted by a note.
  */
-export type AlertTone = Exclude<StatusTone, "running">;
+export type AlertTone = "neutral" | "info" | "success" | "warning" | "danger";
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   tone?: AlertTone;
