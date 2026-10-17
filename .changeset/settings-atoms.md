@@ -11,4 +11,6 @@ Add the settings atoms to `@tangle-network/ui/primitives`, so every product's se
 
 Rows and lists answer to their card's width: below 34rem rows stack and list items become two lines with the state under the title.
 
-`PageShell` gains `measure="settings"` and a `header` slot. The settings measure is a 48rem column of cards with a sticky 13rem section column once its frame is 60rem wide, and a sticky 56px tab strip below that which keeps the current tab in view by scrolling the strip only. The reading layout and every existing export are unchanged.
+`PageShell` gains `measure="settings"` and a `header` slot. The settings measure is a 48rem column of cards with a sticky 13rem section column once its frame is 60rem wide, and a sticky 56px tab strip below that which keeps the current tab in view by scrolling the strip only, including when the links are replaced or the web font swaps. Without navigation it is the 48rem column alone. Its `className` goes on the frame, so a `max-w-*` bounds the width the layout answers to.
+
+The reading layout adds its 13rem navigation track only when it has a navigation, so an article with a header or an outline but no navigation no longer drops into that track. Every existing export is unchanged.

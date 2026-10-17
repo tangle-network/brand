@@ -1,5 +1,5 @@
 import { Bell, Bot, Check, CreditCard, Inbox, Loader2, Settings, Users, Workflow } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Avatar, AvatarFallback } from "./avatar";
 import { Button } from "./button";
@@ -52,14 +52,28 @@ const roles = [
   { value: "viewer", label: "Can only view" },
 ];
 
-function SettingsPage() {
+interface SettingsPageProps {
+  /** Only the first two sections render at first; the rest arrive 300ms later, as role-gated sections do. */
+  sectionsLoadLater?: boolean;
+  /** Leave out the section navigation. */
+  withoutNavigation?: boolean;
+  className?: string;
+}
+
+function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, className }: SettingsPageProps) {
   const [current, setCurrent] = useState("team");
+  const [sections, setSections] = useState<readonly (typeof SECTIONS)[number][]>(sectionsLoadLater ? SECTIONS.slice(0, 2) : SECTIONS);
+  useEffect(() => {
+    if (!sectionsLoadLater) return;
+    const loaded = setTimeout(() => setSections(SECTIONS), 300);
+    return () => clearTimeout(loaded);
+  }, [sectionsLoadLater]);
   const [name, setName] = useState("Fieldnote GTM");
   const [digest, setDigest] = useState(true);
   const [approval, setApproval] = useState("each");
   const [roleOf, setRoleOf] = useState<Record<string, string>>(Object.fromEntries(members.map((m) => [m.email, m.role])));
 
-  const navigation = SECTIONS.map((section) => {
+  const navigation = withoutNavigation ? undefined : sections.map((section) => {
     const Icon = section.icon;
     return (
       <a key={section.id} href={`#${section.id}`} aria-current={current === section.id ? "page" : undefined} onClick={() => setCurrent(section.id)}>
@@ -73,6 +87,7 @@ function SettingsPage() {
   return (
     <PageShell
       measure="settings"
+      className={className}
       navigationLabel="Settings sections"
       header={<PageHeader title="Project settings" description="Fieldnote GTM" />}
       navigation={navigation}
@@ -226,6 +241,15 @@ type Story = StoryObj<typeof SettingsSection>;
 
 /** Every settings atom state on one page in PageShell measure="settings"; resize to see the nav switch at 60rem and rows stack at 34rem. */
 export const Page: Story = { render: () => <SettingsPage /> };
+
+/** The sections a role gates load after the page renders; on a phone the strip still centres the current tab when it arrives. */
+export const SectionsLoadLater: Story = { render: () => <SettingsPage sectionsLoadLater /> };
+
+/** A settings page with no section navigation is the 48rem column alone at every width. */
+export const WithoutNavigation: Story = { render: () => <SettingsPage withoutNavigation /> };
+
+/** className bounds the frame the layout answers to, so a 42rem page in a wide window gets the tab strip. */
+export const Bounded: Story = { render: () => <SettingsPage className="mx-auto max-w-2xl" /> };
 
 /** The promoted Field: hint, info tip with an aside action, a live error, and a status. */
 export const Fields: Story = { render: () => <FieldsExample /> };

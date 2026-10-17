@@ -14,18 +14,21 @@
 .tangle-reading-article { width: 100%; max-width: var(--reading-max-width); overflow-wrap: anywhere; }
 .tangle-reading-nav a, .tangle-reading-outline a { display: block; padding: 0.5rem 0; color: hsl(var(--muted-foreground)); text-decoration: none; }
 .tangle-reading-nav a[aria-current]:not([aria-current="false"]), .tangle-reading-outline a[aria-current]:not([aria-current="false"]) { color: var(--accent-text); font-weight: 600; }
+/* The 13rem track exists only beside a nav, so an article with no nav keeps the full column. */
 @media(min-width: 64rem) {
-  .tangle-reading-shell { grid-template-columns: 13rem minmax(0,1fr); }
+  .tangle-reading-shell:has(> .tangle-reading-nav) { grid-template-columns: 13rem minmax(0,1fr); }
   .tangle-reading-outline { display: none; }
   .tangle-reading-nav { position: sticky; top: var(--shell-header-height); align-self: start; max-height: calc(100dvh - var(--shell-header-height)); overflow: auto; }
 }
 @media(min-width: 80rem) {
-  .tangle-reading-shell:has(.tangle-reading-outline) { grid-template-columns: 13rem minmax(0,1fr) 11rem; }
+  .tangle-reading-shell:has(> .tangle-reading-outline) { grid-template-columns: minmax(0,1fr) 11rem; }
+  .tangle-reading-shell:where(:has(> .tangle-reading-nav)):has(> .tangle-reading-outline) { grid-template-columns: 13rem minmax(0,1fr) 11rem; }
   .tangle-reading-outline { display: block; position: sticky; top: var(--shell-header-height); align-self: start; }
 }
 .tangle-reading-header { grid-column: 1 / -1; min-width: 0; }
 /* PageShell measure="settings". The frame is the query container, so the layout follows the content area's width, not the viewport's.
-   Below 60rem the navigation is a sticky tab strip whose track is the divider; from 60rem it is a sticky 13rem column beside a 48rem article. */
+   Below 60rem the navigation is a sticky tab strip whose track is the divider; from 60rem it is a sticky 13rem column beside a 48rem article.
+   Without a nav the page is the 48rem column alone. */
 .tangle-settings-frame { container: tangle-settings / inline-size; width: 100%; min-width: 0; }
 .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 1.5rem; grid-template-columns: minmax(0,1fr); gap: 0; max-width: calc(13rem + 2.5rem + 48rem + 4rem); padding: 1.5rem var(--tangle-settings-gutter) 3rem; }
 .tangle-reading-shell[data-measure="settings"] > .tangle-reading-header { margin-bottom: 0.5rem; }
@@ -47,7 +50,8 @@
   .tangle-reading-shell[data-measure="settings"] > .tangle-reading-article { gap: 1rem; }
 }
 @container tangle-settings (min-width: 60rem) {
-  .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 2rem; grid-template-columns: 13rem minmax(0,48rem); column-gap: 2.5rem; align-items: start; padding: 2rem; }
+  .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 2rem; grid-template-columns: minmax(0,48rem); column-gap: 2.5rem; align-items: start; padding: 2rem; }
+  .tangle-reading-shell[data-measure="settings"]:has(> .tangle-reading-nav) { grid-template-columns: 13rem minmax(0,48rem); }
   .tangle-reading-shell[data-measure="settings"] > .tangle-reading-header { margin-bottom: 1.75rem; }
   .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav { top: 2rem; flex-direction: column; align-items: stretch; gap: 2px; height: auto; margin: 0; padding: 0; overflow: visible; background: none; box-shadow: none; }
   .tangle-reading-shell[data-measure="settings"] > .tangle-reading-nav > :is(ul, ol) { flex-direction: column; align-items: stretch; gap: 2px; }

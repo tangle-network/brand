@@ -230,6 +230,50 @@ for (const theme of ["light", "dark"]) {
     expect(errors).toEqual([])
   })
 
+  test(`sections that load after the page: the strip centres the current tab when it arrives (${theme})`, async ({ page }, testInfo) => {
+    const errors = await openStory(page, "primitives-settings--sections-load-later", theme, PHONE)
+    const nav = page.getByRole("navigation", { name: "Settings sections" })
+    const current = nav.locator('a[aria-current="page"]')
+    await expect(current).toHaveText(/Team/)
+    await expect.poll(async () => {
+      const [tab, strip] = [await box(current), await box(nav)]
+      return tab.left >= strip.left + 16 && tab.right <= strip.right - 16
+    }, { message: "the current tab came into view" }).toBe(true)
+    expect(await nav.evaluate((node) => node.scrollLeft), "the strip scrolled to it").toBeGreaterThan(0)
+    expect(await page.evaluate(() => [window.scrollX, window.scrollY]), "only the strip scrolled, never the page").toEqual([0, 0])
+    await shot(page, testInfo, `sections-load-later-390-${theme}.png`)
+    expect(errors).toEqual([])
+  })
+
+  test(`settings page without navigation: the 48rem column alone (${theme})`, async ({ page }, testInfo) => {
+    const errors = await openStory(page, "primitives-settings--without-navigation", theme, DESKTOP)
+    await expect(page.getByRole("navigation")).toHaveCount(0)
+    const article = await box(page.locator(".tangle-reading-article"))
+    const header = await box(page.locator(".tangle-reading-header"))
+    expect(article.width, "the article keeps its 48rem column").toBeCloseTo(768, 0)
+    expect(header.left, "the header starts with the column").toBeCloseTo(article.left, 0)
+    expect(header.right, "the header ends with the column").toBeCloseTo(article.right, 0)
+    await shot(page, testInfo, `without-navigation-1280-${theme}.png`, { fullPage: true })
+    await page.setViewportSize(PHONE)
+    expect((await box(page.locator(".tangle-reading-article"))).width, "the column spans the phone inside its gutters").toBeCloseTo(PHONE.width - 32, 0)
+    expect(await pageOverflow(page), "no sideways page scroll").toBeLessThanOrEqual(1)
+    await shot(page, testInfo, `without-navigation-390-${theme}.png`, { fullPage: true })
+    expect(errors).toEqual([])
+  })
+
+  test(`a frame bounded by className picks its layout from its own width (${theme})`, async ({ page }, testInfo) => {
+    const errors = await openStory(page, "primitives-settings--bounded", theme, DESKTOP)
+    const frame = await box(page.locator(".tangle-settings-frame"))
+    expect(frame.width, "max-w-2xl bounds the frame").toBe(672)
+    expect(frame.left, "mx-auto centres it").toBeCloseTo((DESKTOP.width - 672) / 2, 0)
+    const nav = page.getByRole("navigation", { name: "Settings sections" })
+    expect((await box(nav)).height, "a 42rem frame gets the tab strip in a 1280 px window").toBe(56)
+    const article = await box(page.locator(".tangle-reading-article"))
+    expect(article.width, "the article spans the frame inside its gutters").toBeCloseTo(672 - 48, 0)
+    await shot(page, testInfo, `bounded-1280-${theme}.png`, { fullPage: true })
+    expect(errors).toEqual([])
+  })
+
   test(`fields at 1280 and 390 px (${theme})`, async ({ page }, testInfo) => {
     const errors = await openStory(page, "primitives-settings--fields", theme, DESKTOP)
     const error = page.locator(`#default-model-message`)
