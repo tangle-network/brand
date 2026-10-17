@@ -1,7 +1,7 @@
 /** React-free presentation. Consumers scan this published source with Tailwind. */
 import { surfaceMotion } from "./lib/motion";
 import { cva } from "class-variance-authority";
-import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText, fieldPresentation, fieldSizes, fieldTouchText } from "./lib/control-presentation";
+import { controlHeight, controlMotion, controlRadius, controlSizes, controlSquare, controlText, fieldPresentation, fieldSizes, fieldTouchText, touchTarget } from "./lib/control-presentation";
 import { focusRing, focusFieldInvalid } from "./lib/focus";
 import { ixControl, ixControlSoft, ixSelected, ixTabUnderline } from "./lib/interaction";
 import { cn } from "./lib/utils";
@@ -29,15 +29,15 @@ export const buttonVariants = cva(
           `bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-accent)] hover:bg-[var(--btn-primary-hover)] active:scale-[0.97] ${ixControl}`,
       },
       size: {
-        default: `${controlHeight.md} ${controlText.md} ${controlRadius.md} px-4 py-2`,
-        md: `${controlHeight.md} ${controlText.md} ${controlRadius.md} px-4 py-2`,
-        sm: `${controlHeight.sm} ${controlText.sm} ${controlRadius.sm} px-3`,
-        lg: `${controlHeight.lg} ${controlText.lg} ${controlRadius.lg} px-7`,
+        default: `${controlHeight.md} ${controlText.md} ${controlRadius.md} ${touchTarget} px-4 py-2`,
+        md: `${controlHeight.md} ${controlText.md} ${controlRadius.md} ${touchTarget} px-4 py-2`,
+        sm: `${controlHeight.sm} ${controlText.sm} ${controlRadius.sm} ${touchTarget} px-3`,
+        lg: `${controlHeight.lg} ${controlText.lg} ${controlRadius.lg} ${touchTarget} px-7`,
         display: "tangle-control-display",
         xl: "h-13 rounded-xl px-9 text-base",
-        icon: `${controlSquare.md} ${controlText.md} ${controlRadius.md}`,
-        "icon-sm": `${controlSquare.sm} ${controlText.sm} ${controlRadius.sm}`,
-        "icon-lg": `${controlSquare.lg} ${controlText.lg} ${controlRadius.lg}`,
+        icon: `${controlSquare.md} ${controlText.md} ${controlRadius.md} ${touchTarget}`,
+        "icon-sm": `${controlSquare.sm} ${controlText.sm} ${controlRadius.sm} ${touchTarget}`,
+        "icon-lg": `${controlSquare.lg} ${controlText.lg} ${controlRadius.lg} ${touchTarget}`,
         ...controlSizes,
       },
     },

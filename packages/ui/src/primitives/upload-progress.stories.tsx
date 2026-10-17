@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useState } from 'react'
+import { Button } from './button'
 import { UploadProgress, type UploadFile } from './upload-progress'
 
 const meta: Meta<typeof UploadProgress> = {
@@ -7,7 +9,7 @@ const meta: Meta<typeof UploadProgress> = {
   parameters: { layout: 'centered', backgrounds: { default: 'dark' } },
   decorators: [
     (Story) => (
-      <div className="w-[420px]">
+      <div className="w-[420px] max-w-[calc(100vw-2rem)]">
         <Story />
       </div>
     ),
@@ -118,3 +120,36 @@ export const NoActions: Story = {
   name: 'No remove / retry handlers',
   args: { files: [complete, uploading45, error] },
 }
+
+// A failed upload inside a form, as used by the Agent Builder cover field.
+// Each retry becomes pending; a new observed failure makes retry available again.
+const cover: UploadFile = {
+  id: 'cover',
+  name: 'cover-image-with-a-long-filename-for-project-review.png',
+  size: 2048,
+  status: 'error',
+  error: 'The upload failed. Try again or remove this file.',
+}
+
+function RecoveryExample() {
+  const [files, setFiles] = useState<UploadFile[]>([cover, complete])
+  const [retries, setRetries] = useState(0)
+  const [submits, setSubmits] = useState(0)
+  return (
+    <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); setSubmits((count) => count + 1) }}>
+      <UploadProgress
+        files={files}
+        onRetry={(id) => {
+          setRetries((count) => count + 1)
+          setFiles((current) => current.map((file) => file.id === id ? { ...file, status: 'pending', error: undefined } : file))
+        }}
+        onRemove={(id) => setFiles((current) => current.filter((file) => file.id !== id))}
+      />
+      <Button type="button" variant="outline" onClick={() => setFiles((current) => current.map((file) => file.id === cover.id ? cover : file))}>Simulate another failure</Button>
+      <output className="block text-foreground" aria-label="Retry count">{retries}</output>
+      <output className="block text-foreground" aria-label="Form submissions">{submits}</output>
+    </form>
+  )
+}
+
+export const Recovery: Story = { render: () => <RecoveryExample /> }

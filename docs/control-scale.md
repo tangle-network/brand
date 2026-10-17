@@ -17,7 +17,8 @@ A product picks a size name, never a pixel value.
 | `lg` | 44px | 16px | `rounded-lg` | `--control-height-lg`, `--control-text-lg` |
 
 - Every control defaults to `md`. Before this scale, a default `Input` was 44px beside a 36px default `Button` and `SelectTrigger`.
-- Icon-only buttons use `icon-sm`, `icon` and `icon-lg`: squares on the same three heights.
+- On a coarse primary pointer, `Button`, `Input` and `SelectTrigger` have a 44px minimum in both dimensions at every scale size, including `compact`. Density tokens can increase this height but cannot shrink the touch floor. Fine-primary-pointer devices, including hybrids with a secondary touch input, retain the table above, matching the existing SegmentedControl policy.
+- Icon-only buttons use `icon-sm`, `icon` and `icon-lg`: squares on the same three heights, with a 44px minimum in both dimensions on coarse pointers.
 - `md` reads `--control-height`, the density knob; set it on a subtree to make that region denser or roomier.
 - Fields (`Input`, `Textarea`, `SelectTrigger`) render 16px text on a coarse pointer at every size, because iOS Safari zooms the page when a field under 16px takes focus.
 - `compact` and `touch` remain for existing callers: `compact` is `md` with tighter padding; `touch` is at least 44px with 16px text. `Button` keeps `xl` (52px) for a display call to action outside the scale.
