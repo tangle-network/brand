@@ -22,6 +22,9 @@ const Switch = React.forwardRef<
       // theme. The bg-primary fill is tuned to carry white text and measured
       // 2.4:1 on the dark card, with a bg-background thumb at 2.5:1 on it.
       // brand's switch-contrast.test.ts asserts these pairs for every theme.
+      // On a coarse pointer a transparent 44px hit area surrounds the 20px track,
+      // as on InfoTip; the insets start inside the 2px border.
+      "relative pointer-coarse:before:absolute pointer-coarse:before:-inset-x-1.5 pointer-coarse:before:-inset-y-3.5 pointer-coarse:before:content-['']",
       "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 shadow-sm transition-[background-color,border-color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-transparent data-[state=checked]:bg-[var(--accent-text)] data-[state=unchecked]:border-muted-foreground data-[state=unchecked]:bg-transparent",
       focusRing,
       className,

@@ -1,4 +1,6 @@
 @import "tailwindcss";
 @import "@tangle-network/brand/styles";
+/* Consumers import UI's presentation contracts after Brand; stories render with them too. */
+@import "../packages/ui/src/styles/presentation.css";
 
 @source "../packages/*/src";

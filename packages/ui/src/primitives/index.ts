@@ -79,6 +79,7 @@ export { Badge, badgeVariants } from "./badge";
 export type { BadgeProps } from "./badge";
 
 export { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+export type { AvatarProps } from "./avatar";
 
 export {
   DropdownMenu,
@@ -198,6 +199,21 @@ export type { HeadingProps, HeadingVariant } from "./heading";
 
 export { PageShell } from "./page-shell";
 export type { PageShellProps } from "./page-shell";
+
+export { Field, fieldMessageId } from "./field";
+export type { FieldProps } from "./field";
+
+export { SettingsList, SettingsListItem, SettingsRow, SettingsSection } from "./settings";
+export type {
+  SettingsListAction,
+  SettingsListColumns,
+  SettingsListItemProps,
+  SettingsListMenuItem,
+  SettingsListProps,
+  SettingsRowLayout,
+  SettingsRowProps,
+  SettingsSectionProps,
+} from "./settings";
 
 export { PageHeader } from "./page-header";
 export type { PageHeaderProps } from "./page-header";

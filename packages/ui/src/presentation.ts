@@ -18,6 +18,8 @@ export const buttonVariants = cva(
           `bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97] ${ixControl}`,
         outline:
           `border border-border bg-card hover:bg-muted active:scale-[0.97] text-foreground ${ixControl}`,
+        "destructive-outline":
+          `border border-[var(--surface-danger-border)] bg-card hover:bg-[var(--surface-danger-bg)] active:scale-[0.97] text-[var(--surface-danger-text)] ${ixControl}`,
         secondary:
           `bg-muted border border-border text-foreground hover:bg-muted/80 active:scale-[0.97] ${ixControl}`,
         ghost:
