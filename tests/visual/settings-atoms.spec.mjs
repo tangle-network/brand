@@ -178,7 +178,9 @@ for (const theme of ["light", "dark"]) {
     const tab = await box(current)
     expect(tab.left, "current tab in view, clear of the edge").toBeGreaterThanOrEqual(navBox.left + 16)
     expect(tab.right).toBeLessThanOrEqual(navBox.right - 16)
-    expect(Math.abs((tab.left + tab.right) / 2 - (navBox.left + navBox.right) / 2), "current tab centred").toBeLessThan(2)
+    const scrolled = await nav.evaluate((node) => ({ left: node.scrollLeft, max: node.scrollWidth - node.clientWidth }))
+    const centred = Math.abs((tab.left + tab.right) / 2 - (navBox.left + navBox.right) / 2) < 2
+    expect(centred || Math.abs(scrolled.left - scrolled.max) < 1, "current tab centred, or the strip is at its end").toBe(true)
     expect(tab.height, "tabs are 44px").toBe(44)
     expect(await page.evaluate(() => [window.scrollX, window.scrollY]), "only the strip scrolled, never the page").toEqual([0, 0])
     await expect(nav.locator("svg").first(), "icons show only in the column").toBeHidden()
