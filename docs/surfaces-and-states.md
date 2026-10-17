@@ -72,7 +72,7 @@ A soft wash, `--ix-hover-bg` (.07 light, .08 dark), replaces the glow where a gl
 
 | Primitive | Helper |
 | --- | --- |
-| `Button` default, destructive, secondary, outline, sandbox | `ixControl` |
+| `Button` default, destructive, destructive-outline, secondary, outline, sandbox | `ixControl` |
 | `Button` ghost, link, bare | `ixControlSoft` (wash, never the glow) |
 | `Button` with `aria-pressed` | `ixControl` + `ixSelected` |
 | `Input`, `Textarea` | `ixField` + focusField's `:focus` border and halo |

@@ -33,11 +33,18 @@ function Saved() {
   return <span className="inline-flex items-center gap-1 text-[var(--surface-success-text)]"><Check aria-hidden="true" className="size-4" />Saved</span>;
 }
 
-const automations = [
+interface Automation { name: string; meta: string; state: string; verb: string; ownerOnly?: boolean; error?: string }
+
+const automations: Automation[] = [
   { name: "Weekly competitor scan", meta: "Mondays at 09:00", state: "Active", verb: "Pause" },
   { name: "Inbound lead triage", meta: "When a signed webhook arrives", state: "Paused", verb: "Resume", ownerOnly: true },
   { name: "Daily brief", meta: "Every day at 08:00 · Europe/Berlin", state: "Couldn't start", verb: "Try again", error: "Platform didn't respond. Nothing ran; try again." },
 ];
+
+/** Pause turns an automation off; Resume and Try again turn it back on. */
+function runVerb(job: Automation): Automation {
+  return job.state === "Active" ? { ...job, state: "Paused", verb: "Resume" } : { ...job, state: "Active", verb: "Pause", error: undefined };
+}
 
 const members = [
   { name: "Priya Raman", email: "priya@fieldnote.example", role: "owner" },
@@ -71,6 +78,7 @@ function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, cl
   const [name, setName] = useState("Fieldnote GTM");
   const [digest, setDigest] = useState(true);
   const [approval, setApproval] = useState("each");
+  const [jobs, setJobs] = useState(automations);
   const [roleOf, setRoleOf] = useState<Record<string, string>>(Object.fromEntries(members.map((m) => [m.email, m.role])));
 
   const navigation = withoutNavigation ? undefined : sections.map((section) => {
@@ -138,19 +146,23 @@ function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, cl
         </SettingsSection>
 
         <SettingsSection id="automations" title="Automations" info="Automations run on the project's agent and are billed as compute." actions={<Button type="button" variant="outline">New automation</Button>}>
-          <SettingsList aria-label="Automations" columns={{ status: "8rem", actions: "9rem" }}>
-            {automations.map((job) => (
+          <SettingsList aria-label="Automations" columns={{ status: "8rem", action: "9rem" }}>
+            {jobs.map((job) => (
               <SettingsListItem
                 key={job.name}
                 title={<a href={`#${job.name}`}>{job.name}</a>}
                 meta={job.meta}
                 status={job.error ? <span className="font-medium text-[var(--surface-danger-text)]">{job.state}</span> : job.state}
                 error={job.error}
-                actions={<Button type="button" variant="ghost">{job.verb}</Button>}
+                action={{
+                  label: job.verb,
+                  onSelect: () => setJobs((all) => all.map((each) => (each.name === job.name ? runVerb(each) : each))),
+                  disabledReason: job.ownerOnly ? "Only Priya, the owner, can resume it." : undefined,
+                }}
                 menu={[
                   { label: "Duplicate", onSelect: () => undefined },
                   job.ownerOnly
-                    ? { label: "Delete", tone: "danger", onSelect: () => undefined, disabledReason: "Only the owner can delete it." }
+                    ? { label: "Delete", tone: "danger", onSelect: () => undefined, disabledReason: "Only Priya, the owner, can delete it." }
                     : { label: "Delete", tone: "danger", onSelect: () => undefined },
                 ]}
               />
@@ -165,7 +177,7 @@ function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, cl
               return (
                 <SettingsListItem
                   key={member.email}
-                  leading={<Avatar className="h-8 w-8"><AvatarFallback>{member.name.split(" ").map((part) => part[0]).join("")}</AvatarFallback></Avatar>}
+                  leading={<Avatar size="sm"><AvatarFallback>{member.name.split(" ").map((part) => part[0]).join("")}</AvatarFallback></Avatar>}
                   title={member.name}
                   meta={member.email}
                   status={member.role === "owner" ? <span className="text-foreground">Owner</span> : (
@@ -199,7 +211,7 @@ function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, cl
           <SettingsRow label="Monthly cap" htmlFor="monthly-cap"><Input id="monthly-cap" defaultValue="$900" /></SettingsRow>
         </SettingsSection>
 
-        <SettingsSection id="delete" tone="danger" title="Delete project" description="Deletes every chat, vault file and automation for everyone." actions={<Button type="button" variant="outline">Delete project…</Button>} />
+        <SettingsSection id="delete" tone="danger" title="Delete project" description="Deletes every chat, vault file and automation for everyone." actions={<Button type="button" variant="destructive-outline">Delete project…</Button>} />
       </>}
     />
   );
@@ -210,7 +222,7 @@ function FieldsExample() {
   return (
     <div className="mx-auto max-w-xl p-6">
       <Card className="space-y-4 p-4">
-        <Field label="Display name" htmlFor="display-name" hint="Shown in the sidebar and in emails.">
+        <Field label="Display name" htmlFor="display-name" hint="Use 40 characters or fewer.">
           <Input id="display-name" defaultValue="Research agent" aria-describedby={fieldMessageId("display-name")} />
         </Field>
         <Field label="Default model" htmlFor="default-model" info="Replaces the profile's model for new chats." aside={<Button type="button" variant="ghost">Use default</Button>}

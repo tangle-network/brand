@@ -36,7 +36,8 @@ function buttonClassName(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | "bare" | null;
+  /** `destructive-outline` is a destructive action at rest, such as "Delete project…", whose confirmation uses `destructive`. */
+  variant?: "default" | "destructive" | "destructive-outline" | "outline" | "secondary" | "ghost" | "link" | "sandbox" | "bare" | null;
   /** sm 32px, default/md 36px (`--control-height`), lg 44px; icon sizes are squares on the same heights. */
   size?: "default" | "md" | "sm" | "lg" | "xl" | "display" | "icon" | "icon-sm" | "icon-lg" | "compact" | "touch" | null;
   asChild?: boolean;

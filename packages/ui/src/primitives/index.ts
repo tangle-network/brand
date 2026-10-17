@@ -79,6 +79,7 @@ export { Badge, badgeVariants } from "./badge";
 export type { BadgeProps } from "./badge";
 
 export { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+export type { AvatarProps } from "./avatar";
 
 export {
   DropdownMenu,
@@ -204,6 +205,7 @@ export type { FieldProps } from "./field";
 
 export { SettingsList, SettingsListItem, SettingsRow, SettingsSection } from "./settings";
 export type {
+  SettingsListAction,
   SettingsListColumns,
   SettingsListItemProps,
   SettingsListMenuItem,

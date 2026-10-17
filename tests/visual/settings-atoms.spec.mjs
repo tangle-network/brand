@@ -131,8 +131,33 @@ for (const theme of ["light", "dark"]) {
     for (let i = 0; i < 3; i++) statusLefts.push(Math.round((await box(jobs.nth(i).getByText(["Active", "Paused", "Couldn't start"][i], { exact: true }))).left))
     expect(new Set(statusLefts).size, "states share a column").toBe(1)
 
-    // The ⋯ menu: destructive in danger text; an unavailable item stays focusable with its reason and does nothing.
+    // The at-rest action reads as a control: a bordered button in another colour than the state beside it.
+    const look = (locator) => locator.evaluate((node) => {
+      const style = getComputedStyle(node)
+      return { color: style.color, border: style.borderTopWidth, borderColor: style.borderTopColor }
+    })
+    const pause = await look(jobs.first().getByRole("button", { name: "Pause" }))
+    const active = await look(jobs.first().getByText("Active", { exact: true }))
+    expect(pause.border, "the action has a border").toBe("1px")
+    expect(pause.borderColor, "the action's border is drawn").not.toBe("rgba(0, 0, 0, 0)")
+    expect(active.border, "the state has none").toBe("0px")
+    expect(pause.color, "the action and the state differ in colour").not.toBe(active.color)
+
+    // A locked action stays focusable, is described by its reason under the meta, and does nothing.
     const triage = jobs.nth(1)
+    const resume = triage.getByRole("button", { name: "Resume" })
+    await expect(resume).toHaveAttribute("aria-disabled", "true")
+    const lockReason = triage.getByText("Only Priya, the owner, can resume it.")
+    await expect(lockReason).toBeVisible()
+    await expect(triage.locator("svg.lucide-lock")).toBeVisible()
+    await expectDescribedBy(resume, lockReason)
+    await resume.focus()
+    await expect(resume).toBeFocused()
+    await page.keyboard.press("Enter")
+    await resume.click({ force: true })
+    await expect(triage.getByText("Paused", { exact: true }), "the locked Resume did nothing").toBeVisible()
+
+    // The ⋯ menu: destructive in danger text; an unavailable item stays focusable with its reason and does nothing.
     const more = triage.getByRole("button", { name: "More actions Inbound lead triage" })
     await more.focus()
     await page.keyboard.press("Enter")
@@ -140,7 +165,7 @@ for (const theme of ["light", "dark"]) {
     await expect(menu).toBeVisible()
     const locked = menu.getByRole("menuitem", { name: /Delete/ })
     await expect(locked).toHaveAttribute("aria-disabled", "true")
-    await expect(locked).toContainText("Only the owner can delete it.")
+    await expect(locked).toContainText("Only Priya, the owner, can delete it.")
     await shot(page, testInfo, `menu-1280-${theme}.png`)
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowDown")
@@ -156,6 +181,24 @@ for (const theme of ["light", "dark"]) {
     const colors = await danger.evaluate((node) => ({ border: getComputedStyle(node).borderTopColor, title: getComputedStyle(node.querySelector("h2")).color }))
     expect(colors.border).not.toBe(await page.getByRole("region", { name: "General" }).evaluate((node) => getComputedStyle(node).borderTopColor))
     expect(colors.title).not.toBe(await page.getByRole("region", { name: "General" }).evaluate((node) => getComputedStyle(node.querySelector("h2")).color))
+
+    // Delete project at rest is an outline button in the danger tone: danger text and edge on the card, no fill.
+    const deleteButton = await danger.getByRole("button", { name: "Delete project…" }).evaluate((node) => {
+      const style = getComputedStyle(node)
+      return { color: style.color, border: style.borderTopColor, background: style.backgroundColor }
+    })
+    const editBrief = await page.getByRole("button", { name: "Edit brief" }).evaluate((node) => {
+      const style = getComputedStyle(node)
+      return { border: style.borderTopColor, background: style.backgroundColor }
+    })
+    expect(deleteButton.color, "danger text").toBe(colors.title)
+    expect(deleteButton.border, "danger edge").toBe(colors.border)
+    expect(deleteButton.background, "the outline's card fill, not the destructive fill").toBe(editBrief.background)
+
+    // An unlocked action runs: Pause turns the first automation off.
+    await jobs.first().getByRole("button", { name: "Pause" }).click()
+    await expect(jobs.first().getByText("Paused", { exact: true })).toBeVisible()
+    await expect(jobs.first().getByRole("button", { name: "Resume" })).toBeVisible()
 
 
     expect(await smallText(page), "no visible text under 14px").toEqual([])
@@ -253,6 +296,7 @@ for (const theme of ["light", "dark"]) {
     expect(article.width, "the article keeps its 48rem column").toBeCloseTo(768, 0)
     expect(header.left, "the header starts with the column").toBeCloseTo(article.left, 0)
     expect(header.right, "the header ends with the column").toBeCloseTo(article.right, 0)
+    expect(article.left, "the column is centred").toBeCloseTo(DESKTOP.width - article.right, 0)
     await shot(page, testInfo, `without-navigation-1280-${theme}.png`, { fullPage: true })
     await page.setViewportSize(PHONE)
     expect((await box(page.locator(".tangle-reading-article"))).width, "the column spans the phone inside its gutters").toBeCloseTo(PHONE.width - 32, 0)
@@ -300,7 +344,7 @@ test("settings page in an 820 px pane: tab strip with side-by-side rows", async 
   expect(errors).toEqual([])
 })
 
-test("the info tip toggles on tap and keeps a 44px touch target", async ({ browser }) => {
+test("the info tip and the switch keep their size and a 44px touch target", async ({ browser }) => {
   const context = await browser.newContext({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 1 })
   const page = await context.newPage()
   const errors = await openStory(page, "primitives-settings--page", "light", PHONE)
@@ -313,6 +357,19 @@ test("the info tip toggles on tap and keeps a 44px touch target", async ({ brows
   await expect(page.getByRole("tooltip")).toContainText("Dates in chats")
   await tip.tap()
   await expect(page.getByRole("tooltip")).toHaveCount(0)
+
+  const digest = page.locator("#digest")
+  const track = await box(digest)
+  expect([track.width, track.height], "the visible track stays 36 x 20").toEqual([36, 20])
+  const centre = track.left + track.width / 2
+  const hitAt = (x, y) => page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest("button")?.id, { x, y })
+  expect(await hitAt(centre, track.top - 10), "10px above the track").toBe("digest")
+  expect(await hitAt(centre, track.bottom + 10), "10px below the track").toBe("digest")
+  expect(await hitAt(track.left - 3, track.top + 10), "3px left of the track").toBe("digest")
+  expect(await hitAt(centre, track.top - 15), "the area ends at 44px").not.toBe("digest")
+  await expect(digest).toHaveAttribute("aria-checked", "true")
+  await page.touchscreen.tap(centre, track.bottom + 10)
+  await expect(digest, "a tap under the track toggles it").toHaveAttribute("aria-checked", "false")
   expect(errors).toEqual([])
   await context.close()
 })

@@ -60,9 +60,9 @@ A field composed by hand uses `Label` and `HelpText` and sets `aria-describedby`
 
 Settings compose four primitives from `@tangle-network/ui/primitives`, all at the 14px floor (section titles 16px) with controls at `md`:
 
-- `SettingsSection` is one card per group (at most four per page section), with an anchor `id`, an optional one-line description, top-right actions, a `danger` tone and a footer.
+- `SettingsSection` is one card per group (at most four per page section), with an anchor `id`, an optional one-line description, top-right actions, a `danger` tone and a footer. A danger section's action at rest is `Button variant="destructive-outline"`; the confirmation it opens uses `destructive`.
 - `SettingsRow` is one setting: label left, control right (`inline`), on the label's line (`compact`, for switches and single buttons) or under it (`stacked`). Its status sits after the label; an `error` or `disabledReason` replaces the description and is wired to the control through `fieldMessageId(htmlFor)`.
-- `SettingsList` and `SettingsListItem` are comparable rows with aligned state and action columns; destructive actions live only in the item's ⋯ menu.
+- `SettingsList` and `SettingsListItem` are comparable rows with aligned state and action columns. The item draws its one at-rest `action` as an outline button, so it never reads as the state; a `disabledReason` locks it and shows the reason under the meta. Destructive actions live only in the item's ⋯ menu.
 - `Field` is a labelled field for forms that are not rows, with the same message wiring.
 
 Rows and lists respond to their card's width, not the viewport's. `PageShell measure="settings"` frames the page: a 13rem section column beside a 48rem article from 60rem of frame width, and a 56px tab strip below that.

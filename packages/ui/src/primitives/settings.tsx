@@ -215,13 +215,13 @@ export interface SettingsListColumns {
   main?: string;
   /** A fixed state column, such as `"8rem"`. Below 34rem the state moves under the title, full width. */
   status?: string;
-  /** A fixed column for row actions, such as `"11rem"`. Below 34rem it shrinks to its content. */
-  actions?: string;
-  /** A column for the ⋯ menu, such as `"36px"`. Without it the menu ends the actions cell. */
+  /** A fixed column for the at-rest action, such as `"9rem"`. Below 34rem it shrinks to its content. */
+  action?: string;
+  /** A column for the ⋯ menu, such as `"36px"`. Without it the menu ends the action cell. */
   menu?: string;
 }
 
-const LIST_SLOTS = ["leading", "main", "status", "actions", "menu"] as const;
+const LIST_SLOTS = ["leading", "main", "status", "action", "menu"] as const;
 
 const LENGTH = /^[\d.]+(?:px|rem|em|ch)$/;
 
@@ -230,7 +230,7 @@ function listTracks(columns: SettingsListColumns, narrow: boolean) {
     if (slot === "main") return [[slot, columns.main ?? "minmax(0,1fr)"]];
     const width = columns[slot];
     if (!width || (narrow && slot === "status")) return [];
-    return [[slot, narrow && slot === "actions" ? "auto" : width]];
+    return [[slot, narrow && slot === "action" ? "auto" : width]];
   });
   // A subgrid item's inline padding (px-5, px-4 when narrow) lands on its edge
   // cells as extra margin, so a fixed edge track grows by it to keep its width.
@@ -252,7 +252,7 @@ export interface SettingsListProps {
 /**
  * Comparable rows whose status and action columns line up across items (CSS
  * subgrid). Below 34rem each item becomes two lines: the title and meta with
- * actions on the right, then the state under them at full width.
+ * its action on the right, then the state under them at full width.
  */
 export function SettingsList({ columns, children, "aria-label": ariaLabel }: SettingsListProps) {
   const style = {
@@ -285,6 +285,13 @@ export interface SettingsListMenuItem {
   disabledReason?: React.ReactNode;
 }
 
+export interface SettingsListAction {
+  label: string;
+  onSelect: () => void;
+  /** Why the action is unavailable, naming who can take it. The button stays focusable, does nothing, and the reason shows under the meta. */
+  disabledReason?: React.ReactNode;
+}
+
 export interface SettingsListItemProps {
   /** A logo or avatar, in the list's `leading` column. */
   leading?: React.ReactNode;
@@ -292,12 +299,12 @@ export interface SettingsListItemProps {
   title: React.ReactNode;
   /** One line under the title, such as an address or a schedule. */
   meta?: React.ReactNode;
-  /** The item's state, or a control that sets it (a role select). */
+  /** The item's state as plain text, or a control that sets it (a role select). */
   status?: React.ReactNode;
   /** Shown under the meta in danger text and announced. */
   error?: React.ReactNode;
-  /** The one verb the item needs at rest, as ghost buttons. */
-  actions?: React.ReactNode;
+  /** The one verb the item needs at rest. It is drawn as an outline button, so it never reads as the state beside it. */
+  action?: SettingsListAction;
   /** Everything else, including destructive actions, behind a ⋯ button. */
   menu?: SettingsListMenuItem[];
 }
@@ -341,14 +348,27 @@ const NARROW_STATUS = "@max-[34rem]/settings-section:col-start-[main] @max-[34re
 /**
  * One item in a {@link SettingsList}; each slot goes to the list's column of
  * that name. Without a status column the state follows the meta, and without
- * a menu column the ⋯ menu ends the actions cell.
+ * a menu column the ⋯ menu ends the action cell.
  */
-export function SettingsListItem({ leading, title, meta, status, error, actions, menu }: SettingsListItemProps) {
+export function SettingsListItem({ leading, title, meta, status, error, action, menu }: SettingsListItemProps) {
   const columns = React.useContext(SettingsListContext);
   const titleId = React.useId();
+  const reasonId = `${titleId}-reason`;
+  const locked = action?.disabledReason != null;
   const menuNode = menu && menu.length > 0 ? <ItemMenu items={menu} titleId={titleId} /> : null;
-  const actionCell = (actions != null || (menuNode && !columns.menu)) && (
-    <>{actions}{!columns.menu && menuNode}</>
+  const actionButton = action && (
+    <Button
+      type="button"
+      variant="outline"
+      aria-disabled={locked || undefined}
+      aria-describedby={locked ? reasonId : undefined}
+      onClick={locked ? undefined : action.onSelect}
+    >
+      {action.label}
+    </Button>
+  );
+  const actionCell = (actionButton || (menuNode && !columns.menu)) && (
+    <>{actionButton}{!columns.menu && menuNode}</>
   );
   return (
     <li
@@ -367,6 +387,7 @@ export function SettingsListItem({ leading, title, meta, status, error, actions,
         </div>
         {meta != null && <div className="text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]">{meta}</div>}
         {status != null && !columns.status && <div className="mt-1 text-sm leading-5 text-muted-foreground">{status}</div>}
+        {locked && <LockLine id={reasonId} className="mt-1">{action?.disabledReason}</LockLine>}
       </div>
       {error != null && (
         <ErrorLine className="col-start-[main] row-start-2 mt-1 @max-[34rem]/settings-section:col-end-[-1] @max-[34rem]/settings-section:row-start-3">{error}</ErrorLine>
@@ -375,7 +396,7 @@ export function SettingsListItem({ leading, title, meta, status, error, actions,
         <div className={cn("col-start-[status] row-start-1 min-w-0 text-sm leading-5 text-muted-foreground", NARROW_STATUS)}>{status}</div>
       )}
       {actionCell && (
-        <div className="col-start-[actions] row-start-1 flex min-w-0 items-center justify-end gap-1">{actionCell}</div>
+        <div className="col-start-[action] row-start-1 flex min-w-0 items-center justify-end gap-1">{actionCell}</div>
       )}
       {menuNode && columns.menu && <div className="col-start-[menu] row-start-1 flex justify-end">{menuNode}</div>}
     </li>

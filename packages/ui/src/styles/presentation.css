@@ -31,6 +31,8 @@
    Without a nav the page is the 48rem column alone. */
 .tangle-settings-frame { container: tangle-settings / inline-size; width: 100%; min-width: 0; }
 .tangle-reading-shell[data-measure="settings"] { --tangle-settings-gutter: 1.5rem; grid-template-columns: minmax(0,1fr); gap: 0; max-width: calc(13rem + 2.5rem + 48rem + 4rem); padding: 1.5rem var(--tangle-settings-gutter) 3rem; }
+/* Without a nav the shell is the column and its gutters, so the centred shell centres the column and its header. */
+.tangle-reading-shell[data-measure="settings"]:not(:has(> .tangle-reading-nav)) { max-width: calc(48rem + 2 * var(--tangle-settings-gutter)); }
 .tangle-reading-shell[data-measure="settings"] > .tangle-reading-header { margin-bottom: 0.5rem; }
 .tangle-reading-shell[data-measure="settings"] > .tangle-reading-header > * { margin-bottom: 0; }
 .tangle-reading-shell[data-measure="settings"] > .tangle-reading-outline { display: none; }
