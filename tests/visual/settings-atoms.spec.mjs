@@ -147,10 +147,10 @@ for (const theme of ["light", "dark"]) {
     const triage = jobs.nth(1)
     const resume = triage.getByRole("button", { name: "Resume" })
     await expect(resume).toHaveAttribute("aria-disabled", "true")
-    const lockReason = triage.getByText("Only Priya, the owner, can resume it.")
-    await expect(lockReason).toBeVisible()
+    await expect(triage.getByText("Only Priya, the owner, can resume it.")).toBeVisible()
     await expect(triage.locator("svg.lucide-lock")).toBeVisible()
-    await expectDescribedBy(resume, lockReason)
+    const reasonId = await resume.getAttribute("aria-describedby")
+    await expect(page.locator(`[id="${reasonId}"]`), "the button is described by its reason").toHaveText("Only Priya, the owner, can resume it.")
     await resume.focus()
     await expect(resume).toBeFocused()
     await page.keyboard.press("Enter")
@@ -359,6 +359,7 @@ test("the info tip and the switch keep their size and a 44px touch target", asyn
   await expect(page.getByRole("tooltip")).toHaveCount(0)
 
   const digest = page.locator("#digest")
+  await digest.scrollIntoViewIfNeeded()
   const track = await box(digest)
   expect([track.width, track.height], "the visible track stays 36 x 20").toEqual([36, 20])
   const centre = track.left + track.width / 2
