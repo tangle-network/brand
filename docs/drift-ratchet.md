@@ -76,6 +76,29 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
 
+## Settings layout ratchet, 2026-10-17
+
+After the apps composed their settings pages from agent-app `settings-react`, `check --remote --update-baseline` lowered these rows from each default branch.
+The same rows lowered hospitality `font_size_literal` 65 to 64, browser `size_literal` 3 to 2 and blueprint `native_control` 401 to 393. No gated count rose.
+
+| Surface | Adoption | Head | Before | After | Still counted |
+| --- | --- | --- | ---: | ---: | --- |
+| gtm | gtm-agent #1720 | `41bfb7395` | 1 | 0 | |
+| tax | tax-agent #607 | `b173739f0` | 1 | 0 | |
+| legal | legal-agent #466 | `e69e39fa4` | 1 | 0 | |
+| creative | creative-agent #612 | `05bc326b9` | 1 | 0 | |
+| hospitality | hospitality-agent #518 | `b094a583e` | 5 | 3 | `web/GuestGuidebookSettings.tsx`, `PhoneLineSettings.tsx`, `SummarySettings.tsx` |
+| browser | bad-app #144 | `ca95d9366` | 1 | 0 | |
+| builder | agent-builder #704 | `8a10f63e0` | 1 | 0 | |
+| blueprint | blueprint-agent #2825 | `6cea23be8` | 4 | 3 | `routes/settings.partner.$partnerId.tsx`, `routes/settings.partner._index.tsx`, `components/@settings/tabs/partner-dashboard/PartnerSettingsTab.tsx` |
+
+Not lowered, read at agent-container develop `eeb1f0c3d` and router main `0334c0125`:
+sandbox counts 2, equal to its row, because its adoption (agent-container #11425) has not merged; its row also has a `native_control` rise (54 to 55).
+Platform counts 0, as its row already records, and its row has `arbitrary_color` (21 to 22) and `native_control` (444 to 458) rises.
+Intelligence still counts 1 (`pages/Settings.tsx`), equal to its row.
+Router (tangle-router #753) still counts 4: its server-rendered Hono views draw a local `SettingsLayout` and cannot import the React `settings-react`, and it has no row.
+starter-foundry, ph0ny, law-lead and legal-underwriting are not drift surfaces.
+
 ## Settings layout baseline, 2026-10-17
 
 Recorded from each default branch when `settings_layout` was added; each surface ratchets to 0 as its settings pages compose from agent-app `settings-react`.
