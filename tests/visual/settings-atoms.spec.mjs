@@ -273,6 +273,51 @@ for (const theme of ["light", "dark"]) {
     expect(errors).toEqual([])
   })
 
+  test(`settings strip at 390 px: the first and last sections stay reachable by swipe and arrow-style changes (${theme})`, async ({ page }) => {
+    const errors = await openStory(page, "primitives-settings--page", theme, PHONE)
+    const nav = page.getByRole("navigation", { name: "Settings sections" })
+    const left = () => nav.evaluate((node) => Math.round(node.scrollLeft))
+    const max = () => nav.evaluate((node) => Math.round(node.scrollWidth - node.clientWidth))
+    await nav.locator("a").nth(2).click()
+    await expect.poll(async () => {
+      const [tab, strip] = [await box(nav.locator('a[aria-current="page"]')), await box(nav)]
+      return Math.abs((tab.left + tab.right) / 2 - (strip.left + strip.right) / 2) < 2
+    }, { message: "a middle section is current and centred" }).toBe(true)
+    expect(await left()).toBeGreaterThan(0)
+    expect(await left()).toBeLessThan(await max())
+    // What the app's scroll arrows do to the strip: scroll it, then add and
+    // remove an arrow element inside it as the edge is reached.
+    const arrowFlip = () => nav.evaluate(async (node) => {
+      const arrow = document.createElement("button")
+      node.prepend(arrow)
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      arrow.remove()
+      await new Promise((resolve) => setTimeout(resolve, 150))
+    })
+    const box0 = await box(nav)
+    await page.mouse.move(box0.left + box0.width / 2, box0.top + box0.height / 2)
+    await page.mouse.wheel(-5000, 0)
+    await expect.poll(left).toBe(0)
+    await arrowFlip()
+    await page.waitForTimeout(300)
+    expect(await left(), "the first section stays reachable").toBe(0)
+    const first = nav.locator("a").first()
+    expect((await box(first)).left, "the first link is fully on screen").toBeGreaterThanOrEqual(0)
+    await page.mouse.wheel(5000, 0)
+    await expect.poll(async () => (await left()) - (await max())).toBe(0)
+    await arrowFlip()
+    await page.waitForTimeout(300)
+    expect(await left(), "the last section stays reachable").toBe(await max())
+    expect((await box(nav.locator("a").last())).right, "the last link is fully on screen").toBeLessThanOrEqual(PHONE.width)
+    // Choosing another section still centres it.
+    await nav.locator("a").nth(2).click()
+    await expect.poll(async () => {
+      const [tab, strip] = [await box(nav.locator('a[aria-current="page"]')), await box(nav)]
+      return Math.abs((tab.left + tab.right) / 2 - (strip.left + strip.right) / 2) < 2
+    }).toBe(true)
+    expect(errors).toEqual([])
+  })
+
   test(`sections that load after the page: the strip centres the current tab when it arrives (${theme})`, async ({ page }, testInfo) => {
     const errors = await openStory(page, "primitives-settings--sections-load-later", theme, PHONE)
     const nav = page.getByRole("navigation", { name: "Settings sections" })
