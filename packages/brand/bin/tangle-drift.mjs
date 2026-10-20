@@ -34,7 +34,8 @@ export const SURFACES = {
   sandbox: { repo: "tangle-network/agent-container", roots: ["products/sandbox/web"] },
   platform: { repo: "tangle-network/agent-container", roots: ["products/platform/web"] },
   intelligence: { repo: "tangle-network/agent-container", roots: ["products/intelligence/web"] },
-  gtm: { repo: "tangle-network/gtm-agent", roots: [""] },
+  // These raw renderer assets run only inside customer ad HTML, never the app UI.
+  gtm: { repo: "tangle-network/gtm-agent", roots: [""], exclude: [":!src/lib/.server/sandbox/creative/*"] },
   tax: { repo: "tangle-network/tax-agent", roots: ["apps/web"] },
   legal: { repo: "tangle-network/legal-agent", roots: [""] },
   insurance: { repo: "tangle-network/insurance-agent", roots: [""] },
@@ -213,7 +214,7 @@ export function grepMatches(source, roots, pattern, exts) {
   const args = ["grep", "-I", "-P", "-n", "-o", "--null", "-e", pattern];
   if (source.rev) args.push(source.rev);
   else args.push("--untracked");
-  args.push("--", ...pathspecs(roots, exts), ...EXCLUDE);
+  args.push("--", ...pathspecs(roots, exts), ...EXCLUDE, ...(source.exclude ?? []));
   const prefix = source.rev ? `${source.rev}:` : "";
   const out = git(source.dir, args, { allowExit1: true });
   const rows = [];
@@ -230,7 +231,7 @@ function grepFiles(source, pattern, specs) {
   const args = ["grep", "-I", "-P", "-l", "--null", "-e", pattern];
   if (source.rev) args.push(source.rev);
   else args.push("--untracked");
-  args.push("--", ...specs, ...EXCLUDE);
+  args.push("--", ...specs, ...EXCLUDE, ...(source.exclude ?? []));
   const prefix = source.rev ? `${source.rev}:` : "";
   return git(source.dir, args, { allowExit1: true }).split("\0").filter(Boolean)
     .map((f) => (f.startsWith(prefix) ? f.slice(prefix.length) : f).trim()).filter(Boolean);
@@ -372,14 +373,15 @@ function pkgVersions(source, roots) {
 
 /** Measure one surface from `source`. `matches` holds the raw gated matches for reporting. */
 export function measure(surface, source) {
-  const { roots, extraExt } = SURFACES[surface];
+  const { roots, extraExt, exclude = [] } = SURFACES[surface];
+  source = { ...source, exclude };
   const files = listFiles(source, roots);
   const srcRe = extraExt ? /\.(tsx|jsx|astro|vue|svelte|js|html)$/ : /\.(tsx|jsx|astro|vue|svelte)$/;
   const tsxFiles = files.filter((f) => srcRe.test(f) && !/node_modules|test|spec|stories|fixtures|dist\//.test(f)).length;
   const cssFiles = files.filter((f) => f.endsWith(".css") && !f.includes("node_modules") && !f.includes("dist/")).length;
 
   const matches = {};
-  const row = { repo: SURFACES[surface].repo, roots, branch: source.branch ?? null, head: source.head ?? null,
+  const row = { repo: SURFACES[surface].repo, roots, exclude, branch: source.branch ?? null, head: source.head ?? null,
     tsx_files: tsxFiles, css_files: cssFiles, versions: pkgVersions(source, roots), importing_files: {} };
   for (const pkg of SHARED) {
     const escaped = pkg.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
