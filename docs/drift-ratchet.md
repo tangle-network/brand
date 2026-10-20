@@ -45,6 +45,11 @@ A settings interface in component files that are neither pages nor named for set
 
 SUPER also counts `.js` and `.html` for palette and hex, because its interface is plain JavaScript and HTML.
 Tests, stories, fixtures, `dist`, `node_modules`, `.d.ts`, generated, proof and evidence paths are excluded.
+The owning surface may declare additional exclusions in `SURFACES`; these apply to every
+metric and are reported in scan JSON. GTM excludes `src/lib/.server/sandbox/creative/*`:
+its raw assets are injected into customer ad HTML by the sandbox renderer and never style
+the application UI. App routes, components and styles remain scanned. This boundary does
+not change any baseline or allow a consumer to supply its own exclusions.
 Each baseline row also records file counts, shared-package versions and the number of files importing each shared package; those are informational and never gated.
 
 ## Consumer gate
