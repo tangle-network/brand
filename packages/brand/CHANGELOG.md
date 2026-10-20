@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.26.2
+
+### Patch Changes
+
+- 916d254: Scope GTM design drift to application UI by excluding its customer ad-renderer assets. Add owning-surface exclusions without changing drift baselines or allowing consumer overrides.
+
 ## 1.26.1
 
 ### Patch Changes
