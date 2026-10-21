@@ -234,6 +234,9 @@ export { Chip } from "./chip";
 export type { ChipProps } from "./chip";
 
 export { Wizard, WizardStep } from "./wizard";
+export { HoverCard, HoverCardTrigger, HoverCardContent, HoverCardHeader, HoverCardTitle, HoverCardDescription } from "./hover-card";
+
+export { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from "./breadcrumb";
 export type { WizardProps, WizardStepProps } from "./wizard";
 
 export { IconTile, initialsOf } from "./icon-tile";
