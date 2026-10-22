@@ -42,7 +42,7 @@ export async function measurePresentedFeedback(page, plan) {
     firstFrame();
   };
   session.on("Page.screencastFrame", onFrame);
-  let inputs = [], outcome = false, captureError;
+  let inputs = [], outcome = false, captureError, finalViewport;
   try {
     await input.target.evaluate((element, type) => {
       window.__tangleFeedbackInputs = [];
@@ -66,17 +66,29 @@ export async function measurePresentedFeedback(page, plan) {
     await act();
     await page.waitForTimeout(settleMs);
     outcome = await verify();
-    inputs = await page.evaluate(() => window.__tangleFeedbackInputs);
   } catch (error) {
     captureError = String(error?.stack ?? error);
   } finally {
-    await page.evaluate(() => window.__tangleFeedbackStop?.()).catch(() => {});
+    let inputReadTimer;
+    try {
+      const retained = await Promise.race([
+        page.evaluate(() => {
+          window.__tangleFeedbackStop?.();
+          return { inputs: window.__tangleFeedbackInputs ?? [],
+            viewport: { width: innerWidth, height: innerHeight, devicePixelRatio, visualScale: visualViewport?.scale } };
+        }),
+        new Promise((_, reject) => { inputReadTimer = setTimeout(() => reject(Error("Input-observer cleanup timed out")), 1000); }),
+      ]);
+      inputs = retained.inputs;
+      finalViewport = retained.viewport;
+    } catch (error) { captureError ??= String(error?.stack ?? error); }
+    finally { clearTimeout(inputReadTimer); }
     await session.send("Page.stopScreencast").catch(error => { frameError = String(error); });
     session.off("Page.screencastFrame", onFrame);
     await Promise.all(writes);
     await session.detach();
   }
-  const observation = { attemptId, label, patch, viewport, inputType: input.type, inputs, outcome, frames, captureError, frameError,
+  const observation = { attemptId, label, patch, viewport, finalViewport, inputType: input.type, inputs, outcome, frames, captureError, frameError,
     handlerMeaning: "Capture listener start; application handler start is not inferred",
     clock: "Browser input epoch and CDP image frame-swap epoch", spacingMs: settleMs };
   if (captureError || frameError || inputs.length !== 1 || !outcome) {
@@ -84,7 +96,7 @@ export async function measurePresentedFeedback(page, plan) {
     observation.reason = captureError || frameError || (inputs.length !== 1 ? "Expected exactly one trusted initiating input" : "Intended outcome failed");
   } else {
     try {
-      Object.assign(observation, await analyzeFrames(page, directory, frames, patch, viewport, inputs[0].inputEpochMs));
+      Object.assign(observation, await analyzeFrames(page, directory, frames, patch, viewport, finalViewport, inputs[0].inputEpochMs));
     } catch (error) {
       Object.assign(observation, { status: "UNCHECKED", reason: "Frame analysis failed", analysisError: String(error?.stack ?? error) });
     }
@@ -93,12 +105,18 @@ export async function measurePresentedFeedback(page, plan) {
   return observation;
 }
 
-async function analyzeFrames(page, directory, frames, patch, viewport, inputEpochMs) {
+async function analyzeFrames(page, directory, frames, patch, viewport, finalViewport, inputEpochMs) {
   if (frames.some(frame => !Number.isFinite(frame.timestamp))) {
     return { status: "UNCHECKED", reason: "Frame-swap timestamp absent" };
   }
   if (frames.some(frame => frame.offsetTop !== 0)) {
     return { status: "UNCHECKED", reason: "Nonzero browser inset has no verified patch mapping" };
+  }
+  if (viewport.visualScale !== 1 || finalViewport.visualScale !== 1 || frames.some(frame => frame.pageScaleFactor !== 1)) {
+    return { status: "UNCHECKED", reason: "Visual/page zoom has no verified feedback-patch mapping" };
+  }
+  if (["width", "height", "devicePixelRatio"].some(field => viewport[field] !== finalViewport[field])) {
+    return { status: "UNCHECKED", reason: "Viewport changed during input" };
   }
   if (!Number.isFinite(viewport.observedClockTickMs)) {
     return { status: "UNCHECKED", reason: "Browser timestamp quantization not observed" };
