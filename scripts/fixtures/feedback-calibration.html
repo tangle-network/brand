@@ -1,0 +1,22 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presented feedback instrument calibration</title>
+<style>
+  body { margin: 24px; background: #fff; color: #111; }
+  button { width: 220px; height: 80px; border: 2px solid #111; background: #fff; }
+  button[data-feedback="shown"] { background: #4837b9; color: #fff; }
+</style>
+<p>Instrument fixture only; no product or provider operation.</p>
+<button aria-label="Delayed feedback fixture">Delayed feedback fixture</button>
+<script>
+  document.querySelector('button').addEventListener('click', event => {
+    window.feedbackCalibration = {
+      inputEpochMs: performance.timeOrigin + event.timeStamp,
+      handlerEpochMs: performance.timeOrigin + performance.now(),
+    };
+    setTimeout(() => {
+      document.querySelector('button').dataset.feedback = 'shown';
+      window.feedbackCalibration.mutationEpochMs = performance.timeOrigin + performance.now();
+    }, window.feedbackCalibrationDelay);
+  });
+</script>

@@ -25,6 +25,8 @@ Use the sorted nearest-rank percentile, rank ceil(p × n). Report both batches, 
 
 Use browser traces, marked frame captures and calibrated recording timestamps to identify visible feedback. Record timestamp quantization and capture frame interval. If uncertainty spans a budget boundary, mark the measurement UNCHECKED and improve the instrument. A loaded host's callback gap does not prove a dropped display frame. Validate the instrument against a deliberately delayed fixture before claiming accuracy. Store this measurement in the existing live instrument during implementation; the capture script is only a reference.
 
+The existing `scripts/surface-dismiss-proof.mjs --feedback` capture path records individual native-dismissal observations through `scripts/lib/presented-feedback.mjs` and its delayed-render calibration fixture. Consumers reuse that helper in their existing capture paths: declare a stable pixel patch on the relevant control, settle hover/focus before input, verify the real intended outcome, and retain the original CDP frame images and input/frame-swap timestamps. The helper records timestamp/capture uncertainty and preserves failed attempts; it does not establish semantic feedback from an arbitrary changing pixel. Its batch summary requires two forty-observation batches per declared condition and cold/warm class, using the installed Brand budget. The individual fixture observations alone do not satisfy the consecutive-batch protocol or establish a production claim.
+
 References: [Event Timing](https://www.w3.org/TR/event-timing/) and the existing [UI evidence procedure](https://github.com/drewstone/dotfiles/blob/1eefcc1e30bbd91c5a5c29ed57d6e7abc2bf8261/docs/anti-patterns/ui-evidence.md).
 
 ## Persistence, effects and cancellation
