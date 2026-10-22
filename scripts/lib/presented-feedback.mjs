@@ -172,17 +172,18 @@ export function summarizeFeedbackBatches(batches, budgetMs) {
     const siblings = batches.filter(other => other.condition === batch.condition && other.temperature === batch.temperature);
     const allRows = siblings.flatMap(other => other.samples), ids = allRows.map(row => row.attemptId);
     const epochs = allRows.map(row => row.inputs?.length === 1 ? row.inputs[0].inputEpochMs : undefined);
+    const invalidStatus = allRows.some(row => row.status === "FAIL") ? "FAIL" : "UNCHECKED";
     if (ids.some(id => !id) || epochs.some(epoch => !Number.isFinite(epoch))) {
-      return { ...result, status: "UNCHECKED", reason: "Native input/attempt identities absent" };
+      return { ...result, status: invalidStatus, reason: "Native input/attempt identities absent; any input/product failure is preserved" };
     }
     if (new Set(ids).size !== ids.length || new Set(epochs).size !== epochs.length) {
       return { ...result, status: "FAIL", reason: "Repeated attempt/input identities cannot count as another batch" };
     }
     if (epochs.some((epoch, index) => index > 0 && epoch <= epochs[index - 1])) {
-      return { ...result, status: "UNCHECKED", reason: "Attempt order is not consecutive by native input start" };
+      return { ...result, status: invalidStatus, reason: "Attempt order is not consecutive by native input start" };
     }
     if (!batch.condition || !["cold", "warm"].includes(batch.temperature) || siblings.length !== 2 || allRows.length !== 80 || rows.length !== 40 || observed.length !== 40 || !batch.calibration?.pass) {
-      return { ...result, status: result.failures ? "FAIL" : "UNCHECKED", reason: "Require two40-observation batches per declared condition/temperature and valid calibration; no silent exclusions" };
+      return { ...result, status: invalidStatus, reason: "Require two40-observation batches per declared condition/temperature and valid calibration; no silent exclusions" };
     }
     const lower = observed.map(row => row.latencyLowerMs), upper = observed.map(row => row.latencyUpperMs);
     const statistics = { p50LowerMs: nearest(lower, 0.5), p50UpperMs: nearest(upper, 0.5),
