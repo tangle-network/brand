@@ -248,5 +248,26 @@ export type { CategoryTone, Tone, ToneClasses } from "./tone";
 export { MetricStrip, Metric } from "./metric-strip";
 export type { MetricStripProps, MetricProps } from "./metric-strip";
 
+export { SeriesSparkline } from "./series-sparkline";
+export type { SeriesSparklineProps } from "./series-sparkline";
+export { MetricChart } from "./metric-chart";
+export type { ChartReferenceLine, MetricChartProps } from "./metric-chart";
+export {
+  normalizeSeries,
+  periodDelta,
+  seriesAreaPath,
+  seriesExtent,
+  seriesLinePath,
+  seriesMean,
+  seriesScale,
+} from "../lib/series";
+export type {
+  PeriodDelta,
+  SeriesExtent,
+  SeriesPoint,
+  SeriesPointInput,
+  SeriesScale,
+} from "../lib/series";
+
 export { Toolbar, FilterField } from "./toolbar";
 export type { ToolbarProps, FilterFieldProps } from "./toolbar";
