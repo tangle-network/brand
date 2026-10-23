@@ -116,6 +116,20 @@ export const metricLayouts = {
   6: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(6n+1))]:border-l",
 } as const;
 
+/** Hand-rolled SVG charts: every stroke and fill is currentColor against a
+ * token class, so ink stays theme-aware with no hardcoded hues. Charts draw
+ * lines and text only; the grouping plane (border, surface) is caller-owned. */
+export const chartPresentation = {
+  sparkline: "h-9 w-full text-primary",
+  root: "h-auto w-full",
+  axis: "text-muted-foreground",
+  gridLine: "opacity-20",
+  referenceLine: "opacity-60",
+  primarySeries: "text-primary",
+  secondarySeries: "text-muted-foreground",
+  area: "opacity-10",
+} as const;
+
 export const dialogPresentation = {
   overlay: "fixed inset-0 z-50 bg-black/40",
   transition: surfaceMotion,
