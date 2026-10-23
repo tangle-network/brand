@@ -36,8 +36,8 @@ jobs:
           cache: pnpm
       - name: Install frozen dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Chromium and system dependencies
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install pinned Chromium on the qualified browser host
+        run: pnpm exec playwright install chromium
       - name: Build the existing Storybook
         run: pnpm --filter @tangle-network/brand build && pnpm build-storybook --quiet
       - name: Verify control geometry and upload recovery in Chromium
