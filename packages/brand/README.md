@@ -10,6 +10,24 @@ pnpm add @tangle-network/brand
 
 ## Use
 
+### Social previews
+
+`@tangle-network/brand/social` is framework-neutral. Pass the page's existing
+copy and verified media to `socialMetadata({ url, title, description, image,
+video? })`. The image requires its public HTTPS `url`, MIME `type`, measured
+pixel `width`/`height` and descriptive `alt`; an optional video requires the same
+media fields except alt. Render the returned `tags` in the server/static head
+and use `canonicalUrl` for the canonical link. Each tag has either `property`
+or `name`, plus `content`; the consumer's HTML renderer owns escaping.
+
+Keep product-specific composition and media approval with their existing
+owners. Brand owns the common tag contract; callers supply the approved asset
+URLs. The default X card retains the image fallback. Do not infer video playback
+from metadata or switch to a platform-specific player without that platform's
+current supported contract and a real preview check. This helper does not fetch
+media, prove its MIME/codec/duration/range/cache behavior, or approve publication.
+Verify those against the served files. Canonical URLs omit query and fragment.
+
 ### Tailwind v4
 
 ```css
