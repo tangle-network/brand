@@ -67,12 +67,16 @@ export interface SettingsRowProps {
   onRetry?: () => void;
   /**
    * `inline` (default): text left, control right, stacked below 34rem.
-   * `compact`: the control keeps its own width and stays on the line (switches, single buttons).
+   * `compact`: the control keeps its own width and stays on the line (switches, single buttons); a row with a value uses `inline`.
    * `stacked`: the control spans the row under the text (textareas, lists).
    */
   layout?: SettingsRowLayout;
   /** Why the control is unavailable, naming who can change it. Replaces the description after a lock glyph. */
   disabledReason?: React.ReactNode;
+  /** A read-only value before any children; supplying even an empty value keeps its span. */
+  value?: React.ReactNode;
+  /** Use mono for the value, such as an identifier; children keep their own font. */
+  mono?: boolean;
   children?: React.ReactNode;
 }
 
@@ -101,14 +105,16 @@ function describeControl(children: React.ReactNode, htmlFor: string | undefined,
 }
 
 /**
- * One setting: its label, an optional consequence line and its control. The
+ * One setting: its label, an optional consequence line, read-only value and control. The
  * label carries the save status after it; an error or a lock reason replaces
  * the description. Rows inside a {@link SettingsSection} are divided by a
  * hairline and stack when the card is narrower than 34rem.
  */
-export function SettingsRow({
-  id, label, description, info, htmlFor, status, error, onRetry, layout = "inline", disabledReason, children,
-}: SettingsRowProps) {
+export function SettingsRow(props: SettingsRowProps) {
+  const {
+    id, label, description, info, htmlFor, status, error, onRetry, layout = "inline", disabledReason, value, mono, children,
+  } = props;
+  const hasValue = Object.hasOwn(props, "value");
   const messageId = htmlFor ? fieldMessageId(htmlFor) : undefined;
   const hasMessage = error != null || disabledReason != null || description != null;
   const control = describeControl(children, htmlFor, hasMessage ? messageId : undefined, error != null);
@@ -120,7 +126,7 @@ export function SettingsRow({
         "grid min-w-0 items-center gap-x-8 gap-y-3 px-5 py-4 @max-[34rem]/settings-section:px-4",
         SCROLL_OFFSET,
         DIVIDED,
-        ROW_COLUMNS[layout],
+        ROW_COLUMNS[hasValue && layout === "compact" ? "inline" : layout],
       )}
     >
       <div className="min-w-0">
@@ -142,8 +148,11 @@ export function SettingsRow({
               <div id={messageId} className="mt-0.5 text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]">{description}</div>
             )}
       </div>
-      {control != null && control !== false && (
-        <div className={cn("flex min-w-0 items-center gap-2", ROW_CONTROL[layout])}>{control}</div>
+      {(hasValue || (control != null && control !== false)) && (
+        <div className={cn("flex min-w-0 items-center gap-2", ROW_CONTROL[hasValue && layout === "compact" ? "inline" : layout])}>
+          {hasValue && <span data-slot="settings-value" className={cn("min-w-0 text-foreground text-sm [overflow-wrap:anywhere] @min-[34rem]/settings-section:text-right", mono && "font-mono")}>{value}</span>}
+          {control}
+        </div>
       )}
     </div>
   );
