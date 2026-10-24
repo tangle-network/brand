@@ -50,6 +50,11 @@
       "import": "./dist/knot.js",
       "default": "./dist/knot.js"
     },
+    "./social": {
+      "types": "./dist/social.d.ts",
+      "import": "./dist/social.js",
+      "default": "./dist/social.js"
+    },
     "./styles/presentation.css": "./src/styles/presentation.css"
   },
   "scripts": {
