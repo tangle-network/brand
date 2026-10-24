@@ -37,3 +37,10 @@ export {
   type ApprovalPlanStep,
 } from "./approval-card";
 export { RunPhaseList, type RunPhase } from "./run-phase-list";
+export {
+  DecisionTree,
+  type Decision,
+  type DecisionChoice,
+  type DecisionOption,
+  type DecisionTreeProps,
+} from "./decision-tree";
