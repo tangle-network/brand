@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.27.0
+
+### Minor Changes
+
+- 3527225: Publish framework-neutral social metadata for server-rendered and static product pages. Keep the poster fallback, canonical URL, alt text and optional video properties together without importing React or claiming social-client playback.
+
 ## 1.26.2
 
 ### Patch Changes
