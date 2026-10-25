@@ -1,5 +1,5 @@
 import { type KeyboardEvent, type ReactNode, type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Check, GitFork, Loader2, X } from "lucide-react";
+import { Check, GitFork, Loader2, Sparkles, X } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export interface DecisionOption {
@@ -102,13 +102,14 @@ function OptionCard({ option, index, from, node, dim, active, onFocus, onChoose 
       aria-keyshortcuts={String(index + 1)}
       className={cn(card, "flex w-full flex-col gap-1 px-3 py-2 text-left text-sm transition-[opacity,box-shadow,border-color] duration-150 motion-reduce:transition-none",
         "hover:border-[var(--accent-text,hsl(var(--primary)))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent-text,hsl(var(--primary)))]",
+        option.recommended && "border-l-2 border-l-[var(--accent-text,hsl(var(--primary)))]",
         active && "border-[color-mix(in_oklab,var(--accent-text,hsl(var(--primary)))_45%,transparent)] shadow-[0_0_0_3px_color-mix(in_oklab,var(--accent-text,hsl(var(--primary)))_12%,transparent)]",
         dim && "opacity-40")}>
       <span className="flex items-center gap-2">
         <KeyChip n={index + 1} />
         {option.icon && <span aria-hidden className="inline-flex size-4 shrink-0 items-center justify-center [&>*]:size-4">{option.icon}</span>}
         <span className="min-w-0 font-medium text-foreground">{option.label}</span>
-        {option.recommended && <span className="ml-auto shrink-0 text-xs font-medium text-[var(--accent-text,hsl(var(--primary)))]">Agent&rsquo;s pick</span>}
+        {option.recommended && <Sparkles role="img" aria-label="Agent's pick" className="ml-auto size-3.5 shrink-0 text-[var(--accent-text,hsl(var(--primary)))]" />}
       </span>
       {option.detail && <span className={cn("pl-7 text-xs leading-5 text-muted-foreground", option.caution && "w-fit rounded bg-[var(--surface-warning-bg,hsl(38_92%_50%/0.16))] px-1 text-[var(--surface-warning-text,hsl(32_80%_34%))]")}>{option.detail}</span>}
     </button>
@@ -212,12 +213,11 @@ export function DecisionTree({ decisions, onDecide, title = "Decisions", allowIn
         <div className="flex items-center gap-2">
           <GitFork aria-hidden className="size-4 text-[var(--accent-text,hsl(var(--primary)))]" />
           <span className="font-semibold text-foreground">{title}</span>
-          <span className="text-muted-foreground">{pending === 0 ? "none waiting" : `${pending} waiting for you`}</span>
+          {pending > 0 && <span className="rounded-full bg-muted px-1.5 text-xs tabular-nums text-muted-foreground" aria-label={`${pending} waiting`}>{pending}</span>}
         </div>
         {decisions.length > 1 && (
           <div className="flex items-center gap-2 text-muted-foreground" aria-label={`Decision ${page + 1} of ${decisions.length}`}>
             <span className="flex gap-1" aria-hidden>{decisions.map((item, i) => <span key={item.id} className={cn("size-1.5 rounded-full", i === page ? "bg-foreground" : "bg-border")} />)}</span>
-            <span className="tabular-nums">{page + 1} of {decisions.length}</span>
           </div>
         )}
       </header>
@@ -266,12 +266,6 @@ export function DecisionTree({ decisions, onDecide, title = "Decisions", allowIn
           </>
         )}
       </div>
-      {choice === undefined && (
-        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          {top?.followUp ? "Answer" : "Pick a branch"} <KeyChip n={1} /> – <KeyChip n={(top?.followUp?.options.length ?? decision.options.length) + (top?.followUp || !allowInstead ? 0 : 1)} />
-          {top?.followUp && <span className="ml-2">Esc to go back</span>}
-        </p>
-      )}
     </section>
   );
 }
