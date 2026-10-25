@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.27.1
+
+### Patch Changes
+
+- e652c36: Expose social metadata declarations to TypeScript consumers using legacy Node
+  module resolution. The modern package export, runtime code and styles stay the same.
+
 ## 1.27.0
 
 ### Minor Changes
