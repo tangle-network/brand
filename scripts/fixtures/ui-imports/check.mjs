@@ -28,7 +28,8 @@ export async function runUiImportFixtures({ root, packageDirectory, consumerDire
 
   const manifest = json(join(installedDirectory, "package.json"));
   assert.equal(manifest.name, "@tangle-network/ui");
-  assert.equal(manifest.sideEffects, false, "retain the existing side-effect contract");
+  // #388 marks only the stylesheet sources as side-effectful; every JavaScript module stays tree-shakeable.
+  assert.deepEqual(manifest.sideEffects, ["./src/styles/*.css"], "retain the existing side-effect contract");
   assert.ok(!lstatSync(installedDirectory).isSymbolicLink(), "UI must be a packed npm dependency, not a source link");
   const dependencyLock = readFileSync(join(consumerDirectory, "package-lock.json"));
 

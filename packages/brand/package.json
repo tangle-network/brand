@@ -1,7 +1,7 @@
 {
   "name": "@tangle-network/brand",
   "version": "1.27.1",
-  "description": "Tangle brand system \u2014 design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
+  "description": "Tangle brand system — design tokens, logo, Tailwind v4 theme. Single source of truth for every Tangle app.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -80,10 +80,10 @@
     }
   },
   "devDependencies": {
-    "@storybook/react": "^10.6.0",
+    "@storybook/react": "^10.6.3",
     "@types/react": "^19.3.0",
-    "react": "^19.3.0",
-    "tsdown": "^0.23.0",
+    "react": "^19.3.1",
+    "tsdown": "0.23.1",
     "typescript": "^7.0.2"
   },
   "keywords": [

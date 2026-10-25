@@ -35,7 +35,8 @@ export async function verify() {
       h(Select, null, h(SelectTrigger, { size, "aria-label": "Packed select" }, h(SelectValue, { placeholder: "Choose" }))),
     ));
     assert.ok(html.includes("bg-[var(--field-surface,var(--well))]"), "fields use the scoped field well");
-    assert.ok(html.includes("duration-[var(--duration-fast)]"), "duration token is time-valued");
+    // #388: controls consume Brand motion roles as complete duration-and-easing shorthands.
+    assert.ok(html.includes("var(--motion-control)"), "controls use the Brand motion role");
     assert.ok(!html.includes("duration-[var(--transition-fast)]"));
     assert.ok(!html.includes(`size="${size}"`), "presentation size must not leak to native attributes");
     assert.match(html, /aria-busy="true"/);
