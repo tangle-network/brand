@@ -24,8 +24,12 @@ Each package versions independently via [changesets](https://github.com/changese
 
 ## Development
 
+Merge `origin/main` before code qualification. Choose the changed package's checks from `package.json` and run them through `beelink-gate auto https://github.com/tangle-network/brand.git <full-sha> -- bash -lc '<commands>'`; the launcher performs the frozen install. Build before the affected integration checks. Workflow and documentation changes use YAML and content checks.
+
+For shared control geometry, accessibility, or upload recovery changes, retain the Chromium check against this exact tree's Storybook:
+
 ```bash
-pnpm install
-pnpm build        # build all packages
-pnpm typecheck    # typecheck all packages
+beelink-gate auto https://github.com/tangle-network/brand.git <full-sha> -- bash -lc 'pnpm exec playwright install chromium && pnpm --filter @tangle-network/brand build && pnpm build-storybook --quiet && CI=true PLAYWRIGHT_HTML_OPEN=never pnpm exec playwright test tests/visual/control-accessibility.spec.mjs --workers=2 --reporter=html'
 ```
+
+The Beelink needs Chromium's system dependencies and Python for the existing static server. Keep `playwright-report/` and `test-results/` for review, including screenshots and failure traces. The automatic accessibility workflow is retired; package publication and its artifact verification remain in the release workflow. A Storybook fixture pass does not establish a served application's accessibility or product-flow success.
