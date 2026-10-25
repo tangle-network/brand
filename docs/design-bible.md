@@ -36,7 +36,7 @@ Lead with Sandbox, Router and Intelligence. Open-source tools provide supporting
 
 Name the product, value or decision directly. Explain what changes for the buyer or builder. Use evidence to carry detail; earn the CTA. Remove invented labels, internal taxonomy, obvious mechanics and repeated claims.
 
-Cut taglines, helper text and secondary labels; if a screen needs them to make sense, fix the layout (Drew, 2026-10-24). Control labels stay visible (see Interaction).
+Cut taglines, helper text and secondary labels; if a screen needs them to make sense, fix the layout. Control labels stay visible (see Interaction).
 
 ## Graphic standard
 
