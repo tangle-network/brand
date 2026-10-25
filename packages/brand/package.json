@@ -27,6 +27,11 @@
     "README.md",
     "CHANGELOG.md"
   ],
+  "typesVersions": {
+    "*": {
+      "social": ["dist/social.d.ts"]
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
