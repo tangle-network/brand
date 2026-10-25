@@ -66,6 +66,8 @@ Settings compose four primitives from `@tangle-network/ui/primitives`, all at th
 - `SettingsList` and `SettingsListItem` are comparable rows with aligned state and action columns. The item draws its one at-rest `action` as an outline button, so it never reads as the state; a `disabledReason` locks it and shows the reason under the meta. Destructive actions live only in the item's ⋯ menu.
 - `Field` is a labelled field for forms that are not rows, with the same message wiring.
 
+`SettingsRow value={...}` displays read-only data in a foreground 14px span; `mono` applies only to that span. A supplied `value`, including `0`, `""`, `false`, `null` or `undefined`, keeps the value span. Mixed React content stays intact, and `children` still renders after the value for an action or control. Values align right in wide cards, including `stacked` rows; compact value rows use the existing bounded inline columns. Below 34rem values stack below the label, aligned left, even in `compact`; rows without `value` keep their existing layout and control/message wiring. Product formatters, loading states and fallback values stay with the caller.
+
 Rows and lists respond to their card's width, not the viewport's. `PageShell measure="settings"` frames the page: a 13rem section column beside a 48rem article from 60rem of frame width, and a 56px tab strip below that.
 
 ## Utilities

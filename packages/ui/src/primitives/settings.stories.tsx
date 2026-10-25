@@ -243,6 +243,40 @@ function FieldsExample() {
   );
 }
 
+/** Read-only product data beside existing controls; all values here are sample data. */
+function SettingsValuesExample() {
+  const [details, setDetails] = useState(false);
+  return (
+    <div className="mx-auto max-w-4xl space-y-6 p-6">
+      <SettingsSection id="read-only-values" title="Account values">
+        <SettingsRow id="value-zero" label="Active sessions" value={0} layout="compact" />
+        <SettingsRow id="value-empty" label="Empty value" value="" layout="compact" />
+        <SettingsRow id="value-false" label="False value" value={false} layout="compact" />
+        <SettingsRow id="value-null" label="Null value" value={null} layout="compact" />
+        <SettingsRow id="value-undefined" label="Undefined value" value={undefined} layout="compact" />
+        <SettingsRow id="value-mixed" label="Projected monthly cost" value={<>$0.00 <span className="text-muted-foreground">/month</span></>} layout="compact" />
+        <SettingsRow id="value-long" label="Session identifier" value="session_with_a_long_unbroken_identifier_that_must_wrap_inside_its_settings_card_without_hiding_the_label_or_overflowing" mono layout="compact" />
+        <SettingsRow id="value-agent" label="Agent identifier" value="research-agent" mono layout="compact" />
+        <SettingsRow id="value-model" label="Model identifier" value="workspace-model" mono layout="compact" />
+        <SettingsRow id="value-provider" label="Provider identifier" value="workspace-provider" mono layout="compact" />
+        <SettingsRow id="value-stacked" label="Stacked summary" value="Workspace summary" layout="stacked" />
+        <SettingsRow id="value-action" label="Value with action" value="workspace-provider" status={details ? "Details shown" : undefined} layout="compact">
+          <Button type="button" variant="outline" onClick={() => setDetails((shown) => !shown)}>{details ? "Hide details" : "Show details"}</Button>
+        </SettingsRow>
+        <SettingsRow id="value-control" label="Value with input" value="UTC" htmlFor="value-timezone" description="The original input keeps its message wiring.">
+          <Input id="value-timezone" defaultValue="UTC" />
+        </SettingsRow>
+      </SettingsSection>
+      <div className="max-w-sm">
+        <SettingsSection id="narrow-values" title="Narrow card in any window">
+          <SettingsRow id="narrow-value" label="Account email" value="reader@workspace.example" layout="compact" />
+          <SettingsRow id="legacy-compact" label="Daily digest" htmlFor="value-digest" layout="compact"><Switch id="value-digest" defaultChecked /></SettingsRow>
+        </SettingsSection>
+      </div>
+    </div>
+  );
+}
+
 const meta = {
   title: "Primitives/Settings",
   component: SettingsSection,
@@ -265,3 +299,6 @@ export const Bounded: Story = { render: () => <SettingsPage className="mx-auto m
 
 /** The promoted Field: hint, info tip with an aside action, a live error, and a status. */
 export const Fields: Story = { render: () => <FieldsExample /> };
+
+/** Values preserve ReactNode content and coexist with controls; only value rows stack in a narrow compact layout. */
+export const Values: Story = { render: () => <SettingsValuesExample /> };
