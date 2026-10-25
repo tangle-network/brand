@@ -48,7 +48,7 @@
     "build": "node scripts/gen-css.mjs --check && tsdown && cp src/figure.css dist/figure.css && cp src/react/live.css dist/react/live.css"
   },
   "devDependencies": {
-    "tsdown": "^0.23.0",
+    "tsdown": "0.23.1",
     "typescript": "^7.0.2"
   },
   "keywords": [
