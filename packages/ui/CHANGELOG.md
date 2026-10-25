@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.44.0
+
+### Minor Changes
+
+- e19c28a: Add read-only `value` and optional `mono` presentation to SettingsRow while preserving children, the public props interface, and control message wiring. Value rows use the inline layout and stack in narrow cards; rows without a value keep their existing layout.
+
 ## 11.43.0
 
 ### Minor Changes
