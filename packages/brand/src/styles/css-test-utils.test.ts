@@ -60,11 +60,12 @@ describe("hexRelativeLuminanceIn", () => {
     expect(card).toBeGreaterThan(canvas);
   });
 
-  it("says a token is non-hex rather than claiming it is missing", () => {
-    expect(() => hexRelativeLuminanceIn("--a: var(--b);", "a")).toThrow(
-      /not a hex color/,
-    );
-    expect(() => hexRelativeLuminanceIn("--a: #fff;", "b")).toThrow(/missing/);
+  it("follows an alias to the colour it paints, and names an alias that leads nowhere", () => {
+    expect(hexRelativeLuminanceIn("--a: var(--b); --b: #fff;", "a")).toBe(1);
+    expect(hexRelativeLuminanceIn("--a: hsl(var(--b)); --b: 0 0% 100%;", "a")).toBe(1);
+    expect(() => hexRelativeLuminanceIn("--a: var(--b);", "a")).toThrow(/--b is not defined/);
+    expect(() => hexRelativeLuminanceIn("--a: rgba(0, 0, 0, 0.5);", "a")).toThrow(/not a hex color/);
+    expect(() => hexRelativeLuminanceIn("--a: #fff;", "b")).toThrow(/not defined/);
   });
 });
 
@@ -73,7 +74,9 @@ describe("hslIn", () => {
     expect(hslIn("--a: 240 33% 6%;", "a")).toEqual({ h: 240, s: 33, l: 6 });
   });
 
-  it("throws when the slot is absent", () => {
-    expect(() => hslIn("--a: 240 33% 6%;", "b")).toThrow(/missing HSL slot/);
+  it("follows an alias to its triple, and throws when the slot is absent or not a triple", () => {
+    expect(hslIn("--a: var(--b); --b: 240 33% 6%;", "a")).toEqual({ h: 240, s: 33, l: 6 });
+    expect(() => hslIn("--a: 240 33% 6%;", "b")).toThrow(/not defined/);
+    expect(() => hslIn("--a: #fff;", "a")).toThrow(/not an HSL triple/);
   });
 });
