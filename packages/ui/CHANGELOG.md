@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.44.1
+
+### Patch Changes
+
+- 5ef0ec4: Update runtime dependencies (Radix primitives, lucide-react, marked, motion, shiki) to their latest versions.
+
 ## 11.44.0
 
 ### Minor Changes
