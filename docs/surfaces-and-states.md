@@ -20,7 +20,7 @@ Each level has a token. A card is one level; what it contains is the next.
 | popover | `--hsl-popover` | `SelectContent`, `DropdownMenuContent` (a portal never takes the card level) |
 | well | `--well-page`, `--well-card`, `--well-raised`, `--well-raised-2` | a field's fill on each level |
 | field border | `--field-border` | a field's hairline, at least 3:1 against the card |
-| hairline | `--hsl-border` | dividers and card edges |
+| hairline | `--hsl-border` | every divider, card edge and table rule; `--border-subtle` and `--border-default` are its older names |
 
 Elevation tokens: `--shadow-card` (level 1), `--shadow-raised` (nested), `--shadow-well` (inset, fields) and `--edge-highlight` (a 1px top highlight on dark planes; transparent in light).
 
@@ -35,7 +35,19 @@ Fields read `--well` through `ixField`. `Toolbar` still sets `--field-surface` t
 
 ### Values
 
-Hospitality is the first theme on the tuned ladder (OKLCH L x100, gated in `surface-ladder.test.ts`):
+The canonical spine (`:root`, `.dark`, `.light`, `data-theme="dark"`, `"light"` and `"tangle-dark"`) takes its raised levels from its own planes: raised is L3 (`--hsl-secondary`) and raised-2 is L4 (`--hsl-popover`). OKLCH L x100, gated in `surface-ladder.test.ts`:
+
+| Level | Light | Dark |
+| --- | ---: | ---: |
+| page | 94.9 `#eceef3` | 15.0 `#0a0a14` |
+| card | 100 `#ffffff` + shadow | 21.7 `#191826` |
+| raised | 95.2 `#edeff4` | 26.6 `#252237` + top highlight |
+| raised-2, popover | 100 `#ffffff` | 31.6 `#312e47` |
+| well on page / in card | 100 / 94.9 | 10.2 (page + 30% black) / 10.2 |
+| well in raised / raised-2 | 100 / 94.9 | 21.7 (the card) / 21.7 |
+| hairline | 83.5 `#c8c7d6` | 34.1 `#37364a` (1.5:1 on the card) |
+
+Hospitality tunes its own ladder:
 
 | Level | Light | Dark |
 | --- | ---: | ---: |
@@ -52,7 +64,7 @@ Hospitality is the first theme on the tuned ladder (OKLCH L x100, gated in `surf
 
 Rules: every adjacent pair is at least 4.4 L apart (a card or field within 3 of its parent reads as flat); dark wells sit at least 4.5 below what holds them; field borders clear 3:1 against the card (WCAG 1.4.11).
 Inks follow the planes: Hospitality's dark accent text (`#b2dbc2`) and dark destructive red (`0 80% 88%`) are lighter than the canonical ones so selected text on a tint and error text on the popover keep 4.5:1.
-The canonical spine and other named themes default every new token to today's look: raised levels paint `--hsl-card`, every well is `--bg-input`, and `--field-border` is the hairline. Their tuned values land separately.
+The other named themes keep a flat ladder until each is tuned: raised levels paint `--hsl-card` and a field in a nested card takes the well of a field in a card. The test lists every named theme with its own planes, so a new one cannot inherit the spine's indigo raised planes by accident.
 
 ## The four interaction states
 
