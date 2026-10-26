@@ -37,7 +37,7 @@ Later rollouts include professional-document, creative and hospitality surfaces.
 | States | Design empty, populated, long-content, loading, interrupted, denied, unknown, error and success states together. Essential context cannot depend on hover. |
 | Mobile | Recompose the task around reading, deciding and returning; do not shrink a desktop dashboard. Detail panels become an intentional navigation state with a reliable way back. |
 
-Use [Charts](../packages/charts/README.md), existing controls and surfaces as the implementation basis. Audit the current stories and real consumer versions before creating another primitive.
+Use [Charts](https://github.com/tangle-network/charts), existing controls and surfaces as the implementation basis. Audit the current stories and real consumer versions before creating another primitive.
 
 ## Delivery method
 
