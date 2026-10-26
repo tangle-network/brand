@@ -6,6 +6,11 @@
  * hairline (1.5:1 against the card in dark) because shadow does no work on a dark
  * canvas. Light mirrors it: white paper on a grey canvas, never white-on-white.
  *
+ * Each colour is declared ONCE, as a role (a plane, an ink tier, one of four
+ * indigos, one ink per status hue), and every other name of that colour is an
+ * alias of it, so a retune or a named theme moves one value and every family
+ * follows: hsl-*, md3-*, depth-*, bg-*, status-*, surface-*, code-* and brand-*.
+ *
  * Apps consume this spine as-is. If a product needs its own accent identity,
  * add a named theme in named-themes.css (`data-theme="<name>"`) — do NOT re-declare
  * these tokens in the app, or its surfaces silently stop tracking the brand. */
@@ -56,96 +61,179 @@
 .light,
 .dark {
   color-scheme: dark;
-  --md3-surface: #0a0a14; /* L0 page canvas — indigo-lifted off black */
-  --md3-surface-dim: #040408; /* recessed page: 4.1 L under the #0a0a14 panel (the inset workspace surface needs >= 3) */
+
+  /* ── Planes ─────────────────────────────────────────────────────────────
+   * One ladder, authored once as HSL channels because the shadcn layer reads
+   * hsl(var(--hsl-*)); every hex plane below is derived from it, so a step
+   * moves in one place. L0 is lifted off black toward indigo; L1 chrome sits
+   * below it and the cards step up from it in even increments. */
+  --hsl-background: 240 33% 6%;      /* L0 canvas #0a0a14 */
+  --hsl-input: 244 29% 9%;           /* L1 chrome and field wells #11101e */
+  --hsl-card: 244 23% 12%;           /* L2 resting card #191826 */
+  --hsl-secondary: 249 24% 16%;      /* L3 nested plane and hover well #221f33 */
+  --hsl-popover: 247 23% 21%;        /* L4 overlay #2c2942: a popover carries body text, so it sits on the top plane the ink ramp reaches */
+  --hsl-muted: var(--hsl-secondary);
+  --hsl-accent: var(--hsl-secondary); /* neutral hover; indigo lives in --accent-surface-strong */
+  /* The floor of the ladder: the recessed page and the terminal well share it
+   * because dark has no plane below L0 to give them. They stay two tokens
+   * because they diverge in light, where the well is paper and the page grey. */
+  --md3-surface-dim: #040408;        /* 4.1 L under the L0 panel: the inset workspace surface needs >= 3 */
+  --md3-surface-container-lowest: var(--md3-surface-dim);
   --md3-surface-bright: #232238;
-  /* Same value as --md3-surface-dim by design, not by drift: both name the floor
-   * of the ladder, and dark has no plane below it to give them. They stay two
-   * tokens because the roles diverge in light, where the well is paper (#ffffff)
-   * and the recessed page is grey (#dcdee6) — a consumer binding to the wrong one
-   * there gets the wrong surface. */
-  --md3-surface-container-lowest: #040408; /* L-1 terminal/code well */
-  --md3-surface-container-low: #12111f; /* L1 chrome, field wells */
-  --md3-surface-container: #191826; /* L2 resting card */
-  --md3-surface-container-high: #221f33; /* L3 nested / hover */
-  --md3-surface-container-highest: #2c2942; /* L4 overlay */
-  --md3-surface-variant: #221f33;
-  --md3-on-surface: #e6e6e6;
-  --md3-on-surface-variant: #b5b5b5;
-
-  --md3-primary: #A5B4FC;
-  --md3-primary-dim: #7C6CF6;
-  --md3-primary-container: #4C3FC5;
-  --md3-on-primary: #ffffff;
-  --md3-on-primary-container: #E0E7FF;
-  --md3-primary-fixed: #A5AAFC;
-  --md3-primary-fixed-dim: #818CF8;
-
-  --md3-secondary: #C7D2FE;
-  --md3-secondary-dim: #A5B4FC;
-  --md3-secondary-container: #312E81;
-  --md3-on-secondary: #E8E5FF;
-  --md3-on-secondary-container: #E8E5FF;
-
-  --md3-tertiary: #10B981;
-  --md3-tertiary-container: var(--surface-success-bg);
-  --md3-outline: #8e8e8e;
-  --md3-outline-variant: #2a293d;
-
-  --md3-error: #ff5277;
-  --md3-error-dim: #eb2855;
-  --md3-error-container: #82042b;
-  --md3-on-error: #ffffff;
-  --md3-on-error-container: #ffbdf2;
-
+  --md3-surface: hsl(var(--hsl-background));
+  --md3-surface-container-low: hsl(var(--hsl-input));
+  --md3-surface-container: hsl(var(--hsl-card));
+  --md3-surface-container-high: hsl(var(--hsl-secondary));
+  --md3-surface-container-highest: hsl(var(--hsl-popover));
+  --md3-surface-variant: var(--md3-surface-container-high);
+  --depth-1: var(--md3-surface);
+  --depth-2: var(--md3-surface-container);
+  --depth-3: var(--md3-surface-container-high);
+  --depth-4: var(--md3-surface-container-highest);
+  --bg-root: var(--md3-surface);
+  --bg-dark: var(--depth-1);
+  --bg-card: var(--depth-2);
+  --bg-elevated: var(--depth-4);
+  --bg-section: var(--depth-1);
+  --bg-input: hsl(var(--hsl-input));
+  /* Sidebar: L1 chrome, one step BELOW the canvas, so the nav reads as what the
+   * content sits in front of rather than as another card. */
+  --sidebar-background: var(--hsl-input);
+  --sidebar-accent: var(--hsl-secondary);
   --md3-inverse-surface: #fdfdfd;
-  --md3-inverse-primary: #4C3FC5;
   --md3-inverse-on-surface: #000000;
-  --md3-surface-tint: #A5B4FC;
 
-  /* Semantic HSL bridge — the indigo-lifted surface ladder (GTM's, now every product's) */
-  --hsl-background: 240 33% 6%; /* L0 canvas #0a0a14 */
-  /* Near-white ink on the canvas is the glare end of the range, and the tiers
-   * below it need room to separate. This neutral ink keeps the original 10.6:1
-   * contrast on the card and leaves four steps the eye can tell apart. */
+  /* ── Ink ────────────────────────────────────────────────────────────────
+   * Neutral on purpose: colour in the ink would compete with the one accent.
+   * Near-white on the canvas is the glare end of the range, so the tiers sit
+   * below it: 10.6 / 7.8 / 6.4 / 5.4 against the L2 card, solved against the
+   * WHOLE ladder so the faintest tier still clears the 4.5:1 body floor on the
+   * overlay plane. tokens.test.ts asserts every tier on every plane. */
   --hsl-foreground: 0 0% 90.1961%;     /* #e6e6e6 */
-  --hsl-card: 244 23% 12%; /* L2 card #191826 */
-  --hsl-card-foreground: 0 0% 90.1961%;
-  --hsl-popover: 247 23% 21%;          /* #2c2942 — the NESTED plane despite
-     the name; the overlay plane is --md3-surface-container-highest. A popover
-     carries body text, and the ladder above L3 is reserved for planes that lift
-     by shadow, so it sits on L3 and the ink ramp reaches it. */
-  --hsl-popover-foreground: 0 0% 90.1961%;
-  /* The fill indigo, NOT the bright one: `.btn-primary` puts white on this, and
-   * #6366F1 carries white at only 4.47:1. This clears the floor at 7.4:1. The
-   * bright indigo stays available for accent TEXT via --accent-text. */
-  --hsl-primary: 246 54% 51%;       /* #4c3fc6 */
-  --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 249 24% 16%; /* L3 #221f33 */
-  --hsl-secondary-foreground: 0 0% 90.1961%;
-  --hsl-muted: 249 24% 16%; /* L3 hover well */
-  --hsl-muted-foreground: 240 5% 68%;  /* #a9a9b1 — high enough that the
-     reduced-opacity caption derivatives (/70, /60) still clear the large-text
-     contrast floor against the L2 card. */
-  --hsl-accent: 249 24% 16%; /* neutral hover (indigo lives in accent-surface-strong) */
-  --hsl-accent-foreground: 0 0% 90.1961%;
-  /* Light red carrying dark ink, as the dark primary does: it must read as
-   * error TEXT on every dark plane (AA) and still carry its foreground as a fill. */
-  --hsl-destructive: 0 90% 77%;
-  --hsl-destructive-foreground: 0 60% 10%;
-  /* Quiet on purpose: 1.5:1 against the resting card. Shadow does no work on a
-   * dark canvas, so the hairline is what states where a plane ends. */
-  --hsl-border: 243 20% 20%; /* #2a293d = --md3-outline-variant */
-  --hsl-input: 244 29% 9%; /* recessed field well #11101e */
-  /* Brighter than --primary on purpose: the ring is NON-TEXT and has to clear
-   * 3:1 against BOTH canvas and card. The fill indigo is tuned to carry white
-   * text instead, so the two cannot be the same value. */
-  --hsl-ring: 233 100% 87%;
-  --hsl-success: 160 84% 39%;
-  --hsl-warning: 40 94% 56%;
-  --hsl-info: 200 88% 56%;
+  --hsl-muted-foreground: 240 5% 68%;  /* #a9a9b1: the /70 and /60 caption derivatives still clear the large-text floor on the card */
+  --text-primary: hsl(var(--hsl-foreground));
+  --text-secondary: #c7c7c7;
+  --text-muted: #b5b5b5;
+  --text-dim: #a5a5a5;
+  --hsl-card-foreground: var(--hsl-foreground);
+  --hsl-popover-foreground: var(--hsl-foreground);
+  --hsl-secondary-foreground: var(--hsl-foreground);
+  --hsl-accent-foreground: var(--hsl-foreground);
+  --sidebar-foreground: var(--hsl-foreground);
+  --sidebar-accent-foreground: var(--hsl-foreground);
+  --md3-on-surface: var(--text-primary);
+  --md3-on-surface-variant: var(--text-muted);
+  --md3-outline: #8e8e8e;
 
-  /* Tailwind/shadcn aliases */
+  /* ── Hairlines ──────────────────────────────────────────────────────────
+   * 1.5:1 against the resting card, quiet by design: shadow does no work on a
+   * dark canvas, so the hairline states where a plane ends without drawing a
+   * box around every panel. */
+  --hsl-border: 243 20% 20%;           /* #2a293d */
+  --md3-outline-variant: hsl(var(--hsl-border));
+  --sidebar-border: var(--hsl-border);
+  --border-subtle: rgba(255, 255, 255, 0.10);
+  --border-default: rgba(255, 255, 255, 0.16);
+  --border-hover: rgba(255, 255, 255, 0.28);
+
+  /* ── Accent: four indigos, each with one job ────────────────────────────
+   *   fill  --hsl-primary    carries white at 7.4:1: buttons, the CTA, the selected row at 30%
+   *   mark  --brand-primary  the brand indigo of the logo and marketing fills; never under text
+   *   line  --brand-cool     edges, chart accents, the focus ring family
+   *   ink   --accent-text    the bright indigo as TEXT and icon only: 6.7:1 on the card
+   * Every other indigo name is one of these four, so a named theme that retints
+   * the accent retints all of them. The ring is brighter than the fill on
+   * purpose: it is non-text and must clear 3:1 on the canvas AND the card,
+   * while the fill is tuned to carry white. */
+  --hsl-primary: 246 54% 51%;          /* fill #4c3fc6 */
+  --hsl-primary-foreground: 0 0% 100%;
+  --hsl-ring: 233 100% 87%;
+  --brand-primary: #7C6CF6;
+  --brand-cool: #818CF8;
+  --accent-text: #A5B4FC;
+  --brand-purple: #C7D2FE;             /* the ink, softened: gradient text and ink on the deep field */
+  --brand-strong: #2E2A5E;             /* the deep field the softened ink sits on */
+  --brand-strong-text: #ffffff;
+  --brand-strong-text-muted: rgba(255, 255, 255, 0.7);
+  --brand-strong-text-dim: rgba(255, 255, 255, 0.5);
+  --brand-glow: var(--accent-text);
+  --brand-vibrant: var(--brand-primary);
+  --btn-primary-bg: hsl(var(--hsl-primary));
+  --btn-primary-hover: #5a50d6;
+  --btn-primary-text: #ffffff;
+  --btn-cta-bg: var(--btn-primary-bg);
+  --btn-cta-text: var(--btn-primary-text);
+  --sidebar-primary: var(--hsl-primary);
+  --sidebar-primary-foreground: var(--hsl-primary-foreground);
+  --sidebar-ring: var(--hsl-ring);
+  --md3-primary: var(--accent-text);
+  --md3-primary-dim: var(--brand-primary);
+  --md3-primary-container: var(--btn-primary-bg);
+  --md3-on-primary: #ffffff;
+  --md3-on-primary-container: var(--brand-purple);
+  --md3-primary-fixed: var(--accent-text);
+  --md3-primary-fixed-dim: var(--brand-cool);
+  --md3-secondary: var(--brand-purple);
+  --md3-secondary-dim: var(--accent-text);
+  --md3-secondary-container: var(--brand-strong);
+  --md3-on-secondary: var(--brand-purple);
+  --md3-on-secondary-container: var(--brand-purple);
+  --md3-inverse-primary: var(--btn-primary-bg);
+  --md3-surface-tint: var(--accent-text);
+  /* Accent wells: soft is the hover neutral, strong the active or selected row. */
+  --accent-surface-soft: color-mix(in srgb, var(--accent-text) 7%, transparent);
+  --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 30%, transparent);
+  --bg-hover: var(--accent-surface-soft);
+  --bg-selection: color-mix(in srgb, var(--brand-primary) 28%, transparent);
+  --border-accent: color-mix(in srgb, var(--brand-cool) 35%, transparent);
+  --border-accent-hover: color-mix(in srgb, var(--brand-cool) 50%, transparent);
+  /* The indigo spark, kept ONLY for the logo mark and the send button. */
+  --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), var(--accent-text));
+  --tangle-gradient-text: linear-gradient(135deg, var(--brand-purple), var(--accent-text));
+  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--brand-primary));
+
+  /* ── Status: one ink, one wash, one border per hue ──────────────────────
+   * The ink is pastel on purpose. A saturated fill vibrates on a 6% canvas,
+   * and the ink already clears AA on every plane, so it is also the fill: a
+   * status fill carries dark text, as the destructive one always has. The
+   * shadcn channels are the source; the surface, status, md3, code and brand
+   * names of each hue alias them. */
+  --hsl-success: 154.7 60.2% 60.6%;        /* #5ed7a4 */
+  --hsl-warning: 41.5 88.2% 63.3%;         /* #f4c14f */
+  --hsl-destructive: 2.8 100% 83.1%;       /* #ffada9 */
+  --hsl-destructive-foreground: 0 60% 10%;
+  --hsl-info: 199.7 100% 70.2%;            /* #67cdff */
+  --surface-success-text: hsl(var(--hsl-success));
+  --surface-success-bg: #2f5146;
+  --surface-success-border: #3c7760;
+  --surface-warning-text: hsl(var(--hsl-warning));
+  --surface-warning-bg: #4b4232;
+  --surface-warning-border: #7a6236;
+  --surface-danger-text: hsl(var(--hsl-destructive));
+  --surface-danger-bg: #5a3b40;
+  --surface-danger-border: #7d4d53;
+  --surface-info-text: hsl(var(--hsl-info));
+  --surface-info-bg: #2d4e67;
+  --surface-info-border: #3d7292;
+  --status-running: var(--surface-success-text);
+  --status-creating: var(--accent-text);
+  --status-stopped: var(--surface-warning-text);
+  --status-warm: var(--surface-orange-text);
+  --status-cold: var(--surface-info-text);
+  --status-error: var(--surface-danger-text);
+  --status-deleted: var(--text-dim);
+  --brand-emerald: var(--surface-success-text);
+  --md3-tertiary: var(--surface-success-text);
+  --md3-tertiary-container: var(--surface-success-bg);
+  --md3-error: var(--surface-danger-text);
+  --md3-error-dim: color-mix(in srgb, var(--md3-error) 85%, black);
+  --md3-error-container: var(--surface-danger-bg);
+  --md3-on-error: hsl(var(--hsl-destructive-foreground));
+  --md3-on-error-container: var(--surface-danger-text);
+  /* ── shadcn aliases: the names @tangle-network/ui and Tailwind read ─────
+   * Declared once; they re-resolve per theme through the --hsl-* spine. --input
+   * is the input BORDER and the Switch off-track, a mid-tone that must stay
+   * visible against a surface, so it is NOT the field fill (--bg-input). */
   --background: var(--hsl-background);
   --foreground: var(--hsl-foreground);
   --card: var(--hsl-card);
@@ -163,11 +251,6 @@
   --destructive: var(--hsl-destructive);
   --destructive-foreground: var(--hsl-destructive-foreground);
   --border: var(--hsl-border);
-  /* shadcn's `--input` is the input BORDER and the Switch's off-track — a
-   * mid-tone that has to stay visible AGAINST a surface. It is deliberately NOT
-   * the field fill: pointing it at the recessed well would tint a border and a
-   * track the same color as the plane behind them, and both would vanish. The
-   * field fill is --hsl-input / --bg-input below. */
   --input: var(--hsl-muted-foreground);
   --ring: var(--hsl-ring);
   --success: var(--hsl-success);
@@ -175,45 +258,6 @@
   --error: var(--hsl-destructive);
   --info: var(--hsl-info);
 
-  /* Sidebar tokens — L1 chrome: one step BELOW the canvas here, so the nav reads
-   * as chrome the content sits in front of rather than as another card. */
-  --sidebar-background: 244 29% 9%;    /* L1 chrome #11101e */
-  --sidebar-foreground: 0 0% 90.1961%;
-  --sidebar-primary: 246 54% 51%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 20.7843%;      /* L3 hover well */
-  --sidebar-accent-foreground: 0 0% 90.1961%;
-  --sidebar-border: 0 0% 29.8039%;
-  --sidebar-ring: 233 100% 87%;
-
-  /* Depth scale — tracks the MD3 ladder (canvas / card / nested / overlay) */
-  --depth-1: #0a0a14;
-  --depth-2: #191826;
-  --depth-3: #221f33;
-  --depth-4: #2c2942;
-
-  /* Status colors */
-  --status-running: #10B981;
-  --status-creating: #A5B4FC;
-  --status-stopped: #FFB800;
-  --status-warm: #FF8A4C;
-  --status-cold: #4AABFF;
-  --status-error: #FF4D6D;
-  --status-deleted: #6B7094;
-
-  /* Status surface tokens — bg / border / text for each semantic color */
-  --surface-success-bg: #2f5146;
-  --surface-success-border: #3c7760;
-  --surface-success-text: #5ed7a4;
-  --surface-warning-bg: #4b4232;
-  --surface-warning-border: #7a6236;
-  --surface-warning-text: #f4c14f;
-  --surface-danger-bg: #5a3b40;
-  --surface-danger-border: #7d4d53;
-  --surface-danger-text: #ffada9;
-  --surface-info-bg: #2d4e67;
-  --surface-info-border: #3d7292;
-  --surface-info-text: #67cdff;
   /* tones:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */
   --tone-violet-bg: #392751;
   --tone-violet-bg-hover: #432b60;
@@ -281,7 +325,6 @@
   --surface-teal-border: #207e73;
   --surface-teal-text: #0bd8b6;
   /* tones:end */
-
   /* Run-mix ramp — the fills of a proportional status bar.
    *
    * Separate from the `--surface-*-text` tones because a 6px bar is read
@@ -322,79 +365,28 @@
   --mesh-violet: transparent;
   --mesh-blue: transparent;
 
-  /* Brand gradients — the indigo spark, kept ONLY for the logo mark + send button */
-  --tangle-gradient: linear-gradient(135deg, #4C3FC5, #A5B4FC);
-  --tangle-gradient-text: linear-gradient(135deg, #C7D2FE, #A5B4FC);
-  --accent-gradient-strong: linear-gradient(135deg, #4C3FC5, #7C6CF6);
-  /* Accent wells — soft = hover neutral, strong = active/selected row (indigo) */
-  --accent-surface-soft: rgba(165, 180, 252, 0.07);
-  --accent-surface-strong: rgba(76, 63, 197, 0.30);
-  /* The BRIGHT indigo, and only ever as text: --primary is the fill (it carries
-   * white), and at 6.7:1 on the card this is the one that stays legible as ink. */
-  --accent-text: #A5B4FC;
-
-  /* Surfaces — solid fills off the ladder (no radial mesh) */
-  --bg-root: #0a0a14;
-  --bg-dark: var(--depth-1);
-  --bg-card: var(--depth-2);
-  --bg-elevated: var(--depth-4);
-  --bg-section: var(--depth-1);
-  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
-  --bg-hover: rgba(165, 180, 252, 0.07);
-  --bg-selection: rgba(124, 108, 246, 0.28);
-
-  /* Text — neutral */
-  /* Four steps the eye can actually separate: 10.6 / 7.8 / 6.4 / 5.4 against the
-   * L2 card. --text-dim is the faintest tier but it is still TEXT, so it clears
-   * the 4.5:1 body floor rather than only the 3:1 large-text one.
-   *
-   * Solved against the WHOLE ladder, not against one plane. A faint tier tuned
-   * on the card alone still has to clear the floor on the nested and overlay
-   * planes above it, which carry the modals, the drawers and every dropdown
-   * menu — so both ends meet in the middle: the faint tiers sit high enough for
-   * the overlay, and the planes above the card sit low enough for them. The
-   * card, the chrome and the canvas are fixed points. tokens.test.ts asserts
-   * every tier on every plane, so a retune cannot open a gap on one plane while
-   * looking correct on another. */
-  --text-primary: #e6e6e6;
-  --text-secondary: #c7c7c7;
-  --text-muted: #b5b5b5;
-  --text-dim: #a5a5a5;
-
-  /* Brand accents — Tangle */
-  --brand-primary: #7C6CF6;
-  --brand-strong: #2E2A5E;
-  --brand-strong-text: #ffffff;
-  --brand-strong-text-muted: rgba(255, 255, 255, 0.7);
-  --brand-strong-text-dim: rgba(255, 255, 255, 0.5);
-  --brand-cool: #818CF8;
-  --brand-glow: #A5AAFC;
-  --brand-purple: #C7D2FE;
-  --brand-vibrant: #6366F1;
-  --brand-emerald: #10B981;
-
-  /* Borders — neutral hairlines */
-  --border-subtle: rgba(255, 255, 255, 0.10);
-  --border-default: rgba(255, 255, 255, 0.16);
-  --border-hover: rgba(255, 255, 255, 0.28);
-  --border-accent: rgba(129, 140, 248, 0.35);
-  --border-accent-hover: rgba(129, 140, 248, 0.50);
-
-  /* Buttons */
-  --btn-primary-bg: #4C3FC5;
-  --btn-primary-hover: #5A50D6;
-  --btn-primary-text: #ffffff;
-  --btn-cta-bg: #4C3FC5;
-  --btn-cta-text: #FFFFFF;
-
-  /* Code / runtime syntax */
-  --code-keyword: #A5AAFC;
-  --code-string: #34D399;
-  --code-function: #6D9FFF;
-  --code-number: #FFB347;
-  --code-success: #10B981;
-  --code-comment: #606294;
-  --code-error: #FF4D6D;
+  /* ── Code ───────────────────────────────────────────────────────────────
+   * The same inks as the status family and the accent, so a keyword, a
+   * string and a warning never carry three different purples or ambers.
+   * Keywords take the categorical violet, not the accent: a keyword is not a
+   * link. --code-* is the older name for the same roles. */
+  --code-header-bg: hsl(var(--hsl-background));
+  --syntax-foreground: var(--text-primary);
+  --syntax-variable: var(--text-secondary);
+  --syntax-comment: var(--text-dim);
+  --syntax-keyword: var(--tone-violet-icon);
+  --syntax-meta: var(--accent-text);
+  --syntax-function: var(--surface-info-text);
+  --syntax-string: var(--surface-success-text);
+  --syntax-number: var(--surface-warning-text);
+  --syntax-error: var(--surface-danger-text);
+  --code-keyword: var(--syntax-keyword);
+  --code-string: var(--syntax-string);
+  --code-function: var(--syntax-function);
+  --code-number: var(--syntax-number);
+  --code-success: var(--surface-success-text);
+  --code-comment: var(--syntax-comment);
+  --code-error: var(--syntax-error);
 
   /* Shadows — flat, no inner ring, no indigo glow */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -531,18 +523,6 @@
   --tool-card-py: 0.5rem;
   --tool-icon-size: 1.75rem;
 
-  /* Syntax highlighting — the light palette is authored below. */
-  --code-header-bg: hsl(var(--hsl-background));
-  --syntax-comment: #9ea2cc;
-  --syntax-keyword: #A78FFF;
-  --syntax-string: #10b981;
-  --syntax-function: #6D9FFF;
-  --syntax-number: #FFB347;
-  --syntax-meta: #8263FF;
-  --syntax-error: #FF4D6D;
-  --syntax-variable: #C4C0D8;
-  --syntax-foreground: #E8E6F6;
-
   /* Shared motion vocabulary, previously authored by the light-default Agent
    * App consumer. These are tokens only, not automatic animation classes. */
   --duration-instant: 90ms;
@@ -599,130 +579,85 @@
 [data-theme="agents-light"],
 .light {
   color-scheme: light;
-  /* Light theme — neutral surfaces with purple accents */
-  --code-header-bg: color-mix(in srgb, hsl(var(--hsl-muted)) 50%, transparent);
-  --syntax-foreground: #24243a;
-  --syntax-comment: #6b7280;
-  --syntax-keyword: #7c3aed;
-  --syntax-string: #047857;
-  --syntax-function: #2563eb;
-  --syntax-number: #b45309;
-  --syntax-meta: #6d28d9;
-  --syntax-variable: #334155;
-  --syntax-error: #dc2626;
 
-  /* MD3 surface hierarchy */
-  /* The light ladder ALTERNATES; it is not monotonic, and that is deliberate.
-   * On a neutral canvas, a raised plane is PAPER (white) and a recessed one is a
-   * neutral WELL. So card and overlay are both white and separate from each other
-   * by shadow and ring, not by fill — which is how light-mode elevation actually
-   * reads. Forcing a strictly-darkening ladder here is what produced the
-   * white-on-white flatness this palette replaced. Pinned in tokens.test.ts. */
-  --md3-surface: #eceef3; /* L0 page canvas — cool grey, BELOW the wells */
-  --md3-surface-dim: #dcdee6;
+  /* ── Planes: white paper on a cool grey canvas ───────────────────────────
+   * The light ladder ALTERNATES, and that is deliberate: a raised plane is
+   * PAPER and a recessed one is a neutral WELL, so the card and the overlay
+   * are both white and separate by shadow and ring, not by fill. Forcing a
+   * strictly darkening ladder here is what produced the white-on-white
+   * flatness this palette replaced. Pinned in tokens.test.ts. */
+  --hsl-background: 223 23% 94%;     /* L0 canvas #eceef3, BELOW the wells */
+  --hsl-input: 225 29% 97%;          /* L1 chrome and field wells #f5f6fa */
+  --hsl-card: 0 0% 100%;             /* L2 card: paper */
+  --hsl-secondary: 230 27% 96%;      /* L3 nested well #f2f3f8 */
+  --hsl-popover: var(--hsl-card);    /* L4 overlay: paper, lifted by shadow, never out-lightening a card */
+  --md3-surface-dim: #dcdee6;        /* the recessed page */
+  --md3-surface-container-lowest: hsl(var(--hsl-card)); /* insets read as paper */
   --md3-surface-bright: #ffffff;
-  --md3-surface-container-lowest: #ffffff;  /* insets read as paper */
-  --md3-surface-container-low: #f6f7fa; /* L1 chrome, field wells — well */
-  --md3-surface-container: #ffffff;         /* L2 resting card — paper */
-  --md3-surface-container-high: #f1f2f7; /* L3 nested / hover — well */
-  --md3-surface-container-highest: #ffffff; /* L4 overlay — paper + shadow */
-  --md3-surface-variant: #f1f2f7;
-  --md3-on-surface: #2d2d2d;
-  --md3-on-surface-variant: #4c4c4c;
-
-  --md3-primary: #3E349E;
-  --md3-primary-dim: #352B88;
-  --md3-primary-container: #352B88;
-  --md3-on-primary: #ffffff;
-  --md3-on-primary-container: #9B93F0;
-  --md3-primary-fixed: #E8E5FF;
-  --md3-primary-fixed-dim: #C5C0F0;
-
-  --md3-secondary: #524A78;
-  --md3-secondary-dim: #3E3660;
-  --md3-secondary-container: #E8E5FF;
-  --md3-on-secondary: #ffffff;
-  --md3-on-secondary-container: #524A78;
-
-  --md3-tertiary: #065F46;
-  --md3-tertiary-container: #D1FAE5;
-  --md3-outline: #787878;
-  --md3-outline-variant: #c7c6d6;
-
-  --md3-error: #ba1a1a;
-  --md3-error-dim: #93000a;
-  --md3-error-container: #ffdad6;
-  --md3-on-error: #ffffff;
-  --md3-on-error-container: #93000a;
-
+  --sidebar-background: var(--hsl-card); /* paper, flat, with a hairline */
   --md3-inverse-surface: #2e2e3e;
-  --md3-inverse-primary: #A5AAFC;
   --md3-inverse-on-surface: #f0f1f4;
-  --md3-surface-tint: #6366F1;
 
-  /* Semantic HSL bridge — white paper on an achromatic canvas */
-  --hsl-background: 223 23% 94%; /* L0 canvas #eceef3 */
-  /* Neutral ink rather than pure black keeps the original 13.7:1 contrast on
-   * white paper and 11.4:1 on the canvas: AAA with headroom in both places. */
-  --hsl-foreground: 0 0% 17.6471%;     /* #2d2d2d */
-  --hsl-card: 0 0% 100%;            /* L2 card = white paper */
-  --hsl-card-foreground: 0 0% 17.6471%;
-  --hsl-popover: 0 0% 100%;
-  --hsl-popover-foreground: 0 0% 17.6471%;
-  --hsl-primary: 246 54% 51%;       /* #4c3fc6 — carries white at 7.4:1 */
-  --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 230 27% 96%; /* L3 #f2f3f8 */
-  --hsl-secondary-foreground: 0 0% 17.6471%;
-  --hsl-muted: 230 27% 96%; /* L3 hover well */
-  /* The shared components fade captions with /70 and /60, so a translucent
-   * foreground renders composited over the surface behind it. This neutral value
-   * keeps 3.0:1 at /60 and 8.6:1 at full strength on paper. */
-  --hsl-muted-foreground: 0 0% 29.8039%;  /* #4c4c4c text-muted */
-  --hsl-accent: 230 27% 96%; /* neutral hover */
-  --hsl-accent-foreground: 0 0% 17.6471%;
-  --hsl-destructive: 0 72% 41%;
+  /* ── Ink: neutral grey, so purple stays reserved for interaction ─────────
+   * 13.7:1 on paper and 11.4:1 on the canvas, AAA with headroom. --text-dim is
+   * pinned from the CANVAS, the lighter plane that binds the faintest tier:
+   * 4.6:1 there and 5.6:1 on the card, asserted in tokens.test.ts. */
+  --hsl-foreground: 0 0% 17.6471%;       /* #2d2d2d */
+  --hsl-muted-foreground: 0 0% 29.8039%; /* #4c4c4c: 3.0:1 at /60 and 8.6:1 at full strength on paper */
+  --text-secondary: #3f3f3f;
+  --text-muted: #4c4c4c;
+  --text-dim: #686868;
+  --md3-outline: #787878;
+
+  /* ── Hairlines ──────────────────────────────────────────────────────────── */
+  --hsl-border: 244 16% 81%;           /* #c8c7d6 */
+  --border-subtle: rgba(0, 0, 0, 0.10);
+  --border-default: rgba(0, 0, 0, 0.14);
+  --border-hover: rgba(0, 0, 0, 0.24);
+
+  /* ── Accent ─────────────────────────────────────────────────────────────
+   * The fill is the same indigo as dark (it carries white at 7.4:1) and is
+   * also the ring: on paper it clears 3:1 as a line. The ink is the bright
+   * indigo at 6.1:1 on paper; the mark is the website's indigo. */
+  --hsl-ring: var(--hsl-primary);
+  --brand-primary: #6366F1;
+  --brand-purple: var(--brand-primary);
+  --accent-text: #3c32e9;
+  --md3-primary: var(--accent-text);
+  --md3-primary-dim: var(--btn-primary-bg);
+  --md3-on-primary-container: #ffffff;
+  --md3-primary-fixed: #E8E5FF;        /* the accent tint: a chip or a selected row on paper */
+  --md3-primary-fixed-dim: color-mix(in srgb, var(--md3-primary-fixed) 85%, var(--accent-text));
+  --md3-secondary: var(--accent-text);
+  --md3-secondary-dim: var(--btn-primary-bg);
+  --md3-secondary-container: var(--md3-primary-fixed);
+  --md3-on-secondary: #ffffff;
+  --md3-on-secondary-container: var(--accent-text);
+  --md3-inverse-primary: #A5B4FC;
+  --md3-surface-tint: var(--brand-primary);
+  --accent-surface-soft: color-mix(in srgb, var(--btn-primary-bg) 5%, transparent);
+  --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 13%, transparent);
+  --bg-selection: color-mix(in srgb, var(--btn-primary-bg) 16%, transparent);
+  --border-accent: color-mix(in srgb, var(--btn-primary-hover) 18%, transparent);
+  --border-accent-hover: color-mix(in srgb, var(--btn-primary-hover) 35%, transparent);
+  --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover));
+  --tangle-gradient-text: var(--tangle-gradient);
+  --accent-gradient-strong: var(--tangle-gradient);
+
+  /* ── Status: the deep inks carry white, so each is its own fill too ─────── */
+  --hsl-success: 162.9 93.5% 24.3%;        /* #047857 */
+  --hsl-warning: 25.9 90% 35.3%;           /* #ab4f09 */
+  --hsl-destructive: 0 73.7% 41.8%;        /* #b91c1c */
   --hsl-destructive-foreground: 0 0% 100%;
-  --hsl-border: 244 16% 81%; /* #c8c7d6, the --md3-outline-variant hairline */
-  --hsl-input: 225 29% 97%; /* field well #f5f6fa */
-  --hsl-ring: 246 54% 51%;
-  --hsl-success: 160 84% 30%;
-  --hsl-warning: 41 96% 50%;
-  --hsl-info: 212 80% 50%;
-
-  /* depth-2 (card) and depth-4 (elevated) are BOTH paper, on purpose: in light,
-   * a popover does not out-lighten a white card — it lifts by shadow. See the
-   * ladder note above. */
-  --depth-1: #eceef3; /* canvas */
-  --depth-2: #ffffff;  /* card — paper */
-  --depth-3: #f1f2f7; /* nested well */
-  --depth-4: #ffffff;  /* elevated — paper, separated by shadow */
-
-  --status-running: #059669;
-  --status-creating: #3E349E;
-  --status-stopped: #B45309;
-  --status-warm: #C05621;
-  --status-cold: #1D6FA4;
-  --status-error: #ba1a1a;
-  --status-deleted: #6B6B82;
-
-  --glass-bg: var(--depth-2);
-  --glass-bg-strong: var(--depth-1);
-  --glass-border: var(--border-subtle);
-  --glass-border-hover: var(--border-default);
-
-  /* Status surface overrides — light values */
+  --hsl-info: 201.3 96.3% 32.2%;           /* #0369a1 */
   --surface-success-bg: #ecfdf5;
   --surface-success-border: #a7f3d0;
-  --surface-success-text: #047857;
   --surface-warning-bg: #fffbeb;
   --surface-warning-border: #fde68a;
-  --surface-warning-text: #ab4f09;
   --surface-danger-bg: #fff1f2;
   --surface-danger-border: #fecdd3;
-  --surface-danger-text: #b91c1c;
   --surface-info-bg: #f0f9ff;
   --surface-info-border: #bae6fd;
-  --surface-info-text: #0369a1;
   /* tones:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */
   --tone-violet-bg: #f7edfe;
   --tone-violet-bg-hover: #f2e2fc;
@@ -790,7 +725,6 @@
   --surface-teal-border: #a1ded2;
   --surface-teal-text: #017d6d;
   /* tones:end */
-
   /* Run-mix ramp — the fills of a proportional status bar.
    *
    * Separate from the `--surface-*-text` tones because a 6px bar is read
@@ -815,119 +749,14 @@
   --run-mix-in-flight: #00679e;
   --run-mix-cancelled: #515367;
 
-  --surface-neutral-bg: var(--depth-3);
-  --surface-neutral-border: var(--border-subtle);
-  --surface-neutral-text: var(--text-muted);
-
-  /* Sidebar — light, flat surface + hairline */
-  --sidebar-background: 0 0% 100%;     /* white paper */
-  --sidebar-foreground: 0 0% 17.6471%;
-  --sidebar-primary: 246 54% 51%;     /* #4c3fc6 */
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 94.902%;       /* L3 hover well */
-  --sidebar-accent-foreground: 0 0% 17.6471%;
-  --sidebar-border: 0 0% 81.5686%;   /* = --md3-outline-variant */
-  --sidebar-ring: 246 54% 51%;
-
-  --mesh-teal: transparent;
-  --mesh-violet: transparent;
-  --mesh-blue: transparent;
-
-  /* Surfaces — flat single-neutral light */
-  --bg-root: #eceef3;
-  --bg-dark: var(--depth-1);
-  --bg-card: var(--depth-2);
-  /* Paper, exactly like --bg-card: in light you cannot raise a plane by making it
-   * lighter than white, so an overlay lifts by SHADOW. A consumer that fills with
-   * --bg-elevated and applies no shadow gets no separation from a card — that is
-   * the contract, not an oversight (--hsl-popover is white for the same reason).
-   * Pair it with --shadow-dropdown. */
-  --bg-elevated: var(--depth-4);
-  --bg-section: var(--depth-1);
-  --bg-input: hsl(var(--hsl-input));  /* the field well — same color, hex-free */
-  --bg-hover: rgba(76, 63, 198, 0.06);
-  --bg-selection: rgba(76, 63, 198, 0.16);
-
-  /* Mirrors the dark ramp's spacing against white paper. The ink uses neutral
-   * grays so purple stays reserved for interaction accents.
-   *
-   * --text-dim is pinned from the CANVAS (#eceef3), not the white card: it is
-   * the faintest tier, so the lighter L0 is the surface that binds it. Its 4.6:1
-   * canvas and 5.6:1 card contrasts clear the body-text floor, as asserted in
-   * tokens.test.ts, because a ratio quoted in a comment drifts the moment a
-   * surface moves and nothing catches it. */
-  --text-primary: #2d2d2d;
-  --text-secondary: #3f3f3f;
-  --text-muted: #4c4c4c;
-  --text-dim: #686868;
-
-  --brand-primary: #6366F1;
-  --brand-strong: #2E2A5E;
-  --brand-strong-text: #ffffff;
-  --brand-strong-text-muted: rgba(255, 255, 255, 0.7);
-  --brand-strong-text-dim: rgba(255, 255, 255, 0.5);
-  --brand-cool: #818CF8;
-  --brand-glow: #A5AAFC;
-  --brand-purple: #6366F1;
-  --brand-vibrant: #6366F1;
-  --brand-emerald: #059669;
-
-  --border-subtle: rgba(0, 0, 0, 0.10);
-  --border-default: rgba(0, 0, 0, 0.14);
-  --border-hover: rgba(0, 0, 0, 0.24);
-  --border-accent: rgba(91, 78, 212, 0.18);
-  --border-accent-hover: rgba(91, 78, 212, 0.35);
-
-  --btn-primary-bg: #4C3FC5;
-  --btn-primary-hover: #5A50D6;
-  --btn-primary-text: #ffffff;
-  --btn-cta-bg: #4C3FC5;
-  --btn-cta-text: #ffffff;
-
-  --code-keyword: #3E349E;
-  --code-string: #059669;
-  --code-function: #352B88;
-  --code-number: #B45309;
-  --code-success: #059669;
-  --code-comment: #6B6E8A;
-  --code-error: #ba1a1a;
+  --glass-bg-strong: var(--depth-1);
+  --code-header-bg: color-mix(in srgb, hsl(var(--hsl-muted)) 50%, transparent);
 
   /* Shadows — flat, no inner ring, no glow */
   --shadow-card: 0 1px 2px rgba(25, 28, 36, 0.06);
   --shadow-dropdown: 0 8px 30px rgba(25, 28, 36, 0.10);
   --shadow-glow: none;
   --shadow-accent: 0 1px 2px rgba(25, 28, 36, 0.06);
-
-  /* Indigo spark kept for logo + send; accent-fill is the active row well */
-  --tangle-gradient: linear-gradient(135deg, #4F46E5, #5B4ED4);
-  --tangle-gradient-text: linear-gradient(135deg, #4F46E5, #5B4ED4);
-  --accent-gradient-strong: linear-gradient(135deg, #4F46E5, #5B4ED4);
-  --accent-surface-soft: rgba(76, 63, 198, 0.05);
-  --accent-surface-strong: rgba(76, 63, 198, 0.13);
-  --accent-text: #3c32e9;
-
-  /* Typography — unified on Inter */
-  --font-sans: "Inter Variable", "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Inter Variable", "Inter", "Geist", sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
-
-  /* Radius — unified chrome scale (matches dark; 8px md) */
-  --radius: 0.5rem;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --radius-pill: 999px;
-  --radius-full: 999px;
-  --radius-composer: 26px;
-  /* Radius by role. New surfaces pick the role they play; system.css repeats
-     these for pages that load it on its own ladders. */
-  --radius-tag: 4px;
-  --radius-chip: 8px;
-  --radius-field: 12px;
-  --radius-panel: 16px;
-  --radius-cover: 20px;
-  --radius-sheet: 24px;
 }
 
 

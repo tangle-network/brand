@@ -77,6 +77,8 @@ describe("canonical ink is neutral; surfaces share one faint indigo cast", () =>
   // reads as a cool neutral beside the accent rather than as a coloured fill.
   const MAX_CHROMA = 0.1;
   const inIndigoBand = (h: number) => h >= 220 && h <= 255;
+  const hexOf = (spine: string, token: string) =>
+    `#${hexIn(spine, token).map((c) => c.toString(16).padStart(2, "0")).join("")}`;
   const hexHueChroma = (hex: string) => {
     const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
     const max = Math.max(r, g, b);
@@ -95,8 +97,7 @@ describe("canonical ink is neutral; surfaces share one faint indigo cast", () =>
         expect(hslIn(spine, token).s, `--${token}`).toBe(0);
       }
       for (const token of inkHexRoles) {
-        const hex = spine.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
-        expect(hex, `--${token} must be defined`).toBeDefined();
+        const hex = hexOf(spine, token);
         expect(hexHueChroma(hex!).c, `--${token} is achromatic`).toBe(0);
       }
     });
@@ -109,8 +110,7 @@ describe("canonical ink is neutral; surfaces share one faint indigo cast", () =>
         if (sat > 0) expect(inIndigoBand(h), `--${token} hue ${h}`).toBe(true);
       }
       for (const token of surfaceHexRoles) {
-        const hex = spine.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
-        expect(hex, `--${token} must be defined`).toBeDefined();
+        const hex = hexOf(spine, token);
         const { h, c } = hexHueChroma(hex!);
         expect(c, `--${token} chroma`).toBeLessThanOrEqual(MAX_CHROMA);
         if (c > 0.02) expect(inIndigoBand(h), `--${token} hue ${h}`).toBe(true);
@@ -450,7 +450,7 @@ describe("input tokens carry two DIFFERENT roles and must not be conflated", () 
     ["light", LIGHT],
   ] as const) {
     it(`${name}: the field fill is single-sourced from --hsl-input`, () => {
-      expect(spine).toMatch(/--bg-input:\s*hsl\(var\(--hsl-input\)\)/);
+      expect(hexIn(spine, "bg-input")).toEqual(hexIn(spine, "hsl-input"));
     });
   }
 });
@@ -499,18 +499,19 @@ describe("canonical light spine", () => {
   it("keeps the light canvas single-sourced — --depth-1 and --md3-surface agree", () => {
     // Both are the L0 page canvas. Two hex literals for one plane is a divergence
     // waiting to happen the next time one of them is retuned.
-    const canvasHex = (token: string) =>
-      LIGHT.match(new RegExp(`--${token}:\\s*(#[0-9a-fA-F]{6})`))?.[1];
-    expect(canvasHex("depth-1")).toBe(canvasHex("md3-surface"));
+    expect(hexIn(LIGHT, "depth-1")).toEqual(hexIn(LIGHT, "md3-surface"));
   });
 
   it("keeps the derived --bg-* surfaces on the ladder", () => {
     // Hardcoded hex here is how `bg-card` (→ --hsl-card) and `var(--bg-card)`
     // drifted into disagreeing about what a card is.
-    for (const token of ["bg-dark", "bg-card", "bg-elevated", "bg-section"]) {
-      expect(LIGHT, `--${token} must derive from the ladder`).toMatch(
-        new RegExp(`--${token}:\\s*var\\(--depth-`),
-      );
+    for (const [token, plane] of [
+      ["bg-dark", "depth-1"],
+      ["bg-card", "depth-2"],
+      ["bg-elevated", "depth-4"],
+      ["bg-section", "depth-1"],
+    ] as const) {
+      expect(hexIn(LIGHT, token), `--${token} paints ${plane}`).toEqual(hexIn(LIGHT, plane));
     }
   });
 });
@@ -583,5 +584,27 @@ describe("categorical tones are a complete, legible family", () => {
         ).toBeGreaterThanOrEqual(4.5);
       }
     }
+  });
+});
+
+describe("each colour is declared once: a role, then aliases", () => {
+  // The spine is authored as roles (planes, ink tiers, four indigos, one ink
+  // per status hue) that every other name of the same colour aliases. A new
+  // hex literal is a second declaration of a colour that already has a name,
+  // so the count can only fall. The generated tone region is excluded: its
+  // values are the generator's, solved from the planes declared here.
+  const literalsOutsideTones = (spine: string) => {
+    const set = new Set<string>();
+    for (const [, name, value] of spine.matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/g)) {
+      if (/^(tone-|surface-(violet|orange|teal)-)/.test(name)) continue;
+      for (const hex of value.match(/#[0-9a-fA-F]{6}\b/g) ?? []) set.add(hex.toLowerCase());
+    }
+    return set;
+  };
+  it.each([
+    ["dark", DARK, 28],
+    ["light", LIGHT, 25],
+  ] as const)("%s spine declares no new hex literal", (_, spine, ceiling) => {
+    expect(literalsOutsideTones(spine).size).toBeLessThanOrEqual(ceiling);
   });
 });

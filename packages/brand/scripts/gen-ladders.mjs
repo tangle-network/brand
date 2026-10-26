@@ -18,6 +18,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { block, decls, resolveHex } from './css-resolve.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -405,12 +406,14 @@ const distance = (a, b) => {
 // backgrounds, so they are solved against the resting card read from there.
 const TOKENS_FILE = path.join(OUT, 'tokens.css')
 const tokensSource = fs.readFileSync(TOKENS_FILE, 'utf8')
-const cardIn = (nth) => {
-  const all = [...tokensSource.matchAll(/--md3-surface-container:\s*(#[0-9a-fA-F]{6})/g)].map((m) => m[1].toLowerCase())
-  if (all.length !== 2) throw new Error(`tokens.css: expected exactly 2 --md3-surface-container hex values (dark, light), found ${all.length}`)
-  return all[nth]
+// The card is an alias of the spine's HSL channels, so it is read through the
+// same resolver the tests and gen-palette use.
+const DARK_SPINE = decls(block(tokensSource, '.dark'))
+const LIGHT_SPINE = decls(block(tokensSource, '\n.light'))
+const CARD = {
+  dark: resolveHex(DARK_SPINE, 'md3-surface-container'),
+  light: resolveHex(LIGHT_SPINE, 'md3-surface-container', DARK_SPINE),
 }
-const CARD = { dark: cardIn(0), light: cardIn(1) }
 
 // One value per role, solved per ramp and theme. Every rule is a floor the
 // generator enforces; an unsatisfiable ramp fails the build instead of shipping.

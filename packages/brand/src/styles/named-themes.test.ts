@@ -11,6 +11,7 @@ import {
   hexRelativeLuminanceIn,
   hslIn,
   hslToRgb,
+  resolveIn,
 } from "./css-test-utils";
 
 /**
@@ -100,71 +101,15 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
   );
   if (!light) throw new Error('missing theme block: [data-theme="tangle-light"]');
 
-  it("IS the canonical dark spine, named — no drift from tokens.css", () => {
+  it("declares nothing: the attribute names the spine tokens.css seeds on it", () => {
     // tangle-dark exists so the attribute can NAME the default spine (a dark
-    // island in a light-named wrapper, a picker's explicit selection). If its
-    // values diverge from :root, "tangle dark" becomes two palettes.
-    const hslTokens = [
-      "hsl-background",
-      "hsl-foreground",
-      "hsl-card",
-      "hsl-card-foreground",
-      "hsl-popover",
-      "hsl-popover-foreground",
-      "hsl-primary",
-      "hsl-primary-foreground",
-      "hsl-secondary",
-      "hsl-secondary-foreground",
-      "hsl-muted",
-      "hsl-muted-foreground",
-      "hsl-accent",
-      "hsl-accent-foreground",
-      "hsl-destructive",
-      "hsl-destructive-foreground",
-      "hsl-border",
-      "hsl-input",
-      "hsl-ring",
-    ];
-    for (const token of hslTokens) {
-      expect(hslIn(css, token), `--${token} must equal the :root dark spine`).toEqual(
-        hslIn(CANON, token),
-      );
-    }
-    const hexTokens = [
-      "depth-1",
-      "depth-2",
-      "depth-3",
-      "depth-4",
-      "md3-surface-container-lowest",
-      "md3-surface-container-low",
-      "md3-surface-container",
-      "md3-surface-container-high",
-      "md3-surface-container-highest",
-      "md3-outline-variant",
-      "accent-text",
-      "brand-primary",
-      "brand-glow",
-      "text-primary",
-      "text-secondary",
-      "text-muted",
-      "text-dim",
-    ];
-    for (const token of hexTokens) {
-      expect(hexIn(css, token), `--${token} must equal the :root dark spine`).toEqual(
-        hexIn(CANON, token),
-      );
-    }
-    // Aliased and rgba declarations don't fit hslIn/hexIn — compare them raw.
-    for (const token of [
-      "bg-root",
-      "bg-card",
-      "bg-input",
-      "border-subtle",
-      "border-default",
-      "border-hover",
-    ]) {
-      expect(declIn(css, token), `--${token} must equal the :root dark spine`).toBe(
-        declIn(CANON, token),
+    // island in a light-named wrapper, a picker's explicit selection). It is
+    // the canonical spine by construction: tokens.css declares every dark token
+    // on this selector, so a copy here could only drift from it.
+    expect(css.replace(/^[^{]*\{/, "").trim()).toBe("");
+    for (const token of ["hsl-background", "hsl-destructive", "accent-text", "text-dim"]) {
+      expect(resolveIn(css, token), `--${token} resolves to the :root dark spine`).toBe(
+        resolveIn(CANON, token),
       );
     }
   });
@@ -238,27 +183,14 @@ describe('named theme: [data-theme="tangle-dark"]', () => {
 
   it("is self-sufficient inside a light-named wrapper — the island it exists for", () => {
     // The feature's stated scenario: tangle-dark nested in a tangle-light
-    // wrapper. The browser composes the two scopes, so a token the island omits
-    // inherits the WRAPPER's light value, not :root's — the light group's
-    // near-black secondary-foreground on the dark secondary measured ~1.5:1
-    // before the block redeclared its foregrounds. Model that cascade: every
-    // tangle-light rule (the shared light group AND the theme block), with the
-    // island's declarations overriding.
-    const wrapper = blocksIn(themes, '[data-theme="tangle-light"]').join("\n");
-    const effective = (token: string) => {
-      const read = (source: string) => {
-        try {
-          return hslIn(source, token);
-        } catch {
-          return null;
-        }
-      };
-      const value = read(css) ?? read(wrapper);
-      if (!value) {
-        throw new Error(`--${token} resolves to nothing inside the island`);
-      }
-      return value;
-    };
+    // wrapper. A token the island omitted would inherit the WRAPPER's light
+    // value (its near-black secondary-foreground on the dark secondary measured
+    // ~1.5:1 once), which is why tokens.css seeds the whole spine on the
+    // island's own selector.
+    // The island declares every dark token on itself (the baseline tokens.css
+    // seeds on its selector), so nothing falls through to the wrapper: the
+    // chain is the island's own block over the canonical dark spine.
+    const effective = (token: string) => hslIn(css, token);
     for (const [fgToken, bgToken] of [
       ["hsl-secondary-foreground", "hsl-secondary"],
       ["hsl-accent-foreground", "hsl-accent"],
@@ -304,14 +236,12 @@ describe("named themes: secondary text tiers are readable text", () => {
   ];
   for (const scope of scopes) {
     it(`[data-theme="${scope}"] holds AA for --text-muted and --text-dim`, () => {
-      const css = blocksIn(themes, `[data-theme="${scope}"]`).find((b) =>
-        /--text-dim:/.test(b),
-      );
-      expect(css, `${scope} declares its text ladder`).toBeDefined();
-      const resolve = (token: string): ReturnType<typeof hexIn> => {
-        const ref = css!.match(new RegExp(`--${token}:\\s*var\\(--([a-z0-9-]+)\\)`));
-        return ref ? resolve(ref[1]) : hexIn(css!, token);
-      };
+      // The theme block over the spine it inherits; tangle-dark declares nothing
+      // and resolves to the canonical dark spine.
+      const blocks = blocksIn(themes, `[data-theme="${scope}"]`);
+      const css = blocks.find((b) => /--hsl-background:/.test(b)) ?? blocks[0];
+      const chain = scope.endsWith("-light") ? [css, CANON_LIGHT] : [css];
+      const resolve = (token: string) => hexIn(chain, token);
       const planes = {
         canvas: resolve("bg-root"),
         card: resolve("bg-card"),
@@ -450,13 +380,16 @@ describe('named theme: [data-theme="hospitality"]', () => {
     // sage planes (surface-ladder.test.ts holds their hue and contrast), and the
     // dark destructive red is lightened to read on the lighter popover; it stays
     // red. The other status hues, info and every category stay canonical.
-    for (const css of [light, dark]) {
+    for (const [css, spine] of [
+      [light, CANON_LIGHT],
+      [dark, CANON],
+    ] as const) {
       expect(css).not.toMatch(
         /--(hsl-)?(success|warning|info|error)\b|--destructive|--hsl-destructive-foreground|--surface-info-|--status-|--tone-|--run-mix-|--syntax-/,
       );
-      expect(hslIn(css, "hsl-destructive").h, "destructive stays red").toBe(0);
+      expect(hslIn([css, spine], "hsl-destructive").h, "destructive stays red").toBe(0);
     }
-    expect(declIn(light, "hsl-destructive")).toBe(declIn(CANON_LIGHT, "hsl-destructive"));
+    expect(hslIn(light, "hsl-destructive")).toEqual(hslIn(CANON_LIGHT, "hsl-destructive"));
   });
 
   it("keeps the canonical ladder roles: paper cards on a tinted canvas in light, rising planes in dark", () => {
@@ -680,8 +613,12 @@ describe("dark themes: destructive reads as text", () => {
       '[data-theme="agents"]',
       '.dark[data-theme="website"]',
     ].map((selector): [string, string] => {
-      const css = blocksIn(themes, selector).find((b) => b.includes("--hsl-background"));
-      if (!css) throw new Error(`missing dark theme block: ${selector}`);
+      // A selector can head two rules (tangle-light's shared status group and
+      // its theme block); the theme block is the one with a canvas. tangle-dark
+      // declares nothing and resolves to the spine it is seeded with.
+      const blocks = blocksIn(themes, selector);
+      const css = blocks.find((b) => b.includes("--hsl-background")) ?? (blocks.length === 1 ? blocks[0] : undefined);
+      if (css === undefined) throw new Error(`missing dark theme block: ${selector}`);
       return [selector, css];
     }),
   ];

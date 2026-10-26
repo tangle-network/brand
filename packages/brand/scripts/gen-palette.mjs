@@ -4,6 +4,7 @@
 // Values are read from tokens.css and named-themes.css; run with --check in build.
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { block, decls, resolveHex, resolveValue } from "./css-resolve.mjs";
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const styles = path.join(here, "..", "src", "styles");
@@ -11,47 +12,14 @@ const OUT = path.join(here, "..", "src", "palette.generated.ts");
 const tokens = readFileSync(path.join(styles, "tokens.css"), "utf8");
 const named = readFileSync(path.join(styles, "named-themes.css"), "utf8");
 
-// The body of the first rule whose selector list ends with `last` (the selector the brace follows).
-function block(css, last) {
-  const re = new RegExp(`${last.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{`, "g");
-  const m = re.exec(css);
-  if (!m) throw new Error(`no block for ${last}`);
-  let depth = 1, i = m.index + m[0].length;
-  const start = i;
-  for (; i < css.length && depth; i++) depth += css[i] === "{" ? 1 : css[i] === "}" ? -1 : 0;
-  return css.slice(start, i - 1);
-}
-const decls = (body) => {
-  const out = {};
-  for (const m of body.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/g)) out[m[1]] = m[2].trim();
-  return out;
-};
 const DARK = decls(block(tokens, ".dark"));
 const LIGHT = { ...DARK, ...decls(block(tokens, "\n.light")) };
 const WEBSITE_LIGHT = { ...LIGHT, ...decls(block(named, '[data-theme="website"]:where(:not(.dark))')) };
 const WEBSITE_DARK = { ...DARK, ...decls(block(named, '.dark[data-theme="website"]')) };
-
-const hslHex = (h, s, l) => {
-  s /= 100; l /= 100;
-  const f = (n) => { const k = (n + h / 30) % 12; const a = s * Math.min(l, 1 - l); return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
-  return "#" + [f(0), f(8), f(4)].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
+const resolve = (scope, name) => {
+  const v = resolveValue(scope, name);
+  return /^rgba?\(/.test(v) ? v : resolveHex(scope, name);
 };
-function resolve(scope, name, seen = new Set()) {
-  if (seen.has(name)) throw new Error(`cycle at --${name}`);
-  seen.add(name);
-  let v = scope[name];
-  if (v == null) throw new Error(`--${name} is not defined`);
-  const ref = v.match(/^var\(--([a-z0-9-]+)\)$/);
-  if (ref) return resolve(scope, ref[1], seen);
-  const hsl = v.match(/^hsl\(var\(--([a-z0-9-]+)\)\)$/);
-  if (hsl) v = resolve(scope, hsl[1], seen);
-  const tri = v.match(/^([\d.]+)\s+([\d.]+)%\s+([\d.]+)%$/);
-  if (tri) return hslHex(+tri[1], +tri[2], +tri[3]);
-  if (/^#[0-9a-fA-F]{6}$/.test(v)) return v.toLowerCase();
-  if (/^#[0-9a-fA-F]{3}$/.test(v)) return ("#" + [...v.slice(1)].map((c) => c + c).join("")).toLowerCase();
-  if (/^rgba?\(/.test(v)) return v;
-  throw new Error(`--${name}: cannot resolve "${v}"`);
-}
 // Role name -> token. Planes, ink, accent, status surfaces and the indigo ramp.
 const ROLES = {
   canvas: "md3-surface", card: "md3-surface-container", well: "md3-surface-container-low",
