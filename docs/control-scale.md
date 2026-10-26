@@ -80,6 +80,7 @@ Brand's Tailwind theme registers the scale for product code that is not a primit
 - A page title is `PageHeader` from `@tangle-network/ui/primitives` (30px, `text-page`), with its description, actions and meta slots; `level={2}` gives a nested section header. Products do not write their own `<h1>`.
 
 Body and supporting text use Tailwind's steps: `text-xs` 12px, `text-sm` 14px, `text-base` 16px and up.
+Each `--font-size-<step>` token is the same size as `text-<step>`, so `sm` is 14px in CSS and in a class.
 12px is the floor.
 
 ## Enforcement

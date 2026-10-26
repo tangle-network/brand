@@ -18,7 +18,7 @@
   --text-hero: var(--font-size-hero);
   --text-page: var(--font-size-3xl);
   --text-section: var(--font-size-xl);
-  --text-eyebrow: var(--font-size-sm);
+  --text-eyebrow: var(--font-size-xs);
   --text-control-sm: var(--control-text-sm);
   --text-control-md: var(--control-text-md);
   --text-control-lg: var(--control-text-lg);

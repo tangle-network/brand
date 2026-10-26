@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockIn, blocksIn, contrastRatio, declIn, hexIn, hslIn, hslToRgb, oklchLightness } from "./css-test-utils";
+import { blockIn, blocksIn, contrastRatio, declIn, hexIn, hslIn, hslToRgb, oklchLightness, resolveIn } from "./css-test-utils";
 
 /**
  * The surface ladder and the interaction palette.
@@ -171,14 +171,13 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
     }
   });
 
-  it("defaults the raised planes and shadows to the plain spine (wells: the canonical suite below)", () => {
-    expect(declIn(body, "hsl-raised")).toBe("var(--hsl-card)");
-    expect(declIn(body, "hsl-raised-2")).toBe("var(--hsl-card)");
+  it("takes the raised planes from the spine's own L3 and L4 (values: the canonical suite below)", () => {
+    expect(declIn(body, "hsl-raised")).toBe("var(--hsl-secondary)");
+    expect(declIn(body, "hsl-raised-2")).toBe("var(--hsl-popover)");
     expect(declIn(body, "well")).toBe("var(--well-page)");
     expect(declIn(body, "shadow-raised")).toBe("var(--shadow-card)");
     // A shadow token joins a comma list; "none" would void the list.
     expect(declIn(body, "shadow-well")).toBe("0 0 0 0 transparent");
-    expect(declIn(body, "edge-highlight")).toBe("0 0 0 0 transparent");
   });
 
   it("derives the four interaction states from the focus ring at the specified alphas", () => {
@@ -223,19 +222,20 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
   });
 });
 
-describe("Canonical surface ladder (every theme without its own ladder)", () => {
-  // The spine's shared --bg-input sat +3.1 L above the dark page and -2.6 L under
-  // the white card, so a field read as the plane it was on. The defaults derive
-  // wells and the field border from each theme's own page, card, hairline and ink.
-  const withWells = (selector: string) => {
+describe("Canonical surface ladder (the spine: :root, .dark, .light, dark, light, tangle-dark)", () => {
+  // Drew, 2026-10-26, on a Discovery run page built from the spine: "no color
+  // depth ladder". Raised levels painted the card and every well was one value,
+  // so a card in a card, and a field in it, read as the plane they sat on.
+  const css = rules(tokens);
+  const ladderRule = (selector: string) => {
     const block = blocksIn(tokens, selector).find((b) => /--well-page:/.test(b));
-    if (!block) throw new Error(`no well defaults under ${selector}`);
+    if (!block) throw new Error(`no ladder rule under ${selector}`);
     return block;
   };
-  const defaults = withWells("[data-theme]");
-  const lightDefaults = withWells('[data-theme$="-light"]');
-  const DARK = blockIn(tokens, ".dark");
-  const LIGHT = blockIn(tokens, ".light");
+  const shared = ladderRule("[data-theme]");
+  const lightRule = ladderRule('[data-theme$="-light"]');
+  const DARK = [shared, blockIn(tokens, ".dark")];
+  const LIGHT = [lightRule, shared, blockIn(tokens, ".light")];
 
   type Rgb = [number, number, number];
   const toLab = (rgb: Rgb) => {
@@ -255,37 +255,104 @@ describe("Canonical surface ladder (every theme without its own ladder)", () => 
   };
   /** `color-mix(in oklab, a, b <t>)`. */
   const mix = (a: Rgb, b: Rgb, t: number) => fromLab(toLab(a).map((v, i) => v * (1 - t) + toLab(b)[i] * t));
-  const spine = (css: string, token: string) => hslToRgb(hslIn(css, token)) as Rgb;
+  /** A token as the browser paints it, including the `page + 30% black` well. */
+  const rgb = (sources: string[], token: string): Rgb => {
+    const recess = /^color-mix\(in oklab, hsl\(var\(--([a-z0-9-]+)\)\) (\d+)%, black\)$/.exec(resolveIn(sources, token));
+    if (recess) return mix(rgb(sources, recess[1]!), [0, 0, 0], 1 - Number(recess[2]) / 100);
+    return hexIn(sources, token);
+  };
+  const Lof = (sources: string[], token: string) => oklchLightness(rgb(sources, token));
 
-  it("declares the derivations this suite measures", () => {
-    expect(declIn(defaults, "well-page")).toBe("color-mix(in oklab, hsl(var(--hsl-background)) 70%, black)");
-    expect(declIn(defaults, "field-border")).toBe("color-mix(in oklab, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 45%)");
-    expect(declIn(lightDefaults, "well-page")).toBe("hsl(var(--hsl-card))");
-    for (const token of ["well-card", "well-raised", "well-raised-2"]) {
-      expect(declIn(defaults, token)).toBe("var(--well-page)");
-      expect(declIn(lightDefaults, token)).toBe("hsl(var(--hsl-background))");
+  const ladder: Array<[role: string, token: string, light: number, dark: number]> = [
+    ["page", "hsl-background", 94.9, 15.0],
+    ["card", "hsl-card", 100, 21.7],
+    ["raised", "hsl-raised", 95.2, 26.6],
+    ["raised-2", "hsl-raised-2", 100, 31.6],
+    ["popover", "hsl-popover", 100, 31.6],
+    ["well on page", "well-page", 100, 10.2],
+    ["well in card", "well-card", 94.9, 10.2],
+    ["well in raised", "well-raised", 100, 21.7],
+    ["well in raised-2", "well-raised-2", 94.9, 21.7],
+    ["hairline", "hsl-border", 83.5, 34.1],
+  ];
+  for (const [role, token, lightL, darkL] of ladder) {
+    it(`${role} (--${token}) lands at L ${lightL} light / ${darkL} dark`, () => {
+      expect(Lof(LIGHT, token)).toBeCloseTo(lightL, 0);
+      expect(Lof(DARK, token)).toBeCloseTo(darkL, 0);
+    });
+  }
+
+  const steps: Array<[child: string, parent: string]> = [
+    ["hsl-card", "hsl-background"],
+    ["hsl-raised", "hsl-card"],
+    ["hsl-raised-2", "hsl-raised"],
+    ["well-page", "hsl-background"],
+    ["well-card", "hsl-card"],
+    ["well-raised", "hsl-raised"],
+    ["well-raised-2", "hsl-raised-2"],
+  ];
+  it.each([
+    ["light", LIGHT],
+    ["dark", DARK],
+  ])("steps every plane and well at least 4.4 L off its parent in %s", (_mode, sources) => {
+    for (const [child, parent] of steps) {
+      expect(Math.abs(Lof(sources, child) - Lof(sources, parent)), `${child} on ${parent}`).toBeGreaterThanOrEqual(4.4);
     }
   });
 
-  it("recesses the dark well at least 4 L below the page and the card", () => {
-    const well = mix(spine(DARK, "hsl-background"), [0, 0, 0], 0.3);
-    expect(oklchLightness(spine(DARK, "hsl-background")) - oklchLightness(well)).toBeGreaterThanOrEqual(4);
-    expect(oklchLightness(spine(DARK, "hsl-card")) - oklchLightness(well)).toBeGreaterThanOrEqual(10);
+  it("sinks every dark well below the plane it sits on, and lifts dark planes with a top highlight", () => {
+    for (const [well, parent] of steps.filter(([child]) => child.startsWith("well"))) {
+      expect(Lof(DARK, well), `${well} under ${parent}`).toBeLessThan(Lof(DARK, parent));
+    }
+    expect(declIn(shared, "edge-highlight")).toBe("inset 0 1px 0 rgba(255, 255, 255, 0.06)");
+    expect(declIn(lightRule, "edge-highlight")).toBe("0 0 0 0 transparent");
   });
 
-  it("steps the light well 4 L or more off the page and the card", () => {
-    const page = oklchLightness(spine(LIGHT, "hsl-background"));
-    const card = oklchLightness(spine(LIGHT, "hsl-card"));
-    expect(card - page).toBeGreaterThanOrEqual(4);
+  it("draws every line with one hairline: 1.5:1 on the dark card and still seen on the raised plane", () => {
+    for (const sources of [LIGHT, DARK]) {
+      for (const alias of ["border-subtle", "border-default", "md3-outline-variant"]) {
+        expect(hexIn(sources, alias), `--${alias}`).toEqual(hexIn(sources, "hsl-border"));
+      }
+    }
+    expect(contrastRatio(rgb(DARK, "hsl-border"), rgb(DARK, "hsl-card"))).toBeGreaterThanOrEqual(1.45);
+    expect(contrastRatio(rgb(DARK, "hsl-border"), rgb(DARK, "hsl-raised"))).toBeGreaterThanOrEqual(1.25);
+    expect(contrastRatio(rgb(LIGHT, "hsl-border"), rgb(LIGHT, "hsl-background"))).toBeGreaterThanOrEqual(1.4);
   });
 
   it.each([
-    ["dark", () => DARK],
-    ["light", () => LIGHT],
-  ])("draws a field border that clears 3:1 on the card and the page in %s (WCAG 1.4.11)", (_mode, css) => {
-    const border = mix(spine(css(), "hsl-border"), spine(css(), "hsl-foreground"), 0.45);
-    expect(contrastRatio(border, spine(css(), "hsl-card")), "on the card").toBeGreaterThanOrEqual(3);
-    expect(contrastRatio(border, spine(css(), "hsl-background")), "on the page").toBeGreaterThanOrEqual(3);
+    ["dark", DARK],
+    ["light", LIGHT],
+  ])("draws a field border that clears 3:1 on the page, card and raised plane in %s (WCAG 1.4.11)", (_mode, sources) => {
+    expect(declIn(shared, "field-border")).toBe("color-mix(in oklab, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 45%)");
+    const border = mix(rgb(sources, "hsl-border"), rgb(sources, "hsl-foreground"), 0.45);
+    for (const plane of ["hsl-background", "hsl-card", "hsl-raised"]) {
+      expect(contrastRatio(border, rgb(sources, plane)), `on --${plane}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("keeps every named theme with its own planes on the flat ladder until it is tuned", () => {
+    // The canonical ladder is the spine's indigo planes; a named theme that
+    // inherited it would nest an indigo card inside its own card.
+    const flat = css.match(/([^{}]*)\{\s*--hsl-raised:\s*var\(--hsl-card\);[^}]*\}/);
+    expect(flat, "the named-theme flat rule").not.toBeNull();
+    const flatBody = flat![0];
+    for (const [token, value] of [
+      ["hsl-raised", "var(--hsl-card)"],
+      ["hsl-raised-2", "var(--hsl-card)"],
+      ["well-raised", "var(--well-card)"],
+      ["well-raised-2", "var(--well-card)"],
+      ["edge-highlight", "0 0 0 0 transparent"],
+    ]) {
+      expect(declIn(flatBody, token!), `--${token}`).toBe(value);
+    }
+    const names = (selectors: string) => [...selectors.matchAll(/data-theme="([^"]+)"/g)].map((m) => m[1]);
+    const ownPlanes = new Set(
+      [...rules(themes).matchAll(/([^{}]*)\{([^{}]*)\}/g)]
+        .filter((m) => m[2]!.includes("--hsl-background:"))
+        .flatMap((m) => names(m[1]!)),
+    );
+    const tuned = new Set(["hospitality"]);
+    expect(new Set(names(flat![1]!))).toEqual(new Set([...ownPlanes].filter((name) => !tuned.has(name!))));
   });
 });
 

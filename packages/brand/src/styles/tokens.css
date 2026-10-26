@@ -1,10 +1,11 @@
 /* Tangle design tokens — the single palette every Tangle surface renders from.
  *
- * The surface ladder is NEUTRAL GREY and the indigo is trim — accent, never
- * field. It steps in even lightness increments so a card, a nested panel and an
- * overlay each read as a distinct plane by their own fill, and carries a crisp
- * hairline (1.5:1 against the card in dark) because shadow does no work on a dark
- * canvas. Light mirrors it: white paper on a grey canvas, never white-on-white.
+ * The surface ladder is near-neutral grey with a faint indigo cast; the indigo
+ * accent is trim, never field. Each plane steps at least 4.4 OKLCH L off the
+ * plane it sits on (surface-ladder.test.ts), so a card, a card in a card and a
+ * field each read by their own fill. Dark adds a 1.5:1 hairline and a top edge
+ * highlight, because a black shadow on a dark canvas renders as nothing; light
+ * is white paper on a grey canvas, separated by shadow.
  *
  * Each colour is declared ONCE, as a role (a plane, an ink tier, one of four
  * indigos, one ink per status hue), and every other name of that colour is an
@@ -15,26 +16,9 @@
  * add a named theme in named-themes.css (`data-theme="<name>"`) — do NOT re-declare
  * these tokens in the app, or its surfaces silently stop tracking the brand. */
 
-/* MD3 surface hierarchy */
 /* Dark is the default theme (`:root`/`[data-sandbox-ui]`). It also responds to
  * the standard `[data-theme="dark"]` / `.dark` switch so any consumer can pin or
  * toggle a theme without inventing an ad-hoc `data-sandbox-theme` name. */
-/*
- * Surfaces are NEUTRAL GREY and the indigo is trim.
- *
- * Colour in the surface competes with colour in the accent: on an indigo-cast
- * ladder the indigo nav pill, link and focus ring are one more indigo thing on
- * an indigo page, and the eye stops finding them. Neutral planes give the brand
- * a field to sit on, so a single accent does all the signalling.
- *
- * The canvas stays above pure black (#0a0a14, lifted toward indigo). Near-white ink on it is the
- * glare end of the range, so its luminance leaves room for distinct text tiers.
- *
- * Elevation is carried by surface lightness plus a hairline that can actually be
- * seen — a black shadow on a dark canvas renders as nothing, so shadow does no
- * work here. The hairline is about 1.5:1 against the resting card — quiet by design,
- * enough to state an edge without drawing a box around every panel.
- */
 /* Seed a complete baseline on every supported boundary BEFORE mode overrides.
  * Inherited var() aliases are already substituted at their parent; declaring
  * them here lets a nested light/dark/named scope resolve its own palette.
@@ -65,13 +49,14 @@
   /* ── Planes ─────────────────────────────────────────────────────────────
    * One ladder, authored once as HSL channels because the shadcn layer reads
    * hsl(var(--hsl-*)); every hex plane below is derived from it, so a step
-   * moves in one place. L0 is lifted off black toward indigo; L1 chrome sits
-   * below it and the cards step up from it in even increments. */
-  --hsl-background: 240 33% 6%;      /* L0 canvas #0a0a14 */
-  --hsl-input: 244 29% 9%;           /* L1 chrome and field wells #11101e */
-  --hsl-card: 244 23% 12%;           /* L2 resting card #191826 */
-  --hsl-secondary: 249 24% 16%;      /* L3 nested plane and hover well #221f33 */
-  --hsl-popover: 247 23% 21%;        /* L4 overlay #2c2942: a popover carries body text, so it sits on the top plane the ink ramp reaches */
+   * moves in one place. OKLCH L x100: page 15.0, card 21.7, raised 26.6,
+   * raised-2 and overlay 31.6, each at least 4.4 over the plane it sits on.
+   * The page is lifted off black so near-white ink keeps room for its tiers. */
+  --hsl-background: 240 33% 6%;      /* L0 page #0a0a14 */
+  --hsl-input: 244 29% 9%;           /* L1 chrome (the sidebar) and the legacy field fill #11101e */
+  --hsl-card: 244 23% 12%;           /* L2 card #191826 */
+  --hsl-secondary: 249 24% 17.5%;    /* L3 raised: a card in a card, and the hover well #252237 */
+  --hsl-popover: 247 21% 23%;        /* L4 raised-2 and overlay #312e47: a popover carries body text, so it sits on the top plane the ink ramp reaches */
   --hsl-muted: var(--hsl-secondary);
   --hsl-accent: var(--hsl-secondary); /* neutral hover; indigo lives in --accent-surface-strong */
   /* The floor of the ladder: the recessed page and the terminal well share it
@@ -125,15 +110,16 @@
   --md3-on-surface-variant: var(--text-muted);
   --md3-outline: #8e8e8e;
 
-  /* ── Hairlines ──────────────────────────────────────────────────────────
-   * 1.5:1 against the resting card, quiet by design: shadow does no work on a
-   * dark canvas, so the hairline states where a plane ends without drawing a
-   * box around every panel. */
-  --hsl-border: 243 20% 20%;           /* #2a293d */
+  /* ── Hairline ───────────────────────────────────────────────────────────
+   * ONE role for every divider, card edge and table rule, so lines never
+   * disagree. 1.5:1 against the card and 1.3:1 on the raised plane: quiet by
+   * design, it states where a plane ends without boxing every panel.
+   * --border-subtle and --border-default are its older names. */
+  --hsl-border: 244 16% 25%;           /* #37364a */
   --md3-outline-variant: hsl(var(--hsl-border));
   --sidebar-border: var(--hsl-border);
-  --border-subtle: rgba(255, 255, 255, 0.10);
-  --border-default: rgba(255, 255, 255, 0.16);
+  --border-subtle: hsl(var(--hsl-border));
+  --border-default: hsl(var(--hsl-border));
   --border-hover: rgba(255, 255, 255, 0.28);
 
   /* ── Accent: four indigos, each with one job ────────────────────────────
@@ -357,7 +343,7 @@
   --glass-bg: var(--depth-2);
   --glass-bg-strong: var(--depth-3);
   --glass-border: var(--border-subtle);
-  --glass-border-hover: var(--border-default);
+  --glass-border-hover: var(--border-hover);
   --glass-blur: 0px;
 
   /* Mesh glows — off; depth comes from the ladder, not from glow */
@@ -461,12 +447,13 @@
   --transcript-font-size: 1rem;   /* 16px: the chat reading size */
   --transcript-line-height: var(--line-height-base);
 
-  /* Typography scale — override per-app for custom type hierarchy.
-     Components reference these instead of hardcoded pixel values. */
-  --font-size-xs: 0.6875rem;      /* 11px — labels, timestamps */
-  --font-size-sm: 0.75rem;        /* 12px — captions, meta */
-  --font-size-base: 0.9375rem;    /* 15px — message body */
-  --font-size-lg: 1rem;           /* 16px — emphasized text */
+  /* Typography scale. Each --font-size-<step> is Tailwind's text-<step>, so a
+     step name means one size everywhere ("sm" is 14px); 12px is the floor.
+     Components reference these instead of pixel values; an app may override. */
+  --font-size-xs: 0.75rem;        /* 12px — meta, timestamps, eyebrows */
+  --font-size-sm: 0.875rem;       /* 14px — UI text */
+  --font-size-base: 1rem;         /* 16px — reading text */
+  --font-size-lg: 1.125rem;       /* 18px — emphasized text */
   --font-size-xl: 1.25rem;        /* 20px — section title (h2) */
   /* Display tier — page titles, marketing section heads, and heroes.
      Hero sizes are fluid (clamp) so they scale with the viewport without
@@ -589,7 +576,7 @@
   --hsl-background: 223 23% 94%;     /* L0 canvas #eceef3, BELOW the wells */
   --hsl-input: 225 29% 97%;          /* L1 chrome and field wells #f5f6fa */
   --hsl-card: 0 0% 100%;             /* L2 card: paper */
-  --hsl-secondary: 230 27% 96%;      /* L3 nested well #f2f3f8 */
+  --hsl-secondary: 228 25% 94.5%;    /* L3 raised: a card in a card #edeff4, 4.8 L under its paper */
   --hsl-popover: var(--hsl-card);    /* L4 overlay: paper, lifted by shadow, never out-lightening a card */
   --md3-surface-dim: #dcdee6;        /* the recessed page */
   --md3-surface-container-lowest: hsl(var(--hsl-card)); /* insets read as paper */
@@ -609,10 +596,8 @@
   --text-dim: #686868;
   --md3-outline: #787878;
 
-  /* ── Hairlines ──────────────────────────────────────────────────────────── */
+  /* ── Hairline: 1.7:1 on paper, 1.4:1 on the canvas ──────────────────────── */
   --hsl-border: 244 16% 81%;           /* #c8c7d6 */
-  --border-subtle: rgba(0, 0, 0, 0.10);
-  --border-default: rgba(0, 0, 0, 0.14);
   --border-hover: rgba(0, 0, 0, 0.24);
 
   /* ── Accent ─────────────────────────────────────────────────────────────
@@ -807,15 +792,13 @@
  *           level in, --hsl-raised-2 two levels in.
  *   --well  the field fill: --well-page on the page, --well-card in a card,
  *           --well-raised in a card in a card, --well-raised-2 deeper still.
- * A theme that tunes its ladder (Hospitality) sets these per mode. Every other
- * theme gets wells derived from its own page and card, so a field always sits
- * at least 3 OKLCH L points off the plane it is on (agent-app-signoff
- * surface-ladder): dark wells recess below the page (page + 30% black: -4.6 L on
- * the page, -10.9 L in a card on the spine); light wells take the opposite plane
- * (the card on the page, the page in a card: 5 L either way). The old shared
- * --bg-input sat +3.1 above the dark page and -2.6 under the white card. Raised
- * levels still paint the card here: --hsl-raised is an HSL triplet and cannot
- * be derived per theme.
+ * The canonical ladder is the spine's own planes: raised is L3 (--hsl-secondary),
+ * raised-2 is L4 (--hsl-popover), and each well is a plane at least 4.4 OKLCH L
+ * off the level it fills. Dark wells always sit deeper (page + 30% black on the
+ * page and in a card, the card in a raised plane); light wells take the
+ * opposite plane (paper on a grey level, the canvas on paper). Dark raised
+ * planes also carry a 1px top highlight. Hospitality tunes its own ladder; the
+ * other named themes keep a flat one (below) until theirs is tuned.
  *
  * INTERACTION. Four states, all from the focus ring hue (--hsl-ring), so one
  * green or one indigo marks every interactive thing in a theme:
@@ -833,20 +816,20 @@
 [data-sandbox-ui],
 [data-sandbox-theme],
 [data-theme] {
-  --hsl-raised: var(--hsl-card);
-  --hsl-raised-2: var(--hsl-card);
+  --hsl-raised: var(--hsl-secondary);
+  --hsl-raised-2: var(--hsl-popover);
   --well-page: color-mix(in oklab, hsl(var(--hsl-background)) 70%, black);
   --well-card: var(--well-page);
-  --well-raised: var(--well-page);
-  --well-raised-2: var(--well-page);
+  --well-raised: hsl(var(--hsl-card));
+  --well-raised-2: var(--well-raised);
   --well: var(--well-page);
   /* The hairline is 1.5:1 by design; a field edge is non-text UI and needs 3:1.
-   * 45% toward the ink measures 4.0:1 on the spine card in both modes. */
+   * 45% toward the ink clears 4:1 on the spine card in both modes. */
   --field-border: color-mix(in oklab, hsl(var(--hsl-border)), hsl(var(--hsl-foreground)) 45%);
   --shadow-raised: var(--shadow-card);
   /* A shadow token joins a comma list, so "none" would void the whole list. */
   --shadow-well: 0 0 0 0 transparent;
-  --edge-highlight: 0 0 0 0 transparent;
+  --edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --ix-hover: 0 0 0 1px hsl(var(--hsl-ring) / 0.45), 0 0 0 4px hsl(var(--hsl-ring) / 0.16);
   --ix-hover-border: hsl(var(--hsl-ring) / 0.7);
   --ix-press: 0 0 0 1px hsl(var(--hsl-ring) / 0.95), 0 0 0 4px hsl(var(--hsl-ring) / 0.3);
@@ -870,8 +853,20 @@
   --ix-hover-bg: hsl(var(--hsl-ring) / 0.07);
   --well-page: hsl(var(--hsl-card));
   --well-card: hsl(var(--hsl-background));
-  --well-raised: hsl(var(--hsl-background));
-  --well-raised-2: hsl(var(--hsl-background));
+  --well-raised-2: var(--well-card);
+  --edge-highlight: 0 0 0 0 transparent;
+}
+
+/* Named themes with their own planes keep a flat ladder until each is tuned as
+ * Hospitality was: a nested card paints the card, and its field the card's well. */
+[data-theme="aubergine"], [data-theme="aubergine-light"], [data-theme="arena"], [data-theme="arena-light"],
+[data-theme="super"], [data-theme="super-light"], [data-theme="tangle-light"], [data-theme="agents"],
+[data-theme="agents-light"], [data-theme="website"], [data-theme="intelligence"] {
+  --hsl-raised: var(--hsl-card);
+  --hsl-raised-2: var(--hsl-card);
+  --well-raised: var(--well-card);
+  --well-raised-2: var(--well-card);
+  --edge-highlight: 0 0 0 0 transparent;
 }
 
 /* Surface context: keyed only on the Card primitive's data-slot, never on app

@@ -113,7 +113,7 @@ export function SidebarDropZone({
         dragOver
           ? "border-[var(--brand-cool,hsl(var(--ring)))] bg-[var(--accent-surface-soft)]"
           : persistent
-            ? "border-[var(--border-subtle,hsl(var(--border)))] bg-transparent hover:border-[var(--border-default,hsl(var(--border)))] hover:bg-[var(--bg-hover,hsl(var(--accent)))]"
+            ? "border-[var(--border-subtle,hsl(var(--border)))] bg-transparent hover:border-[var(--border-strong)] hover:bg-[var(--bg-hover,hsl(var(--accent)))]"
             : "",
         disabled && "opacity-50 pointer-events-none",
         className,
