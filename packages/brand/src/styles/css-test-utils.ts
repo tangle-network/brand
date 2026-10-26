@@ -6,6 +6,32 @@
  * importing file's context.
  */
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { block as resolverBlock, decls, resolveValue } from "../../scripts/css-resolve.mjs";
+
+/** The canonical dark spine's declarations: what every other block inherits. */
+const BASELINE: Record<string, string> = decls(
+  resolverBlock(
+    readFileSync(path.resolve(import.meta.dirname, "tokens.css"), "utf8"),
+    ".dark",
+  ),
+);
+
+/**
+ * A token's concrete value in a block, with aliases followed: `var(--x)`
+ * chains and `hsl(var(--x))` wrappers, each hop reading the block first and
+ * the canonical dark baseline second, which is how the browser resolves a
+ * custom property declared on the same element as the light override.
+ */
+export function resolveIn(css: string | string[], token: string): string {
+  // A chain of blocks models the cascade on one element: the first block that
+  // declares a name wins, as a named theme's own rule beats the spine it sits on.
+  const sources = Array.isArray(css) ? css : [css];
+  const scope = Object.assign({}, ...sources.map(decls).reverse());
+  return resolveValue(scope, token, BASELINE);
+}
+
 /** Escape every regex metacharacter, so a selector is matched literally. */
 function escapeRegex(literal: string): string {
   return literal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -78,15 +104,12 @@ export function declIn(css: string, token: string): string {
 
 /** Read an `H S% L%` channel triple. */
 export function hslIn(
-  css: string,
+  css: string | string[],
   token: string,
 ): { h: number; s: number; l: number } {
-  const m = css.match(
-    new RegExp(
-      `--${token}:\\s*(\\d+(?:\\.\\d+)?)\\s+(\\d+(?:\\.\\d+)?)%\\s+(\\d+(?:\\.\\d+)?)%`,
-    ),
-  );
-  if (!m) throw new Error(`missing HSL slot --${token}`);
+  const value = resolveIn(css, token);
+  const m = /^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/.exec(value);
+  if (!m) throw new Error(`--${token} is not an HSL triple (found "${value}")`);
   return { h: Number(m[1]), s: Number(m[2]), l: Number(m[3]) };
 }
 
@@ -99,11 +122,13 @@ type Rgb = [number, number, number];
  * separate question, answered by `compositeOver`). A token that exists but is not
  * hex reports exactly that, rather than claiming it is missing.
  */
-export function hexIn(css: string, token: string): Rgb {
-  const declaration = css.match(new RegExp(`--${token}:\\s*([^;]+)`));
-  if (!declaration) throw new Error(`missing surface --${token}`);
-
-  const value = declaration[1].trim();
+export function hexIn(css: string | string[], token: string): Rgb {
+  const value = resolveIn(css, token);
+  // A plane authored as channels resolves to a triple; read it as the colour it paints.
+  const triple = /^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/.exec(value);
+  if (triple) {
+    return hslToRgb({ h: Number(triple[1]), s: Number(triple[2]), l: Number(triple[3]) }).map(Math.round) as Rgb;
+  }
   const hex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/.exec(value);
   if (!hex) {
     throw new Error(`--${token} is not a hex color (found "${value}")`);
@@ -181,7 +206,7 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
  * below" assertion made on HSL L would be measuring the wrong thing. Hex parsing
  * (and its error reporting) is `hexIn`'s.
  */
-export function hexRelativeLuminanceIn(css: string, token: string): number {
+export function hexRelativeLuminanceIn(css: string | string[], token: string): number {
   return relativeLuminance(hexIn(css, token));
 }
 

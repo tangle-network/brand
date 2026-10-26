@@ -305,6 +305,6 @@ describe("Inset workspace backdrop (canonical themes)", () => {
     expect(Math.abs(panel - backdrop)).toBeGreaterThanOrEqual(3);
   });
   it("keeps the dark floor tokens equal, as their comment says", () => {
-    expect(declIn(DARK, "md3-surface-dim")).toBe(declIn(DARK, "md3-surface-container-lowest"));
+    expect(hexIn(DARK, "md3-surface-dim")).toEqual(hexIn(DARK, "md3-surface-container-lowest"));
   });
 });

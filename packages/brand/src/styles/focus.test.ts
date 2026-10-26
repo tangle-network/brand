@@ -43,18 +43,6 @@ const dangerAlpha = alphaOf(
   /--focus-border-danger:\s*color-mix\(in srgb, var\(--surface-danger-text\) ([\d.]+)(%), transparent\)/,
 );
 
-/** Reads a token from the first source that declares it, as the cascade would. */
-function effective<T>(sources: string[], readToken: (css: string) => T): T {
-  for (const css of sources) {
-    try {
-      return readToken(css);
-    } catch {
-      // Not declared here; fall through to the scope it inherits from.
-    }
-  }
-  throw new Error("token resolves to nothing");
-}
-
 const lightStatus = blocksIn(themes, '[data-theme="tangle-light"]').join("\n");
 const scopes: Array<{ name: string; sources: string[] }> = [
   { name: "canonical dark", sources: [DARK] },
@@ -89,12 +77,13 @@ describe("the focus palette resolves in every theme scope", () => {
 describe("a focused field's border clears 3:1 against the field", () => {
   for (const { name, sources } of scopes) {
     it(name, () => {
-      const field = hslToRgb(effective(sources, (css) => hslIn(css, "hsl-card")));
-      const ring = hslToRgb(effective(sources, (css) => hslIn(css, "hsl-ring")));
+      // The scope chain models the cascade: a theme's own rule, then the spine it inherits.
+      const field = hslToRgb(hslIn(sources, "hsl-card"));
+      const ring = hslToRgb(hslIn(sources, "hsl-ring"));
       const border = compositeOver(ring, field, borderAlpha);
       expect(contrastRatio(border, field), "focus border on field").toBeGreaterThanOrEqual(3);
 
-      const danger = effective(sources, (css) => hexIn(css, "surface-danger-text"));
+      const danger = hexIn(sources, "surface-danger-text");
       const dangerBorder = compositeOver(danger, field, dangerAlpha);
       expect(contrastRatio(dangerBorder, field), "danger focus border on field").toBeGreaterThanOrEqual(3);
     });

@@ -28,6 +28,15 @@
   --spacing-control-md: var(--control-height);
   --spacing-control-lg: var(--control-height-lg);
   --spacing-shell-header: var(--shell-header-height);
+  --color-brand: var(--brand-primary);
+  --color-brand-dim: var(--btn-primary-bg);
+  --color-brand-cool: var(--brand-cool);
+  --color-brand-glow: var(--brand-glow);
+  --color-brand-emerald: var(--brand-emerald);
+  --color-status-running: var(--status-running);
+  --color-status-creating: var(--status-creating);
+  --color-status-stopped: var(--status-stopped);
+  --color-status-error: var(--status-error);
   --color-scrim: var(--scrim);
   --color-scrim-strong: var(--scrim-strong);
   --color-on-media: var(--on-media);
@@ -230,31 +239,14 @@
 }
 
 /* ───────────────────────── Tangle — canonical dark spine ───────────────────
- * tangle-dark names the default :root/.dark spine explicitly. The named block
- * repeats its surfaces and ink so a dark island remains self-sufficient
- * inside a light-named wrapper. Indigo stays in the accent; status tokens inherit
- * the dark-tuned root palette.
+ * tangle-dark names the default :root/.dark spine explicitly, for a dark island
+ * inside a light-named wrapper or a picker's explicit choice. It is the
+ * canonical spine by construction, never a copy of it.
  */
 [data-theme="tangle-dark"] {
-  --hsl-background: 240 33% 6%;       --hsl-foreground: 0 0% 90.1961%;
-  --hsl-card: 244 23% 12%;             --hsl-card-foreground: 0 0% 90.1961%;
-  --hsl-popover: 247 23% 21%;          --hsl-popover-foreground: 0 0% 90.1961%;
-  --hsl-primary: 246 54% 51%;            --hsl-primary-foreground: 0 0% 100%;
-  --hsl-secondary: 249 24% 16%;        --hsl-secondary-foreground: 0 0% 90.1961%;
-  --hsl-muted: 249 24% 16%;            --hsl-muted-foreground: 240 5% 68%;
-  --hsl-accent: 249 24% 16%;           --hsl-accent-foreground: 0 0% 90.1961%;
-  --hsl-destructive: 0 90% 77%;        --hsl-destructive-foreground: 0 60% 10%;
-  --hsl-border: 243 20% 20%;           --hsl-input: 244 29% 9%;
-  --hsl-ring: 233 100% 87%;
-  --depth-1: #0a0a14; --depth-2: #191826; --depth-3: #221f33; --depth-4: #2c2942;
-  --bg-root: #0a0a14; --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
-  --md3-surface-container-lowest: #040408; --md3-surface-container-low: #12111f;
-  --md3-surface-container: #191826; --md3-surface-container-high: #221f33;
-  --md3-surface-container-highest: #2c2942; --md3-outline-variant: #2a293d;
-  --border-subtle: rgba(255, 255, 255, 0.10); --border-default: rgba(255, 255, 255, 0.16);
-  --border-hover: rgba(255, 255, 255, 0.28); --accent-text: #A5B4FC;
-  --brand-primary: #7C6CF6; --brand-glow: #A5AAFC;
-  --text-primary: #e6e6e6; --text-secondary: #c7c7c7; --text-muted: #b5b5b5; --text-dim: #a5a5a5;
+  /* Nothing to declare: tokens.css seeds the complete dark spine on this
+   * selector, so a tangle-dark island carries every value itself and inherits
+   * nothing from a light wrapper. */
 }
 /* Its light mode. */
 [data-theme="tangle-light"] {
@@ -378,7 +370,7 @@
   --hsl-accent: 133 38.4% 88%;    --hsl-accent-foreground: 143 25% 12%;
   --hsl-border: 107 8.7% 79.8%;   --hsl-input: 0 0% 100%;
   --hsl-ring: 148 28% 43%;
-  --hsl-destructive: 0 72% 41%;
+  --hsl-destructive: 0 73.7% 41.8%; /* the canonical light red, restated so the dark block below mirrors it */
   --hsl-raised: 110 18.7% 93.7%;  --hsl-raised-2: 0 0% 100%;
   --sidebar-background: 108 21.7% 95.5%; --sidebar-foreground: 143 25% 12%;
   --sidebar-primary: 153 38% 25%;        --sidebar-primary-foreground: 0 0% 100%;

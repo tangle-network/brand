@@ -18,8 +18,10 @@ const ladders = read("ladders.css");
 
 /** The spine block of a selector: the rule that declares the surface ladder. */
 function spine(source: string, selector: string): string {
-  const block = blocksIn(source, selector).find((b) => b.includes("--hsl-background:"));
-  if (!block) throw new Error(`missing spine block: ${selector}`);
+  const blocks = blocksIn(source, selector);
+  // A theme that declares nothing (tangle-dark) is the baseline its chain continues to.
+  const block = blocks.find((b) => b.includes("--hsl-background:")) ?? (blocks.length === 1 ? blocks[0] : undefined);
+  if (block === undefined) throw new Error(`missing spine block: ${selector}`);
   return block;
 }
 
