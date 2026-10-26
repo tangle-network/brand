@@ -90,6 +90,7 @@ export function FileArtifactPane({
       activeId={activeTabId}
       onSelect={onTabSelect}
       onClose={onTabClose}
+      className="shadow-none"
     />
   ) : undefined;
   const isMarkdown =
