@@ -373,6 +373,7 @@ for (const theme of ["light", "dark"]) {
   })
 
   test(`notes, toned list states and long values at 1280 and 390 px (${theme})`, async ({ page }, testInfo) => {
+    test.slow()
     for (const viewport of [DESKTOP, PHONE]) {
       const errors = await openStory(page, "primitives-settings--notes-and-tones", theme, viewport)
       const wide = viewport === DESKTOP
@@ -457,7 +458,8 @@ for (const theme of ["light", "dark"]) {
     }
   })
 
-  test(`server-rendered settings markup under a sticky host header (${theme})`, async ({ page }, testInfo) => {
+  test(`server-rendered settings markup sticks below a host's sticky header (${theme})`, async ({ page }, testInfo) => {
+    test.slow()
     const errors = await openStory(page, "primitives-settings--server-rendered-host", theme, DESKTOP)
     const nav = page.getByRole("navigation", { name: "Settings sections" })
     const current = nav.locator('a[aria-current="page"]')
@@ -474,14 +476,23 @@ for (const theme of ["light", "dark"]) {
       return tab.left >= strip.left + 16 && tab.right <= strip.right - 16
     }, { message: "the current tab is centred in the strip" }).toBe(true)
     await shot(page, testInfo, `server-host-390-${theme}.png`)
+    expect(errors).toEqual([])
+  })
 
+  test(`bindSettingsNav on server markup: document clicks, client-router clicks, back-forward restore (${theme})`, async ({ page }) => {
+    test.slow()
+    const errors = await openStory(page, "primitives-settings--server-rendered-host", theme, PHONE)
+    const nav = page.getByRole("navigation", { name: "Settings sections" })
+    const current = nav.locator('a[aria-current="page"]')
+    await expect(current).toHaveText("Usage")
     // A click a client router takes (preventDefault) leaves the current link to the router.
     await page.evaluate(() => document.querySelector('a[href="/settings-doc/team"]').addEventListener("click", (event) => event.preventDefault()))
     await nav.getByRole("link", { name: "Team" }).click()
     await expect(current).toHaveText("Usage")
     // A click that loads another document marks its link at once, while that document is still loading.
+    // The next document never arrives during the test; evaluate dispatches the click without waiting on that navigation.
     await page.route("**/settings-doc/**", () => {})
-    await nav.getByRole("link", { name: "Billing" }).click()
+    await nav.getByRole("link", { name: "Billing" }).evaluate((link) => link.click())
     await expect(current).toHaveText("Billing")
     await expect(current).toHaveCount(1)
     // A page restored from the back-forward cache shows the section it rendered.
