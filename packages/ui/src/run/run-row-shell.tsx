@@ -7,9 +7,10 @@ import { formatDuration } from "../utils/format";
 export type RunRowStatus = "running" | "success" | "error" | "idle";
 
 /**
- * Trailing status indicator shared by every run row. Only `error` draws a
- * mark (a red dot). Success is silence, and a running row carries its state in
- * the title — a `TextShimmer` sweep — so neither renders anything here.
+ * A red dot for a failed row, for rows composed outside the shell. The shell
+ * itself marks a failure on the row's own glyph, beside its name, never at the
+ * far edge. Success is silence, and a running row carries its state in the
+ * title — a `TextShimmer` sweep.
  */
 export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
   if (status !== "error") return null;
@@ -132,7 +133,11 @@ export function RunRowShell({
             >
               <span
                 aria-hidden
-                className="flex h-[1.375rem] w-[1.375rem] shrink-0 items-center justify-center text-muted-foreground"
+                data-run-row-status={status === "error" ? "error" : undefined}
+                className={cn(
+                  "flex h-[1.375rem] w-[1.375rem] shrink-0 items-center justify-center",
+                  status === "error" ? "text-[var(--surface-danger-text)]" : "text-muted-foreground",
+                )}
               >
                 <span
                   data-run-row-glyph=""
@@ -174,24 +179,21 @@ export function RunRowShell({
                 </span>
               ) : null}
 
-              <span className="ml-auto flex shrink-0 items-center gap-1.5">
-                {!isRunning && durationMs != null ? (
-                  <span
-                    data-run-row-duration=""
-                    className="font-mono text-[10px] tabular-nums text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    {formatDuration(durationMs)}
-                  </span>
-                ) : null}
-                <RunRowStatusDot status={status} />
-              </span>
+              {!isRunning && durationMs != null ? (
+                <span
+                  data-run-row-duration=""
+                  className="ml-auto shrink-0 font-mono text-sm tabular-nums text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  {formatDuration(durationMs)}
+                </span>
+              ) : null}
             </button>
           </Collapsible.Trigger>
 
           {collapsedError && !open ? (
             <div
               className={cn(
-                "pb-1.5 pr-2 text-xs leading-snug text-[var(--surface-danger-text)]",
+                "pb-1.5 pr-2 text-sm leading-snug text-[var(--surface-danger-text)]",
                 ERROR_INDENT,
               )}
             >

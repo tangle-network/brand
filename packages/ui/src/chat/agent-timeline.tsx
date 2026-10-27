@@ -154,9 +154,11 @@ const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; suppo
  * most, a tool sequence — and prose beside it — sits tightest, cards and
  * consecutive paragraphs fall between.
  */
-type StepKind = "user" | "prose" | "tool" | "card";
+export type AgentTimelineStepKind = "user" | "prose" | "tool" | "card";
+type StepKind = AgentTimelineStepKind;
 
-function stepKind(item: AgentTimelineItem): StepKind {
+/** What a row is, for the gap above the next one. */
+export function agentTimelineStepKind(item: AgentTimelineItem): AgentTimelineStepKind {
   if (item.kind === "message") return item.role === "user" ? "user" : "prose";
   if (item.kind === "status" || item.kind === "artifact") return "card";
   return "tool";
@@ -282,6 +284,87 @@ function ArtifactCard({ item }: { item: AgentTimelineArtifactItem }) {
   );
 }
 
+/** The transcript column every timeline sits in: centred, at the reading width. */
+export function AgentTimelineColumn({ className, children }: { className?: string; children?: ReactNode }) {
+  return <div className={cn("mx-auto flex w-full max-w-5xl flex-col px-4 py-4", className)}>{children}</div>;
+}
+
+export interface AgentTimelineStepProps {
+  item: AgentTimelineItem;
+  /** The kind of the row above, which sets the gap; omit for the first row. */
+  previous?: AgentTimelineStepKind;
+  /** Draw the message's author line (the first prose of a turn). */
+  headed?: boolean;
+  renderToolActions?: (part: ToolPart) => ReactNode;
+  viewerId?: string;
+}
+
+/**
+ * One row of the timeline with the gap its neighbour pair calls for. A
+ * consumer that windows a long transcript renders these inside one
+ * `AgentTimelineColumn`, so the rows keep the column's rhythm and edge.
+ */
+export function AgentTimelineStep({ item, previous, headed, renderToolActions, viewerId }: AgentTimelineStepProps) {
+  const kind = agentTimelineStepKind(item);
+  return (
+    <div data-timeline-step={kind} className={cn(spacingBefore(previous, kind), kind === "tool" && ROW_BLEED)}>
+      <TimelineItem item={item} headed={headed} renderToolActions={renderToolActions} viewerId={viewerId} />
+    </div>
+  );
+}
+
+function TimelineItem({ item, headed, renderToolActions, viewerId }: Omit<AgentTimelineStepProps, "previous">): ReactNode {
+  if (item.kind === "message") {
+    return item.role === "user" ? (
+      <UserMessage content={item.content} timestamp={item.timestamp} author={item.author} viewerId={viewerId} />
+    ) : (
+      <AssistantMessage item={item} author={headed ? item.author : undefined} />
+    );
+  }
+
+  if (item.kind === "tool") {
+    return (
+      <ToolCallStep
+        type={item.call.type}
+        label={item.call.label}
+        status={item.call.status}
+        detail={item.call.detail}
+        output={item.call.output}
+        duration={item.call.duration}
+        part={item.part}
+        actions={item.part ? renderToolActions?.(item.part) : undefined}
+      />
+    );
+  }
+
+  if (item.kind === "tool_group") {
+    return (
+      <ToolCallGroup title={item.title}>
+        {item.calls.map((call, callIndex) => {
+          const part = item.parts?.[callIndex];
+          return (
+            <ToolCallStep
+              key={call.id}
+              type={call.type}
+              label={call.label}
+              status={call.status}
+              detail={call.detail}
+              output={call.output}
+              duration={call.duration}
+              part={part}
+              actions={part ? renderToolActions?.(part) : undefined}
+            />
+          );
+        })}
+      </ToolCallGroup>
+    );
+  }
+
+  if (item.kind === "status") return <StatusCard item={item} />;
+  if (item.kind === "artifact") return <ArtifactCard item={item} />;
+  return item.content;
+}
+
 /**
  * AgentTimeline — unified mixed-content transcript for agent-backed sandbox
  * sessions. Renders messages, tool rows, status cards, and artifact handoffs
@@ -352,84 +435,29 @@ export function AgentTimeline({
     speakingAgent = item.author?.id;
   }
 
-  const renderItem = (item: AgentTimelineItem): ReactNode => {
-    if (item.kind === "message") {
-      return item.role === "user" ? (
-        <UserMessage content={item.content} timestamp={item.timestamp} author={item.author} viewerId={viewerId} />
-      ) : (
-        <AssistantMessage item={item} author={headedAgentMessages.has(item.id) ? item.author : undefined} />
-      );
-    }
-
-    if (item.kind === "tool") {
-      return (
-        <ToolCallStep
-          type={item.call.type}
-          label={item.call.label}
-          status={item.call.status}
-          detail={item.call.detail}
-          output={item.call.output}
-          duration={item.call.duration}
-          part={item.part}
-          actions={item.part ? renderToolActions?.(item.part) : undefined}
-        />
-      );
-    }
-
-    if (item.kind === "tool_group") {
-      return (
-        <ToolCallGroup title={item.title}>
-          {item.calls.map((call, callIndex) => {
-            const part = item.parts?.[callIndex];
-            return (
-              <ToolCallStep
-                key={call.id}
-                type={call.type}
-                label={call.label}
-                status={call.status}
-                detail={call.detail}
-                output={call.output}
-                duration={call.duration}
-                part={part}
-                actions={part ? renderToolActions?.(part) : undefined}
-              />
-            );
-          })}
-        </ToolCallGroup>
-      );
-    }
-
-    if (item.kind === "status") return <StatusCard item={item} />;
-    if (item.kind === "artifact") return <ArtifactCard item={item} />;
-    return item.content;
-  };
-
   return (
-    <div className={cn("mx-auto flex w-full max-w-5xl flex-col px-4 py-4", className)}>
-      {renderList.map((item, index) => {
-        const kind = stepKind(item);
-        const prev = index > 0 ? stepKind(renderList[index - 1]) : undefined;
-        return (
-          <div
-            key={item.id}
-            data-timeline-step={kind}
-            className={cn(spacingBefore(prev, kind), kind === "tool" && ROW_BLEED)}
-          >
-            {renderItem(item)}
-          </div>
-        );
-      })}
+    <AgentTimelineColumn className={className}>
+      {renderList.map((item, index) => (
+        <AgentTimelineStep
+          key={item.id}
+          item={item}
+          previous={index > 0 ? agentTimelineStepKind(renderList[index - 1]) : undefined}
+          headed={headedAgentMessages.has(item.id)}
+          renderToolActions={renderToolActions}
+          viewerId={viewerId}
+        />
+      ))}
       {collapsible ? (
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="mt-2 self-start text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="mt-2 self-start text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           {collapsed
             ? `Show ${hiddenCount} more step${hiddenCount === 1 ? "" : "s"}`
             : "Show less"}
         </button>
       ) : null}
-    </div>
+    </AgentTimelineColumn>
   );
 }

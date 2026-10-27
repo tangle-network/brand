@@ -57,7 +57,7 @@ describe("InlineToolItem", () => {
     expect(container.querySelector(".tangle-text-shimmer")).not.toBeNull();
   });
 
-  it("keeps the red dot and the collapsed error on failure", () => {
+  it("marks a failure on its glyph and keeps the collapsed error", () => {
     const { container } = render(
       <InlineToolItem
         part={part({ status: "error", error: "ENOENT: no such file", output: undefined })}

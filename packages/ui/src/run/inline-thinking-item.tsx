@@ -80,7 +80,7 @@ export const InlineThinkingItem = memo(
             </div>
           </ExpandableContent>
         ) : (
-          <div className="px-3 py-2.5 text-xs text-muted-foreground">
+          <div className="px-3 py-2.5 text-sm text-muted-foreground">
             No reasoning text provided.
           </div>
         )}

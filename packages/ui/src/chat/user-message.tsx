@@ -31,7 +31,7 @@ function formatTime(date: Date): string {
 
 function MessageActions({ children, align = "end" }: { children: ReactNode; align?: "start" | "end" }) {
   return (
-    <div className={`flex flex-wrap items-center ${align === "end" ? "justify-end" : "justify-start"} gap-1.5 text-xs text-muted-foreground`}>
+    <div className={`flex flex-wrap items-center ${align === "end" ? "justify-end" : "justify-start"} gap-1.5 text-sm text-muted-foreground`}>
       {children}
     </div>
   );
