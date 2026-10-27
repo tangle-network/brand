@@ -123,7 +123,7 @@ for (const theme of ["light", "dark"]) {
         const action = await type(page.getByRole("button", { name: "Copy embed code" }).getByText("Copy embed code"))
         expect(action, "the action label matches the header label beside it").toEqual(await type(page.getByText("HTML", { exact: true })))
         expect(action.size).toBe("14px")
-        expect(action.family, "not the code font").not.toBe(await page.locator("pre code").evaluate((node) => getComputedStyle(node).fontFamily))
+        expect(action.family, "not the code font").not.toBe(await page.getByRole("region", { name: "HTML code" }).locator("code").evaluate((node) => getComputedStyle(node).fontFamily))
         await page.screenshot({ path: process.env.SETTINGS_SHOTS_DIR ? `${process.env.SETTINGS_SHOTS_DIR}/code-block-copy-${coarse ? 390 : 1280}-${theme}.png` : testInfo.outputPath("code-block-copy.png") })
         expect(errors).toEqual([])
       })
