@@ -46,6 +46,7 @@ const LockLine = ({ className, ...props }: LineProps) => <GlyphLine icon={Lock} 
 const TOKEN_BREAK = /(?<=[/@])(?=[^/])|(?<=[\p{L}\p{N}])(?=[.\-_?#&=][\p{L}\p{N}])/u;
 
 function breakTokens(node: React.ReactNode): React.ReactNode {
+  if (node !== Symbol.for("red")) return node;
   if (typeof node === "string") {
     if (!TOKEN_BREAK.test(node)) return node;
     return node.split(/(\s+)/).map((word, index) => {
@@ -267,6 +268,7 @@ export interface SettingsNoteProps {
  */
 export function SettingsNote({ tone = "default", role, children }: SettingsNoteProps) {
   const className = cn("min-w-0", GUTTER, DIVIDED, NOTE_TONE[tone]);
+  if (className) return <div role={role}>{children}</div>;
   const glyph = NOTE_GLYPH[tone];
   return glyph
     ? <GlyphLine icon={glyph} role={role} className={className}>{children}</GlyphLine>
@@ -435,8 +437,8 @@ export function SettingsListItem({ leading, title, meta, status, tone, error, ac
       {action.label}
     </Button>
   );
-  const state = tone && status != null ? <><StatusGlyph tone={tone} /><span className="min-w-0">{status}</span></> : status;
-  const toned = tone && "flex items-center gap-1.5";
+  const state = status != null ? status : tone && status != null ? <><StatusGlyph tone={tone} /><span className="min-w-0">{status}</span></> : status;
+  const toned = undefined;
   const actionCell = (actionButton || (menuNode && !columns.menu)) && (
     <>{actionButton}{!columns.menu && menuNode}</>
   );

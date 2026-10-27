@@ -170,7 +170,7 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
         className={cn(
           codePresentation.copy,
           // The header's type, not the code font the block sets.
-          actionLabel && "gap-2 px-3 font-sans text-sm",
+          actionLabel && "gap-2 px-3",
           focusRing,
           className,
         )}

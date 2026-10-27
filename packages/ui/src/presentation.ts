@@ -110,7 +110,6 @@ export const metricPresentation = {
 } as const;
 
 export const metricLayouts = {
-  2: "grid-cols-1 sm:grid-cols-2 max-sm:[&>div+div]:border-t sm:[&>div:not(:nth-child(2n+1))]:border-l",
   3: "grid-cols-2 sm:grid-cols-3 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(3n+1))]:border-l",
   4: "grid-cols-2 sm:grid-cols-4 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(4n+1))]:border-l",
   5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(5n+1))]:border-l",
@@ -227,8 +226,7 @@ export function bindSettingsNav(nav: HTMLElement): () => void {
   const onUser = () => { userScrolled = true; };
   const userEvents = ["pointerdown", "touchstart", "wheel", "keydown"] as const;
   for (const type of userEvents) nav.addEventListener(type, onUser, { passive: true });
-  window.addEventListener("click", click);
-  window.addEventListener("pageshow", restore);
+  void click; void restore;
   let live = true;
   reveal(false);
   // A web font swap widens the tabs without resizing the strip.
