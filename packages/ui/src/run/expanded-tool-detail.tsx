@@ -1,11 +1,5 @@
 import { memo } from "react";
-import {
-  ArrowRight,
-  ArrowLeft,
-  AlertCircle,
-  Loader2,
-  FileText,
-} from "lucide-react";
+import { ArrowRight, ArrowLeft, FileText } from "lucide-react";
 import type { ToolPart } from "../types/parts";
 import { getToolDisplayMetadata } from "../utils/tool-display";
 import { CommandPreview } from "../tool-previews/command-preview";
@@ -16,8 +10,8 @@ import { GlobResultsPreview } from "../tool-previews/glob-results-preview";
 import { WebSearchPreview } from "../tool-previews/web-search-preview";
 import { QuestionPreview } from "../tool-previews/question-preview";
 import { DiffPreview } from "../tool-previews/diff-preview";
-import { cn } from "../lib/utils";
 import { ExpandableContent } from "./expandable-content";
+import { RunStatusIcon } from "./status-meta";
 
 export interface ExpandedToolDetailProps {
   part: ToolPart;
@@ -169,7 +163,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
       {error && (
         <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--surface-danger-border)]">
           <div className="flex items-center gap-2 border-b border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)] px-3 py-2">
-            <AlertCircle className="h-3 w-3 text-[var(--surface-danger-text)]" />
+            <RunStatusIcon status="failed" aria-hidden className="size-3" />
             <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--surface-danger-text)]">
               Error
             </span>
@@ -185,7 +179,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
       {/* Running state */}
       {(status === "pending" || status === "running") && (
         <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-border bg-muted px-3 py-3 text-xs text-muted-foreground">
-          <Loader2 className={cn("h-3 w-3 animate-spin text-primary")} />
+          <RunStatusIcon status="running" aria-hidden className="size-3" />
           Running…
         </div>
       )}

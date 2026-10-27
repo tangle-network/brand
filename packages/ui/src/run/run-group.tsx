@@ -2,7 +2,6 @@ import { memo, useMemo, type ComponentType, type ReactNode } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   Bot,
-  Loader2,
   ChevronDown,
   ChevronRight,
   Terminal,
@@ -13,7 +12,6 @@ import {
   Globe,
   ClipboardList,
   Settings,
-  Sparkles,
   type LucideProps,
 } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -24,6 +22,7 @@ import type { AgentBranding } from "../types/branding";
 import type { CustomToolRenderer } from "../types/tool-display";
 import { InlineToolItem } from "./inline-tool-item";
 import { InlineThinkingItem } from "./inline-thinking-item";
+import { RunStatusIcon, statusMeta } from "./status-meta";
 import { Markdown } from "../markdown/markdown";
 import { SyntheticText } from "../chat/synthetic-text";
 
@@ -98,7 +97,7 @@ function AssistantShell({
         <span>{branding.label}</span>
         {isStreaming ? (
           <span className="inline-flex items-center gap-1.5">
-            <Loader2 className="h-3 w-3 animate-spin" />
+            <RunStatusIcon status="running" aria-hidden className="size-3" />
             Thinking
           </span>
         ) : null}
@@ -418,7 +417,7 @@ export const RunGroup = memo(
                         key={key}
                         className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground"
                       >
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        <RunStatusIcon status="running" aria-hidden />
                         Building view…
                       </div>
                     );
@@ -484,17 +483,10 @@ export const RunGroup = memo(
                 ) : null}
                 <span className="ml-auto flex shrink-0 items-center gap-1.5">
                   <CategoryBadges categories={stats.toolCategories} />
-                  {isStreaming ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-accent)] bg-[var(--accent-surface-soft)] px-2 py-px text-[10px] font-semibold uppercase text-[var(--accent-text)]">
-                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                      Running
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-px text-[10px] font-semibold uppercase text-muted-foreground">
-                      <Sparkles className="h-2.5 w-2.5" />
-                      Done
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-px text-[10px] font-semibold uppercase text-muted-foreground">
+                    <RunStatusIcon status={isStreaming ? "running" : "done"} aria-hidden className="size-3" />
+                    {statusMeta(isStreaming ? "running" : "done").label}
+                  </span>
                 </span>
               </button>
             </Collapsible.Trigger>
@@ -542,7 +534,7 @@ export const RunGroup = memo(
                     } else if (toolPart.state.status === "running") {
                       node = (
                         <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--md3-surface-container)] px-4 py-3 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                          <RunStatusIcon status="running" aria-hidden />
                           Building view…
                         </div>
                       );
