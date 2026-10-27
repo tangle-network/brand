@@ -492,15 +492,16 @@ for (const theme of ["light", "dark"]) {
     // A click that loads another document marks its link during the click, before any document arrives.
     // The server answers 204, so the browser stays on this page and nothing else could have moved the mark.
     await page.route("**/settings-doc/**", (route) => route.fulfill({ status: 204 }))
-    const marked = await nav.getByRole("link", { name: "Billing" }).evaluate((link) => {
+    // Read inside the page: Playwright's own locators wait on the navigation the click started.
+    const marks = await nav.getByRole("link", { name: "Billing" }).evaluate((link) => {
+      const current = () => [...link.closest("nav").querySelectorAll('[aria-current="page"]')].map((each) => each.textContent)
       link.click()
-      return [...link.closest("nav").querySelectorAll('[aria-current="page"]')].map((each) => each.textContent)
+      const clicked = current()
+      window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }))
+      return { clicked, restored: current() }
     })
-    expect(marked, "the clicked link is the one current link as the click returns").toEqual(["Billing"])
-    await expect(current).toHaveText("Billing")
-    // A page restored from the back-forward cache shows the section it rendered.
-    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })))
-    await expect(current).toHaveText("Usage")
+    expect(marks.clicked, "the clicked link is the one current link as the click returns").toEqual(["Billing"])
+    expect(marks.restored, "a back-forward restore shows the section the page rendered").toEqual(["Usage"])
     expect(errors).toEqual([])
   })
 
