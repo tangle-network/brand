@@ -374,23 +374,18 @@
   --code-comment: var(--syntax-comment);
   --code-error: var(--syntax-error);
 
-  /* Shadows — flat, no inner ring, no indigo glow */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.45);
+  /* Shadows — flat, no inner ring, no glow. Every shadow is one colour,
+     --shadow-color, as HSL channels so each sets its own alpha: black here, a
+     deep cool ink in light. A shadow never inverts into a light halo; dark
+     elevation is the plane step plus --edge-highlight. --shadow-overlay is the
+     lift above --shadow-dropdown, for a surface that covers the page (a
+     drawer, a modal, a floating dock): a tight contact layer plus a wide one. */
+  --shadow-color: 0 0% 0%;
+  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.3);
+  --shadow-dropdown: 0 8px 30px hsl(var(--shadow-color) / 0.45);
   --shadow-glow: none;
-  --shadow-accent: 0 1px 2px rgba(0, 0, 0, 0.3);
-  /* The lift above --shadow-dropdown, for a surface that covers the page
-     rather than sitting beside it: a drawer, a modal, a floating dock.
-     Two layers — a tight contact shadow plus a wide ambient one.
-     Alone among the shadows this is derived from --hsl-foreground instead of
-     a fixed rgba, so it INVERTS with the theme. That is what makes it work in
-     dark: a black shadow on a dark canvas renders as nothing (see the ladder
-     note at the top of this file), while the foreground is near-white there,
-     so the same declaration reads as a soft halo. One definition therefore
-     serves both themes and the light block does not restate it. */
-  --shadow-overlay:
-    0 2px 6px hsl(var(--hsl-foreground) / 0.1),
-    0 16px 40px hsl(var(--hsl-foreground) / 0.16);
+  --shadow-accent: var(--shadow-card);
+  --shadow-overlay: 0 2px 6px hsl(var(--shadow-color) / 0.3), 0 16px 40px hsl(var(--shadow-color) / 0.5);
   /* Scrim and media ink. A scrim dims the page behind a modal or sheet, or
      darkens a photo under its caption. It is black in every theme: a dimming
      layer that inverted in dark mode would brighten the page it covers.
@@ -410,12 +405,18 @@
   --radius-pill: 999px;
   --radius-full: 999px;
   --radius-composer: 26px;    /* centered composer pill */
-  /* Radius by role. New surfaces pick the role they play; system.css repeats
-     these for pages that load it on its own ladders. */
+  /* Radius by role, one ramp: tag 4, control 8, card 12, container 16, and
+     --radius-pill for every chip and status pill. Chip, field and panel are
+     the older names of control, card and container. Cover and sheet are the
+     media and bottom-sheet radii. system.css repeats these for pages that load
+     it on its own ladders. */
   --radius-tag: 4px;
-  --radius-chip: 8px;
-  --radius-field: 12px;
-  --radius-panel: 16px;
+  --radius-control: var(--radius-md);
+  --radius-card: var(--radius-xl);
+  --radius-container: 16px;
+  --radius-chip: var(--radius-control);
+  --radius-field: var(--radius-card);
+  --radius-panel: var(--radius-container);
   --radius-cover: 20px;
   --radius-sheet: 24px;
   --radius: 0.5rem;           /* 8px chrome default (was 10px) */
@@ -527,6 +528,11 @@
   --motion-dismiss: var(--duration-instant) var(--ease-exit);
   --motion-stream: var(--duration-stream) var(--ease-expo);
   --motion-arrive: var(--duration-arrive) var(--ease-expo);
+  /* The only loop period on a page. A running mark breathes on it with
+     `tangle-breathe` (opacity, never position or scale), so every live thing
+     shares one rhythm. Reduced motion keeps it: see the rule below. */
+  --duration-ambient: 2000ms;
+  --motion-ambient: var(--duration-ambient) ease-in-out;
 
   /* Elapsed interaction thresholds, not animation durations. See
    * docs/design-bible.md#interaction. Reduced motion leaves these unchanged. */
@@ -737,11 +743,11 @@
   --glass-bg-strong: var(--depth-1);
   --code-header-bg: color-mix(in srgb, hsl(var(--hsl-muted)) 50%, transparent);
 
-  /* Shadows — flat, no inner ring, no glow */
-  --shadow-card: 0 1px 2px rgba(25, 28, 36, 0.06);
-  --shadow-dropdown: 0 8px 30px rgba(25, 28, 36, 0.10);
-  --shadow-glow: none;
-  --shadow-accent: 0 1px 2px rgba(25, 28, 36, 0.06);
+  /* Shadows — the dark roles in the light shadow colour, at light alphas. */
+  --shadow-color: 220 40% 8%;
+  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --shadow-dropdown: 0 8px 30px hsl(var(--shadow-color) / 0.1);
+  --shadow-overlay: 0 2px 6px hsl(var(--shadow-color) / 0.1), 0 16px 40px hsl(var(--shadow-color) / 0.16);
 }
 
 
@@ -940,7 +946,11 @@
 
 
 /* Motion is opt-in at the component, but its reduced-motion preference is
- * shared. Re-declare composites at the same boundary as their durations. */
+ * shared. Re-declare composites at the same boundary as their durations.
+ * --duration-ambient is not zeroed: the essential running mark
+ * (data-motion="essential") keeps its opacity-only breathe, because it is the
+ * only "still working" signal and it never moves anything. */
+@keyframes tangle-breathe { 50% { opacity: 0.45; } }
 @media (prefers-reduced-motion: reduce) {
   :root,
   .dark,

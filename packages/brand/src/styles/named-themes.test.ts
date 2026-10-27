@@ -301,7 +301,7 @@ for (const [name, mode] of [
       it("is a white page whose cards separate by shadow", () => {
         expect(declIn(css, "hsl-background")).toBe("0 0% 100%");
         expect(declIn(css, "hsl-card")).toBe("0 0% 100%");
-        expect(declIn(css, "shadow-card")).toMatch(/rgb\(/);
+        expect(declIn(css, "shadow-card")).toMatch(/hsl\(var\(--shadow-color\)/);
       });
     }
   });

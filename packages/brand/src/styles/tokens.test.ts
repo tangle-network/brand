@@ -5,10 +5,12 @@ import {
   blockIn,
   compositeOver,
   contrastRatio,
+  declIn,
   hexIn,
   hexRelativeLuminanceIn,
   hslIn,
   hslToRgb,
+  resolveIn,
 } from "./css-test-utils";
 
 /**
@@ -606,5 +608,41 @@ describe("each colour is declared once: a role, then aliases", () => {
     ["light", LIGHT, 25],
   ] as const)("%s spine declares no new hex literal", (_, spine, ceiling) => {
     expect(literalsOutsideTones(spine).size).toBeLessThanOrEqual(ceiling);
+  });
+});
+
+describe("shadow, radius and loop period are one role each", () => {
+  // The run-UI critique of 2026-10-27 (fixes 9, 10 and 22) found a white shadow
+  // haze in dark mode, six radii and seven loop periods. Each is now one role
+  // that every other name aliases, so a surface cannot drift to a second value.
+  it.each([
+    ["dark", DARK, "0 0% 0%"],
+    ["light", LIGHT, "220 40% 8%"],
+  ] as const)("%s: every shadow is drawn in --shadow-color and never inverts", (_, spine, colour) => {
+    expect(declIn(spine, "shadow-color")).toBe(colour);
+    for (const token of ["shadow-card", "shadow-dropdown", "shadow-overlay"]) {
+      const value = declIn(spine, token);
+      expect(value, `--${token}`).toMatch(/^[^,]*hsl\(var\(--shadow-color\) \/ [\d.]+\)/);
+      expect(value, `--${token} names a colour of its own`).not.toMatch(/rgba?\(|#[0-9a-f]{3,8}\b|--hsl-foreground/i);
+    }
+  });
+
+  it("draws radii from one ramp, and the older role names alias it", () => {
+    const ramp = { tag: "4px", control: "8px", card: "12px", container: "16px", pill: "999px" };
+    for (const [role, px] of Object.entries(ramp)) expect(resolveIn(DARK, `radius-${role}`), role).toBe(px);
+    for (const [older, role] of [["chip", "control"], ["field", "card"], ["panel", "container"]]) {
+      expect(declIn(DARK, `radius-${older}`)).toBe(`var(--radius-${role})`);
+    }
+  });
+
+  it("has one loop period, which reduced motion keeps for an opacity-only breathe", () => {
+    expect(declIn(DARK, "duration-ambient")).toBe("2000ms");
+    expect(declIn(DARK, "motion-ambient")).toBe("var(--duration-ambient) ease-in-out");
+    const reduced = tokens.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/)![1];
+    expect(reduced).toContain("--duration-fast: 0ms");
+    expect(reduced, "the essential breathe keeps its period").not.toContain("--duration-ambient");
+    const breathe = tokens.match(/@keyframes tangle-breathe \{([\s\S]*?)\}\s*\}/)?.[1];
+    expect(breathe, "the shared breathe keyframe").toMatch(/opacity/);
+    expect(breathe, "a loop never moves or scales").not.toMatch(/transform|translate|scale|rotate/);
   });
 });

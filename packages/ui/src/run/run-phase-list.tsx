@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { ChevronRight, CircleAlert, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
+import { RunStatusIcon } from "./status-meta";
 
 export interface RunPhase {
   id: string;
@@ -37,8 +38,7 @@ function PhaseRow({ phase }: { phase: RunPhase }) {
           <span className="font-medium text-foreground">{phase.title}</span>
           {phase.summary && <span className="text-muted-foreground"> · {phase.summary}</span>}
         </span>
-        {phase.status === "running" && <Loader2 aria-label="Running" className="mt-1 size-4 shrink-0 animate-spin text-muted-foreground" />}
-        {phase.status === "error" && <CircleAlert aria-label="Had an error" className="mt-1 size-4 shrink-0 text-[var(--surface-danger-text)]" />}
+        {phase.status && phase.status !== "done" && <RunStatusIcon status={phase.status} className="mt-1" />}
       </button>
       {open && <div id={id} className="mb-2 ml-6 mt-1">{phase.content}</div>}
     </li>
