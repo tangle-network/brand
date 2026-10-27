@@ -6,12 +6,7 @@ import { expect, test } from "playwright/test"
 // shadow is the mode's one shadow colour, so dark mode has no light halo.
 
 const VIEWPORTS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } }
-const STORIES = [
-  "run-rungroup--streaming",
-  "run-rungroup--complete-debugging-run",
-  "run-expandedtooldetail--bash-error",
-  "run-expandedtooldetail--running",
-]
+const STORIES = ["run-rungroup--streaming", "run-rungroup--complete-debugging-run", "run-runphaselist--phases"]
 
 // Screenshots are evidence, not assertions: cap them so a stalled frame never decides the verdict.
 async function shot(page, path) {
@@ -29,7 +24,10 @@ for (const theme of ["dark", "light"]) {
       const seen = new Set()
       for (const id of STORIES) {
         await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`, { waitUntil: "load" })
-        await page.locator("[data-run-status]").first().waitFor({ state: "attached", timeout: 30_000 })
+        await page.locator("[data-run-status]").first().waitFor({ state: "attached", timeout: 30_000 }).catch(async () => {
+          const root = await page.locator("#storybook-root, body").first().innerText().catch(() => "")
+          throw new Error(`${id}: no status glyph; errors ${JSON.stringify(errors)}; page: ${root.slice(0, 400)}`)
+        })
         const facts = await page.evaluate(() => {
           const probe = (value) => {
             const el = document.createElement("i")
