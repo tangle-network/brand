@@ -166,7 +166,7 @@ export function RunRowShell({
               {description ? (
                 <span
                   className={cn(
-                    "hidden min-w-0 flex-1 truncate text-sm text-muted-foreground transition-colors group-hover:text-foreground sm:inline",
+                    "min-w-0 flex-1 truncate text-sm text-muted-foreground transition-colors group-hover:text-foreground",
                     descriptionMono && "font-mono",
                   )}
                 >
