@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Markdown } from './markdown'
 import { CodeBlock, CopyButton } from './code-block'
+import { codePresentation } from '../lib/code-presentation'
 
 // ─── Markdown ────────────────────────────────────────────────────────────────
 
@@ -228,6 +229,14 @@ export const CodeBlockLabelledCopy: Story = {
       <CodeBlock code={`<script src="https://embed.tangle.tools/agent.js" data-agent="support"></script>`} language="html" label="HTML">
         <CopyButton text={`<script src="https://embed.tangle.tools/agent.js" data-agent="support"></script>`} label="Copy embed code" />
       </CodeBlock>
+      {/* A server-rendered host (tangle-router) builds the same header from codePresentation alone. */}
+      <div className={`${codePresentation.root} mt-4`}>
+        <div className={codePresentation.header}>
+          <span>bash</span>
+          <button type="button" className={codePresentation.copy}>Copy</button>
+        </div>
+        <pre className="p-3"><code>export TANGLE_API_KEY="sk-tan-..."</code></pre>
+      </div>
     </div>
   ),
 }

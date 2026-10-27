@@ -142,7 +142,7 @@ export const codePresentation = {
   tabs: `tangle-code-tabs ${tabsPresentation.list.underline}`,
   tab: tabsPresentation.trigger.underline,
   root: "group relative min-w-0 overflow-hidden rounded-lg border font-mono bg-card border-border",
-  header: "flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-1.5 bg-[var(--code-header-bg,hsl(var(--background)))]",
+  header: "flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-1.5 font-sans text-sm bg-[var(--code-header-bg,hsl(var(--background)))]",
   copy: "flex items-center justify-center min-w-8 min-h-8 pointer-coarse:min-w-11 pointer-coarse:min-h-11 rounded-md bg-muted border border-border hover:border-[var(--border-strong)] transition-colors data-[copy-loading=true]:after:content-['…'] data-[copy-loading=true]:gap-1",
   copyStatus: "sr-only data-[copy-long-work=true]:not-sr-only data-[copy-long-work=true]:text-xs data-[copy-long-work=true]:text-muted-foreground",
 };

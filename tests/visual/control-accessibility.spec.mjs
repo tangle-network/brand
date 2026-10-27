@@ -124,6 +124,9 @@ for (const theme of ["light", "dark"]) {
         expect(action, "the action label matches the header label beside it").toEqual(await type(page.getByText("HTML", { exact: true })))
         expect(action.size).toBe("14px")
         expect(action.family, "not the code font").not.toBe(await page.getByRole("region", { name: "HTML code" }).locator("code").evaluate((node) => getComputedStyle(node).fontFamily))
+        // A server-rendered header built from codePresentation alone gets the same type.
+        expect(await type(page.getByText("bash", { exact: true })), "a server-rendered header label").toEqual(action)
+        expect(await type(page.getByRole("button", { name: "Copy", exact: true })), "a server-rendered copy button").toEqual(action)
         await page.screenshot({ path: process.env.SETTINGS_SHOTS_DIR ? `${process.env.SETTINGS_SHOTS_DIR}/code-block-copy-${coarse ? 390 : 1280}-${theme}.png` : testInfo.outputPath("code-block-copy.png") })
         expect(errors).toEqual([])
       })
