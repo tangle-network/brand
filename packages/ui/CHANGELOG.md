@@ -1,5 +1,15 @@
 # @tangle-network/ui
 
+## 11.46.0
+
+### Minor Changes
+
+- 7924be7: SegmentedControl (row): the selected segment is a raised thumb on one quiet well instead of a tint inside an inset ring, the track uses the hairline border token, and the control is 36px tall so it sits inside a 44px toolbar with air above and below.
+
+### Patch Changes
+
+- 9bd1487: RunRowShell shows its description (the file, command or query) at every width, truncated, instead of hiding it below 640px, where a transcript read as a column of bare verbs ("Read", "Read", "Shell").
+
 ## 11.45.0
 
 ### Minor Changes
