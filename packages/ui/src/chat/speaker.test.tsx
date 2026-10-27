@@ -52,6 +52,7 @@ describe("SpeakerHeader", () => {
     expect(screen.getByText("@writer")).toBeInTheDocument()
     expect(screen.getByText("Answering")).toBeInTheDocument()
     expect(container.querySelector("[data-speaker-state]")?.getAttribute("data-speaker-state")).toBe("answering")
+    expect(container.querySelector("[data-run-status]")?.getAttribute("data-run-status")).toBe("running")
   })
 
   it("says nothing more once the responder has ended, even while others answer", () => {
@@ -62,8 +63,9 @@ describe("SpeakerHeader", () => {
   })
 
   it("shows a failed responder as failed while the turn still runs", () => {
-    render(<SpeakerHeader speaker={{ id: "ap_research", name: "Research Lead", state: "failed" }} live />)
+    const { container } = render(<SpeakerHeader speaker={{ id: "ap_research", name: "Research Lead", state: "failed" }} live />)
     expect(screen.getByText("Failed")).toBeInTheDocument()
+    expect(container.querySelector("[data-run-status]")?.getAttribute("data-run-status")).toBe("failed")
     expect(screen.queryByText("Answering")).not.toBeInTheDocument()
   })
 

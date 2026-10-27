@@ -2,7 +2,6 @@ import { TRANSCRIPT_TEXT } from "./transcript-text";
 import { useState, type KeyboardEvent, type ReactNode } from "react";
 import {
   AlertTriangle,
-  CheckCircle2,
   CircleDot,
   FileText,
   Info,
@@ -16,6 +15,7 @@ import { Markdown } from "../markdown/markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
 import { ToolCallGroup, ToolCallStep } from "../run/tool-call-step";
+import { statusMeta } from "../run/status-meta";
 import type { ChatAuthor } from "../types/message";
 import type { ToolPart } from "../types/parts";
 
@@ -132,7 +132,7 @@ const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; suppo
     card: "border-[var(--surface-success-border)] bg-[var(--surface-success-bg)]",
     text: "text-[var(--surface-success-text)]",
     supportingText: "text-[var(--surface-success-text)]",
-    icon: CheckCircle2,
+    icon: statusMeta("done").icon,
   },
   warning: {
     card: "border-[var(--surface-warning-border)] bg-[var(--surface-warning-bg)]",
@@ -144,7 +144,8 @@ const TONE_STYLES: Record<AgentTimelineTone, { card: string; text: string; suppo
     card: "border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)]",
     text: "text-[var(--surface-danger-text)]",
     supportingText: "text-[var(--surface-danger-text)]",
-    icon: AlertTriangle,
+    // Failed is always the failed glyph; the triangle is for warnings.
+    icon: statusMeta("failed").icon,
   },
 };
 

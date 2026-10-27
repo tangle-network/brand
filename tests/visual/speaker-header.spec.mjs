@@ -30,9 +30,16 @@ for (const story of STORIES) {
           const box = await header.boundingBox()
           expect(box.height).toBeLessThanOrEqual(24)
           expect(box.x + box.width).toBeLessThanOrEqual(viewport.width)
-          // A name of ordinary length stays whole; the handle gives way first.
+          // A name of ordinary length stays whole; the handle gives way first. The text's own width is
+          // compared with its box, because scrollWidth rounds away the sub-pixel overflow that still
+          // draws an ellipsis.
           const name = header.locator("span[title]").first()
-          if ((await name.textContent()).length <= 20) expect(await name.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true)
+          const whole = (node) => {
+            const range = document.createRange()
+            range.selectNodeContents(node)
+            return range.getBoundingClientRect().width <= node.getBoundingClientRect().width + 0.01
+          }
+          if ((await name.textContent()).length <= 20) expect(await name.evaluate(whole)).toBe(true)
           const state = await header.getAttribute("data-speaker-state")
           if (state !== "done") {
             const label = header.getByText(state === "failed" ? "Failed" : "Answering", { exact: true })

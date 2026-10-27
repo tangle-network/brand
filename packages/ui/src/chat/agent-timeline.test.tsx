@@ -307,3 +307,12 @@ describe("transcript type scale", () => {
     expect(textClasses(agent)).toEqual(textClasses(user))
   })
 })
+
+describe("AgentTimeline status cards", () => {
+  it("marks a failed card with the failed glyph and keeps the triangle for warnings", () => {
+    const glyph = (tone: "error" | "warning") =>
+      render(<AgentTimeline items={[{ id: tone, kind: "status", label: tone, tone }]} />).container.querySelector("svg")?.getAttribute("class")
+    expect(glyph("error")).toContain("lucide-circle-x")
+    expect(glyph("warning")).toContain("lucide-triangle-alert")
+  })
+})
