@@ -646,3 +646,39 @@ describe("shadow, radius and loop period are one role each", () => {
     expect(breathe, "a loop never moves or scales").not.toMatch(/transform|translate|scale|rotate/);
   });
 });
+
+describe("data-accent scopes retint the accent and nothing else", () => {
+  // Palette plan item 6: a product sets data-accent="<category>" on <html> or a
+  // theme boundary. Each hue's roles are generated (gen-ladders.mjs) into the
+  // tone regions, which the ratchet above already counts as generated tones.
+  const themes = readFileSync(path.resolve(import.meta.dirname, "named-themes.css"), "utf8");
+  const region = themes.match(/\/\* accent-scopes:begin[\s\S]*?accent-scopes:end \*\//)?.[0] ?? "";
+  const hues = [...region.matchAll(/^\[data-accent="([a-z]+)"\],$/gm)].map((m) => m[1]);
+
+  it("scopes every categorical hue", () => {
+    expect(hues).toEqual(["violet", "orange", "teal", "blue", "pink", "brown", "cyan", "lime"]);
+  });
+
+  for (const [theme, spine] of [
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const) {
+    it.each(hues)(`${theme} %s: the accent ink clears 4.5:1 on the page and the card`, (hue) => {
+      for (const plane of ["md3-surface", "md3-surface-container"]) {
+        expect(contrastRatio(hexIn(spine, `tone-${hue}-ink`), hexIn(spine, plane)), plane).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+  }
+
+  it("maps the five roles to the hue and re-declares no plane, body ink or status", () => {
+    for (const hue of hues) {
+      const rule = blockIn(region, `[data-accent="${hue}"] :is(.light, .dark, [data-theme], [data-sandbox-ui], [data-sandbox-theme])`);
+      expect([...rule.matchAll(/--([a-z-]+): var\(--tone-([a-z]+)-([a-z]+)\);/g)].map((m) => `${m[1]}=${m[2]}-${m[3]}`)).toEqual([
+        `hsl-primary=${hue}-fill`, `hsl-ring=${hue}-ring`, `brand-primary=${hue}-mark`, `brand-cool=${hue}-line`, `accent-text=${hue}-ink`,
+      ]);
+    }
+    const declared = [...region.matchAll(/--([a-z0-9-]+):/g)].map((m) => m[1]);
+    const untouchable = /^(hsl-(background|card|popover|secondary|muted|accent|border|input|foreground|muted-foreground|success|warning|destructive|info)|text-|md3-(surface($|-(container|dim|bright|variant))|on-surface|outline)|depth-|bg-(root|card|elevated|dark|section|input)|surface-|status-(running|stopped|warm|cold|error|deleted))/;
+    expect(declared.filter((t) => untouchable.test(t))).toEqual([]);
+  });
+});

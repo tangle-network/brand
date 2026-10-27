@@ -5,9 +5,9 @@
 //
 // out-dir must hold the tokens.css whose tone regions are rewritten.
 //
-// It also writes the categorical tone family into the two marked regions of
-// tokens.css (plus their data-tone scopes) and the agents named theme into
-// named-themes.css, so every consumer of the canonical stylesheet (and the
+// It also writes the categorical tone family and each hue's accent roles into
+// the two marked regions of tokens.css (plus their data-tone scopes), and the
+// agents named theme and the data-accent scopes into named-themes.css, so every consumer of the canonical stylesheet (and the
 // legacy-light projection generated from it) carries the same values. --check
 // writes nothing and fails when any of the four outputs is stale.
 //
@@ -18,7 +18,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { block, decls, resolveHex } from './css-resolve.mjs'
+import { block, decls, hslHex, resolveHex } from './css-resolve.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -498,6 +498,66 @@ for (const theme of ['dark', 'light']) {
   }
 }
 
+// ── accent scopes (tokens.css tone regions + named-themes.css) ─────────────
+// data-accent="<category>" on <html> or any theme boundary retints the
+// interaction accent to that category's hue: the four indigo roles of the spine
+// (fill, mark, line, ink) and the ring. Planes, body ink and status never move.
+// Each hue's roles are solved per mode against the canonical planes and written
+// into the tone regions as --tone-<hue>-{fill,ring,mark,line,ink}.
+//   fill  carries white at 4.5:1, also at its 10% lighter hover; one value in both modes, as the indigo is
+//   ink   step 11 toward 12 until 4.5:1 on the page, the card and every selected tint (accent-on-tint.test.ts)
+//   line  the first step from 9 with 3:1 on the page and the card
+//   mark  step 9, the brand fill of a logo or a hero; never under text
+//   ring  the ink in dark and the fill in light, as the spine's ring is; 3:1 on the card at the focus border's 80%
+const WHITE = '#ffffff'
+// The solver works in rounded hex and the tests composite in floats; aiming a
+// hair above the 4.5:1 floor keeps a solved pair from rounding under it.
+const AA = 4.55
+const PLANE = (name) => ({ dark: resolveHex(DARK_SPINE, name), light: resolveHex(LIGHT_SPINE, name, DARK_SPINE) })
+const PAGE = PLANE('md3-surface')
+const MUTED = PLANE('hsl-muted')
+const INVERSE = PLANE('md3-inverse-surface')
+const channel = (hex) => hsl(hex)
+const rounded = (hex) => hslHex(...channel(hex).split(' ').map(parseFloat))
+const toward = (from, to, ok) => {
+  for (let t = 0; t <= 1.0001; t += 0.01) {
+    const c = rounded(mix(to, from, t))
+    if (ok(c)) return c
+  }
+  return null
+}
+const solveAccent = (name, ramp) => {
+  const at = (theme, step) => R[ramp][theme][step - 1]
+  const carriesWhite = (c) => contrast(WHITE, c) >= AA && contrast(WHITE, mix(WHITE, c, 0.1)) >= AA
+  const fill = [9, 10, 11].map((s) => rounded(at('light', s))).find(carriesWhite) ?? toward(at('light', 11), at('light', 12), carriesWhite)
+  if (!fill) throw new Error(`accent ${name}: no fill carries white at 4.5:1`)
+  const out = {}
+  for (const theme of ['dark', 'light']) {
+    const planes = [PAGE[theme], CARD[theme]]
+    const tints = [PAGE, CARD, MUTED].flatMap((p) => [0.1, 0.15, 0.2].map((a) => mix(fill, p[theme], a)))
+    const ink = toward(at(theme, 11), at(theme, 12), (c) => [...planes, ...tints].every((p) => contrast(c, p) >= AA))
+    const line = [9, 10, 11, 12].map((s) => at(theme, s)).find((c) => planes.every((p) => contrast(c, p) >= 3))
+    if (!ink || !line) throw new Error(`accent ${name} ${theme}: no ${ink ? 'line' : 'ink'} clears its floor`)
+    const ring = theme === 'dark' ? ink : fill
+    if (contrast(mix(ring, CARD[theme], 0.8), CARD[theme]) < 3) throw new Error(`accent ${name} ${theme}: focus border under 3:1`)
+    out[theme] = { fill: channel(fill), ring: channel(ring), mark: at(theme, 9), line, ink }
+  }
+  // The derived inks in ACCENT_DERIVED keep the pairs the spine documents.
+  const pairs = [
+    ['softened ink on the deep field', mix(WHITE, out.dark.ink, 0.35), mix('#000000', fill, 0.5), 4.5],
+    ['ink on the light tint', out.light.ink, mix(out.light.ink, WHITE, 0.12), 4.5],
+    ['inverse ink on the inverse surface', mix(WHITE, out.light.mark, 0.4), INVERSE.light, 4.5],
+  ]
+  for (const [pair, a, b, floor] of pairs) {
+    if (contrast(a, b) < floor) throw new Error(`accent ${name}: ${pair} is ${contrast(a, b).toFixed(2)}:1`)
+  }
+  return out
+}
+const ACCENT_SOLVED = Object.fromEntries(Object.entries(CATEGORY).map(([name, ramp]) => [name, solveAccent(name, ramp)]))
+const ACCENTS = Object.fromEntries(
+  ['dark', 'light'].map((theme) => [theme, Object.fromEntries(Object.entries(ACCENT_SOLVED).map(([n, a]) => [n, a[theme]]))]),
+)
+
 const toneRegion = (theme) => {
   const lines = ['  /* tones:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */']
   for (const [name, roles] of Object.entries(TONES[theme])) {
@@ -514,6 +574,9 @@ const toneRegion = (theme) => {
     let text = ramp[10]
     for (let t = 0.01; contrast(text, tone.bg) < 4.5; t += 0.01) text = mix(ramp[11], ramp[10], t)
     lines.push(`  --surface-${name}-bg: ${tone.bg};`, `  --surface-${name}-border: ${tone.border};`, `  --surface-${name}-text: ${text};`)
+  }
+  for (const [name, roles] of Object.entries(ACCENTS[theme])) {
+    for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value};`)
   }
   lines.push('  /* tones:end */')
   return lines.join('\n')
@@ -585,7 +648,105 @@ ${agentsBlock('light')}
 /* agents:end */`
 const AGENTS = /\/\* agents:begin[^\n]*\n(?:.*\n)*?\/\* agents:end \*\//m
 if (!AGENTS.test(namedSource)) throw new Error('named-themes.css: the agents region is missing')
-const named = namedSource.replace(AGENTS, agentsRegion)
+
+// ── accent scope rules (named-themes.css) ──────────────────────────────────
+// A scope maps the five roles to its hue. One shared rule re-declares every
+// token the spine derives from them, because a var() resolves where it is
+// declared; the set and each derivation are read from the spine's own cascade
+// for .dark and .light, so the rule follows any retune. A derivation that
+// differs by mode becomes light-dark(), which reads the color-scheme every mode
+// boundary sets. The region is the stylesheet's last, so a scope wins over the
+// named theme it sits on or in.
+const ACCENT_ROLES = { 'hsl-primary': 'fill', 'hsl-ring': 'ring', 'brand-primary': 'mark', 'brand-cool': 'line', 'accent-text': 'ink' }
+// Indigo literals that are not roles, and the fill's white pair: under an
+// accent they derive from the hue's roles. solveAccent holds their pairs.
+const ACCENT_DERIVED = {
+  'btn-primary-hover': 'color-mix(in srgb, hsl(var(--hsl-primary)), white 10%)',
+  'brand-purple': 'color-mix(in srgb, var(--accent-text), white 35%)',
+  'brand-strong': 'color-mix(in srgb, hsl(var(--hsl-primary)), black 50%)',
+  'md3-primary-fixed': 'color-mix(in srgb, var(--accent-text) 12%, white)',
+  'md3-inverse-primary': 'color-mix(in srgb, var(--brand-primary), white 40%)',
+  'hsl-primary-foreground': '0 0% 100%',
+  'btn-primary-text': WHITE,
+  'md3-on-primary': WHITE,
+}
+/** Split on the commas outside parentheses: a selector list or a function's arguments. */
+const splitTop = (text) => {
+  const parts = []
+  let depth = 0
+  let start = 0
+  for (let k = 0; k < text.length; k++) {
+    if (text[k] === '(') depth++
+    else if (text[k] === ')') depth--
+    else if (text[k] === ',' && !depth) parts.push(text.slice(start, k).trim()), (start = k + 1)
+  }
+  return [...parts, text.slice(start).trim()]
+}
+/** A stylesheet's top-level rules as [selector list, body]; at-rules are skipped. */
+const topRules = (css) => {
+  const src = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const rules = []
+  for (let i = 0, open; (open = src.indexOf('{', i)) >= 0; ) {
+    let j = open + 1
+    for (let depth = 1; depth; j++) depth += src[j] === '{' ? 1 : src[j] === '}' ? -1 : 0
+    const head = src.slice(i, open).trim()
+    if (!head.startsWith('@')) rules.push([splitTop(head), src.slice(open + 1, j - 1)])
+    i = j
+  }
+  return rules
+}
+const SPINE_RULES = [...topRules(tokensSource), topRules(namedSource)[0]]
+const MODE = Object.fromEntries(
+  ['dark', 'light'].map((m) => [m, Object.assign({}, ...SPINE_RULES.filter(([sel]) => sel.includes(`.${m}`)).map(([, body]) => decls(body)))]),
+)
+const seeded = new Set([...Object.keys(ACCENT_ROLES), ...Object.keys(ACCENT_DERIVED)])
+const follows = []
+for (let grew = true; grew; ) {
+  grew = false
+  for (const [token, value] of Object.entries({ ...MODE.light, ...MODE.dark })) {
+    const refs = [...`${MODE.dark[token] ?? ''} ${MODE.light[token] ?? ''}`.matchAll(/var\(--([a-z0-9-]+)\)/g)].map((m) => m[1])
+    if (!seeded.has(token) && refs.some((r) => seeded.has(r))) seeded.add(token), follows.push(token), (grew = true)
+  }
+}
+const exprIn = (mode, token) => {
+  const value = MODE[mode][token] ?? MODE.dark[token]
+  return token in ACCENT_DERIVED && !value.includes('var(') ? ACCENT_DERIVED[token] : value
+}
+const gradientIn = (mode, value) => {
+  const ref = value.match(/^var\(--([a-z0-9-]+)\)$/)
+  return ref && /gradient\(/.test(exprIn(mode, ref[1])) ? gradientIn(mode, exprIn(mode, ref[1])) : value
+}
+const byMode = (light, dark) => {
+  if (light === dark) return light
+  const [l, d] = [gradientIn('light', light), gradientIn('dark', dark)].map((v) => v.match(/^linear-gradient\((.*)\)$/s))
+  if (l && d) {
+    const [ls, ds] = [splitTop(l[1]), splitTop(d[1])]
+    if (ls.length === ds.length && ls[0] === ds[0]) return `linear-gradient(${ls.map((stop, i) => byMode(stop, ds[i])).join(', ')})`
+  }
+  if (/gradient|%\s*$/.test(`${light}\n${dark}`)) throw new Error(`accent: no per-mode form for ${light} / ${dark}`)
+  return `light-dark(${light}, ${dark})`
+}
+const ACCENT_NAMES = Object.keys(CATEGORY)
+const accentScope = (sel) => `${sel},\n${sel}:is(${MODE_BOUNDARY.slice(4)},\n${sel} ${MODE_BOUNDARY}`
+const accentRegion = [
+  `/* accent-scopes:begin — generated by scripts/gen-ladders.mjs from its CATEGORY map and the spine; edit there, not these lines.
+ * data-accent="<category>" on <html> or any theme boundary retints the
+ * interaction accent: the five roles take the hue's --tone-<hue>-* values and
+ * the shared rule re-declares what derives from them. Planes, body ink and
+ * status stay the theme's. Last in the stylesheet, so a scope wins over the
+ * named theme it sits on or in. */`,
+  ...ACCENT_NAMES.map(
+    (name) =>
+      `${accentScope(`[data-accent="${name}"]`)} {\n${Object.entries(ACCENT_ROLES).map(([t, role]) => `  --${t}: var(--tone-${name}-${role});`).join('\n')}\n}`,
+  ),
+  `${accentScope(`:is(${ACCENT_NAMES.map((n) => `[data-accent="${n}"]`).join(', ')})`)} {\n${[...Object.keys(ACCENT_DERIVED), ...follows]
+    .map((t) => `  --${t}: ${byMode(exprIn('light', t), exprIn('dark', t))};`)
+    .join('\n')}\n}`,
+  '/* accent-scopes:end */',
+].join('\n')
+const ACCENT_REGION = /\/\* accent-scopes:begin[\s\S]*?\/\* accent-scopes:end \*\//m
+if (!ACCENT_REGION.test(namedSource)) throw new Error('named-themes.css: the accent-scopes region is missing')
+const named = namedSource.replace(AGENTS, agentsRegion).replace(ACCENT_REGION, accentRegion)
 
 const outputs = [
   ['ladders.css', ladders],
@@ -603,5 +764,5 @@ if (CHECK) {
 } else {
   fs.mkdirSync(OUT, { recursive: true })
   for (const [file, text] of outputs) fs.writeFileSync(path.join(OUT, file), text)
-  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and the agents theme in named-themes.css to ${OUT}`)
+  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and the agents theme and ${ACCENT_NAMES.length} accent scopes (${follows.length} derived tokens) in named-themes.css to ${OUT}`)
 }

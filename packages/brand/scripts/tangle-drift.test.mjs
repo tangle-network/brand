@@ -200,6 +200,7 @@ test("settings_layout counts settings pages that do not compose settings-react, 
   mkdirSync(dir);
   git(dir, "init", "-q", "-b", "main");
   const shared = 'import { SettingsLayout } from "@tangle-network/agent-app/settings-react";\n';
+  const bound = 'import { bindSettingsNav } from "@tangle-network/ui/presentation";\n';
   write(dir, {
     "src/routes/app.workspace.settings.tsx": shared, // composes, so its section routes are covered
     "src/routes/app.workspace.settings.team.tsx": "export default function Team() {}\n",
@@ -248,8 +249,9 @@ test("settings_layout counts settings pages that do not compose settings-react, 
   assert.match(planted.out, /FAIL settings_layout: 6 > baseline 5/);
   assert.match(planted.out, /src\/routes\/app\.billing-settings\.tsx:1: imports nothing from @tangle-network\/agent-app\/settings-react/);
 
-  write(dir, { "src/routes/app.billing-settings.tsx": shared, "src/routes/app.workspace.settings_.export.tsx": shared });
-  commit(dir, "compose both from settings-react");
+  // A server-rendered host composes the same frame by binding it.
+  write(dir, { "src/routes/app.billing-settings.tsx": shared, "src/routes/app.workspace.settings_.export.tsx": bound });
+  commit(dir, "compose one from settings-react and bind the other");
   const adopted = run();
   assert.equal(adopted.code, 0);
   assert.match(adopted.out, /lower than baseline: settings_layout 5 -> 4/);
