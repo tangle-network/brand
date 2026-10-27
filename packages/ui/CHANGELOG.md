@@ -1,5 +1,12 @@
 # @tangle-network/ui
 
+## 11.50.1
+
+### Patch Changes
+
+- 22512f2: `SpeakerHeader` keeps the responder's name whole on a narrow row: the `@handle` truncates first.
+- d9ad4c2: `SpeakerHeader` draws its Answering and Failed glyphs with `RunStatusIcon`, and an `AgentTimeline` status card with tone `error` shows the failed glyph (`statusMeta("failed")`, CircleX) instead of the warning triangle. On a narrow row a speaker's handle now takes only the space its name and state leave, so the name never shows an ellipsis while the handle can still give way.
+
 ## 11.50.0
 
 ### Minor Changes
