@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from "react";
-import { StatusPill } from "../primitives/status-pill";
+import { RunStatusIcon } from "../run/status-meta";
 import { MessageAuthor } from "./message-author";
 
 /** Where one responder is in its answer. */
@@ -79,9 +79,9 @@ export interface SpeakerHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>,
  * gets, then the handle a person types to address the agent, then its state.
  *
  * The state comes from the speaker's own end state, else from `live`. An
- * answering responder shows the status grammar's open ring with the word, a
- * failed one its cross with the word, and a finished one nothing, as a settled
- * run row does. `data-speaker-state` carries all three.
+ * answering responder shows the running glyph with the word, a failed one the
+ * failed glyph with the word, both from `RunStatusIcon`, and a finished one
+ * nothing, as a settled run row does. `data-speaker-state` carries all three.
  */
 export function SpeakerHeader({ speaker, live = false, ...props }: SpeakerHeaderProps) {
   const state: SpeakerState = speaker.state ?? (live ? "answering" : "done");
@@ -92,20 +92,18 @@ export function SpeakerHeader({ speaker, live = false, ...props }: SpeakerHeader
       {...props}
     >
       {speaker.handle ? (
-        // A person reads the name first: on a narrow row the handle gives way before the name does.
-        <span className="min-w-0 shrink-[100] truncate text-muted-foreground text-sm" title={`@${speaker.handle}`}>
+        // A person reads the name first. The handle has no base width and grows only into the space
+        // the name and state leave, up to its own width, so it gives way before the name loses a pixel.
+        <span className="min-w-0 max-w-fit flex-1 truncate text-muted-foreground text-sm" title={`@${speaker.handle}`}>
           @{speaker.handle}
         </span>
       ) : null}
-      {state === "answering" ? (
-        <StatusPill tone="running" bare size="md" className="shrink-0 py-0">
-          Answering
-        </StatusPill>
-      ) : state === "failed" ? (
-        <StatusPill tone="danger" bare size="md" className="shrink-0 py-0">
-          Failed
-        </StatusPill>
-      ) : null}
+      {state === "done" ? null : (
+        <span className="inline-flex shrink-0 items-center gap-1.5 font-medium text-sm">
+          <RunStatusIcon status={state === "failed" ? "failed" : "running"} aria-hidden />
+          {state === "failed" ? "Failed" : "Answering"}
+        </span>
+      )}
     </MessageAuthor>
   );
 }
