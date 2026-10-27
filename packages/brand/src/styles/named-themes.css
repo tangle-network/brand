@@ -393,7 +393,6 @@
   --border-hover: rgba(23, 38, 29, 0.28); --border-strong: #798479;
   --field-border: #798479;
   --border-accent: rgba(40, 88, 66, 0.20); --border-accent-hover: rgba(40, 88, 66, 0.36);
-  --shadow-color: 144 25% 12%;  /* #17261d, the forest ink */
   --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.07), 0 4px 14px -4px hsl(var(--shadow-color) / 0.1);
   --shadow-raised: 0 1px 1px hsl(var(--shadow-color) / 0.05), 0 2px 6px -2px hsl(var(--shadow-color) / 0.07);
   --shadow-well: inset 0 1px 2px hsl(var(--shadow-color) / 0.06);
