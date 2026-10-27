@@ -6,12 +6,7 @@ import { expect, test } from "playwright/test"
 // shadow is the mode's one shadow colour, so dark mode has no light halo.
 
 const VIEWPORTS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } }
-const STORIES = [
-  "run-rungroup--streaming",
-  "run-rungroup--complete-debugging-run",
-  "run-expandedtooldetail--bash-error",
-  "run-expandedtooldetail--running",
-]
+const STORIES = ["run-rungroup--streaming", "run-rungroup--complete-debugging-run", "run-runphaselist--phases"]
 
 // Screenshots are evidence, not assertions: cap them so a stalled frame never decides the verdict.
 async function shot(page, path) {
