@@ -302,8 +302,8 @@ function NotesAndTonesExample() {
       <SettingsSection id="webhooks" title="Webhooks" description="Signed POSTs when traces, evals or budgets change.">
         <SettingsNote>
           <MetricStrip columns={2} aria-label="Last 7 days">
-            <Metric label="Deliveries" value="1,284" hint="Last 7 days" />
-            <Metric label="Failed" value="3" hint="Each retried 5 times" />
+            <Metric label="Deliveries" value="1,284" />
+            <Metric label="Failed" value="3" />
           </MetricStrip>
         </SettingsNote>
         <SettingsList aria-label="Webhook endpoints" columns={{ status: "7rem", action: "8rem", menu: "36px" }}>
