@@ -92,7 +92,8 @@ export function SpeakerHeader({ speaker, live = false, ...props }: SpeakerHeader
       {...props}
     >
       {speaker.handle ? (
-        <span className="min-w-0 truncate text-muted-foreground text-sm" title={`@${speaker.handle}`}>
+        // A person reads the name first: on a narrow row the handle gives way before the name does.
+        <span className="min-w-0 shrink-[100] truncate text-muted-foreground text-sm" title={`@${speaker.handle}`}>
           @{speaker.handle}
         </span>
       ) : null}

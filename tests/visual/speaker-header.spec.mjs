@@ -4,10 +4,11 @@ import { expect, test } from "playwright/test"
 
 // Speaker headers in a real browser, at desktop and phone width in both
 // themes: every header stays on one line, a long name and handle truncate
-// while the state stays whole, and nothing scrolls the page sideways.
+// while the state stays whole, an ordinary name never truncates before its
+// handle does, and nothing scrolls the page sideways.
 // Screenshots go to SPEAKER_SHOTS_DIR when it is set.
 
-const VIEWPORTS = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 } }
+const VIEWPORTS = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 }, small: { width: 360, height: 740 } }
 const STORIES = ["answering-at-once", "stored-with-failure", "long-names"]
 
 for (const story of STORIES) {
@@ -29,6 +30,9 @@ for (const story of STORIES) {
           const box = await header.boundingBox()
           expect(box.height).toBeLessThanOrEqual(24)
           expect(box.x + box.width).toBeLessThanOrEqual(viewport.width)
+          // A name of ordinary length stays whole; the handle gives way first.
+          const name = header.locator("span[title]").first()
+          if ((await name.textContent()).length <= 20) expect(await name.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true)
           const state = await header.getAttribute("data-speaker-state")
           if (state !== "done") {
             const label = header.getByText(state === "failed" ? "Failed" : "Answering", { exact: true })
