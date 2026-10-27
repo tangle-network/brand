@@ -15,20 +15,21 @@ export function isViewerMessage(author: ChatAuthor | undefined, viewerId: string
   return author === undefined || author.id === viewerId;
 }
 
-export interface MessageAuthorProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+export interface MessageAuthorProps extends HTMLAttributes<HTMLDivElement> {
   author: ChatAuthor;
 }
 
 /**
  * The line above a message in a transcript with several participants: the
- * author's avatar, name and, when given, their role as a tag.
+ * author's avatar, name and, when given, their role as a tag. Children follow
+ * on the same line, such as a responder's handle and state.
  *
  * The avatar's tone comes from the author's id, so a participant keeps one
  * colour for the whole thread and in every product. Tones can repeat between
  * participants, so the name is always shown beside it. The avatar repeats the
  * visible name and is hidden from assistive technology.
  */
-export function MessageAuthor({ author, className, ...props }: MessageAuthorProps) {
+export function MessageAuthor({ author, className, children, ...props }: MessageAuthorProps) {
   return (
     <div data-message-author="" className={cn("flex min-w-0 max-w-full items-center gap-2", className)} {...props}>
       <IconTile
@@ -47,6 +48,7 @@ export function MessageAuthor({ author, className, ...props }: MessageAuthorProp
           {author.role}
         </Tag>
       ) : null}
+      {children}
     </div>
   );
 }
