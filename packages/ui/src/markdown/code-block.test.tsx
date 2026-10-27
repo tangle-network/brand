@@ -188,12 +188,6 @@ describe("CodeBlock", () => {
     expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
   });
 
-  it("renders the header label at the 14px text-sm step", () => {
-    const { getByText } = render(<CodeBlock code={"x"} label="YAML" />);
-    expect(getByText("YAML").className).toContain("text-sm");
-    expect(getByText("YAML").className).not.toContain("calc(");
-  });
-
   it("announces a failed copy", async () => {
     const writeText = vi.fn().mockRejectedValue(new Error("denied"));
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });

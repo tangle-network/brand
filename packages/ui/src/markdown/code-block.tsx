@@ -83,13 +83,13 @@ export const CodeBlock = memo(
           <div className={codePresentation.header}>
             {metadata && <span className="tangle-api-meta">{apiMetadataText(metadata)}</span>}
             {filename ? (
-              <span className="flex min-w-0 items-center gap-2 font-sans text-sm">
+              <span className="flex min-w-0 items-center gap-2">
                 <FileCode2 aria-hidden className="size-4 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 truncate font-mono font-medium text-foreground" title={filename}>{filename}</span>
                 {languageName && <span className="shrink-0 text-muted-foreground">{languageName}</span>}
               </span>
             ) : (
-              <span className="font-sans text-sm font-medium text-muted-foreground">{headerLabel}</span>
+              <span className="font-medium text-muted-foreground">{headerLabel}</span>
             )}
             {children}
             {examples?.length ? <CopyButton text={code}/> : null}
