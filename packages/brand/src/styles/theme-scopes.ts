@@ -80,6 +80,14 @@ export const scopes: Array<{ name: string; sources: string[] }> = [
     sources: [named('[data-theme="website"]:where(:not(.dark))'), LIGHT, DARK],
   },
   { name: "website dark", sources: [named('.dark[data-theme="website"]'), DARK] },
+  // Every data-accent scope on each canonical mode: its role rule, then the spine.
+  ...[...themes.matchAll(/^\[data-accent="([a-z]+)"\],$/gm)].flatMap(([, hue]) => {
+    const rule = blockIn(themes, `[data-accent="${hue}"] :is(.light, .dark, [data-theme], [data-sandbox-ui], [data-sandbox-theme])`);
+    return [
+      { name: `accent ${hue} on dark`, sources: [rule, DARK] },
+      { name: `accent ${hue} on light`, sources: [rule, LIGHT, DARK] },
+    ];
+  }),
 ];
 
 export type Rgb = [number, number, number];

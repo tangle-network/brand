@@ -143,11 +143,12 @@ export const RULE_PATTERNS = {
  */
 export const PAGE_PATTERNS = {
   // A settings page drawn locally. agent-app's settings-react owns the settings composition: the
-  // section nav, frame, rows and save behaviour.
+  // section nav, frame, rows and save behaviour. A server-rendered host binds the same frame with
+  // ui's bindSettingsNav.
   settings_layout: {
     name: "settings",
-    composes: String.raw`(?:\bfrom|\bimport)\s*\(?\s*["']@tangle-network/agent-app/settings-react(?:/[^"']*)?["']`,
-    reason: "imports nothing from @tangle-network/agent-app/settings-react",
+    composes: String.raw`(?:\bfrom|\bimport)\s*\(?\s*["']@tangle-network/agent-app/settings-react(?:/[^"']*)?["']|\bimport\s*\{[^}]*\bbindSettingsNav\b[^}]*\}\s*from\s*["']@tangle-network/ui/presentation["']`,
+    reason: "imports nothing from @tangle-network/agent-app/settings-react, nor bindSettingsNav from @tangle-network/ui/presentation",
   },
 };
 const PAGE_DIR = /(?:^|\/)(?:routes|pages|views)\//i;
