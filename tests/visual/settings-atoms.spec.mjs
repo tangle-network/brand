@@ -85,8 +85,8 @@ const layout = (locator) => locator.evaluate((root) => {
   for (const [index, c] of chars.entries()) {
     if (c.top === null) continue
     if (previous && c.top > previous.top + 2) {
-      // A break may follow a space, a slash, `@` or a comma, or come before . - _ ? # & =.
-      const clean = /\s/.test(previous.ch) || /\s/.test(c.ch) || /[/@,]/.test(previous.ch) || /[.\-_?#&=]/.test(c.ch)
+      // A break may follow a space, a slash, `@`, a comma or a hyphen, or come before . - _ ? # & =.
+      const clean = /\s/.test(previous.ch) || /\s/.test(c.ch) || /[/@,-]/.test(previous.ch) || /[.\-_?#&=]/.test(c.ch)
       if (!clean) midWord.push(`${chars.slice(Math.max(0, index - 8), index).map((x) => x.ch).join("")}|${chars.slice(index, index + 8).map((x) => x.ch).join("")}`)
     }
     previous = c
