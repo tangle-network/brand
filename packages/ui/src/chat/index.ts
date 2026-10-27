@@ -7,7 +7,12 @@ export type { ChatAuthor } from "../types/message";
 export { ThinkingIndicator, type ThinkingIndicatorProps } from "./thinking-indicator";
 export {
   AgentTimeline,
+  AgentTimelineColumn,
+  AgentTimelineStep,
+  agentTimelineStepKind,
   type AgentTimelineProps,
+  type AgentTimelineStepProps,
+  type AgentTimelineStepKind,
   type AgentTimelineItem,
   type AgentTimelineMessageItem,
   type AgentTimelineToolItem,

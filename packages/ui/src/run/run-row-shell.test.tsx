@@ -40,7 +40,7 @@ describe("RunRowShell", () => {
     expect(container.querySelector("[data-run-row-status]")).toBeNull();
   });
 
-  it("renders the red dot and the collapsed error on error", () => {
+  it("marks a failure on the row's own glyph, with the collapsed error under it", () => {
     const { container } = renderShell("error", {
       collapsedError: "exit code 1",
     });
