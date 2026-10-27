@@ -38,6 +38,16 @@ export const SandboxWithValue: Story = {
   ),
 }
 
+export const Tones: Story = {
+  render: () => (
+    <div className="flex w-80 flex-col gap-4">
+      {(['neutral', 'success', 'warning', 'danger'] as const).map((tone) => (
+        <Progress key={tone} value={tone === 'danger' ? 100 : 70} tone={tone} aria-label={`${tone} reading`} />
+      ))}
+    </div>
+  ),
+}
+
 export const Empty: Story = {
   render: () => <Progress value={0} className="w-80" />,
 }

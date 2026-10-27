@@ -1,17 +1,20 @@
 import { Bell, Bot, Check, CreditCard, Inbox, Loader2, Settings, Users, Workflow } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Avatar, AvatarFallback } from "./avatar";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Field, fieldMessageId } from "./field";
 import { Input, Textarea } from "./input";
+import { Metric, MetricStrip } from "./metric-strip";
 import { PageHeader } from "./page-header";
 import { PageShell } from "./page-shell";
 import { SegmentedControl } from "./segmented-control";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
-import { SettingsList, SettingsListItem, SettingsRow, SettingsSection } from "./settings";
+import { SettingsList, SettingsListItem, SettingsNote, SettingsRow, SettingsSection } from "./settings";
+import type { StatusTone } from "./status-pill";
 import { Switch } from "./switch";
+import { bindSettingsNav } from "../presentation";
 
 /** Example data only: no routing, persistence or fetching. Every state is drawn at once so one screenshot shows them all. */
 
@@ -34,6 +37,8 @@ function Saved() {
 }
 
 interface Automation { name: string; meta: string; state: string; verb: string; ownerOnly?: boolean; error?: string }
+
+const AUTOMATION_TONE: Record<string, StatusTone> = { Active: "success", Paused: "neutral", "Couldn't start": "danger" };
 
 const automations: Automation[] = [
   { name: "Weekly competitor scan", meta: "Mondays at 09:00", state: "Active", verb: "Pause" },
@@ -152,7 +157,8 @@ function SettingsPage({ sectionsLoadLater = false, withoutNavigation = false, cl
                 key={job.name}
                 title={<a href={`#${job.name}`}>{job.name}</a>}
                 meta={job.meta}
-                status={job.error ? <span className="font-medium text-[var(--surface-danger-text)]">{job.state}</span> : job.state}
+                status={job.state}
+                tone={AUTOMATION_TONE[job.state]}
                 error={job.error}
                 action={{
                   label: job.verb,
@@ -277,6 +283,85 @@ function SettingsValuesExample() {
   );
 }
 
+const webhooks: Array<{ url: string; events: string[]; state: string; tone: StatusTone }> = [
+  { url: "https://hooks.fieldnote-analytics.example/intelligence/v1/trace-events", events: ["trace.completed", "eval.regressed", "budget.exceeded"], state: "Active", tone: "success" },
+  { url: "https://ops.fieldnote.example/alerts/webhooks/intelligence_regressions", events: ["eval.regressed"], state: "Inactive", tone: "neutral" },
+  { url: "https://n8n.fieldnote.example/webhook/7f3c2a91-5d4e-4b8a-9c61-2e0f8d7a4b13", events: ["budget.exceeded", "alert.triggered"], state: "Failing", tone: "danger" },
+];
+
+const alertRules: Array<{ name: string; rule: string; severity: string; tone: StatusTone }> = [
+  { name: "Error rate", rule: "Above 5% for 10 minutes", severity: "Critical", tone: "danger" },
+  { name: "p95 latency", rule: "Above 4 s for 15 minutes", severity: "Warning", tone: "warning" },
+  { name: "Daily spend", rule: "Above $40 in a day", severity: "Notice", tone: "neutral" },
+];
+
+/** Notes (figure, empty, loading, notice, refusal), toned list states, and long URLs and event names in narrow columns. */
+function NotesAndTonesExample() {
+  return (
+    <div className="mx-auto max-w-3xl space-y-6 p-6 max-sm:p-4">
+      <SettingsSection id="webhooks" title="Webhooks" description="Signed POSTs when traces, evals or budgets change.">
+        <SettingsNote>
+          <MetricStrip columns={2} aria-label="Last 7 days">
+            <Metric label="Deliveries" value="1,284" hint="Last 7 days" />
+            <Metric label="Failed" value="3" hint="Each retried 5 times" />
+          </MetricStrip>
+        </SettingsNote>
+        <SettingsList aria-label="Webhook endpoints" columns={{ status: "7rem", action: "8rem", menu: "36px" }}>
+          {webhooks.map((hook) => (
+            <SettingsListItem
+              key={hook.url}
+              title={<a href={`#${hook.state}`}>{hook.url}</a>}
+              meta={hook.events.join(", ")}
+              status={hook.state}
+              tone={hook.tone}
+              action={{ label: "Send test", onSelect: () => undefined }}
+              menu={[{ label: "Delete…", tone: "danger", onSelect: () => undefined }]}
+            />
+          ))}
+        </SettingsList>
+        <SettingsNote tone="warning" role="status">One endpoint failed its last three deliveries. It pauses after five.</SettingsNote>
+      </SettingsSection>
+      <SettingsSection id="alert-rules" title="Alert rules">
+        <SettingsList aria-label="Alert rules" columns={{ status: "7rem", menu: "36px" }}>
+          {alertRules.map((rule) => (
+            <SettingsListItem key={rule.name} title={rule.name} meta={rule.rule} status={rule.severity} tone={rule.tone} menu={[{ label: "Delete…", tone: "danger", onSelect: () => undefined }]} />
+          ))}
+        </SettingsList>
+      </SettingsSection>
+      <SettingsSection id="saved-versions" title="Saved versions">
+        <SettingsNote tone="muted">No saved versions yet.</SettingsNote>
+        <SettingsNote tone="muted" role="status"><span className="inline-flex items-center gap-1.5"><Loader2 aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />Loading saved versions…</span></SettingsNote>
+        <SettingsNote tone="danger" role="alert">Couldn't load saved versions. The workspace didn't answer; nothing changed.</SettingsNote>
+      </SettingsSection>
+    </div>
+  );
+}
+
+const HOST_SECTIONS = [["account", "Account"], ["keys", "API keys"], ["usage", "Usage"], ["billing", "Billing"], ["webhooks", "Webhooks"], ["team", "Team"]] as const;
+
+/** What a server-rendered host such as tangle-router writes: PageShell's settings markup, with no React inside it. */
+const HOST_MARKUP = `<div class="tangle-settings-frame" style="--tangle-settings-sticky-top: var(--shell-header-height)">
+<div class="tangle-reading-shell" data-measure="settings">
+<div class="tangle-reading-header"><h1 class="tangle-heading" data-variant="section">Settings</h1></div>
+<nav aria-label="Settings sections" class="tangle-reading-nav"><ul role="list">${HOST_SECTIONS.map(([id, label]) => `<li><a href="/settings-doc/${id}"${id === "usage" ? ' aria-current="page"' : ""}>${label}</a></li>`).join("")}</ul></nav>
+<article class="tangle-reading-article">${["Usage", "Limits", "Sources"].map((name) => `<section role="region" aria-label="${name}" data-slot="card" class="rounded-[var(--radius-lg)] border border-border bg-card p-5" style="min-height: 28rem"><h2 class="font-semibold">${name}</h2></section>`).join("")}</article>
+</div></div>`;
+
+/** A host whose document scrolls under its own sticky header, with server markup bound by bindSettingsNav. */
+function ServerRenderedHostExample() {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const nav = root.current?.querySelector<HTMLElement>("nav");
+    return nav ? bindSettingsNav(nav) : undefined;
+  }, []);
+  return (
+    <>
+      <header className="sticky top-0 z-10 flex h-[var(--shell-header-height)] items-center border-b border-border bg-background px-6 font-medium text-sm">Host header</header>
+      <div ref={root} dangerouslySetInnerHTML={{ __html: HOST_MARKUP }} />
+    </>
+  );
+}
+
 const meta = {
   title: "Primitives/Settings",
   component: SettingsSection,
@@ -302,3 +387,9 @@ export const Fields: Story = { render: () => <FieldsExample /> };
 
 /** Values preserve ReactNode content and coexist with controls; only value rows stack in a narrow compact layout. */
 export const Values: Story = { render: () => <SettingsValuesExample /> };
+
+/** Every line that is not a row, list states in their tone, and long URLs and event names wrapping whole at 390. */
+export const NotesAndTones: Story = { render: () => <NotesAndTonesExample /> };
+
+/** tangle-router's case: server-rendered settings markup under a sticky host header, bound with bindSettingsNav. */
+export const ServerRenderedHost: Story = { render: () => <ServerRenderedHostExample /> };

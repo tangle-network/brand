@@ -170,6 +170,13 @@ function ToneGlyph({ tone }: { tone: StatusTone }) {
   }
 }
 
+const GLYPH = "inline-flex [&>svg]:size-3 [&>svg]:shrink-0";
+
+/** The tone's glyph in the tone's ink, before a label that keeps its own colour, as `bare` draws it. */
+export function StatusGlyph({ tone }: { tone: StatusTone }) {
+  return <span aria-hidden="true" className={cn(GLYPH, TONE_TEXT[tone])}><ToneGlyph tone={tone} /></span>;
+}
+
 const StatusPill = React.forwardRef<HTMLSpanElement, StatusPillProps>(
   ({ className, tone, children, icon, bare = false, size = "sm", ...props }, ref) => (
     <span
@@ -186,7 +193,7 @@ const StatusPill = React.forwardRef<HTMLSpanElement, StatusPillProps>(
     >
       {/* In `bare` mode the tone rides on the glyph alone, so it is scoped to
           the wrapper the glyph sits in rather than applied to the whole pill. */}
-      <span aria-hidden="true" className={cn("inline-flex [&>svg]:size-3 [&>svg]:shrink-0", bare && TONE_TEXT[tone])}>
+      <span aria-hidden="true" className={cn(GLYPH, bare && TONE_TEXT[tone])}>
         {icon ?? <ToneGlyph tone={tone} />}
       </span>
       {children}

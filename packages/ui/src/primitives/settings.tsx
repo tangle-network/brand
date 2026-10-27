@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlert, Ellipsis, Lock } from "lucide-react";
+import { CircleAlert, Ellipsis, Lock, TriangleAlert, type LucideIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "../lib/utils";
 import { Button } from "./button";
@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { fieldMessageId } from "./field";
 import { InfoTip } from "./info-tip";
 import { Label } from "./label";
+import { StatusGlyph, type StatusTone } from "./status-pill";
 
 /*
  * Settings rows and lists answer to their section card's width, not the
@@ -21,25 +22,46 @@ import { Label } from "./label";
  */
 
 const SCROLL_OFFSET = "scroll-mt-[calc(var(--shell-header-height)_+_1rem)]";
+const GUTTER = "px-5 py-4 @max-[34rem]/settings-section:px-4";
 const DIVIDED = "not-first:border-t not-first:border-[color:var(--border-subtle)]";
 const ERROR_TEXT = "text-[color:var(--surface-danger-text)]";
 
-function ErrorLine({ id, className, children }: { id?: string; className?: string; children: React.ReactNode }) {
+interface LineProps { id?: string; role?: "status" | "alert"; className?: string; children: React.ReactNode }
+
+function GlyphLine({ icon: Icon, className, children, ...props }: LineProps & { icon: LucideIcon }) {
   return (
-    <div id={id} role="alert" className={cn("flex items-start gap-1.5 text-sm leading-5 [overflow-wrap:anywhere]", ERROR_TEXT, className)}>
-      <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+    <div {...props} className={cn("flex items-start gap-1.5 text-sm leading-5 [overflow-wrap:anywhere]", className)}>
+      <Icon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
       <div className="min-w-0">{children}</div>
     </div>
   );
 }
 
-function LockLine({ id, className, children }: { id?: string; className?: string; children: React.ReactNode }) {
-  return (
-    <div id={id} className={cn("flex items-start gap-1.5 text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]", className)}>
-      <Lock aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-      <div className="min-w-0">{children}</div>
-    </div>
-  );
+const ErrorLine = ({ className, ...props }: LineProps) => <GlyphLine icon={CircleAlert} role="alert" className={cn(ERROR_TEXT, className)} {...props} />;
+const LockLine = ({ className, ...props }: LineProps) => <GlyphLine icon={Lock} className={cn("text-muted-foreground", className)} {...props} />;
+
+// A long identifier (a URL, an address, an event name) is one unit: it moves to the next line
+// whole, and only one wider than its column breaks, at its own punctuation, where a style guide
+// breaks a URL: after a slash run or `@`, before `. - _ ? # & =`. A mid-word break is the last resort.
+const TOKEN_BREAK = /(?<=[/@])(?=[^/])|(?<=[\p{L}\p{N}])(?=[.\-_?#&=][\p{L}\p{N}])/u;
+
+function breakTokens(node: React.ReactNode): React.ReactNode {
+  if (typeof node === "string") {
+    if (!TOKEN_BREAK.test(node)) return node;
+    return node.split(/(\s+)/).map((word, index) => {
+      const parts = word.split(TOKEN_BREAK);
+      return parts.length < 2 ? word : (
+        <span key={index} className="inline-block max-w-full [text-decoration:inherit]">
+          {parts.map((part, at) => <React.Fragment key={at}>{at > 0 && <wbr />}{part}</React.Fragment>)}
+        </span>
+      );
+    });
+  }
+  if (Array.isArray(node)) return React.Children.map(node, breakTokens);
+  if (React.isValidElement<{ children?: React.ReactNode }>(node) && node.props.children != null && typeof node.props.children !== "function") {
+    return React.cloneElement(node, undefined, breakTokens(node.props.children));
+  }
+  return node;
 }
 
 export type SettingsRowLayout = "inline" | "compact" | "stacked";
@@ -123,7 +145,8 @@ export function SettingsRow(props: SettingsRowProps) {
       id={id}
       data-layout={layout}
       className={cn(
-        "grid min-w-0 items-center gap-x-8 gap-y-3 px-5 py-4 @max-[34rem]/settings-section:px-4",
+        "grid min-w-0 items-center gap-x-8 gap-y-3",
+        GUTTER,
         SCROLL_OFFSET,
         DIVIDED,
         ROW_COLUMNS[hasValue && layout === "compact" ? "inline" : layout],
@@ -150,7 +173,7 @@ export function SettingsRow(props: SettingsRowProps) {
       </div>
       {(hasValue || (control != null && control !== false)) && (
         <div className={cn("flex min-w-0 items-center gap-2", ROW_CONTROL[hasValue && layout === "compact" ? "inline" : layout])}>
-          {hasValue && <span data-slot="settings-value" className={cn("min-w-0 text-foreground text-sm [overflow-wrap:anywhere] @min-[34rem]/settings-section:text-right", mono && "font-mono")}>{value}</span>}
+          {hasValue && <span data-slot="settings-value" className={cn("min-w-0 text-foreground text-sm [overflow-wrap:anywhere] @min-[34rem]/settings-section:text-right", mono && "font-mono")}>{breakTokens(value)}</span>}
           {control}
         </div>
       )}
@@ -194,7 +217,7 @@ export function SettingsSection({
       data-tone={tone}
       className={cn("@container/settings-section min-w-0", SCROLL_OFFSET, danger && "border-[color:var(--surface-danger-border)]")}
     >
-      <div className="flex items-start justify-between gap-4 px-5 py-4 @max-[34rem]/settings-section:flex-wrap @max-[34rem]/settings-section:px-4">
+      <div className={cn("flex items-start justify-between gap-4 @max-[34rem]/settings-section:flex-wrap", GUTTER)}>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <CardTitle as="h2" id={titleId} className={cn("leading-6 [overflow-wrap:anywhere]", danger && ERROR_TEXT)}>{title}</CardTitle>
@@ -214,6 +237,40 @@ export function SettingsSection({
       )}
     </Card>
   );
+}
+
+const NOTE_TONE = {
+  default: "text-foreground",
+  muted: "text-muted-foreground",
+  warning: "text-[color:var(--surface-warning-text)]",
+  danger: ERROR_TEXT,
+} as const;
+
+const NOTE_GLYPH: Partial<Record<keyof typeof NOTE_TONE, LucideIcon>> = { warning: TriangleAlert, danger: CircleAlert };
+
+export interface SettingsNoteProps {
+  /**
+   * `default` keeps the body ink, for a figure such as a MetricStrip or an inline form.
+   * `muted` is an empty list or a loading line. `warning` (a notice) and `danger` (a refusal)
+   * lead with a glyph, so the tone is not carried by colour alone.
+   */
+  tone?: keyof typeof NOTE_TONE;
+  /** `status` announces a change politely; `alert` announces a refusal at once. */
+  role?: "status" | "alert";
+  children?: React.ReactNode;
+}
+
+/**
+ * A line or block of a {@link SettingsSection} that is not a row: an empty list, a loading line,
+ * a notice, a refusal or a figure. It takes the rows' gutters and divider, so it lines up with
+ * the rows and lists around it.
+ */
+export function SettingsNote({ tone = "default", role, children }: SettingsNoteProps) {
+  const className = cn("min-w-0", GUTTER, DIVIDED, NOTE_TONE[tone]);
+  const glyph = NOTE_GLYPH[tone];
+  return glyph
+    ? <GlyphLine icon={glyph} role={role} className={className}>{children}</GlyphLine>
+    : <div role={role} className={cn("text-sm leading-5 [overflow-wrap:anywhere]", className)}>{children}</div>;
 }
 
 /** Track widths for a {@link SettingsList}. Every slot its items use needs a column, except status and menu, which have fallbacks. */
@@ -310,6 +367,8 @@ export interface SettingsListItemProps {
   meta?: React.ReactNode;
   /** The item's state as plain text, or a control that sets it (a role select). */
   status?: React.ReactNode;
+  /** The state's tone, drawn as a glyph before it in the tone's ink; the state's text keeps its colour. */
+  tone?: StatusTone;
   /** Shown under the meta in danger text and announced. */
   error?: React.ReactNode;
   /** The one verb the item needs at rest. It is drawn as an outline button, so it never reads as the state beside it. */
@@ -359,7 +418,7 @@ const NARROW_STATUS = "@max-[34rem]/settings-section:col-start-[main] @max-[34re
  * that name. Without a status column the state follows the meta, and without
  * a menu column the ⋯ menu ends the action cell.
  */
-export function SettingsListItem({ leading, title, meta, status, error, action, menu }: SettingsListItemProps) {
+export function SettingsListItem({ leading, title, meta, status, tone, error, action, menu }: SettingsListItemProps) {
   const columns = React.useContext(SettingsListContext);
   const titleId = React.useId();
   const reasonId = `${titleId}-reason`;
@@ -376,6 +435,8 @@ export function SettingsListItem({ leading, title, meta, status, error, action, 
       {action.label}
     </Button>
   );
+  const state = tone && status != null ? <><StatusGlyph tone={tone} /><span className="min-w-0">{status}</span></> : status;
+  const toned = tone && "flex items-center gap-1.5";
   const actionCell = (actionButton || (menuNode && !columns.menu)) && (
     <>{actionButton}{!columns.menu && menuNode}</>
   );
@@ -392,17 +453,17 @@ export function SettingsListItem({ leading, title, meta, status, error, action, 
           id={titleId}
           className="font-medium text-sm leading-5 text-foreground [overflow-wrap:anywhere] [&_a]:rounded-sm [&_a]:text-foreground [&_a]:underline-offset-4 [&_a:hover]:underline [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[var(--focus-border)]"
         >
-          {title}
+          {breakTokens(title)}
         </div>
-        {meta != null && <div className="text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]">{meta}</div>}
-        {status != null && !columns.status && <div className="mt-1 text-sm leading-5 text-muted-foreground">{status}</div>}
+        {meta != null && <div className="text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]">{breakTokens(meta)}</div>}
+        {status != null && !columns.status && <div className={cn("mt-1 text-sm leading-5 text-muted-foreground", toned)}>{state}</div>}
         {locked && <LockLine id={reasonId} className="mt-1">{action?.disabledReason}</LockLine>}
       </div>
       {error != null && (
         <ErrorLine className="col-start-[main] row-start-2 mt-1 @max-[34rem]/settings-section:col-end-[-1] @max-[34rem]/settings-section:row-start-3">{error}</ErrorLine>
       )}
       {status != null && columns.status && (
-        <div className={cn("col-start-[status] row-start-1 min-w-0 text-sm leading-5 text-muted-foreground", NARROW_STATUS)}>{status}</div>
+        <div className={cn("col-start-[status] row-start-1 min-w-0 text-sm leading-5 text-muted-foreground", toned, NARROW_STATUS)}>{state}</div>
       )}
       {actionCell && (
         <div className="col-start-[action] row-start-1 flex min-w-0 items-center justify-end gap-1">{actionCell}</div>

@@ -203,13 +203,14 @@ export type { PageShellProps } from "./page-shell";
 export { Field, fieldMessageId } from "./field";
 export type { FieldProps } from "./field";
 
-export { SettingsList, SettingsListItem, SettingsRow, SettingsSection } from "./settings";
+export { SettingsList, SettingsListItem, SettingsNote, SettingsRow, SettingsSection } from "./settings";
 export type {
   SettingsListAction,
   SettingsListColumns,
   SettingsListItemProps,
   SettingsListMenuItem,
   SettingsListProps,
+  SettingsNoteProps,
   SettingsRowLayout,
   SettingsRowProps,
   SettingsSectionProps,

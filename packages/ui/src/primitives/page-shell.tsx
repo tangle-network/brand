@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { ReactNode } from "react";
 import { cn } from "../lib/utils";
+import { bindSettingsNav } from "../presentation";
 
 export interface PageShellProps {
   children?: ReactNode;
@@ -17,68 +18,17 @@ export interface PageShellProps {
    * column. `settings` is a 48rem column of cards whose navigation is a sticky
    * 13rem column of rows when its frame is at least 60rem wide, and a sticky
    * 56px tab strip under the header below that; the current link
-   * (`aria-current="page"`) is centred by scrolling the strip only. Put
-   * links (or a list of links) in `navigation`; an `svg` in a link shows only
-   * in the column, and an element with `data-count` sits at its end.
+   * (`aria-current="page"`) is centred by scrolling the strip only
+   * ({@link bindSettingsNav}). Put links (or a list of links) in `navigation`;
+   * an `svg` in a link shows only in the column, and an element with
+   * `data-count` sits at its end. A host whose page scrolls under its own
+   * sticky header sets `--tangle-settings-sticky-top` on the frame or an
+   * ancestor, such as `var(--shell-header-height)`, and the nav sticks below it.
    */
   measure?: "reading" | "settings";
   navigationLabel?: string;
   outlineLabel?: string;
   className?: string;
-}
-
-/**
- * Centre the current link of a horizontally scrolling nav, so the links on
- * both sides show that the strip scrolls. It moves the strip, never the page.
- * It centres when the current link changes (or first becomes reachable), never
- * on scroll, arrow taps or re-renders that keep the same current link, so a
- * user who scrolls to the first or last section stays there. Resize and font
- * swaps re-centre only until the user first scrolls the strip.
- */
-function useCurrentLinkInView(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
-  React.useEffect(() => {
-    const nav = ref.current;
-    if (!enabled || !nav) return;
-    let centredKey: string | null = null;
-    let userScrolled = false;
-    const reveal = (layoutOnly: boolean) => {
-      if (nav.scrollWidth <= nav.clientWidth) return;
-      const current = nav.querySelector<HTMLElement>('[aria-current="page"]');
-      if (!current) return;
-      const key = current.getAttribute("href") ?? current.textContent ?? "";
-      if (key !== centredKey) userScrolled = false;
-      else if (!layoutOnly || userScrolled) return;
-      centredKey = key;
-      const strip = nav.getBoundingClientRect();
-      const link = current.getBoundingClientRect();
-      nav.scrollLeft += link.left + link.width / 2 - (strip.left + strip.width / 2);
-    };
-    const onUser = () => { userScrolled = true; };
-    nav.addEventListener("pointerdown", onUser, { passive: true });
-    nav.addEventListener("touchstart", onUser, { passive: true });
-    nav.addEventListener("wheel", onUser, { passive: true });
-    nav.addEventListener("keydown", onUser);
-    let live = true;
-    reveal(false);
-    // A web font swap widens the tabs without resizing the strip, so the
-    // resize observer alone would leave the current tab where it was.
-    void document.fonts?.ready.then(() => { if (live) reveal(true); });
-    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => reveal(true));
-    resize?.observe(nav);
-    // Links that a caller replaces (sections loaded later, a new aria-current)
-    // can change the current link; the same current link is left where it is.
-    const links = new MutationObserver(() => reveal(false));
-    links.observe(nav, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-current"] });
-    return () => {
-      live = false;
-      resize?.disconnect();
-      links.disconnect();
-      nav.removeEventListener("pointerdown", onUser);
-      nav.removeEventListener("touchstart", onUser);
-      nav.removeEventListener("wheel", onUser);
-      nav.removeEventListener("keydown", onUser);
-    };
-  }, [ref, enabled]);
 }
 
 /**
@@ -93,7 +43,8 @@ function useCurrentLinkInView(ref: React.RefObject<HTMLElement | null>, enabled:
 export function PageShell({ children, className, navigation, article, outline, header, measure = "reading", navigationLabel = "Sections", outlineLabel = "On this page" }: PageShellProps) {
   const navRef = React.useRef<HTMLElement>(null);
   const settings = measure === "settings";
-  useCurrentLinkInView(navRef, settings && Boolean(navigation));
+  const hasNavigation = Boolean(navigation);
+  React.useEffect(() => (settings && hasNavigation && navRef.current ? bindSettingsNav(navRef.current) : undefined), [settings, hasNavigation]);
   if (navigation || article || outline || header || settings) {
     const shell = <div className={cn("tangle-reading-shell", !settings && className)} data-measure={settings ? "settings" : undefined}>
       {header && <div className="tangle-reading-header">{header}</div>}

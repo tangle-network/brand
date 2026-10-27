@@ -117,6 +117,35 @@ for (const theme of ["light", "dark"]) {
         }
       })
 
+      test("a labelled CopyButton in a CodeBlock header uses the header's type", async ({ page }, testInfo) => {
+        const errors = await openStory(page, "markdown-markdown--code-block-labelled-copy", theme)
+        const type = (locator) => locator.evaluate((node) => ({ family: getComputedStyle(node).fontFamily, size: getComputedStyle(node).fontSize }))
+        const action = await type(page.getByRole("button", { name: "Copy embed code" }).getByText("Copy embed code"))
+        expect(action, "the action label matches the header label beside it").toEqual(await type(page.getByText("HTML", { exact: true })))
+        expect(action.size).toBe("14px")
+        expect(action.family, "not the code font").not.toBe(await page.locator("pre code").evaluate((node) => getComputedStyle(node).fontFamily))
+        await page.screenshot({ path: process.env.SETTINGS_SHOTS_DIR ? `${process.env.SETTINGS_SHOTS_DIR}/code-block-copy-${coarse ? 390 : 1280}-${theme}.png` : testInfo.outputPath("code-block-copy.png") })
+        expect(errors).toEqual([])
+      })
+
+      test("a toned Progress fills with its status ink", async ({ page }, testInfo) => {
+        const errors = await openStory(page, "primitives-progress--tones", theme)
+        for (const tone of ["neutral", "success", "warning", "danger"]) {
+          const fill = page.getByRole("progressbar", { name: `${tone} reading` }).locator(":scope > div")
+          const expected = await page.evaluate((value) => {
+            const probe = document.createElement("span")
+            probe.style.color = value
+            document.body.append(probe)
+            const color = getComputedStyle(probe).color
+            probe.remove()
+            return color
+          }, `var(--surface-${tone}-text)`)
+          expect(await fill.evaluate((node) => getComputedStyle(node).backgroundColor), `${tone} fill`).toBe(expected)
+        }
+        await page.screenshot({ path: process.env.SETTINGS_SHOTS_DIR ? `${process.env.SETTINGS_SHOTS_DIR}/progress-tones-${coarse ? 390 : 1280}-${theme}.png` : testInfo.outputPath("progress-tones.png") })
+        expect(errors).toEqual([])
+      })
+
       test("upload actions have file-specific names, shared focus and repeatable recovery", async ({ page }, testInfo) => {
         const errors = await openStory(page, "primitives-uploadprogress--recovery", theme)
         const retry = page.getByRole("button", { name: `Retry ${coverName}`, exact: true })

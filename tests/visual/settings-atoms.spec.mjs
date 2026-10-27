@@ -55,6 +55,45 @@ const smallText = (page) => page.evaluate(() => {
 
 const pageOverflow = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
 
+/** The computed colour of a CSS colour expression, such as `var(--surface-danger-text)`. */
+const colorOf = (page, expression) => page.evaluate((value) => {
+  const probe = document.createElement("span")
+  probe.style.color = value
+  document.body.append(probe)
+  const color = getComputedStyle(probe).color
+  probe.remove()
+  return color
+}, expression)
+
+/** The element's text as laid out: how many lines, the line of every character, and each break that splits a word. */
+const layout = (locator) => locator.evaluate((root) => {
+  const chars = []
+  const range = document.createRange()
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  while (walker.nextNode()) {
+    const node = walker.currentNode
+    for (let i = 0; i < node.length; i++) {
+      range.setStart(node, i)
+      range.setEnd(node, i + 1)
+      const rect = [...range.getClientRects()].find((r) => r.width > 0)
+      chars.push({ ch: node.data[i], top: rect ? Math.round(rect.top) : null })
+    }
+  }
+  const tops = chars.map((c) => c.top).filter((top) => top !== null)
+  const midWord = []
+  let previous = null
+  for (const [index, c] of chars.entries()) {
+    if (c.top === null) continue
+    if (previous && c.top > previous.top + 2) {
+      // A break may follow a space, a slash, `@` or a comma, or come before . - _ ? # & =.
+      const clean = /\s/.test(previous.ch) || /\s/.test(c.ch) || /[/@,]/.test(previous.ch) || /[.\-_?#&=]/.test(c.ch)
+      if (!clean) midWord.push(`${chars.slice(Math.max(0, index - 8), index).map((x) => x.ch).join("")}|${chars.slice(index, index + 8).map((x) => x.ch).join("")}`)
+    }
+    previous = c
+  }
+  return { text: chars.map((c) => c.ch).join(""), tops: chars.map((c) => c.top), lines: new Set(tops).size, midWord }
+})
+
 const row = (page, label) => page.locator('[data-layout]').filter({ has: page.getByText(label, { exact: true }) }).first()
 
 async function expectDescribedBy(control, message) {
@@ -330,6 +369,124 @@ for (const theme of ["light", "dark"]) {
     expect(await nav.evaluate((node) => node.scrollLeft), "the strip scrolled to it").toBeGreaterThan(0)
     expect(await page.evaluate(() => [window.scrollX, window.scrollY]), "only the strip scrolled, never the page").toEqual([0, 0])
     await shot(page, testInfo, `sections-load-later-390-${theme}.png`)
+    expect(errors).toEqual([])
+  })
+
+  test(`notes, toned list states and long values at 1280 and 390 px (${theme})`, async ({ page }, testInfo) => {
+    for (const viewport of [DESKTOP, PHONE]) {
+      const errors = await openStory(page, "primitives-settings--notes-and-tones", theme, viewport)
+      const wide = viewport === DESKTOP
+      const inset = wide ? "20px" : "16px"
+      await shot(page, testInfo, `notes-and-tones-${viewport.width}-${theme}.png`, { fullPage: true })
+      const style = (locator) => locator.evaluate((node) => {
+        const css = getComputedStyle(node)
+        return { color: css.color, paddingLeft: css.paddingLeft, paddingTop: css.paddingTop, borderTop: css.borderTopWidth, borderColor: css.borderTopColor }
+      })
+
+      // Notes take the rows' gutters and divider, and their tone.
+      const versions = page.getByRole("region", { name: "Saved versions" })
+      const webhooks = page.getByRole("region", { name: "Webhooks" })
+      const item = await style(webhooks.getByRole("list", { name: "Webhook endpoints" }).locator(":scope > li").first())
+      const list = await style(webhooks.getByRole("list", { name: "Webhook endpoints" }))
+      const meta = await style(webhooks.getByText("Signed POSTs when traces, evals or budgets change."))
+      const empty = versions.locator(":scope > div", { hasText: "No saved versions yet." })
+      const loading = versions.getByRole("status")
+      const refusal = versions.getByRole("alert")
+      const notice = webhooks.getByRole("status")
+      for (const note of [empty, loading, refusal, notice]) {
+        const css = await style(note)
+        expect(css.paddingLeft, "a note keeps the rows' inline gutter").toBe(inset)
+        expect(css.paddingTop, "and their 16px block padding").toBe("16px")
+        expect(css.borderTop, "a note is divided like a row").toBe("1px")
+        expect(css.borderColor, "with the rows' hairline").toBe(list.borderColor)
+      }
+      expect(item.paddingLeft, "list items share the inset").toBe(inset)
+      expect((await style(empty)).color, "an empty line is muted, like meta").toBe(meta.color)
+      await expect(empty.locator("svg")).toHaveCount(0)
+      await expect(refusal).toContainText("Couldn't load saved versions.")
+      expect((await style(refusal)).color, "a refusal is in the danger ink").toBe(await colorOf(page, "var(--surface-danger-text)"))
+      await expect(refusal.locator("svg.lucide-circle-alert"), "and leads with a glyph, not colour alone").toBeVisible()
+      expect((await style(notice)).color, "a notice is in the warning ink").toBe(await colorOf(page, "var(--surface-warning-text)"))
+      await expect(notice.locator("svg.lucide-triangle-alert")).toBeVisible()
+      await expect(loading).toContainText("Loading saved versions…")
+
+      // A figure in a note: the two-column metric strip, in body ink, stacked on a phone.
+      const metrics = webhooks.getByRole("definition").filter({ hasText: /^(1,284|3)$/ })
+      await expect(metrics).toHaveCount(2)
+      expect((await style(metrics.first())).color, "metric values keep the body ink").toBe(await colorOf(page, "hsl(var(--foreground))"))
+      const [first, second] = [await box(metrics.first()), await box(metrics.nth(1))]
+      if (wide) {
+        expect(first.top, "two columns side by side").toBeCloseTo(second.top, 0)
+        expect(second.left).toBeGreaterThan(first.right)
+      } else {
+        expect(second.top, "one column on a phone").toBeGreaterThan(first.bottom)
+        expect(await metrics.nth(1).evaluate((node) => getComputedStyle(node.parentElement).borderTopWidth), "divided by a hairline").toBe("1px")
+      }
+
+      // List states lead with the tone's glyph in the tone's ink; the text keeps the list's state colour.
+      const tones = { Active: "success", Inactive: "neutral", Failing: "danger", Critical: "danger", Warning: "warning", Notice: "neutral" }
+      for (const [state, tone] of Object.entries(tones)) {
+        const text = page.getByText(state, { exact: true })
+        const cell = text.locator("xpath=..")
+        const glyph = cell.locator(":scope > [aria-hidden=true]")
+        await expect(glyph.locator("svg"), `${state} has a glyph`).toHaveCount(1)
+        expect(await glyph.evaluate((node) => getComputedStyle(node).color), `${state} glyph in the ${tone} ink`).toBe(await colorOf(page, `var(--surface-${tone}-text)`))
+        expect((await style(text)).color, `${state} text stays muted`).toBe(meta.color)
+        const [g, t] = [await box(glyph), await box(text)]
+        expect(Math.abs((g.top + g.bottom) / 2 - (t.top + t.bottom) / 2), `${state} glyph centred on its text`).toBeLessThan(3)
+      }
+
+      // Long URLs and event names: a token moves to the next line whole, and a URL wider than its column breaks only at its punctuation.
+      const endpoints = webhooks.getByRole("list", { name: "Webhook endpoints" }).locator(":scope > li")
+      for (let i = 0; i < 3; i++) {
+        const url = await layout(endpoints.nth(i).getByRole("link"))
+        expect(url.midWord, `URL ${i + 1} breaks only at its punctuation`).toEqual([])
+        const events = await layout(endpoints.nth(i).getByRole("link").locator("xpath=../following-sibling::div[1]"))
+        expect(events.midWord, `events ${i + 1} break only between names`).toEqual([])
+        for (const name of events.text.split(", ")) {
+          const start = events.text.indexOf(name)
+          const lines = new Set(events.tops.slice(start, start + name.length).filter((top) => top !== null))
+          expect(lines.size, `${name} stays on one line`).toBe(1)
+        }
+      }
+      expect((await layout(endpoints.first().getByRole("link"))).lines, "the first URL is wider than its column, so it wraps").toBeGreaterThan(1)
+
+      expect(await smallText(page), "no visible text under 14px").toEqual([])
+      expect(await pageOverflow(page), "no sideways page scroll").toBeLessThanOrEqual(1)
+      expect(errors).toEqual([])
+    }
+  })
+
+  test(`server-rendered settings markup under a sticky host header (${theme})`, async ({ page }, testInfo) => {
+    const errors = await openStory(page, "primitives-settings--server-rendered-host", theme, DESKTOP)
+    const nav = page.getByRole("navigation", { name: "Settings sections" })
+    const current = nav.locator('a[aria-current="page"]')
+    await page.evaluate(() => window.scrollTo(0, 900))
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(300)
+    expect(Math.round((await box(nav)).top), "the column sticks 2rem below the 56px host header").toBe(88)
+    await shot(page, testInfo, `server-host-1280-${theme}.png`)
+
+    await page.setViewportSize(PHONE)
+    await page.evaluate(() => window.scrollTo(0, 900))
+    await expect.poll(async () => Math.round((await box(nav)).top), { message: "the strip sticks under the host header" }).toBe(56)
+    await expect.poll(async () => {
+      const [tab, strip] = [await box(current), await box(nav)]
+      return tab.left >= strip.left + 16 && tab.right <= strip.right - 16
+    }, { message: "the current tab is centred in the strip" }).toBe(true)
+    await shot(page, testInfo, `server-host-390-${theme}.png`)
+
+    // A click a client router takes (preventDefault) leaves the current link to the router.
+    await page.evaluate(() => document.querySelector('a[href="/settings-doc/team"]').addEventListener("click", (event) => event.preventDefault()))
+    await nav.getByRole("link", { name: "Team" }).click()
+    await expect(current).toHaveText("Usage")
+    // A click that loads another document marks its link at once, while that document is still loading.
+    await page.route("**/settings-doc/**", () => {})
+    await nav.getByRole("link", { name: "Billing" }).click()
+    await expect(current).toHaveText("Billing")
+    await expect(current).toHaveCount(1)
+    // A page restored from the back-forward cache shows the section it rendered.
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })))
+    await expect(current).toHaveText("Usage")
     expect(errors).toEqual([])
   })
 
