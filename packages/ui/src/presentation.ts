@@ -110,6 +110,7 @@ export const metricPresentation = {
 } as const;
 
 export const metricLayouts = {
+  2: "grid-cols-1 sm:grid-cols-2 max-sm:[&>div+div]:border-t sm:[&>div:not(:nth-child(2n+1))]:border-l",
   3: "grid-cols-2 sm:grid-cols-3 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(3n+1))]:border-l",
   4: "grid-cols-2 sm:grid-cols-4 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:[&>div:not(:nth-child(4n+1))]:border-l",
   5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-sm:[&>div:not(:nth-child(2n+1))]:border-l sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l lg:[&>div:not(:nth-child(5n+1))]:border-l",
@@ -178,6 +179,73 @@ export function bindDialog(dialog: HTMLDialogElement, trigger: HTMLElement): () 
   if (dialog.id) trigger.setAttribute("aria-controls", dialog.id);
   sync();trigger.addEventListener("click",show);dialog.addEventListener("close",close);dialog.addEventListener("click",click);dialog.addEventListener("keydown",key);
   return () => {trigger.removeEventListener("click",show);dialog.removeEventListener("close",close);dialog.removeEventListener("click",click);dialog.removeEventListener("keydown",key);};
+}
+
+/**
+ * The settings section links of PageShell `measure="settings"`, for any host: PageShell binds its
+ * nav with it, and a server-rendered host binds the same markup. On the tab strip the current link
+ * (`aria-current="page"`) is centred by scrolling the strip only, never the page. It centres when
+ * the current link changes or first becomes reachable, never on scroll or on a change that keeps
+ * the same current link, so a user who scrolled to the first or last section stays there; resize
+ * and font swaps re-centre only until the user first scrolls the strip. A plain click on a link to
+ * another document makes it current at once, while that document loads, and a page restored from
+ * the back-forward cache shows the link it left.
+ */
+export function bindSettingsNav(nav: HTMLElement): () => void {
+  let centredKey: string | null = null;
+  let userScrolled = false;
+  let left: { from: Element | null; to: Element } | null = null;
+  const current = () => nav.querySelector<HTMLElement>('[aria-current="page"]');
+  const reveal = (layoutOnly: boolean) => {
+    const link = current();
+    if (nav.scrollWidth <= nav.clientWidth || !link) return;
+    const key = link.getAttribute("href") ?? link.textContent ?? "";
+    if (key !== centredKey) userScrolled = false;
+    else if (!layoutOnly || userScrolled) return;
+    centredKey = key;
+    const strip = nav.getBoundingClientRect(), box = link.getBoundingClientRect();
+    nav.scrollLeft += box.left + box.width / 2 - (strip.left + strip.width / 2);
+  };
+  const mark = (from: Element | null, to: Element | null) => { from?.removeAttribute("aria-current"); to?.setAttribute("aria-current", "page"); };
+  // On window, so it runs after the page's own handlers: a client router that took the click
+  // (preventDefault) sets the current link itself.
+  const click = (event: MouseEvent) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+    if (!(link instanceof HTMLAnchorElement) || !nav.contains(link) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+    if (link.origin !== location.origin || link.pathname + link.search === location.pathname + location.search) return;
+    const from = current();
+    if (from === link) return;
+    left = { from, to: link };
+    mark(from, link);
+  };
+  const restore = (event: PageTransitionEvent) => {
+    if (!event.persisted || !left) return;
+    mark(left.to, left.from);
+    left = null;
+  };
+  const onUser = () => { userScrolled = true; };
+  const userEvents = ["pointerdown", "touchstart", "wheel", "keydown"] as const;
+  for (const type of userEvents) nav.addEventListener(type, onUser, { passive: true });
+  window.addEventListener("click", click);
+  window.addEventListener("pageshow", restore);
+  let live = true;
+  reveal(false);
+  // A web font swap widens the tabs without resizing the strip.
+  void document.fonts?.ready.then(() => { if (live) reveal(true); });
+  const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => reveal(true));
+  resize?.observe(nav);
+  // Links a host replaces (sections loaded later, a new aria-current) can change the current link.
+  const links = new MutationObserver(() => reveal(false));
+  links.observe(nav, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-current"] });
+  return () => {
+    live = false;
+    resize?.disconnect();
+    links.disconnect();
+    for (const type of userEvents) nav.removeEventListener(type, onUser);
+    window.removeEventListener("click", click);
+    window.removeEventListener("pageshow", restore);
+  };
 }
 
 export const labelVariants = cva(

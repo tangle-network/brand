@@ -1,16 +1,27 @@
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 import * as React from "react";
 import { cn } from "../lib/utils";
+import type { StatusTone } from "./status-pill";
+
+// A status ink is also its fill (Brand tokens), so a toned bar matches the state text beside it.
+const TONE_FILL = {
+  neutral: "bg-[var(--surface-neutral-text)]",
+  success: "bg-[var(--surface-success-text)]",
+  warning: "bg-[var(--surface-warning-text)]",
+  danger: "bg-[var(--surface-danger-text)]",
+} satisfies Partial<Record<StatusTone, string>>;
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
     variant?: "default" | "sandbox";
+    /** A state the reading is in, such as `danger` at a limit; it replaces the variant's fill. */
+    tone?: keyof typeof TONE_FILL;
     showValue?: boolean;
   }
 >(
   (
-    { className, value, variant = "default", showValue = false, ...props },
+    { className, value, variant = "default", tone, showValue = false, ...props },
     ref,
   ) => {
     const indicatorVariants = {
@@ -31,7 +42,7 @@ const Progress = React.forwardRef<
           <ProgressPrimitive.Indicator
             className={cn(
               "h-full w-full flex-1 transition-all duration-300 ease-out",
-              indicatorVariants[variant],
+              tone ? TONE_FILL[tone] : indicatorVariants[variant],
             )}
             style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
           />

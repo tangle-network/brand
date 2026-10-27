@@ -221,6 +221,17 @@ export const CodeBlockOnly: Story = {
   ),
 }
 
+export const CodeBlockLabelledCopy: Story = {
+  name: 'CodeBlock — labelled copy action',
+  render: () => (
+    <div className="w-full max-w-[680px] p-6 rounded-xl bg-card">
+      <CodeBlock code={`<script src="https://embed.tangle.tools/agent.js" data-agent="support"></script>`} language="html" label="HTML">
+        <CopyButton text={`<script src="https://embed.tangle.tools/agent.js" data-agent="support"></script>`} label="Copy embed code" />
+      </CodeBlock>
+    </div>
+  ),
+}
+
 export const CodeBlockNoLanguage: Story = {
   name: 'CodeBlock — no language',
   render: () => (

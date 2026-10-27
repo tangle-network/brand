@@ -8,8 +8,8 @@ export interface MetricStripProps
   extends React.HTMLAttributes<HTMLDListElement> {
   children: React.ReactNode;
   /** Desktop columns. Default retains the existing two / sm:four layout.
-   * Five and six use three columns between sm and lg. Never inferred from data. */
-  columns?: 3 | 4 | 5 | 6;
+   * Two stack below sm; five and six use three columns between sm and lg. Never inferred from data. */
+  columns?: 2 | 3 | 4 | 5 | 6;
 }
 
 const MetricStrip = React.forwardRef<HTMLDListElement, MetricStripProps>(
