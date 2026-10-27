@@ -489,12 +489,15 @@ for (const theme of ["light", "dark"]) {
     await page.evaluate(() => document.querySelector('a[href="/settings-doc/team"]').addEventListener("click", (event) => event.preventDefault()))
     await nav.getByRole("link", { name: "Team" }).click()
     await expect(current).toHaveText("Usage")
-    // A click that loads another document marks its link at once, while that document is still loading.
-    // The next document never arrives during the test; evaluate dispatches the click without waiting on that navigation.
-    await page.route("**/settings-doc/**", () => {})
-    await nav.getByRole("link", { name: "Billing" }).evaluate((link) => link.click())
+    // A click that loads another document marks its link during the click, before any document arrives.
+    // The server answers 204, so the browser stays on this page and nothing else could have moved the mark.
+    await page.route("**/settings-doc/**", (route) => route.fulfill({ status: 204 }))
+    const marked = await nav.getByRole("link", { name: "Billing" }).evaluate((link) => {
+      link.click()
+      return [...link.closest("nav").querySelectorAll('[aria-current="page"]')].map((each) => each.textContent)
+    })
+    expect(marked, "the clicked link is the one current link as the click returns").toEqual(["Billing"])
     await expect(current).toHaveText("Billing")
-    await expect(current).toHaveCount(1)
     // A page restored from the back-forward cache shows the section it rendered.
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })))
     await expect(current).toHaveText("Usage")
