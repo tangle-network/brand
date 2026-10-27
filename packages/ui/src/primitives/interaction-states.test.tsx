@@ -191,15 +191,17 @@ describe("each primitive renders its interaction helper", () => {
     expect(classes(screen.getByText(/Guests, staff/))).toContain("line-clamp-2");
   });
 
-  it("SegmentedControl row: a well track, soft items, the selected state on aria-checked", () => {
+  it("SegmentedControl row: a quiet well track, soft items, a raised thumb on aria-checked and no ring", () => {
     const options = [{ value: "a", label: "A–Z" }, { value: "b", label: "Recent" }];
     render(<SegmentedControl aria-label="Sort" value="a" onValueChange={() => {}} options={options} />);
     const track = screen.getByRole("radiogroup");
     expect(classes(track)).toContain("bg-[var(--well)]");
-    expect(classes(track)).toContain("border-[var(--field-border)]");
+    expect(classes(track)).toContain("border-border");
     expect(classes(track)).not.toContain("bg-card");
     for (const radio of screen.getAllByRole("radio")) {
-      expectHelpers(radio, ixControlSoft, ixSelected);
+      expectHelpers(radio, ixControlSoft);
+      expect(classes(radio)).toContain("aria-checked:bg-card");
+      expect([...classes(radio)].some((token) => token.includes("--ix-sel-ring"))).toBe(false);
       for (const token of FOCUS_RING) expect(classes(radio)).toContain(token);
       expect(classes(radio)).not.toContain("bg-[var(--accent-surface)]");
     }

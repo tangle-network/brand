@@ -6,8 +6,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import * as React from "react"
 import { touchTarget } from "../lib/control-presentation"
 import { focusRing, focusRingInset } from "../lib/focus"
-import { ixControlSoft, ixSelected, ixTabUnderline } from "../lib/interaction"
+import { ixControlSoft, ixTabUnderline } from "../lib/interaction"
 import { cn } from "../lib/utils"
+
+/** The row variant's selected segment: a raised thumb on the well, not a tint inside a ring. */
+const rowThumb =
+  "aria-checked:bg-card aria-checked:border-border aria-checked:shadow-[0_1px_2px_rgb(0_0_0/0.08)] hover:aria-checked:bg-card"
 
 /**
  * Visually lightweight segmented control for single-value selection.
@@ -21,10 +25,13 @@ import { cn } from "../lib/utils"
  * console warning fires when both are omitted.
  *
  * Design rules baked into the default variant:
- *   - The row track is a field well (`--well`, `--field-border`), so the
- *     control reads as one inset group on whatever plane it sits on.
- *   - Only the SELECTED segment shows a surface colour + accent text: the
- *     shared selected state (`ixSelected`: tint plus an inset ring). A tab
+ *   - The row track is one quiet well (`--well`, the hairline `border`), so
+ *     the control reads as one inset group on whatever plane it sits on, and
+ *     it is compact (36px) so it sits inside a 44px toolbar with air above
+ *     and below instead of touching its edges.
+ *   - Only the SELECTED segment shows a surface: a raised thumb (the card
+ *     colour with a hairline and a soft shadow) with accent text. No ring is
+ *     drawn around the track's segments, so the group never stacks rings. A tab
  *     shows it as an underline instead (`ixTabUnderline`).
  *   - Unselected segments have NO background — they're plain-text labels
  *     that darken on hover. This keeps the selected segment as the
@@ -224,7 +231,7 @@ export function SegmentedControl<T extends string = string>({
       className={cn(
         "relative flex gap-1",
         variant === "row" &&
-          "flex-wrap items-center rounded-lg border border-[var(--field-border)] bg-[var(--well)] p-1",
+          "flex-wrap items-center rounded-lg border border-border bg-[var(--well)] p-0.5",
         variant === "tabs" &&
           "flex-nowrap items-end border-b border-border pb-0 overflow-x-auto",
         className,
@@ -251,7 +258,7 @@ export function SegmentedControl<T extends string = string>({
             }}
             className={cn(
               "relative inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow]",
-              variant === "row" && ["rounded-md border border-transparent px-3 py-1.5", focusRing, ixControlSoft, ixSelected],
+              variant === "row" && ["rounded-md border border-transparent px-3 py-1", focusRing, ixControlSoft, rowThumb],
               // The strip scrolls horizontally, which would clip an outer ring.
               // The border-b-2 slot stays transparent: the underline is ixTabUnderline's inset shadow.
               variant === "tabs" && ["shrink-0 rounded-none border-b-2 border-transparent -mb-px px-4 py-2", touchTarget, focusRingInset, ixTabUnderline],
