@@ -296,6 +296,45 @@ export const WithToolGroup: Story = {
 }
 
 // ---------------------------------------------------------------------------
+// A settled multi-step turn folded into one row, under a long prompt that folds too
+// ---------------------------------------------------------------------------
+
+const read = (id: string, detail: string, status: 'success' | 'error' = 'success'): AgentTimelineItem => ({
+  id,
+  kind: 'tool',
+  call: { id, type: 'read', label: 'Read', status, detail, duration: 40 },
+  part: { type: 'tool', id, tool: 'read', state: status === 'error' ? { status: 'error', input: { path: detail }, error: `File not found: ${detail}` } : { status: 'completed', input: { path: detail }, output: '…' } },
+})
+
+export const FoldedSteps: Story = {
+  args: {
+    items: [
+      {
+        id: 'user-1',
+        kind: 'message',
+        role: 'user',
+        collapsedLines: 4,
+        content:
+          'Build the most correct, most complete zkVM in Rust: every component of the paper, sound end to end, at 120 bits, measured against the paper\'s own tables, and then better. Start from the commission and the previous handoff; read the open blockers first. Keep one owner per path, and re-measure every gain on the same benchmark before you integrate it. Report the proving rate, proof size, verify time and peak memory at every release.',
+        timestamp: t(300),
+      },
+      { id: 'think-1', kind: 'custom', content: <p className="text-sm text-muted-foreground">Reasoning rows sit inside the fold with the calls they led to.</p> },
+      {
+        id: 'fold-1',
+        kind: 'fold',
+        items: [read('r1', 'inputs/commission.md'), read('r2', 'inputs/previous.md'), read('r3', 'inputs/claims.json'), read('r4', 'inputs/sources/handoff.md'), { id: 'b1', kind: 'tool', call: { id: 'b1', type: 'bash', label: 'Shell', status: 'success', detail: 'git -C repo log --oneline -5', duration: 120 } }],
+      },
+      { id: 'asst-1', kind: 'message', role: 'assistant', content: 'The handoff names four open blockers. I will take the proof-size one first, since the other three depend on it.' },
+      {
+        id: 'fold-2',
+        kind: 'fold',
+        items: [read('r5', 'inputs/sources/open-blockers.md'), read('r6', 'inputs/profile-examples/README.md', 'error'), read('r7', 'repo/README.md')],
+      },
+    ],
+  },
+}
+
+// ---------------------------------------------------------------------------
 // Error state
 // ---------------------------------------------------------------------------
 

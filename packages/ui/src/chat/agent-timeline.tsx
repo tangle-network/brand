@@ -5,6 +5,7 @@ import {
   CircleDot,
   FileText,
   Info,
+  Layers,
 } from "lucide-react";
 import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
@@ -16,6 +17,8 @@ import { ThinkingIndicator } from "./thinking-indicator";
 import { type ToolCallData } from "../run/tool-call-feed";
 import { ToolCallGroup, ToolCallStep } from "../run/tool-call-step";
 import { statusMeta } from "../run/status-meta";
+import { RunRowShell } from "../run/run-row-shell";
+import { TextShimmer } from "../primitives/text-shimmer";
 import type { ChatAuthor } from "../types/message";
 import type { ToolPart } from "../types/parts";
 
@@ -28,6 +31,9 @@ export interface AgentTimelineMessageItem {
   content: string;
   toolCalls?: ReactNode;
   isStreaming?: boolean;
+  /** A user bubble longer than this many lines shows them with a fade and a
+   *  "Show more" inside the bubble; omit to show the whole message. */
+  collapsedLines?: number;
   /** Shown beside a user bubble on hover. Assistant prose carries no
    *  timestamp of its own — the turn's user message dates the exchange. */
   timestamp?: Date;
@@ -57,6 +63,23 @@ export interface AgentTimelineToolGroupItem {
   calls: ToolCallData[];
   /** Source tool parts, parallel to `calls`. */
   parts?: ToolPart[];
+}
+
+/**
+ * A run of steps folded into one quiet row that names what they did ("Read 6
+ * files · Ran 2 commands") and opens to the rows themselves, as an agent app
+ * folds a settled multi-step turn. A failed call keeps the fold in the failure
+ * ink with its error under the row, so a failure never hides behind it.
+ */
+export interface AgentTimelineFoldItem {
+  id: string;
+  kind: "fold";
+  /** The folded rows in order: tool calls, reasoning and other run rows. */
+  items: AgentTimelineItem[];
+  /** The row's words; by default what its tool calls did (`foldSummary`). */
+  summary?: string;
+  /** Start open, e.g. when a link points at one of its steps. */
+  defaultOpen?: boolean;
 }
 
 export interface AgentTimelineStatusItem {
@@ -92,6 +115,7 @@ export type AgentTimelineItem =
   | AgentTimelineMessageItem
   | AgentTimelineToolItem
   | AgentTimelineToolGroupItem
+  | AgentTimelineFoldItem
   | AgentTimelineStatusItem
   | AgentTimelineArtifactItem
   | AgentTimelineCustomItem;
@@ -285,6 +309,82 @@ function ArtifactCard({ item }: { item: AgentTimelineArtifactItem }) {
   );
 }
 
+const FOLD_VERBS: Record<ToolCallData["type"], (n: number) => string> = {
+  read: (n) => `Read ${n} ${n === 1 ? "file" : "files"}`,
+  write: (n) => `Wrote ${n} ${n === 1 ? "file" : "files"}`,
+  edit: (n) => `Edited ${n} ${n === 1 ? "file" : "files"}`,
+  bash: (n) => `Ran ${n} ${n === 1 ? "command" : "commands"}`,
+  grep: (n) => `Searched ${n} ${n === 1 ? "time" : "times"}`,
+  glob: (n) => `Matched ${n} ${n === 1 ? "pattern" : "patterns"}`,
+  list: (n) => `Listed ${n} ${n === 1 ? "folder" : "folders"}`,
+  download: (n) => `Downloaded ${n} ${n === 1 ? "file" : "files"}`,
+  inspect: (n) => `Inspected ${n} ${n === 1 ? "item" : "items"}`,
+  audit: (n) => `Audited ${n} ${n === 1 ? "item" : "items"}`,
+  unknown: (n) => `Used ${n} ${n === 1 ? "tool" : "tools"}`,
+};
+
+/** The tool calls inside a fold, in order (a tool group's calls included). */
+function foldCalls(items: readonly AgentTimelineItem[]): { call: ToolCallData; part?: ToolPart }[] {
+  return items.flatMap((item) =>
+    item.kind === "tool"
+      ? [{ call: item.call, part: item.part }]
+      : item.kind === "tool_group"
+        ? item.calls.map((call, i) => ({ call, part: item.parts?.[i] }))
+        : item.kind === "fold"
+          ? foldCalls(item.items)
+          : [],
+  );
+}
+
+/**
+ * What a fold's tool calls did, by verb in the order they first ran:
+ * "Read 6 files · Ran 2 commands". A fold without tool calls reads by its
+ * row count.
+ */
+export function foldSummary(items: readonly AgentTimelineItem[]): string {
+  const counts = new Map<ToolCallData["type"], number>();
+  for (const { call } of foldCalls(items)) counts.set(call.type, (counts.get(call.type) ?? 0) + 1);
+  if (!counts.size) return `${items.length} ${items.length === 1 ? "step" : "steps"}`;
+  const phrases = [...counts].map(([type, n]) => FOLD_VERBS[type](n));
+  return phrases.length > 3 ? `${phrases.slice(0, 3).join(" · ")} · ${phrases.length - 3} more` : phrases.join(" · ");
+}
+
+function FoldStep({ item, renderToolActions, viewerId }: { item: AgentTimelineFoldItem; renderToolActions?: (part: ToolPart) => ReactNode; viewerId?: string }) {
+  const calls = foldCalls(item.items);
+  const failed = calls.filter(({ call }) => call.status === "error");
+  const running = calls.some(({ call }) => call.status === "running");
+  const firstError = failed.map(({ part }) => (part?.state.status === "error" ? part.state.error : undefined)).find(Boolean);
+  const total = calls.reduce((sum, { call }) => sum + (call.duration ?? 0), 0);
+  const title = item.summary ?? foldSummary(item.items);
+  // What the calls acted on, in order and once each: the row's quiet second half.
+  const targets = [...new Set(calls.map(({ call }) => call.detail).filter((detail): detail is string => Boolean(detail)))];
+  return (
+    <RunRowShell
+      icon={<Layers className="h-3.5 w-3.5" />}
+      title={running ? <TextShimmer>{title}</TextShimmer> : title}
+      description={targets.join(", ") || undefined}
+      descriptionMono
+      status={failed.length ? "error" : running ? "running" : "success"}
+      durationMs={total > 0 && !running ? total : undefined}
+      collapsedError={failed.length ? `${failed.length} failed${firstError ? `: ${firstError}` : ""}` : undefined}
+      defaultOpen={item.defaultOpen}
+      contentClassName="px-3 py-1.5"
+    >
+      <div data-timeline-fold="" className="flex flex-col">
+        {item.items.map((inner, index) => (
+          <AgentTimelineStep
+            key={inner.id}
+            item={inner}
+            previous={index > 0 ? agentTimelineStepKind(item.items[index - 1]) : undefined}
+            renderToolActions={renderToolActions}
+            viewerId={viewerId}
+          />
+        ))}
+      </div>
+    </RunRowShell>
+  );
+}
+
 /** The transcript column every timeline sits in: centred, at the reading width. */
 export function AgentTimelineColumn({ className, children }: { className?: string; children?: ReactNode }) {
   return <div className={cn("mx-auto flex w-full max-w-5xl flex-col px-4 py-4", className)}>{children}</div>;
@@ -317,7 +417,7 @@ export function AgentTimelineStep({ item, previous, headed, renderToolActions, v
 function TimelineItem({ item, headed, renderToolActions, viewerId }: Omit<AgentTimelineStepProps, "previous">): ReactNode {
   if (item.kind === "message") {
     return item.role === "user" ? (
-      <UserMessage content={item.content} timestamp={item.timestamp} author={item.author} viewerId={viewerId} />
+      <UserMessage content={item.content} timestamp={item.timestamp} author={item.author} viewerId={viewerId} collapsedLines={item.collapsedLines} />
     ) : (
       <AssistantMessage item={item} author={headed ? item.author : undefined} />
     );
@@ -360,6 +460,8 @@ function TimelineItem({ item, headed, renderToolActions, viewerId }: Omit<AgentT
       </ToolCallGroup>
     );
   }
+
+  if (item.kind === "fold") return <FoldStep item={item} renderToolActions={renderToolActions} viewerId={viewerId} />;
 
   if (item.kind === "status") return <StatusCard item={item} />;
   if (item.kind === "artifact") return <ArtifactCard item={item} />;

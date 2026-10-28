@@ -113,7 +113,7 @@ export function RunRowShell({
           data-run-row=""
           data-state={open ? "open" : "closed"}
           className={cn(
-            "group min-w-0 flex-1 overflow-hidden border transition-colors",
+            "min-w-0 flex-1 overflow-hidden border transition-colors",
             open
               ? "border-border bg-[var(--md3-surface-container)]"
               : "border-transparent bg-transparent",
@@ -125,8 +125,11 @@ export function RunRowShell({
           <Collapsible.Trigger asChild disabled={!expandable}>
             <button
               type="button"
+              // The header is the hover group, not the whole card: rows nested in an
+              // open row (a fold's steps) keep their own glyphs while the
+              // pointer is over them.
               className={cn(
-                "flex w-full items-center gap-2 text-left",
+                "group flex w-full items-center gap-2 text-left",
                 HEADER_INSET,
                 expandable ? "cursor-pointer" : "cursor-default",
               )}

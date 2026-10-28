@@ -316,3 +316,27 @@ describe("AgentTimeline status cards", () => {
     expect(glyph("warning")).toContain("lucide-triangle-alert")
   })
 })
+
+describe("AgentTimeline folds", () => {
+  const call = (id: string, type: "read" | "bash", detail: string, status: "success" | "error" = "success"): AgentTimelineItem => ({
+    id,
+    kind: "tool",
+    call: { id, type, label: type === "read" ? "Read" : "Shell", status, detail },
+    part: { type: "tool", id, tool: type, state: status === "error" ? { status: "error", input: { path: detail }, error: `File not found: ${detail}` } : { status: "completed", input: { path: detail }, output: "ok" } },
+  })
+
+  it("folds a run of calls into one row that names what they did and opens to the rows", async () => {
+    const user = userEvent.setup()
+    render(<AgentTimeline items={[{ id: "f", kind: "fold", items: [call("a", "read", "inputs/commission.md"), call("b", "read", "inputs/claims.json"), call("c", "bash", "ls repo")] }]} />)
+    const row = screen.getByRole("button", { name: /Read 2 files · Ran 1 command/ })
+    expect(screen.queryByText("Shell")).not.toBeInTheDocument()
+    await user.click(row)
+    expect(screen.getByText("Shell")).toBeInTheDocument()
+    expect(screen.getAllByText("Read")).toHaveLength(2)
+  })
+
+  it("keeps a failure visible under a closed fold", () => {
+    render(<AgentTimeline items={[{ id: "f", kind: "fold", items: [call("a", "read", "a.md"), call("b", "read", "b.md", "error")] }]} />)
+    expect(screen.getByText("1 failed: File not found: b.md")).toBeInTheDocument()
+  })
+})
