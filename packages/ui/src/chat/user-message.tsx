@@ -68,11 +68,9 @@ function BubbleText({ text, lines }: { text: string; lines?: number }) {
         ref={body}
         className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}
         style={folded ? {
-          display: "-webkit-box",
-          WebkitLineClamp: lines,
-          WebkitBoxOrient: "vertical",
+          maxHeight: `${lines}lh`,
           overflow: "hidden",
-          ...(over ? { maskImage: "linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent)", WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent)" } : {}),
+          ...(over ? { maskImage: "linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent)", WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent)" } : {}),
         } : undefined}
       >
         {text}
