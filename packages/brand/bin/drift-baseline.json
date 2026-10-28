@@ -619,29 +619,32 @@
   "roots": [
    ""
   ],
+  "exclude": [
+   ":!src/lib/.server/sandbox/creative/*"
+  ],
   "branch": "master",
-  "head": "41bfb73951a0",
-  "tsx_files": 144,
-  "css_files": 3,
+  "head": "75cdc091b353",
+  "tsx_files": 148,
+  "css_files": 5,
   "versions": {
    "agent-app": [
-    "0.60.185"
+    "1.0.8"
    ],
    "brand": [
-    "1.26.0"
+    "1.31.1"
    ],
    "sandbox-ui": [
-    "0.134.10"
+    "1.1.10"
    ],
    "ui": [
-    "11.40.0"
+    "11.51.1"
    ]
   },
   "importing_files": {
-   "brand": 3,
-   "ui": 21,
-   "sandbox-ui": 112,
-   "agent-app": 273
+   "brand": 1,
+   "ui": 29,
+   "sandbox-ui": 113,
+   "agent-app": 400
   },
   "by_file": {
    "raw_palette": {},
@@ -662,7 +665,6 @@
    },
    "page_heading": {
     "src/components/access-refusal.tsx": 1,
-    "src/components/workspace-terminal-panel.tsx": 2,
     "src/root.tsx": 1,
     "src/routes/_index.tsx": 1,
     "src/routes/admin.integrations.tsx": 1,
@@ -692,7 +694,7 @@
   "size_literal": 0,
   "native_control": 0,
   "control_override": 4,
-  "page_heading": 17,
+  "page_heading": 15,
   "shell_override": 4,
   "header_height_literal": 0,
   "transcript_type_override": 0,

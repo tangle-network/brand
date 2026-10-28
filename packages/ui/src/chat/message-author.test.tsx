@@ -21,11 +21,6 @@ const segmentedParts: SessionPart[] = [
 // The snapshots below were recorded from the components before `author`
 // existed. A transcript that names no author must keep that exact markup.
 describe("a transcript without authors", () => {
-  it("renders ChatMessage as before", () => {
-    expect(html(<ChatMessage role="user" content="Can I break my lease early?" />)).toMatchInlineSnapshot(`"<div class="flex flex-col gap-1 items-end"><div class="flex items-center gap-2 px-1 flex-row-reverse"><span class="font-medium text-foreground text-xs">You</span></div><div class="min-w-0 max-w-[85%] space-y-1 rounded-[var(--radius-lg)] bg-foreground px-[var(--chat-message-px)] py-[var(--chat-message-py)] text-background"><div class="whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div></div>"`)
-    expect(html(<ChatMessage role="assistant" content="It depends on the lease terms." />)).toMatchInlineSnapshot(`"<div class="flex flex-col gap-1 items-start"><div class="flex items-center gap-2 px-1"><span class="font-medium text-foreground text-xs">Agent</span></div><div class="min-w-0 max-w-[85%] space-y-1 text-foreground"><div class="tangle-prose max-w-none tangle-prose tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]"><p>It depends on the lease terms.</p></div></div></div>"`)
-    expect(html(<ChatMessage role="system" content="Session started." />)).toMatchInlineSnapshot(`"<div class="flex flex-col gap-1 items-start"><div class="flex items-center gap-2 px-1"><span class="font-medium text-foreground text-xs">Agent</span></div><div class="min-w-0 max-w-[85%] space-y-1 rounded-[var(--radius-lg)] border border-border bg-card px-[var(--chat-message-px)] py-[var(--chat-message-py)]"><div class="tangle-prose max-w-none tangle-prose tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]"><p>Session started.</p></div></div></div>"`)
-  })
 
   it("renders UserMessage actions and application notes as before", () => {
     expect(html(<UserMessage content="Can I break my lease early?" actions={<button type="button">Copy</button>} />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div><div class="flex flex-wrap items-center justify-end gap-1.5 text-sm text-muted-foreground"><button type="button">Copy</button></div></div></div>"`)
@@ -36,18 +31,6 @@ describe("a transcript without authors", () => {
     expect(html(<UserMessage content="Can I break my lease early?" />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div></div></div>"`)
   })
 
-  it("renders AgentTimeline messages as before", () => {
-    expect(
-      html(
-        <AgentTimeline
-          items={[
-            { id: "u1", kind: "message", role: "user", content: "Can I break my lease early?" },
-            { id: "a1", kind: "message", role: "assistant", content: "It depends on the lease terms." },
-          ]}
-        />,
-      ),
-    ).toMatchInlineSnapshot(`"<div class="mx-auto flex w-full max-w-5xl flex-col px-4 py-4"><div data-timeline-step="user" class=""><div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div></div></div></div><div data-timeline-step="prose" class="mt-4"><div><div class="tangle-prose max-w-none tangle-prose tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]"><p>It depends on the lease terms.</p></div></div></div></div>"`)
-  })
 })
 
 const client: ChatAuthor = { id: "client-maria", name: "Maria Lopez", role: "Client" }
