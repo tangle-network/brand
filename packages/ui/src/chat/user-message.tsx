@@ -66,7 +66,6 @@ function BubbleText({ text, lines }: { text: string; lines?: number }) {
     <>
       <div
         ref={body}
-        data-user-message-body=""
         className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}
         style={folded ? {
           display: "-webkit-box",
