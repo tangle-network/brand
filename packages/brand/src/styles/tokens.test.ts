@@ -589,6 +589,15 @@ describe("categorical tones are a complete, legible family", () => {
   });
 });
 
+describe("syntax keywords use a text-safe category role", () => {
+  it.each([["dark", DARK], ["light", LIGHT]] as const)("%s keywords clear AA on every code plane", (_, spine) => {
+    const ink = hexIn(spine, "syntax-keyword");
+    for (const plane of ["hsl-background", "hsl-card", "hsl-popover"]) {
+      expect(contrastRatio(ink, hexIn(spine, plane)), `keyword on ${plane}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
+
 describe("the generated palette owns every colour", () => {
   it.each([
     ["dark", DARK],
