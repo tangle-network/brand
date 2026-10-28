@@ -49,6 +49,8 @@ export function resolveValue(scope, name, baseline = {}, seen = new Set()) {
   seen.add(name);
   const v = scope[name] ?? baseline[name];
   if (v == null) throw new Error(`--${name} is not defined`);
+  const literal = v.match(/^hsl\(([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\)$/);
+  if (literal) return hslHex(+literal[1], +literal[2], +literal[3]);
   const ref = v.match(/^var\(--([a-z0-9-]+)\)$/);
   if (ref) return resolveValue(scope, ref[1], baseline, seen);
   const wrapped = v.match(/^hsl\(var\(--([a-z0-9-]+)\)\)$/);
