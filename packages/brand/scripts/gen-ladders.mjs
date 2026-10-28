@@ -7,7 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { block, decls } from './css-resolve.mjs'
-import { CATEGORY, renderTemplates, tone } from './palette.mjs'
+import { CATEGORY, hsl, renderTemplates, tone } from './palette.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -93,21 +93,6 @@ const hex = (ref, theme) => {
   if (ref.startsWith('#')) return ref
   const [ramp, step] = ref.split('-')
   return R[ramp][theme][Number(step) - 1]
-}
-const hsl = (h) => {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
-  const max = Math.max(r, g, b)
-  const min = Math.min(r, g, b)
-  const l = (max + min) / 2
-  let s = 0
-  let hue = 0
-  if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4
-    hue *= 60
-  }
-  return `${Math.round(hue)} ${Math.round(s * 1000) / 10}% ${Math.round(l * 1000) / 10}%`
 }
 
 const W = '#ffffff'
@@ -511,9 +496,9 @@ if (CHECK) {
     console.error(`stale: ${stale.join(', ')}; run pnpm --filter @tangle-network/brand gen:ladders`)
     process.exit(1)
   }
-  console.log('ladders.css, system.css, the tokens.css tone regions and the agents theme are current.')
+  console.log('ladders.css, system.css, the tokens.css tone regions and all canonical and named palettes are current.')
 } else {
   fs.mkdirSync(OUT, { recursive: true })
   for (const [file, text] of outputs) fs.writeFileSync(path.join(OUT, file), text)
-  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and the agents theme and ${ACCENT_NAMES.length} accent scopes (${follows.length} derived tokens) in named-themes.css to ${OUT}`)
+  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and all named themes and ${ACCENT_NAMES.length} accent scopes (${follows.length} derived tokens) in named-themes.css to ${OUT}`)
 }
