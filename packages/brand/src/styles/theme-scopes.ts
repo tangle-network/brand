@@ -39,7 +39,7 @@ const named = (selector: string) => spine(themes, selector);
  * Each scope lists its sources from the most specific to the baseline it
  * inherits from, as the cascade resolves them.
  */
-export const scopes: Array<{ name: string; sources: string[] }> = [
+const baseScopes: Array<{ name: string; sources: string[] }> = [
   { name: "canonical dark", sources: [DARK] },
   { name: "canonical light", sources: [LIGHT, DARK] },
   {
@@ -80,13 +80,17 @@ export const scopes: Array<{ name: string; sources: string[] }> = [
     sources: [named('[data-theme="website"]:where(:not(.dark))'), LIGHT, DARK],
   },
   { name: "website dark", sources: [named('.dark[data-theme="website"]'), DARK] },
-  // Every data-accent scope on each canonical mode: its role rule, then the spine.
+];
+
+// Accent is promised on any named boundary, so use every real supported mode,
+// including the light-default projection, rather than only canonical planes.
+export const scopes = [
+  ...baseScopes,
   ...[...themes.matchAll(/^\[data-accent="([a-z]+)"\],$/gm)].flatMap(([, hue]) => {
     const rule = blockIn(themes, `[data-accent="${hue}"] :is(.light, .dark, [data-theme], [data-sandbox-ui], [data-sandbox-theme])`);
-    return [
-      { name: `accent ${hue} on dark`, sources: [rule, DARK] },
-      { name: `accent ${hue} on light`, sources: [rule, LIGHT, DARK] },
-    ];
+    return baseScopes.filter(({ name }) => !name.startsWith("system ")).map(({ name, sources }) => ({
+      name: `accent ${hue} on ${name}`, sources: [rule, ...sources],
+    }));
   }),
 ];
 
