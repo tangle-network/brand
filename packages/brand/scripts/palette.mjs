@@ -68,6 +68,12 @@ const colour = (hue, sat, L) => hslHex(hue, sat, L)
 const hueInk = (hue, sat, planes, target, dark) => inkOn(planes, target, dark, (L) => colour(hue, sat, L))
 const alpha = (hex, opacity) => `rgb(${rgb(hex).map((c) => Math.round(c * 255)).join(' ')} / ${opacity})`
 
+// Every product uses the same ink vocabulary. Account for each supported
+// plane before solving it, including the highest nested Hospitality card.
+const envelope = (dark) => Object.entries(THEMES).filter(([key]) => (key !== 'light' && !key.endsWith('-light')) === dark)
+  .flatMap(([key, [h, c, levels]]) => [...levels.slice(0, 5), ...(key === 'hospitality' ? [43.9] : [])]
+    .map((L) => lch(L, L === 100 ? 0 : dark ? c * L / 100 : c, h)))
+
 export function palette(name) {
   if (CACHE.has(name)) return CACHE.get(name)
   const [hue, chroma, levels, accentHue] = THEMES[name]
@@ -130,8 +136,7 @@ export function palette(name) {
   out['bg-input'] = h('hsl-input')
   // Shared status inks must also survive named planes, including their 10%
   // destructive tint. Solve once against all modes' planes, never by product.
-  const statusPlanes = Object.entries(THEMES).filter(([key]) => (key !== 'light' && !key.endsWith('-light')) === dark)
-    .flatMap(([, [h, c, ls]]) => ls.slice(0, 5).map((L) => lch(L, L === 100 ? 0 : dark ? c * L / 100 : c, h)))
+  const statusPlanes = envelope(dark)
   for (const [tone, statusHue] of Object.entries(STATUS)) {
     const ink = solve((L) => colour(statusHue, tone === 'danger' ? 75 : 65, L),
       (c) => statusPlanes.every((p) => contrast(c, p) >= 5.3 && contrast(c, mix(c, p, .1)) >= 4.65), !dark)
@@ -201,10 +206,11 @@ export function tone(name, mode) {
   const fills = dark
     ? [1.32, 1.47, 1.62].map((target) => solve((L) => colour(hue, 32, L), (c) => luminance(c) > luminance(card) && contrast(c, card) >= target))
     : [.065, .12, .18].map((t) => mix(fill, WHITE, t))
-  const text = hueInk(hue, sat, fills, 4.65, dark)
-  const icon = hueInk(hue, sat, fills, 3.15, dark)
-  const tints = [page, card, muted].flatMap((p) => [.1, .15, .2].map((t) => mix(fill, p, t)))
-  const ink = hueInk(hue, sat, [page, card, ...fills, ...tints], 4.65, dark)
+  const planes = envelope(dark)
+  const text = hueInk(hue, sat, [...fills, ...planes], 4.65, dark)
+  const icon = hueInk(hue, sat, [...fills, ...planes], 3.15, dark)
+  const tints = [...planes, page, card, muted].flatMap((p) => [.1, .15, .2].map((t) => mix(fill, p, t)))
+  const ink = hueInk(hue, sat, [...planes, page, card, ...fills, ...tints], 4.65, dark)
   const ring = dark ? ink : fill
   if (contrast(mix(ring, card, .8), card) < 3) throw new Error(`${name} ${mode}: focus border below 3:1`)
   const inverse = palette('light')['md3-inverse-surface']
