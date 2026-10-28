@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.51.1
+
+### Patch Changes
+
+- dfdfc77: Keep streamed blockquotes stable under host typography styles by suppressing generated quotation marks. Explicit quotation marks in Markdown content remain visible.
+
 ## 11.51.0
 
 ### Minor Changes
