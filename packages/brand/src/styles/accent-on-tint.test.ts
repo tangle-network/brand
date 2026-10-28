@@ -20,6 +20,7 @@ const SURFACES = [
   ["canvas", "hsl-background"],
   ["card", "hsl-card"],
   ["muted", "hsl-muted"],
+  ["popover", "hsl-popover"],
 ] as const;
 
 describe("accent text reads on the selected tint in every theme scope", () => {
@@ -27,7 +28,9 @@ describe("accent text reads on the selected tint in every theme scope", () => {
     it(name, () => {
       const accentText = resolve(sources, "accent-text");
       const primary = resolve(sources, "hsl-primary");
-      for (const [surfaceName, token] of SURFACES) {
+      const raised = sources.some((source) => source.includes("--hsl-raised-2:"))
+        ? [["highest nested card", "hsl-raised-2"] as const] : [];
+      for (const [surfaceName, token] of [...SURFACES, ...raised]) {
         const surface = resolve(sources, token);
         for (const alpha of TINTS) {
           const tint = compositeOver(primary, surface, alpha);

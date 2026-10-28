@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.1
+
+### Patch Changes
+
+- 1986f4e: Generate canonical and named palettes, ink tiers, status colours and accent roles from shared theme inputs. Preserve public token names and mode boundaries while giving named themes their own raised planes and wells.
+
 ## 1.31.0
 
 ### Minor Changes

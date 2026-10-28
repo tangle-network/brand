@@ -589,25 +589,46 @@ describe("categorical tones are a complete, legible family", () => {
   });
 });
 
-describe("each colour is declared once: a role, then aliases", () => {
-  // The spine is authored as roles (planes, ink tiers, four indigos, one ink
-  // per status hue) that every other name of the same colour aliases. A new
-  // hex literal is a second declaration of a colour that already has a name,
-  // so the count can only fall. The generated tone region is excluded: its
-  // values are the generator's, solved from the planes declared here.
-  const literalsOutsideTones = (spine: string) => {
-    const set = new Set<string>();
-    for (const [, name, value] of spine.matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/g)) {
-      if (/^(tone-|surface-(violet|orange|teal)-)/.test(name)) continue;
-      for (const hex of value.match(/#[0-9a-fA-F]{6}\b/g) ?? []) set.add(hex.toLowerCase());
+describe("syntax keywords use a text-safe category role", () => {
+  it.each([["dark", DARK], ["light", LIGHT]] as const)("%s keywords clear AA on every code plane", (_, spine) => {
+    const ink = hexIn(spine, "syntax-keyword");
+    for (const plane of ["hsl-background", "hsl-card", "hsl-popover"]) {
+      expect(contrastRatio(ink, hexIn(spine, plane)), `keyword on ${plane}`).toBeGreaterThanOrEqual(4.5);
     }
-    return set;
-  };
+  });
+});
+
+describe("text-bearing accent gradients keep AA at every stop", () => {
+  const named = readFileSync(path.resolve(import.meta.dirname, "named-themes.css"), "utf8");
+  const namedRules = [...named.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]*)\{([^{}]*--hsl-background:[^{}]*)\}/g)];
+  const cases = [["dark", [DARK]], ["light", [LIGHT, DARK]], ...namedRules.map(([, selector, body]) => [selector.trim(), [body, /-light|not\(\.dark\)/.test(selector) ? LIGHT : DARK, DARK]])] as const;
+  for (const [name, chain] of cases) {
+    it(String(name), () => {
+      const sources = [...chain];
+      const gradient = resolveIn(sources, "accent-gradient-strong");
+      const stops = [...gradient.matchAll(/var\(--([a-z0-9-]+)\)/g)].map((match) => match[1]);
+      expect(stops.length).toBeGreaterThanOrEqual(2);
+      const label = hexIn(sources, "btn-primary-text");
+      for (const stop of stops) expect(contrastRatio(hexIn(sources, stop), label), stop).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});
+
+describe("the generated palette owns every colour", () => {
   it.each([
-    ["dark", DARK, 28],
-    ["light", LIGHT, 25],
-  ] as const)("%s spine declares no new hex literal", (_, spine, ceiling) => {
-    expect(literalsOutsideTones(spine).size).toBeLessThanOrEqual(ceiling);
+    ["dark", DARK],
+    ["light", LIGHT],
+  ] as const)("%s spine declares at most 30 distinct hex literals, including tones", (_, spine) => {
+    const literals = new Set((spine.match(/#[0-9a-fA-F]{6}\b/g) ?? []).map((hex) => hex.toLowerCase()));
+    expect(literals.size).toBeLessThanOrEqual(30);
+  });
+
+  it("has no authored hex outside generated blocks", () => {
+    const named = readFileSync(path.resolve(import.meta.dirname, "named-themes.css"), "utf8");
+    for (const css of [tokens, named]) {
+      expect(css).toContain("/* palette:begin");
+      expect(css.replace(/\/\* palette:begin[\s\S]*?\/\* palette:end \*\//g, "")).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    }
   });
 });
 

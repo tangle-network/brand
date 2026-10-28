@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { blockIn, blocksIn, hslToRgb } from "./css-test-utils";
+import { blockIn, blocksIn, hexIn } from "./css-test-utils";
 
 /**
  * Every theme scope a consumer can select, each with its CSS sources listed
@@ -39,7 +39,7 @@ const named = (selector: string) => spine(themes, selector);
  * Each scope lists its sources from the most specific to the baseline it
  * inherits from, as the cascade resolves them.
  */
-export const scopes: Array<{ name: string; sources: string[] }> = [
+const baseScopes: Array<{ name: string; sources: string[] }> = [
   { name: "canonical dark", sources: [DARK] },
   { name: "canonical light", sources: [LIGHT, DARK] },
   {
@@ -80,13 +80,17 @@ export const scopes: Array<{ name: string; sources: string[] }> = [
     sources: [named('[data-theme="website"]:where(:not(.dark))'), LIGHT, DARK],
   },
   { name: "website dark", sources: [named('.dark[data-theme="website"]'), DARK] },
-  // Every data-accent scope on each canonical mode: its role rule, then the spine.
+];
+
+// Accent is promised on any named boundary, so use every real supported mode,
+// including the light-default projection, rather than only canonical planes.
+export const scopes = [
+  ...baseScopes,
   ...[...themes.matchAll(/^\[data-accent="([a-z]+)"\],$/gm)].flatMap(([, hue]) => {
     const rule = blockIn(themes, `[data-accent="${hue}"] :is(.light, .dark, [data-theme], [data-sandbox-ui], [data-sandbox-theme])`);
-    return [
-      { name: `accent ${hue} on dark`, sources: [rule, DARK] },
-      { name: `accent ${hue} on light`, sources: [rule, LIGHT, DARK] },
-    ];
+    return baseScopes.filter(({ name }) => !name.startsWith("system ")).map(({ name, sources }) => ({
+      name: `accent ${hue} on ${name}`, sources: [rule, ...sources],
+    }));
   }),
 ];
 
@@ -98,18 +102,5 @@ export type Rgb = [number, number, number];
  * declares each name.
  */
 export function resolve(sources: string[], token: string): Rgb {
-  const raw = sources
-    .map((css) => css.match(new RegExp(`(?<![\\w-])--${token}:\\s*([^;]+);`))?.[1]?.trim())
-    .find((value) => value !== undefined);
-  if (raw === undefined) throw new Error(`--${token} resolves to nothing`);
-
-  const ref = /^(?:hsl\()?var\(--([a-z0-9-]+)\)\)?$/.exec(raw);
-  if (ref) return resolve(sources, ref[1]);
-  const hex = /^#([0-9a-fA-F]{6})\b/.exec(raw);
-  if (hex) {
-    return [0, 2, 4].map((i) => Number.parseInt(hex[1].slice(i, i + 2), 16)) as Rgb;
-  }
-  const hsl = /^([\d.]+)\s+([\d.]+)%\s+([\d.]+)%/.exec(raw);
-  if (hsl) return hslToRgb({ h: Number(hsl[1]), s: Number(hsl[2]), l: Number(hsl[3]) });
-  throw new Error(`--${token} has an unreadable value: ${raw}`);
+  return hexIn(sources, token);
 }

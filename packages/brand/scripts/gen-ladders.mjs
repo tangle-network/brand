@@ -1,24 +1,13 @@
 #!/usr/bin/env node
-// Writes ladders.css and system.css from radix-ramps.json.
-//
-//   node scripts/gen-ladders.mjs [--check] [ramps.json] [out-dir]
-//
-// out-dir must hold the tokens.css whose tone regions are rewritten.
-//
-// It also writes the categorical tone family and each hue's accent roles into
-// the two marked regions of tokens.css (plus their data-tone scopes), and the
-// agents named theme and the data-accent scopes into named-themes.css, so every consumer of the canonical stylesheet (and the
-// legacy-light projection generated from it) carries the same values. --check
-// writes nothing and fails when any of the four outputs is stale.
-//
-// radix-ramps.json holds the @radix-ui/colors 3.0.0 values as static data, so
-// the generated CSS has no runtime dependency. Apps that ship ahead of a brand
-// release copy the two generated files verbatim; running this script is the
-// only way to change a value, so every copy stays identical.
+// Generates every spine, named theme, category and accent from palette.mjs.
+// palette-template.css owns only public names, selectors and aliases.
+// Optional legacy ladder/system exports keep their static Radix data.
+// node scripts/gen-ladders.mjs [--check] [ramps.json] [out-dir]
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { block, decls, hslHex, resolveHex } from './css-resolve.mjs'
+import { block, decls } from './css-resolve.mjs'
+import { CATEGORY, hsl, renderTemplates, tones } from './palette.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -54,8 +43,8 @@ const LIGHT_SEL = '[data-sandbox-theme="vault"],\n[data-theme="light"],\n.light'
 
 // The canonical spine, read once: system.css takes its shadow colour from it
 // and the tones below are solved against its planes.
-const TOKENS_FILE = path.join(OUT, 'tokens.css')
-const tokensSource = fs.readFileSync(TOKENS_FILE, 'utf8')
+const [tokenTemplate, namedSource] = renderTemplates(fs.readFileSync(path.join(here, 'palette-template.css'), 'utf8'))
+const tokensSource = tokenTemplate.replace(/\/\* tones:placeholder \*\//g, '/* tones:begin */\n  /* tones:end */').replace('/* tone-scopes:placeholder */', '/* tone-scopes:begin */\n/* tone-scopes:end */')
 const DARK_SPINE = decls(block(tokensSource, '.dark'))
 const LIGHT_SPINE = decls(block(tokensSource, '\n.light'))
 const SPINE = { dark: DARK_SPINE, light: { ...DARK_SPINE, ...LIGHT_SPINE } }
@@ -104,21 +93,6 @@ const hex = (ref, theme) => {
   if (ref.startsWith('#')) return ref
   const [ramp, step] = ref.split('-')
   return R[ramp][theme][Number(step) - 1]
-}
-const hsl = (h) => {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
-  const max = Math.max(r, g, b)
-  const min = Math.min(r, g, b)
-  const l = (max + min) / 2
-  let s = 0
-  let hue = 0
-  if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4
-    hue *= 60
-  }
-  return `${Math.round(hue)} ${Math.round(s * 1000) / 10}% ${Math.round(l * 1000) / 10}%`
 }
 
 const W = '#ffffff'
@@ -364,219 +338,21 @@ ${`${DARK_SEL},\n${LIGHT_SEL}`.replace(/^/gm, '  ')} {
 }
 `
 
-// ── tones (tokens.css) ─────────────────────────────────────────────────────
-// Categorical tones tell kinds of things apart: entities, file types,
-// capabilities. They never report a state; status keeps its own hand-tuned
-// --surface-{success,warning,danger,info,neutral}-* triples above.
-//
-// The set was chosen by measurement, not taste: of the Radix ramps, these eight
-// keep the widest minimum OKLab distance between every pair on the icon and
-// text steps in both themes, and none sits within
-// 8 of the iris brand accent. Radix violet is 3.1 from iris, so the `violet`
-// category reads from the purple ramp; the name is kept because
-// --surface-violet-* already ships. Append new categories; reordering or
-// renaming one changes what an existing tile means.
-const CATEGORY = {
-  violet: 'purple',
-  orange: 'orange',
-  teal: 'teal',
-  blue: 'blue',
-  pink: 'pink',
-  brown: 'brown',
-  cyan: 'cyan',
-  lime: 'lime',
-}
-// The pre-existing categorical names, kept as aliases of the family.
+// Category identities are hue inputs, never a second authored palette.
 const LEGACY_SURFACE = ['violet', 'orange', 'teal']
-
-const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
-const channels = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
-const lum = (h) => {
-  const [r, g, b] = channels(h).map(lin)
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-const contrast = (a, b) => {
-  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x)
-  return (hi + 0.05) / (lo + 0.05)
-}
-const oklab = (h) => {
-  const [r, g, b] = channels(h).map(lin)
-  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
-  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
-  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
-  return [
-    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.808675778 * s,
-  ]
-}
-const distance = (a, b) => {
-  const [p, q] = [oklab(a), oklab(b)]
-  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 100
-}
-
-// The tones sit on the canonical planes in tokens.css, not on the Radix
-// backgrounds, so they are solved against the resting card read from there.
-// The card is an alias of the spine's HSL channels, so it is read through the
-// same resolver the tests and gen-palette use.
-const CARD = {
-  dark: resolveHex(DARK_SPINE, 'md3-surface-container'),
-  light: resolveHex(LIGHT_SPINE, 'md3-surface-container', DARK_SPINE),
-}
-
-// One value per role, solved per ramp and theme. Every rule is a floor the
-// generator enforces; an unsatisfiable ramp fails the build instead of shipping.
-//
-// Light sits on white paper, so it reads Radix steps directly:
-//   bg 3 (a wash at most 1.25:1 from paper; the border separates the chip),
-//   hover 4, selected 5, border 6.
-// Dark cannot: Radix's dark step 3 sits BELOW the #303030 card, and a sunken
-// chip reads as coloured text, while the next steps jump too far to leave room
-// for a hover and a selected fill under step-12 text. So dark fills are the
-// ramp's step 9 mixed into the card, at the least amount that lifts the fill
-// 1.3:1 (bg), 1.45:1 (hover) and 1.6:1 (selected) off it — the same low-chroma
-// raised tint as the hand-tuned status chips. Border is dark step 8.
-// Both themes:
-//   text             step 12, at least 4.5:1 on bg, hover and selected.
-//   icon             the first of steps 9-12 with 3:1 on all three fills.
-//   border-selected  the icon value: a non-text edge at 3:1. Selection also
-//                    shows a check, so it never rests on colour alone.
-const hexOf = (rgb) => `#${rgb.map((c) => Math.round(c * 255).toString(16).padStart(2, '0')).join('')}`
-const mix = (a, b, t) => hexOf(channels(a).map((c, i) => c * t + channels(b)[i] * (1 - t)))
-const lift = (tint, card, target) => {
-  for (let t = 0.01; t <= 1; t += 0.01) {
-    const fill = mix(tint, card, t)
-    if (lum(fill) > lum(card) && contrast(fill, card) >= target) return fill
-  }
-  throw new Error(`${tint} cannot lift ${target}:1 off ${card}`)
-}
-const solve = (name, ramp, theme) => {
-  const at = (step) => R[ramp][theme][step - 1]
-  const card = CARD[theme]
-  const fills =
-    theme === 'light'
-      ? [at(3), at(4), at(5)]
-      : [1.3, 1.45, 1.6].map((target) => lift(at(9), card, target))
-  if (theme === 'light' && contrast(fills[0], card) > 1.25) {
-    throw new Error(`${name} light: step 3 is no longer a wash on the card`)
-  }
-  const text = at(12)
-  const failing = fills.find((f) => contrast(text, f) < 4.5)
-  if (failing) throw new Error(`${name} ${theme}: text ${text} under 4.5:1 on ${failing}`)
-  const iconStep = [9, 10, 11, 12].find((s) => fills.every((f) => contrast(at(s), f) >= 3))
-  if (!iconStep) throw new Error(`${name} ${theme}: no icon step clears 3:1`)
-  return {
-    bg: fills[0],
-    'bg-hover': fills[1],
-    'bg-selected': fills[2],
-    border: theme === 'light' ? at(6) : at(8),
-    'border-selected': at(iconStep),
-    text,
-    icon: at(iconStep),
-  }
-}
-
-const TONES = Object.fromEntries(
-  ['dark', 'light'].map((theme) => [
-    theme,
-    Object.fromEntries(Object.entries(CATEGORY).map(([name, ramp]) => [name, solve(name, ramp, theme)])),
-  ]),
-)
-
-// Distinctness is the reason the set exists: hold it on the icon step, the
-// mark that carries the category (8.1 dark, 7.1 light today; teal/cyan is the
-// closest pair), so a new category that collides with an old one fails here.
-// Text is step 12, ink tinted toward the hue, and light fills are near-white
-// washes; neither is meant to tell categories apart on its own.
-for (const theme of ['dark', 'light']) {
-  const names = Object.keys(CATEGORY)
-  for (let i = 0; i < names.length; i++) {
-    for (let j = i + 1; j < names.length; j++) {
-      const d = distance(TONES[theme][names[i]].icon, TONES[theme][names[j]].icon)
-      if (d < 5.5) throw new Error(`${theme} icon: ${names[i]} and ${names[j]} are ${d.toFixed(1)} apart in OKLab (floor 5.5)`)
-    }
-  }
-}
-
-// ── accent scopes (tokens.css tone regions + named-themes.css) ─────────────
-// data-accent="<category>" on <html> or any theme boundary retints the
-// interaction accent to that category's hue: the four indigo roles of the spine
-// (fill, mark, line, ink) and the ring. Planes, body ink and status never move.
-// Each hue's roles are solved per mode against the canonical planes and written
-// into the tone regions as --tone-<hue>-{fill,ring,mark,line,ink}.
-//   fill  carries white at 4.5:1, also at its 10% lighter hover; one value in both modes, as the indigo is
-//   ink   step 11 toward 12 until 4.5:1 on the page, the card and every selected tint (accent-on-tint.test.ts)
-//   line  the first step from 9 with 3:1 on the page and the card
-//   mark  step 9, the brand fill of a logo or a hero; never under text
-//   ring  the ink in dark and the fill in light, as the spine's ring is; 3:1 on the card at the focus border's 80%
+const TONE_ROLES = ['bg', 'bg-hover', 'bg-selected', 'border', 'border-selected', 'text', 'icon']
+const TONES = Object.fromEntries(['dark', 'light'].map((mode) => [mode,
+  tones(mode),
+]))
 const WHITE = '#ffffff'
-// The solver works in rounded hex and the tests composite in floats; aiming a
-// hair above the 4.5:1 floor keeps a solved pair from rounding under it.
-const AA = 4.55
-const PLANE = (name) => ({ dark: resolveHex(DARK_SPINE, name), light: resolveHex(LIGHT_SPINE, name, DARK_SPINE) })
-const PAGE = PLANE('md3-surface')
-const MUTED = PLANE('hsl-muted')
-const INVERSE = PLANE('md3-inverse-surface')
-const channel = (hex) => hsl(hex)
-const rounded = (hex) => hslHex(...channel(hex).split(' ').map(parseFloat))
-const toward = (from, to, ok) => {
-  for (let t = 0; t <= 1.0001; t += 0.01) {
-    const c = rounded(mix(to, from, t))
-    if (ok(c)) return c
-  }
-  return null
-}
-const solveAccent = (name, ramp) => {
-  const at = (theme, step) => R[ramp][theme][step - 1]
-  const carriesWhite = (c) => contrast(WHITE, c) >= AA && contrast(WHITE, mix(WHITE, c, 0.1)) >= AA
-  const fill = [9, 10, 11].map((s) => rounded(at('light', s))).find(carriesWhite) ?? toward(at('light', 11), at('light', 12), carriesWhite)
-  if (!fill) throw new Error(`accent ${name}: no fill carries white at 4.5:1`)
-  const out = {}
-  for (const theme of ['dark', 'light']) {
-    const planes = [PAGE[theme], CARD[theme]]
-    const tints = [PAGE, CARD, MUTED].flatMap((p) => [0.1, 0.15, 0.2].map((a) => mix(fill, p[theme], a)))
-    const ink = toward(at(theme, 11), at(theme, 12), (c) => [...planes, ...tints].every((p) => contrast(c, p) >= AA))
-    const line = [9, 10, 11, 12].map((s) => at(theme, s)).find((c) => planes.every((p) => contrast(c, p) >= 3))
-    if (!ink || !line) throw new Error(`accent ${name} ${theme}: no ${ink ? 'line' : 'ink'} clears its floor`)
-    const ring = theme === 'dark' ? ink : fill
-    if (contrast(mix(ring, CARD[theme], 0.8), CARD[theme]) < 3) throw new Error(`accent ${name} ${theme}: focus border under 3:1`)
-    out[theme] = { fill: channel(fill), ring: channel(ring), mark: at(theme, 9), line, ink }
-  }
-  // The derived inks in ACCENT_DERIVED keep the pairs the spine documents.
-  const pairs = [
-    ['softened ink on the deep field', mix(WHITE, out.dark.ink, 0.35), mix('#000000', fill, 0.5), 4.5],
-    ['ink on the light tint', out.light.ink, mix(out.light.ink, WHITE, 0.12), 4.5],
-    ['inverse ink on the inverse surface', mix(WHITE, out.light.mark, 0.4), INVERSE.light, 4.5],
-  ]
-  for (const [pair, a, b, floor] of pairs) {
-    if (contrast(a, b) < floor) throw new Error(`accent ${name}: ${pair} is ${contrast(a, b).toFixed(2)}:1`)
-  }
-  return out
-}
-const ACCENT_SOLVED = Object.fromEntries(Object.entries(CATEGORY).map(([name, ramp]) => [name, solveAccent(name, ramp)]))
-const ACCENTS = Object.fromEntries(
-  ['dark', 'light'].map((theme) => [theme, Object.fromEntries(Object.entries(ACCENT_SOLVED).map(([n, a]) => [n, a[theme]]))]),
-)
 
 const toneRegion = (theme) => {
   const lines = ['  /* tones:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */']
   for (const [name, roles] of Object.entries(TONES[theme])) {
-    for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value};`)
+    for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value.startsWith('#') ? `hsl(${hsl(value)})` : value};`)
   }
-  // Literal values rather than var() aliases: tests and consumers read these
-  // as hex, and this generator is the only writer of both. The legacy -text
-  // names keep their hue: sandbox-ui colours glyphs with them straight on the
-  // card, so they take step 11, darkened toward step 12 only as far as 4.5:1
-  // on the fill needs (light orange and teal).
   for (const name of LEGACY_SURFACE) {
-    const tone = TONES[theme][name]
-    const ramp = R[CATEGORY[name]][theme]
-    let text = ramp[10]
-    for (let t = 0.01; contrast(text, tone.bg) < 4.5; t += 0.01) text = mix(ramp[11], ramp[10], t)
-    lines.push(`  --surface-${name}-bg: ${tone.bg};`, `  --surface-${name}-border: ${tone.border};`, `  --surface-${name}-text: ${text};`)
-  }
-  for (const [name, roles] of Object.entries(ACCENTS[theme])) {
-    for (const [role, value] of Object.entries(roles)) lines.push(`  --tone-${name}-${role}: ${value};`)
+    for (const role of ['bg', 'border', 'text']) lines.push(`  --surface-${name}-${role}: var(--tone-${name}-${role});`)
   }
   lines.push('  /* tones:end */')
   return lines.join('\n')
@@ -594,7 +370,6 @@ const tokens = tokensSource.replace(REGION, () => toneRegion(regionIndex++ === 0
 // already follow the theme. An alias resolves where it is declared, so it is
 // declared again on every mode boundary inside the scope; otherwise a nested
 // light, dark or named island would inherit the outer mode's colours.
-const TONE_ROLES = Object.keys(TONES.dark[Object.keys(CATEGORY)[0]])
 const MODE_BOUNDARY = ':is(.light, .dark, [data-theme], [data-sandbox-ui], [data-sandbox-theme])'
 const toneScopes = [
   '/* tone-scopes:begin — generated by scripts/gen-ladders.mjs; edit its CATEGORY map, not these lines. */',
@@ -606,49 +381,10 @@ const toneScopes = [
 ].join('\n')
 const SCOPES = /\/\* tone-scopes:begin[^\n]*\*\/\n(?:.*\n)*?\/\* tone-scopes:end \*\//m
 if (!SCOPES.test(tokens)) throw new Error('tokens.css: the tone-scopes region is missing')
-const tokensOut = tokens.replace(SCOPES, toneScopes)
+const generated = (css) => `/* palette:begin — generated by scripts/gen-ladders.mjs; edit palette.mjs or palette-template.css. */\n${css.trim()}\n/* palette:end */\n`
+const tokensOut = generated(tokens.replace(SCOPES, toneScopes))
 
-// ── agents named theme (named-themes.css) ──────────────────────────────────
-// Agent Builder's identity: white light pages whose cards separate by shadow,
-// and a mauve neutral ladder in both modes. It is the MAP above restricted to
-// the canonical spine: surfaces, text and borders only. Accent, status and
-// category tokens keep their canonical values, so the theme can never change
-// what the brand colour, a state or a category looks like. Values are literal,
-// so the theme needs no ladders.css.
-const KEEP_CANONICAL =
-  /^(hsl-(primary|ring|destructive|success|warning|info)|sidebar-(primary|ring)|md3-(primary|on-primary|error|on-error|surface-tint)|bg-selection|border-accent|btn-|accent-|brand-|surface-|status-)/
 const NAMED_FILE = path.join(OUT, 'named-themes.css')
-const namedSource = fs.readFileSync(NAMED_FILE, 'utf8')
-// A named theme overrides spine tokens and never introduces a name, so the
-// system.css-only roles (bg-page, line, fg, ink, accent-solid ...) stay out.
-const inSpine = (t) => new RegExp(`--${t}:`).test(tokensSource)
-const agentsMap = MAP.filter(([t]) => inSpine(t) && !KEEP_CANONICAL.test(t))
-const agentsBlock = (theme) => {
-  const decls = agentsMap.map(([t, l, d, kind]) => {
-    const value = hex(theme === 'light' ? l : d, theme)
-    return `  --${t}: ${kind === 'hsl' ? hsl(value) : value};`
-  })
-  const shadows = theme === 'light' ? shadowsLight : shadowsDark
-  // shadow-1..3 are this generator's names; the spine reads the three roles.
-  const [one, two, three] = [1, 2, 3].map((n) => shadows.match(new RegExp(`--shadow-${n}: ([^;]+);`))[1])
-  decls.push(`  --shadow-card: ${one};`, `  --shadow-dropdown: ${two};`, `  --shadow-overlay: ${three};`)
-  return decls.join('\n')
-}
-const agentsRegion = `/* agents:begin — generated by scripts/gen-ladders.mjs from its MAP; edit there, not these lines.
- * Agents (Agent Builder): white light pages, cards separated by shadow, and a
- * mauve neutral ladder. Surfaces, text and borders only; the accent, status
- * and category tokens stay canonical. Select data-theme="agents" for dark and
- * data-theme="agents-light" for light. */
-[data-theme="agents"] {
-${agentsBlock('dark')}
-}
-[data-theme="agents-light"] {
-${agentsBlock('light')}
-}
-/* agents:end */`
-const AGENTS = /\/\* agents:begin[^\n]*\n(?:.*\n)*?\/\* agents:end \*\//m
-if (!AGENTS.test(namedSource)) throw new Error('named-themes.css: the agents region is missing')
-
 // ── accent scope rules (named-themes.css) ──────────────────────────────────
 // A scope maps the five roles to its hue. One shared rule re-declares every
 // token the spine derives from them, because a var() resolves where it is
@@ -745,8 +481,8 @@ const accentRegion = [
   '/* accent-scopes:end */',
 ].join('\n')
 const ACCENT_REGION = /\/\* accent-scopes:begin[\s\S]*?\/\* accent-scopes:end \*\//m
-if (!ACCENT_REGION.test(namedSource)) throw new Error('named-themes.css: the accent-scopes region is missing')
-const named = namedSource.replace(AGENTS, agentsRegion).replace(ACCENT_REGION, accentRegion)
+if (!namedSource.includes('/* accent-scopes:placeholder */')) throw new Error('named-themes.css: the accent-scopes region is missing')
+const named = generated(namedSource.replace('/* accent-scopes:placeholder */', accentRegion))
 
 const outputs = [
   ['ladders.css', ladders],
@@ -760,9 +496,9 @@ if (CHECK) {
     console.error(`stale: ${stale.join(', ')}; run pnpm --filter @tangle-network/brand gen:ladders`)
     process.exit(1)
   }
-  console.log('ladders.css, system.css, the tokens.css tone regions and the agents theme are current.')
+  console.log('ladders.css, system.css, the tokens.css tone regions and all canonical and named palettes are current.')
 } else {
   fs.mkdirSync(OUT, { recursive: true })
   for (const [file, text] of outputs) fs.writeFileSync(path.join(OUT, file), text)
-  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and the agents theme and ${ACCENT_NAMES.length} accent scopes (${follows.length} derived tokens) in named-themes.css to ${OUT}`)
+  console.log(`wrote ladders.css, system.css (${MAP.length} tokens per theme), ${Object.keys(CATEGORY).length} tones and their data-tone scopes in tokens.css, and all named themes and ${ACCENT_NAMES.length} accent scopes (${follows.length} derived tokens) in named-themes.css to ${OUT}`)
 }
