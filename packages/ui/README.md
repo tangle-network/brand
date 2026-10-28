@@ -26,6 +26,10 @@ export function App() {
 }
 ```
 
+`partitionBySpeaker` and the speaker types in `/chat` re-export the canonical
+`@tangle-network/agent-interface/speaker` contract. Server consumers import that
+entry directly; `SpeakerHeader` remains the UI renderer.
+
 ## Styling
 
 This package ships no CSS. Its components are Tailwind v4 class names in source, and the build emits JavaScript only, so two pieces of consumer setup carry real weight.
