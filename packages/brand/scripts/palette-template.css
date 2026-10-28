@@ -103,7 +103,7 @@
   --primary-foreground: var(--hsl-primary-foreground); --secondary: var(--hsl-secondary);
   --secondary-foreground: var(--hsl-secondary-foreground); --muted: var(--hsl-muted);
   --muted-foreground: var(--hsl-muted-foreground); --accent: var(--hsl-accent);
-  --accent-foreground: var(--hsl-accent-foreground); --destructive: @palette-destructive@;
+  --accent-foreground: var(--hsl-accent-foreground); --destructive: var(--hsl-destructive);
   --destructive-foreground: var(--hsl-destructive-foreground); --border: var(--hsl-border);
   --input: var(--hsl-muted-foreground); --ring: var(--hsl-ring);
   --success: var(--hsl-success); --warning: var(--hsl-warning);

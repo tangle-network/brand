@@ -145,6 +145,7 @@ export function palette(name) {
       'well-raised': dark ? card : WHITE, 'well-raised-2': dark ? card : page })
   }
   if (name.startsWith('hospitality')) {
+    out['hsl-input'] = dark ? hsl(backdrop) : '0 0% 100%'
     out['hsl-raised'] = v('hsl-secondary')
     out['hsl-raised-2'] = hsl(plane(dark ? 43.9 : 100))
     out['well-page'] = dark ? backdrop : WHITE
