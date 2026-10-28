@@ -1,5 +1,5 @@
 import { TRANSCRIPT_TEXT } from "./transcript-text";
-import { memo, type ReactNode } from "react";
+import { memo, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { ChatAuthor, SessionMessage } from "../types/message";
 import type { SessionPart } from "../types/parts";
 import { isViewerMessage, MessageAuthor } from "./message-author";
@@ -23,6 +23,11 @@ export interface UserMessageProps {
    * someone else's: it sits at the start, on a card, under its author.
    */
   viewerId?: string;
+  /**
+   * Show a long message's first lines with a fade and a "Show more" inside the
+   * bubble, which opens it in place. Omit to show the whole message.
+   */
+  collapsedLines?: number;
 }
 
 function formatTime(date: Date): string {
@@ -37,10 +42,61 @@ function MessageActions({ children, align = "end" }: { children: ReactNode; alig
   );
 }
 
-function UserBubble({ text, timestamp, actions }: {
+/**
+ * A message body that can fold to its first `lines` lines: the last shown line
+ * fades out and a "Show more" inside the bubble opens the rest in place. The
+ * button appears only when the text overflows.
+ */
+function BubbleText({ text, lines }: { text: string; lines?: number }) {
+  const body = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [over, setOver] = useState(false);
+  useLayoutEffect(() => {
+    const element = body.current;
+    if (!element || !lines || open) return;
+    const measure = () => setOver(element.scrollHeight > element.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [lines, open, text]);
+  const folded = Boolean(lines) && !open;
+  return (
+    <>
+      <div
+        ref={body}
+        data-user-message-body=""
+        className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}
+        style={folded ? {
+          display: "-webkit-box",
+          WebkitLineClamp: lines,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          ...(over ? { maskImage: "linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent)", WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent)" } : {}),
+        } : undefined}
+      >
+        {text}
+      </div>
+      {lines && (over || open) ? (
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+          className="mt-1.5 text-sm font-medium underline-offset-2 opacity-75 transition-opacity hover:underline hover:opacity-100"
+        >
+          {open ? "Show less" : "Show more"}
+        </button>
+      ) : null}
+    </>
+  );
+}
+
+function UserBubble({ text, timestamp, actions, lines }: {
   text: string;
   timestamp?: Date;
   actions?: ReactNode;
+  lines?: number;
 }) {
   return (
     <div className="flex justify-end">
@@ -49,14 +105,12 @@ function UserBubble({ text, timestamp, actions }: {
           {timestamp ? (
             <span
               data-user-message-time=""
-              className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-[length:var(--font-size-xs)] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
             >
               {formatTime(timestamp)}
             </span>
           ) : null}
-          <div className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}>
-            {text}
-          </div>
+          <BubbleText text={text} lines={lines} />
         </div>
         {actions ? <MessageActions>{actions}</MessageActions> : null}
       </div>
@@ -69,10 +123,11 @@ function UserBubble({ text, timestamp, actions }: {
  * than the reader's inverse fill, so "mine" and "theirs" differ before the
  * names are read. The timestamp is revealed on the bubble's far side.
  */
-function OtherPersonBubble({ text, timestamp, actions, author }: {
+function OtherPersonBubble({ text, timestamp, actions, author, lines }: {
   text: string;
   timestamp?: Date;
   actions?: ReactNode;
+  lines?: number;
   /** The author line; absent on a later segment of the same message. */
   author?: ChatAuthor;
 }) {
@@ -84,14 +139,12 @@ function OtherPersonBubble({ text, timestamp, actions, author }: {
           {timestamp ? (
             <span
               data-user-message-time=""
-              className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap text-[length:var(--font-size-xs)] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
             >
               {formatTime(timestamp)}
             </span>
           ) : null}
-          <div className={`break-words whitespace-pre-wrap ${TRANSCRIPT_TEXT}`}>
-            {text}
-          </div>
+          <BubbleText text={text} lines={lines} />
         </div>
         {actions ? <MessageActions align="start">{actions}</MessageActions> : null}
       </div>
@@ -104,14 +157,14 @@ function OtherPersonBubble({ text, timestamp, actions, author }: {
  * Application notes interrupt the bubble in source order, outside its attribution.
  */
 export const UserMessage = memo(
-  ({ message: _message, parts, content, timestamp, actions, author, viewerId }: UserMessageProps) => {
+  ({ message: _message, parts, content, timestamp, actions, author, viewerId, collapsedLines }: UserMessageProps) => {
     const other = isViewerMessage(author, viewerId) ? undefined : author;
     // `headed` puts the author line on the first spoken segment only.
     const bubble = (text: string, bubbleActions?: ReactNode, headed = true, key?: number) =>
       other ? (
-        <OtherPersonBubble key={key} text={text} timestamp={timestamp} actions={bubbleActions} author={headed ? other : undefined} />
+        <OtherPersonBubble key={key} text={text} timestamp={timestamp} actions={bubbleActions} author={headed ? other : undefined} lines={collapsedLines} />
       ) : (
-        <UserBubble key={key} text={text} timestamp={timestamp} actions={bubbleActions} />
+        <UserBubble key={key} text={text} timestamp={timestamp} actions={bubbleActions} lines={collapsedLines} />
       );
     // Explicit direct content (including empty content) still overrides parts.
     if (content != null) {
