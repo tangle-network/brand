@@ -72,7 +72,7 @@
   --md3-surface-tint: @palette-md3-surface-tint@; --accent-surface-soft: @palette-accent-surface-soft@;
   --accent-surface-strong: @palette-accent-surface-strong@; --bg-hover: @palette-bg-hover@;
   --bg-selection: @palette-bg-selection@; --border-accent: @palette-border-accent@;
-  --border-accent-hover: @palette-border-accent-hover@; --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), var(--accent-text));
+  --border-accent-hover: @palette-border-accent-hover@; --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover));
   --tangle-gradient-text: linear-gradient(135deg, var(--brand-purple), var(--accent-text)); --accent-gradient-strong: @palette-accent-gradient-strong@;
   --hsl-success: @palette-hsl-success@;
   --hsl-warning: @palette-hsl-warning@;
@@ -116,7 +116,7 @@
   --mesh-blue: transparent;
   --code-header-bg: hsl(var(--hsl-background)); --syntax-foreground: var(--text-primary);
   --syntax-variable: var(--text-secondary); --syntax-comment: var(--text-dim);
-  --syntax-keyword: var(--tone-violet-icon); --syntax-meta: var(--accent-text);
+  --syntax-keyword: var(--tone-violet-text); --syntax-meta: var(--accent-text);
   --syntax-function: var(--surface-info-text); --syntax-string: var(--surface-success-text);
   --syntax-number: var(--surface-warning-text); --syntax-error: var(--surface-danger-text);
   --code-keyword: var(--syntax-keyword); --code-string: var(--syntax-string);

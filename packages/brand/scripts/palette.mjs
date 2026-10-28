@@ -84,7 +84,7 @@ export function palette(name) {
   const primary = inkOn(planes, Math.min(9, ...planes.map((p) => contrast(dark ? WHITE : BLACK, p) - .15)), dark)
   const fill = solve((L) => colour(accentHue, 54, L), (c) => contrast(WHITE, mix(WHITE, c, .1)) >= 4.7, true)
   const accent = hueInk(accentHue, 92, [...planes, ...planes.map((p) => mix(fill, p, .2))], 4.65, dark)
-  const mark = colour(accentHue, 85, dark ? 70 : 64)
+  const mark = hueInk(accentHue, 65, planes, dark ? 4 : 4.6, dark)
   const line = hueInk(accentHue, 85, planes, 3.5, dark)
   const h = (token) => `hsl(var(--${token}))`
   const v = (token) => `var(--${token})`
@@ -121,7 +121,7 @@ export function palette(name) {
     'accent-surface-strong': `color-mix(in srgb, var(--btn-primary-bg) ${dark ? 30 : 13}%, transparent)`,
     'border-accent': `color-mix(in srgb, var(--brand-cool) ${dark ? 35 : 20}%, transparent)`,
     'border-accent-hover': `color-mix(in srgb, var(--brand-cool) ${dark ? 50 : 36}%, transparent)`,
-    'accent-gradient-strong': 'linear-gradient(135deg, var(--btn-primary-bg), var(--brand-primary))',
+    'accent-gradient-strong': 'linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover))',
     'on-media': WHITE, 'surface-neutral-text': v('text-muted'), 'surface-neutral-bg': v('depth-3'), 'surface-neutral-border': v('border-subtle'),
   }
   for (const suffix of ['card', 'popover', 'secondary', 'accent']) out[`hsl-${suffix}-foreground`] = v('hsl-foreground')
@@ -208,10 +208,10 @@ export function tone(name, mode) {
   const ring = dark ? ink : fill
   if (contrast(mix(ring, card, .8), card) < 3) throw new Error(`${name} ${mode}: focus border below 3:1`)
   const inverse = palette('light')['md3-inverse-surface']
-  if (contrast(mix(WHITE, colour(hue, sat, 55), .4), inverse) < 4.5) throw new Error(`${name}: inverse accent below 4.5:1`)
+  if (contrast(mix(WHITE, icon, .4), inverse) < 4.5) throw new Error(`${name}: inverse accent below 4.5:1`)
   if (dark && contrast(mix(WHITE, ink, .35), mix(BLACK, fill, .5)) < 4.5) throw new Error(`${name}: softened accent below 4.5:1`)
   return { bg: fills[0], 'bg-hover': fills[1], 'bg-selected': fills[2], border: mix(icon, fills[0], .5), 'border-selected': icon, text, icon,
-    fill: hsl(fill), ring: hsl(ring), mark: colour(hue, sat, 55), line: icon, ink }
+    fill: hsl(fill), ring: hsl(ring), mark: icon, line: icon, ink }
 }
 
 export function tones(mode) {
