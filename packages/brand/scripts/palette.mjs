@@ -6,7 +6,7 @@ import { hslHex } from './css-resolve.mjs'
 // hue, chroma, [page, chrome, card, raised, overlay, hairline, backdrop], accent hue
 const CACHE = new Map()
 const THEMES = {
-  dark: [287, .137, [15, 18.5, 21.7, 26.6, 31.6, 34.1, 10.8], 246],
+  dark: [287, .125, [15, 18.5, 21.7, 26.6, 31.6, 34.1, 10.8], 246],
   light: [274, .008, [94.9, 97.2, 100, 95.2, 100, 83.5, 90.2], 246],
   aubergine: [295, .25, [20.5, 25.2, 29.9, 34.6, 39.3, 42, 15.8], 258],
   'aubergine-light': [299, .017, [95.5, 98, 100, 95.2, 100, 86, 90.5], 258],
@@ -16,7 +16,7 @@ const THEMES = {
   'super-light': [122, .009, [95.5, 98, 100, 95.2, 100, 86, 90.5], 148],
   'tangle-light': [286, .01, [95.5, 98, 100, 95.2, 100, 86, 90.5], 246],
   intelligence: [301.5, .095, [15, 19.7, 24.4, 29.1, 33.8, 37, 10.3], 246],
-  hospitality: [151, .03, [16.9, 21.6, 31.1, 37.9, 42, 42, 12.4], 153],
+  hospitality: [151, .03, [16.9, 21.6, 31.1, 37.9, 42, 42, 12.2], 153],
   'hospitality-light': [140, .016, [91.6, 96.9, 100, 95.5, 100, 85, 88], 153],
   agents: [308, .022, [18, 22.7, 27.4, 32.1, 36.8, 40, 13.3], 246],
   'agents-light': [318, .006, [100, 98, 100, 95.2, 100, 86, 90.5], 246],
@@ -90,7 +90,7 @@ export function palette(name) {
     'md3-outline': h('hsl-muted-foreground'), 'md3-outline-variant': h('hsl-border'),
     'md3-surface': h('hsl-background'), 'md3-surface-dim': backdrop, 'md3-surface-bright': h('hsl-popover'),
     'md3-surface-container-lowest': dark ? v('md3-surface-dim') : h('hsl-card'),
-    'md3-surface-container-low': h('sidebar-background'), 'md3-surface-container': h('hsl-card'),
+    'md3-surface-container-low': h('hsl-input'), 'md3-surface-container': h('hsl-card'),
     'md3-surface-container-high': h('hsl-secondary'), 'md3-surface-container-highest': h('hsl-popover'),
     'md3-surface-variant': v('md3-surface-container-high'), 'md3-on-surface': v('text-primary'), 'md3-on-surface-variant': v('text-muted'),
     'sidebar-background': name === 'dark' ? v('hsl-input') : name === 'light' ? v('hsl-card') : hsl(chrome),
@@ -121,8 +121,13 @@ export function palette(name) {
   for (const [i, role] of ['md3-surface', 'md3-surface-container', 'md3-surface-container-high', 'md3-surface-container-highest'].entries()) out[`depth-${i + 1}`] = v(role)
   for (const [token, role] of Object.entries({ root: 'depth-1', dark: 'depth-1', section: 'depth-1', card: 'depth-2', elevated: 'depth-4' })) out[`bg-${token}`] = v(role)
   out['bg-input'] = h('hsl-input')
+  // Shared status inks must also survive named planes, including their 10%
+  // destructive tint. Solve once against all modes' planes, never by product.
+  const statusPlanes = Object.entries(THEMES).filter(([key]) => (key !== 'light' && !key.endsWith('-light')) === dark)
+    .flatMap(([, [h, c, ls]]) => ls.slice(0, 5).map((L) => lch(L, L === 100 ? 0 : dark ? c * L / 100 : c, h)))
   for (const [tone, statusHue] of Object.entries(STATUS)) {
-    const ink = hueInk(statusHue, tone === 'danger' ? 75 : 65, planes, 5.2, dark)
+    const ink = solve((L) => colour(statusHue, tone === 'danger' ? 75 : 65, L),
+      (c) => statusPlanes.every((p) => contrast(c, p) >= 5.3 && contrast(c, mix(c, p, .1)) >= 4.65), !dark)
     const wash = dark ? solve((L) => colour(statusHue, 22, L), (c) => luminance(c) > luminance(card) && contrast(c, card) >= 1.32) : mix(ink, WHITE, .06)
     const channel = tone === 'danger' ? 'destructive' : tone
     out[`hsl-${channel}`] = hsl(ink)
@@ -140,6 +145,8 @@ export function palette(name) {
     out[`run-mix-${role}`] = solve((L) => colour(h, role === 'cancelled' ? 12 : 60, L), (c) => luminance(c) >= target)
   }
   if (!['dark', 'light'].includes(name)) {
+    out['bg-root'] = h('hsl-background')
+    out['md3-surface'] = v('bg-root')
     Object.assign(out, { 'hsl-raised': v('hsl-secondary'), 'hsl-raised-2': v('hsl-popover'),
       'well-page': dark ? backdrop : WHITE, 'well-card': dark ? backdrop : page,
       'well-raised': dark ? card : WHITE, 'well-raised-2': dark ? card : page })
@@ -153,8 +160,8 @@ export function palette(name) {
     out['well-raised'] = dark ? plane(22.1) : WHITE
     out['well-raised-2'] = dark ? plane(22.1) : plane(94.9)
     out['field-border'] = plane(dark ? 68.3 : 60)
-    out['border-strong'] = v('field-border')
-    out['text-dim'] = v('text-muted')
+    out['border-strong'] = out['field-border']
+    out['text-dim'] = out['text-muted']
     for (const [tone, statusHue] of Object.entries({ ...STATUS, neutral: 140 })) {
       if (tone === 'info') continue
       const wash = lch(dark ? 37.7 : 92, tone === 'neutral' ? .01 : .04, tone === 'danger' ? 25 : statusHue === 38 ? 80 : statusHue)
@@ -173,7 +180,7 @@ export function renderPalette(template, name) {
   return template.replace(/@palette-([a-z][a-z0-9-]*)@/g, (_, role) => {
     if (!(role in roles)) throw new Error(`${name}: unknown palette role ${role}`)
     const value = roles[role]
-    return value.startsWith('#') && !/^(well-|field-border|surface-)/.test(role) ? `hsl(${hsl(value)})` : value
+    return value.startsWith('#') && !/^(well-|field-border|border-strong|surface-|on-media)/.test(role) ? `hsl(${hsl(value)})` : value
   }).replace(/(--(?!tone-)[a-z0-9-]+: )([\d.]+ [\d.]+% [\d.]+%);/g, (_, key, value) => `${key}${value}; /* ${hslHex(...value.split(' ').map(parseFloat))} */`)
 }
 

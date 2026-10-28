@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { blockIn, blocksIn, hslToRgb } from "./css-test-utils";
+import { blockIn, blocksIn, hexIn } from "./css-test-utils";
 
 /**
  * Every theme scope a consumer can select, each with its CSS sources listed
@@ -98,18 +98,5 @@ export type Rgb = [number, number, number];
  * declares each name.
  */
 export function resolve(sources: string[], token: string): Rgb {
-  const raw = sources
-    .map((css) => css.match(new RegExp(`(?<![\\w-])--${token}:\\s*([^;]+);`))?.[1]?.trim())
-    .find((value) => value !== undefined);
-  if (raw === undefined) throw new Error(`--${token} resolves to nothing`);
-
-  const ref = /^(?:hsl\()?var\(--([a-z0-9-]+)\)\)?$/.exec(raw);
-  if (ref) return resolve(sources, ref[1]);
-  const hex = /^#([0-9a-fA-F]{6})\b/.exec(raw);
-  if (hex) {
-    return [0, 2, 4].map((i) => Number.parseInt(hex[1].slice(i, i + 2), 16)) as Rgb;
-  }
-  const hsl = /^([\d.]+)\s+([\d.]+)%\s+([\d.]+)%/.exec(raw);
-  if (hsl) return hslToRgb({ h: Number(hsl[1]), s: Number(hsl[2]), l: Number(hsl[3]) });
-  throw new Error(`--${token} has an unreadable value: ${raw}`);
+  return hexIn(sources, token);
 }
