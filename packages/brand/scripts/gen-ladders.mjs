@@ -7,7 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { block, decls } from './css-resolve.mjs'
-import { CATEGORY, hsl, renderTemplates, tone } from './palette.mjs'
+import { CATEGORY, hsl, renderTemplates, tones } from './palette.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -342,7 +342,7 @@ ${`${DARK_SEL},\n${LIGHT_SEL}`.replace(/^/gm, '  ')} {
 const LEGACY_SURFACE = ['violet', 'orange', 'teal']
 const TONE_ROLES = ['bg', 'bg-hover', 'bg-selected', 'border', 'border-selected', 'text', 'icon']
 const TONES = Object.fromEntries(['dark', 'light'].map((mode) => [mode,
-  Object.fromEntries(Object.keys(CATEGORY).map((name) => [name, tone(name, mode)])),
+  tones(mode),
 ]))
 const WHITE = '#ffffff'
 

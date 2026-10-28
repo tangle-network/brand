@@ -33,6 +33,13 @@ const linear = (v) => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4
 export const luminance = (hex) => rgb(hex).map(linear).reduce((v, c, i) => v + c * [.2126, .7152, .0722][i], 0)
 export const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + .05) / (Math.min(luminance(a), luminance(b)) + .05)
 export const mix = (a, b, t) => hexOf(rgb(a).map((v, i) => v * t + rgb(b)[i] * (1 - t)))
+function lab(hex) {
+  const [r, g, b] = rgb(hex).map(linear)
+  const l = Math.cbrt(.4122214708 * r + .5363325363 * g + .0514459929 * b)
+  const m = Math.cbrt(.2119034982 * r + .6806995451 * g + .1073969566 * b)
+  const s = Math.cbrt(.0883024619 * r + .2817188376 * g + .6299787005 * b)
+  return [.2104542553 * l + .793617785 * m - .0040720468 * s, 1.9779984951 * l - 2.428592205 * m + .4505937099 * s, .0259040371 * l + .7827717662 * m - .808675778 * s]
+}
 export function hsl(hex) {
   const [r, g, b] = rgb(hex), hi = Math.max(r, g, b), lo = Math.min(r, g, b), d = hi - lo, l = (hi + lo) / 2
   const hue = !d ? 0 : 60 * (hi === r ? ((g - b) / d + 6) % 6 : hi === g ? (b - r) / d + 2 : (r - g) / d + 4)
@@ -90,7 +97,7 @@ export function palette(name) {
     'md3-outline': h('hsl-muted-foreground'), 'md3-outline-variant': h('hsl-border'),
     'md3-surface': h('hsl-background'), 'md3-surface-dim': backdrop, 'md3-surface-bright': h('hsl-popover'),
     'md3-surface-container-lowest': dark ? v('md3-surface-dim') : h('hsl-card'),
-    'md3-surface-container-low': h('hsl-input'), 'md3-surface-container': h('hsl-card'),
+    'md3-surface-container-low': h(['dark', 'light'].includes(name) ? 'hsl-input' : 'sidebar-background'), 'md3-surface-container': h('hsl-card'),
     'md3-surface-container-high': h('hsl-secondary'), 'md3-surface-container-highest': h('hsl-popover'),
     'md3-surface-variant': v('md3-surface-container-high'), 'md3-on-surface': v('text-primary'), 'md3-on-surface-variant': v('text-muted'),
     'sidebar-background': name === 'dark' ? v('hsl-input') : name === 'light' ? v('hsl-card') : hsl(chrome),
@@ -199,8 +206,25 @@ export function tone(name, mode) {
   const tints = [page, card, muted].flatMap((p) => [.1, .15, .2].map((t) => mix(fill, p, t)))
   const ink = hueInk(hue, sat, [page, card, ...fills, ...tints], 4.65, dark)
   const ring = dark ? ink : fill
+  if (contrast(mix(ring, card, .8), card) < 3) throw new Error(`${name} ${mode}: focus border below 3:1`)
+  const inverse = palette('light')['md3-inverse-surface']
+  if (contrast(mix(WHITE, colour(hue, sat, 55), .4), inverse) < 4.5) throw new Error(`${name}: inverse accent below 4.5:1`)
+  if (dark && contrast(mix(WHITE, ink, .35), mix(BLACK, fill, .5)) < 4.5) throw new Error(`${name}: softened accent below 4.5:1`)
   return { bg: fills[0], 'bg-hover': fills[1], 'bg-selected': fills[2], border: mix(icon, fills[0], .5), 'border-selected': icon, text, icon,
     fill: hsl(fill), ring: hsl(ring), mark: colour(hue, sat, 55), line: icon, ink }
+}
+
+export function tones(mode) {
+  const entries = Object.keys(CATEGORY).map((name) => [name, tone(name, mode)])
+  for (let i = 0; i < entries.length; i++) {
+    for (let j = i + 1; j < entries.length; j++) {
+      const [a, b] = [entries[i], entries[j]]
+      const [p, q] = [lab(a[1].icon), lab(b[1].icon)]
+      const distance = Math.hypot(...p.map((v, k) => v - q[k])) * 100
+      if (distance < 5.5) throw new Error(`${mode}: ${a[0]} and ${b[0]} icons only ${distance.toFixed(1)} apart in OKLab; floor 5.5`)
+    }
+  }
+  return Object.fromEntries(entries)
 }
 
 export function renderTemplates(source) {
