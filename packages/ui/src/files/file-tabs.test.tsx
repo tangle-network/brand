@@ -63,4 +63,21 @@ describe("FileTabs", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close README.md" }));
     expect(screen.getAllByRole("tab")).toHaveLength(2);
   });
+
+  it("tells two open files of one name apart by their nearest differing folder", () => {
+    render(
+      <FileTabs
+        tabs={[
+          { id: "x", name: "CHECK.md", path: "code/route-a-lead-2/CHECK.md" },
+          { id: "y", name: "CHECK.md", path: "code/rs3-merge-lead/CHECK.md" },
+          { id: "z", name: "plan.md", path: "pages/plan.md" },
+        ]}
+        activeId="x"
+        onSelect={() => {}}
+        onClose={() => {}}
+      />,
+    );
+    expect(screen.getAllByRole("tab").map((tab) => tab.getAttribute("aria-label"))).toEqual(["CHECK.md in route-a-lead-2", "CHECK.md in rs3-merge-lead", "plan.md"]);
+    expect(screen.getByText("· route-a-lead-2")).toBeInTheDocument();
+  });
 });
