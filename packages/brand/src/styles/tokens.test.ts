@@ -598,6 +598,22 @@ describe("syntax keywords use a text-safe category role", () => {
   });
 });
 
+describe("text-bearing accent gradients keep AA at every stop", () => {
+  const named = readFileSync(path.resolve(import.meta.dirname, "named-themes.css"), "utf8");
+  const namedRules = [...named.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]*)\{([^{}]*--hsl-background:[^{}]*)\}/g)];
+  const cases = [["dark", [DARK]], ["light", [LIGHT, DARK]], ...namedRules.map(([, selector, body]) => [selector.trim(), [body, /-light|not\(\.dark\)/.test(selector) ? LIGHT : DARK, DARK]])] as const;
+  for (const [name, chain] of cases) {
+    it(String(name), () => {
+      const sources = [...chain];
+      const gradient = resolveIn(sources, "accent-gradient-strong");
+      const stops = [...gradient.matchAll(/var\(--([a-z0-9-]+)\)/g)].map((match) => match[1]);
+      expect(stops.length).toBeGreaterThanOrEqual(2);
+      const label = hexIn(sources, "btn-primary-text");
+      for (const stop of stops) expect(contrastRatio(hexIn(sources, stop), label), stop).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});
+
 describe("the generated palette owns every colour", () => {
   it.each([
     ["dark", DARK],
