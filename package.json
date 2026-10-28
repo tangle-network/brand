@@ -20,8 +20,8 @@
     "test:visual": "pnpm build-storybook --quiet && playwright test",
     "test:package": "node scripts/package-smoke.mjs packages/ui && PACKAGE_PEER_OVERRIDES='{\"react-router\":\"^7\"}' node scripts/package-smoke.mjs packages/ui && PACKAGE_OMIT_OPTIONAL_PEERS='[\"@hocuspocus/provider\",\"@tiptap/core\",\"@tiptap/extension-collaboration\",\"@tiptap/extension-collaboration-caret\",\"@tiptap/react\",\"@tiptap/starter-kit\",\"pdfjs-dist\",\"yjs\"]' node scripts/package-smoke.mjs packages/ui",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "version-packages": "node scripts/patch-only-changesets.mjs && changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
