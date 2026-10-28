@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.51.2
+
+### Patch Changes
+
+- d8990b5: Re-export canonical server-safe speaker grouping from AgentInterface; preserve every UI chat name. Record the adopted GTM heading reduction in the owning drift baseline.
+
 ## 11.51.1
 
 ### Patch Changes
