@@ -137,6 +137,14 @@ jobs:
             fi
           done
 
+      - name: Build
+        run: pnpm build
+
+      - name: Admit the release versions
+        uses: tangle-network/agent-runtime/.github/actions/admit-release@18749b731dc159cd20adf44b3c50188b4e233a65
+        with:
+          directories: packages/brand packages/ui
+
       - name: Create release PR or publish
         id: changesets
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
