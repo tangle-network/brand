@@ -50,7 +50,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: var(--md3-surface-dim); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(245 245 245 / 0.28); --accent-text: hsl(257.3684 92.6829% 83.9216%); --brand-primary: hsl(257.8626 85.6209% 70%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(245 245 245 / 0.28); --accent-text: hsl(257.3684 92.6829% 83.9216%); --brand-primary: hsl(258.5185 64.8% 75.4902%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 84.3137%); --text-muted: hsl(0 0% 76.8627%); --text-dim: hsl(0 0% 69.4118%); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(255.7895 51.3514% 7.2549%);
   --md3-surface-bright: hsl(var(--hsl-popover)); --md3-surface-variant: var(--md3-surface-container-high); --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
   --hsl-raised: var(--hsl-secondary); --hsl-raised-2: var(--hsl-popover);
@@ -66,7 +66,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: hsl(var(--hsl-card)); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(63 63 63 / 0.28); --accent-text: hsl(257.9724 92.3404% 53.9216%); --brand-primary: hsl(258.0769 84.7826% 63.9216%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(63 63 63 / 0.28); --accent-text: hsl(257.9724 92.3404% 53.9216%); --brand-primary: hsl(258.1295 65.2582% 58.2353%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 31.7647%); --text-muted: hsl(0 0% 36.4706%); --text-dim: hsl(0 0% 41.9608%); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(258.4615 23.6364% 89.2157%);
   --md3-surface-bright: hsl(var(--hsl-popover)); --md3-surface-variant: var(--md3-surface-container-high); --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
   --hsl-raised: var(--hsl-secondary); --hsl-raised-2: var(--hsl-popover);
@@ -82,7 +82,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: var(--md3-surface-dim); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(236 236 236 / 0.28); --accent-text: hsl(160 91.6667% 42.3529%); --brand-primary: hsl(159.8473 85.6209% 70%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(236 236 236 / 0.28); --accent-text: hsl(160 91.6667% 42.3529%); --brand-primary: hsl(159.7183 65.1376% 42.7451%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 81.1765%); --text-muted: hsl(0 0% 73.7255%); --text-dim: hsl(0 0% 66.6667%); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(160 23.0769% 2.549%);
   --md3-surface-bright: hsl(var(--hsl-popover)); --md3-surface-variant: var(--md3-surface-container-high); --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
   --hsl-raised: var(--hsl-secondary); --hsl-raised-2: var(--hsl-popover);
@@ -98,7 +98,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: hsl(var(--hsl-card)); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(64 64 64 / 0.28); --accent-text: hsl(160.4082 92.4528% 20.7843%); --brand-primary: hsl(160 84.7826% 63.9216%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(64 64 64 / 0.28); --accent-text: hsl(160.4082 92.4528% 20.7843%); --brand-primary: hsl(160 64.8649% 29.0196%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 31.7647%); --text-muted: hsl(0 0% 36.8627%); --text-dim: hsl(0 0% 42.3529%); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(153.3333 13.4328% 86.8627%);
   --md3-surface-bright: hsl(var(--hsl-popover)); --md3-surface-variant: var(--md3-surface-container-high); --md3-on-surface: var(--text-primary); --md3-on-surface-variant: var(--text-muted);
   --hsl-raised: var(--hsl-secondary); --hsl-raised-2: var(--hsl-popover);
@@ -115,7 +115,7 @@
   --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input)); --md3-surface-container-lowest: var(--md3-surface-dim); --md3-surface-container-low: hsl(var(--sidebar-background));
   --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary)); --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border));
   --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border)); --border-hover: rgb(246 246 246 / 0.28); --accent-text: hsl(147.9808 92.0354% 44.3137%);
-  --brand-primary: hsl(147.9389 85.6209% 70%); --brand-glow: var(--accent-text); --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 85.098%); --text-muted: hsl(0 0% 77.2549%); --text-dim: hsl(0 0% 69.8039%);
+  --brand-primary: hsl(148 65.2174% 45.098%); --brand-glow: var(--accent-text); --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 85.098%); --text-muted: hsl(0 0% 77.2549%); --text-dim: hsl(0 0% 69.8039%);
   --md3-primary: var(--accent-text); --bg-hover: color-mix(in srgb, var(--accent-text) 7%, transparent); --bg-selection: color-mix(in srgb, var(--btn-primary-bg) 28%, transparent); --accent-surface-soft: color-mix(in srgb, var(--accent-text) 7%, transparent); --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 30%, transparent);
   --border-accent: color-mix(in srgb, var(--brand-cool) 35%, transparent); --border-accent-hover: color-mix(in srgb, var(--brand-cool) 50%, transparent); --btn-primary-bg: hsl(var(--hsl-primary)); --btn-primary-hover: hsl(147.9452 39.4595% 36.2745%); --btn-primary-text: hsl(0 0% 100%);
   --btn-cta-bg: var(--btn-primary-bg); --btn-cta-text: var(--btn-primary-text); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(120 14.2857% 4.1176%);
@@ -133,7 +133,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: hsl(var(--hsl-card)); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(64 64 64 / 0.28); --accent-text: hsl(148.4848 92.5234% 20.9804%); --brand-primary: hsl(148.0769 84.7826% 63.9216%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(64 64 64 / 0.28); --accent-text: hsl(148.4848 92.5234% 20.9804%); --brand-primary: hsl(148.4536 65.1007% 29.2157%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 31.7647%); --text-muted: hsl(0 0% 36.4706%); --text-dim: hsl(0 0% 41.9608%); --md3-primary: var(--accent-text); --bg-hover: color-mix(in srgb, var(--accent-text) 5%, transparent); --bg-selection: color-mix(in srgb, var(--btn-primary-bg) 16%, transparent);
   --accent-surface-soft: color-mix(in srgb, var(--accent-text) 5%, transparent); --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 13%, transparent); --border-accent: color-mix(in srgb, var(--brand-cool) 20%, transparent); --border-accent-hover: color-mix(in srgb, var(--brand-cool) 36%, transparent);
   --btn-primary-bg: hsl(var(--hsl-primary)); --btn-primary-hover: hsl(147.9452 39.4595% 36.2745%); --btn-primary-text: hsl(0 0% 100%); --btn-cta-bg: var(--btn-primary-bg); --btn-cta-text: var(--btn-primary-text);
@@ -154,7 +154,7 @@
   --depth-1: var(--md3-surface); --depth-2: var(--md3-surface-container); --depth-3: var(--md3-surface-container-high); --depth-4: var(--md3-surface-container-highest); --bg-root: hsl(var(--hsl-background)); --bg-card: var(--depth-2); --bg-input: hsl(var(--hsl-input));
   --md3-surface-container-lowest: hsl(var(--hsl-card)); --md3-surface-container-low: hsl(var(--sidebar-background)); --md3-surface-container: hsl(var(--hsl-card)); --md3-surface-container-high: hsl(var(--hsl-secondary));
   --md3-surface-container-highest: hsl(var(--hsl-popover)); --md3-outline-variant: hsl(var(--hsl-border)); --border-subtle: hsl(var(--hsl-border)); --border-default: hsl(var(--hsl-border));
-  --border-hover: rgb(63 63 63 / 0.28); --accent-text: hsl(246.0302 91.7051% 57.451%); --brand-primary: hsl(246.1538 84.7826% 63.9216%); --brand-glow: var(--accent-text);
+  --border-hover: rgb(63 63 63 / 0.28); --accent-text: hsl(246.0302 91.7051% 57.451%); --brand-primary: hsl(246.3636 64.7059% 60%); --brand-glow: var(--accent-text);
   --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 31.7647%); --text-muted: hsl(0 0% 36.4706%); --text-dim: hsl(0 0% 41.9608%);
   --hsl-raised: var(--hsl-secondary); --hsl-raised-2: var(--hsl-popover);
   --well-page: #ffffff; --well-card: #efeff7;
@@ -204,7 +204,7 @@
   --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.07), 0 4px 14px -4px hsl(var(--shadow-color) / 0.1); --shadow-raised: 0 1px 1px hsl(var(--shadow-color) / 0.05), 0 2px 6px -2px hsl(var(--shadow-color) / 0.07);
   --shadow-well: inset 0 1px 2px hsl(var(--shadow-color) / 0.06); --edge-highlight: 0 0 0 0 transparent;
   --accent-text: hsl(153.2609 92% 19.6078%); --accent-surface-soft: color-mix(in srgb, var(--accent-text) 5%, transparent); --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 13%, transparent);
-  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--brand-primary)); --brand-primary: hsl(153.0769 84.7826% 63.9216%); --brand-cool: hsl(153.12 85.034% 28.8235%); --brand-glow: var(--accent-text); --brand-vibrant: var(--brand-primary);
+  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover)); --brand-primary: hsl(153.3333 65.2174% 27.0588%); --brand-cool: hsl(153.12 85.034% 28.8235%); --brand-glow: var(--accent-text); --brand-vibrant: var(--brand-primary);
   --btn-primary-bg: hsl(var(--hsl-primary)); --btn-primary-hover: hsl(153.3333 39.1304% 36.0784%); --btn-primary-text: hsl(0 0% 100%); --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 29.0196%); --text-muted: hsl(0 0% 34.1176%); --text-dim: hsl(0 0% 34.1176%);
   --surface-success-bg: #d1edd9; --surface-success-text: #1b6c4b; --surface-success-border: #9ac6ae; --surface-warning-bg: #f3e2c7; --surface-warning-text: #79581e; --surface-warning-border: #ceb994;
   --surface-danger-bg: #fedbd7;  --surface-danger-text: #ae2c2c;  --surface-danger-border: #e6a6a4; --surface-neutral-bg: #e1e6e0; --surface-neutral-text: #59605c; --surface-neutral-border: #b8beb8;
@@ -214,7 +214,7 @@
   --hsl-popover: 137.1429 4.6358% 29.6078%; /* #484f4a */  --hsl-popover-foreground: var(--hsl-foreground); --hsl-primary: 153 54.0541% 29.0196%; /* #22724e */     --hsl-primary-foreground: 0 0% 100%; /* #ffffff */
   --hsl-secondary: 130 4.6154% 25.4902%; /* #3e443f */ --hsl-secondary-foreground: var(--hsl-foreground); --hsl-muted: var(--hsl-secondary);    --hsl-muted-foreground: 0 0% 85.8824%; /* #dbdbdb */
   --hsl-accent: var(--hsl-secondary);      --hsl-accent-foreground: var(--hsl-foreground); --hsl-border: 137.1429 4.6358% 29.6078%; /* #484f4a */   --hsl-input: 120 9.0909% 2.1569%; /* #050605 */
-  --hsl-ring: 152.9464 91.8033% 47.8431%; /* #0aea85 */ --hsl-destructive: 0 76.2712% 88.4314%; /* #f8cbcb */
+  --hsl-ring: 152.9464 91.8033% 47.8431%; /* #0aea85 */ --hsl-destructive: 0 74.4681% 90.7843%; /* #f9d6d6 */
   --hsl-raised: var(--hsl-secondary);   --hsl-raised-2: 137.1429 4.3478% 31.5686%; /* #4d544f */ --sidebar-background: 120 5.8824% 10%; /* #181b18 */     --sidebar-foreground: var(--hsl-foreground);
   --sidebar-primary: var(--hsl-primary);        --sidebar-primary-foreground: var(--hsl-primary-foreground); --sidebar-accent: var(--hsl-secondary);         --sidebar-accent-foreground: var(--hsl-foreground);
   --sidebar-border: var(--hsl-border);      --sidebar-ring: var(--hsl-ring); --md3-surface: var(--bg-root); --md3-surface-dim: hsl(120 9.0909% 2.1569%); --md3-surface-bright: hsl(var(--hsl-popover));
@@ -229,7 +229,7 @@
   --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.45), 0 10px 24px -14px hsl(var(--shadow-color) / 0.6); --shadow-raised: 0 1px 2px hsl(var(--shadow-color) / 0.35);
   --shadow-well: inset 0 1px 2px hsl(var(--shadow-color) / 0.5); --edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --accent-text: hsl(152.9464 91.8033% 47.8431%); --accent-surface-soft: color-mix(in srgb, var(--accent-text) 7%, transparent); --accent-surface-strong: color-mix(in srgb, var(--btn-primary-bg) 30%, transparent);
-  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--brand-primary)); --brand-primary: hsl(152.9771 85.6209% 70%); --brand-cool: hsl(152.7869 85.1163% 42.1569%); --brand-glow: var(--accent-text); --brand-vibrant: var(--brand-primary);
+  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover)); --brand-primary: hsl(152.7273 65.2174% 50.3922%); --brand-cool: hsl(152.7869 85.1163% 42.1569%); --brand-glow: var(--accent-text); --brand-vibrant: var(--brand-primary);
   --btn-primary-bg: hsl(var(--hsl-primary)); --btn-primary-hover: hsl(153.3333 39.1304% 36.0784%); --btn-primary-text: hsl(0 0% 100%); --text-primary: hsl(var(--hsl-foreground)); --text-secondary: hsl(0 0% 94.5098%); --text-muted: hsl(0 0% 85.8824%); --text-dim: hsl(0 0% 85.8824%);
   --surface-success-bg: #304838; --surface-success-text: #45d196; --surface-success-border: #367154; --surface-warning-bg: #4d3f29; --surface-warning-text: #dab26b; --surface-warning-border: #77623d;
   --surface-danger-bg: #553937;  --surface-danger-text: #e8a5a5;  --surface-danger-border: #815958; --surface-neutral-bg: #3f433e; --surface-neutral-text: #b4bab6; --surface-neutral-border: #626762;
@@ -444,9 +444,9 @@
   --bg-selection: light-dark(color-mix(in srgb, var(--btn-primary-bg) 16%, transparent), color-mix(in srgb, var(--btn-primary-bg) 28%, transparent));
   --border-accent: light-dark(color-mix(in srgb, var(--brand-cool) 20%, transparent), color-mix(in srgb, var(--brand-cool) 35%, transparent));
   --border-accent-hover: light-dark(color-mix(in srgb, var(--brand-cool) 36%, transparent), color-mix(in srgb, var(--brand-cool) 50%, transparent));
-  --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), light-dark(var(--btn-primary-hover), var(--accent-text)));
+  --tangle-gradient: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover));
   --tangle-gradient-text: linear-gradient(135deg, light-dark(var(--btn-primary-bg), var(--brand-purple)), light-dark(var(--btn-primary-hover), var(--accent-text)));
-  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--brand-primary));
+  --accent-gradient-strong: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover));
   --status-creating: var(--accent-text);
   --primary: var(--hsl-primary);
   --primary-foreground: var(--hsl-primary-foreground);
