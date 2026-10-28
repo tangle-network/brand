@@ -36,6 +36,28 @@ function getTabIcon(name: string) {
   return FileCode;
 }
 
+/**
+ * Each tab's folder hint: two open files with one name ("CHECK.md" twice) each show the nearest parent folder that
+ * tells them apart, as an editor does ("CHECK.md · route-a-lead-2"). A name no other tab shares shows none.
+ */
+function folderHints(tabs: readonly FileTabData[]): Map<string, string> {
+  const hints = new Map<string, string>();
+  const byName = new Map<string, FileTabData[]>();
+  for (const tab of tabs) byName.set(tab.name, [...(byName.get(tab.name) ?? []), tab]);
+  for (const same of byName.values()) {
+    if (same.length < 2) continue;
+    const parents = same.map((tab) => tab.path.replace(/\/+$/, "").split("/").slice(0, -1).reverse());
+    same.forEach((tab, i) => {
+      const own = parents[i]!;
+      // The first folder, walking up, that no other same-named tab has at that depth.
+      const depth = own.findIndex((folder, d) => parents.every((other, j) => j === i || other[d] !== folder));
+      const hint = own[depth >= 0 ? depth : 0];
+      if (hint) hints.set(tab.id, hint);
+    });
+  }
+  return hints;
+}
+
 /** A long name keeps its extension and the characters before it after the ellipsis. */
 function splitName(name: string): [string, string] {
   if (name.length <= 18) return [name, ""];
@@ -55,6 +77,7 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
   }, [activeId, tabs.length]);
 
   if (tabs.length === 0) return null;
+  const hints = folderHints(tabs);
 
   const tabButtons = () => [...(stripRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? [])];
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -84,8 +107,12 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
         className,
       )}
     >
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         const isActive = tab.id === activeId;
+        // An inactive tab keeps a tab's slot: a 1px divider on its right, except beside the active tab, so the strip
+        // reads as tabs rather than loose words.
+        const divided = !isActive && tabs[index + 1] !== undefined && tabs[index + 1]!.id !== activeId;
+        const hint = hints.get(tab.id);
         const Icon = getTabIcon(tab.name);
         const [head, tail] = splitName(tab.name);
 
@@ -99,13 +126,14 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
               isActive
                 ? "border-border bg-card text-foreground"
                 : "border-transparent text-muted-foreground hover:bg-[var(--ix-hover-bg)] hover:text-foreground",
+              divided && "after:absolute after:-right-[3px] after:top-1/2 after:h-4 after:w-px after:-translate-y-1/2 after:bg-border",
             )}
           >
             <button
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-label={tab.dirty ? `${tab.name}, unsaved changes` : tab.name}
+              aria-label={`${tab.name}${hint ? ` in ${hint}` : ""}${tab.dirty ? ", unsaved changes" : ""}`}
               tabIndex={isActive || (!activeId && tab === tabs[0]) ? 0 : -1}
               onClick={() => onSelect(tab.id)}
               className={cn("flex h-full min-w-0 items-center gap-1.5 rounded-t-lg pl-3 pr-1", focusRingInset)}
@@ -115,6 +143,7 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
                 <span className="overflow-hidden text-ellipsis whitespace-pre">{head}</span>
                 {tail && <span className="shrink-0 whitespace-pre">{tail}</span>}
               </span>
+              {hint && <span className="min-w-0 truncate text-muted-foreground">· {hint}</span>}
               {tab.dirty && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--accent-text)]" />}
             </button>
             <button

@@ -271,7 +271,7 @@ export function SegmentedControl<T extends string = string>({
             {option.adornment && (
               <span
                 className={cn(
-                  "text-xs",
+                  "text-sm tabular-nums",
                   active ? "text-[var(--accent-text)]/80" : "text-muted-foreground",
                 )}
               >
