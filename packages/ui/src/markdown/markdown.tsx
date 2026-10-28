@@ -240,7 +240,7 @@ export interface MarkdownProps {
 export const Markdown = memo(({ children, className, urlTransform, linkChip }: MarkdownProps) => {
   return (
     <div
-      className={cn("tangle-prose max-w-none text-sm", className)}
+      className={cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className)}
     >
       <LinkChipContext.Provider value={linkChip}>
         <ReactMarkdown

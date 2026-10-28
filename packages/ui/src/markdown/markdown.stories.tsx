@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useEffect, useState } from 'react'
 import { Markdown } from './markdown'
 import { CodeBlock, CopyButton } from './code-block'
 import { codePresentation } from '../lib/code-presentation'
@@ -11,7 +12,7 @@ const markdownMeta: Meta<typeof Markdown> = {
   parameters: { layout: 'centered', backgrounds: { default: 'dark' } },
   decorators: [
     (Story) => (
-      <div className="w-[680px] rounded-xl bg-card p-6 text-foreground">
+      <div className="w-[680px] max-w-full rounded-xl bg-card p-6 text-foreground">
         <Story />
       </div>
     ),
@@ -261,4 +262,34 @@ export const CodeBlockLight: Story = {
       <CodeBlock light code={`pnpm add @tangle-network/sandbox-ui`} language="bash" />
     </div>
   ),
+}
+
+
+/** Host typography must not add a moving closing quote to streamed text. */
+function StreamingBlockquoteFixture() {
+  const text = '> **A researcher collects the evidence and a writer prepares the draft.**\n> You decide when the work leaves the workspace. Each person sees the source, the proposed action and the result before approving it.'
+  const [length, setLength] = useState(0)
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
+    const delay = setTimeout(() => {
+      let shown = 0
+      interval = setInterval(() => {
+        shown = Math.min(shown + 4, text.length); setLength(shown)
+        if (shown === text.length) clearInterval(interval)
+      }, 30)
+    }, 1500)
+    return () => { clearTimeout(delay); clearInterval(interval) }
+  }, [])
+  return <div className="streaming-blockquote-fixture" data-stream-length={length} data-stream-complete={length === text.length}>
+    <style>{`@layer base {
+      .streaming-blockquote-fixture blockquote p::before { content: open-quote; }
+      .streaming-blockquote-fixture blockquote p::after { content: close-quote; }
+    }`}</style>
+    <Markdown>{text.slice(0, length)}</Markdown>
+  </div>
+}
+
+export const StreamingBlockquote: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => <StreamingBlockquoteFixture />,
 }
