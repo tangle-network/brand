@@ -11,7 +11,7 @@ try {
   const context=await browser.newContext({viewport:{width,height:900},recordVideo:{dir:out}})
   const page=await context.newPage()
   await page.goto(`http://127.0.0.1:6102/iframe.html?id=markdown-markdown--streaming-blockquote&globals=theme:${theme}`)
-  await page.waitForSelector('[data-stream-length="0"]');await page.evaluate(()=>document.fonts.ready)
+  await page.waitForSelector('[data-stream-length="0"]',{state:'attached'});await page.evaluate(()=>document.fonts.ready)
   await page.evaluate(()=>{
    window.shifts=[];window.started=0
    const fixture=document.querySelector('[data-stream-length]')
