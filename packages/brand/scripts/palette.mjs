@@ -89,7 +89,8 @@ export function palette(name) {
   const secondary = inkOn(planes, 6.85, dark)
   const primary = inkOn(planes, Math.min(9, ...planes.map((p) => contrast(dark ? WHITE : BLACK, p) - .15)), dark)
   const fill = solve((L) => colour(accentHue, 54, L), (c) => contrast(WHITE, mix(WHITE, c, .1)) >= 4.7, true)
-  const accent = hueInk(accentHue, 92, [...planes, ...planes.map((p) => mix(fill, p, .2))], 4.65, dark)
+  const accentPlanes = ['dark', 'light'].includes(name) ? envelope(dark) : planes
+  const accent = hueInk(accentHue, 92, [...accentPlanes, ...accentPlanes.map((p) => mix(fill, p, .2))], 4.65, dark)
   const mark = hueInk(accentHue, 65, planes, dark ? 4 : 4.6, dark)
   const line = hueInk(accentHue, 85, planes, 3.5, dark)
   const h = (token) => `hsl(var(--${token}))`
