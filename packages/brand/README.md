@@ -87,9 +87,10 @@ Choose this **instead of** `styles`, `tokens.css` and `named-themes.css`; do not
 
 This export is the shared migration boundary, **not a claim that Agent App has already migrated** and not a replacement for that package's entire stylesheet. Its component-specific variables, neutral-ramp API, keyframes and structural rules remain consumer-owned until a separate, explicit migration reconciles them. Remove duplicate shared palette declarations in that migration rather than placing competing global token systems on the same page.
 
-The only authoring inputs are `src/styles/tokens.css` and `named-themes.css`. Never edit `legacy-light.css` by hand:
+The palette inputs live in `scripts/palette.mjs`; `scripts/palette-template.css` owns selectors, public names, aliases and non-colour styling. `gen-ladders.mjs` generates both canonical stylesheets, every named theme and all accent scopes. Never edit generated CSS by hand. Regenerate the palette before its compatibility projection:
 
 ```sh
+pnpm --filter @tangle-network/brand gen:ladders
 pnpm --filter @tangle-network/brand gen:compat
 pnpm --filter @tangle-network/brand check:compat
 ```
@@ -122,7 +123,7 @@ import { Logo, TangleKnot } from "@tangle-network/brand";
 
 Renderers that cannot read CSS variables (PDF, canvas, WebGL, email, the `theme-color` meta) import `palettes` from `@tangle-network/brand`: resolved hex values for `light`, `dark`, `websiteLight` and `websiteDark`, generated from the stylesheets by `pnpm gen:palette`. Pages styled with CSS keep using the variables.
 
-The base surface ladder is the one GTM proved out: dark is indigo-lifted `#0a0a14` / `#191826` / `#221f33` / `#2c2942`; light is a cool `#eceef3` canvas, white paper cards and overlays, and `#f1f2f7` nested wells. The cast stays below 0.1 chroma and ink stays achromatic, so indigo still reads as the interaction accent, not the base field. Existing named products may supply deliberate surface overrides.
+The palette table specifies canvas hue, chroma, plane lightnesses and accent hue per theme. The generator derives neutral ink tiers from contrast targets, status inks and washes from their semantic hues, and category/accent roles from the shared hue table. Dark planes rise in OKLCH lightness; light alternates paper and wells. Named themes resolve their own sidebar, raised planes and wells. Ink remains neutral so the chosen accent signals interaction. `tokens.test.ts`, `surface-ladder.test.ts` and the generator's contrast guards protect the hierarchy and legibility. Size and colour values belong to the executable inputs rather than a second table here.
 
 Chrome radii are 6/8/10/12px in both base modes; the composer has its own 26px role. Role radii are one ramp: `--radius-tag` 4, `--radius-control` 8, `--radius-card` 12, `--radius-container` 16, and `--radius-pill` for every chip; `--radius-chip`, `--radius-field` and `--radius-panel` are older names of control, card and container. Every shadow is drawn in `--shadow-color`, HSL channels that are black in dark and `220 40% 8%` in light; a named theme retints its shadows by setting that one token. Inter (variable, then static) leads body and display stacks, with Geist fallbacks; Geist Mono leads code with JetBrains Mono and system fallbacks. Runtime font/radius registrations retain their public override names; tests keep Tailwind registration defaults aligned with the canonical declarations.
 

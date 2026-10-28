@@ -330,31 +330,16 @@ describe("Canonical surface ladder (the spine: :root, .dark, .light, dark, light
     }
   });
 
-  it("keeps every named theme with its own planes on the flat ladder until it is tuned", () => {
-    // The canonical ladder is the spine's indigo planes; a named theme that
-    // inherited it would nest an indigo card inside its own card.
-    const flat = css.match(/([^{}]*)\{\s*--hsl-raised:\s*var\(--hsl-card\);[^}]*\}/);
-    expect(flat, "the named-theme flat rule").not.toBeNull();
-    const flatBody = flat![0];
-    for (const [token, value] of [
-      ["hsl-raised", "var(--hsl-card)"],
-      ["hsl-raised-2", "var(--hsl-card)"],
-      ["well-raised", "var(--well-card)"],
-      ["well-raised-2", "var(--well-card)"],
-      ["edge-highlight", "0 0 0 0 transparent"],
-    ]) {
-      expect(declIn(flatBody, token!), `--${token}`).toBe(value);
+  it("gives every named theme its own raised planes and wells", () => {
+    for (const body of rules(themes).matchAll(/[^{}]*\{([^{}]*--hsl-background:[^{}]*)\}/g)) {
+      const own = body[1]!;
+      expect(declIn(own, "hsl-raised")).toBe("var(--hsl-secondary)");
+      expect(resolveIn(own, "hsl-raised"), "raised must differ from the card").not.toBe(resolveIn(own, "hsl-card"));
+      for (const role of ["well-page", "well-card", "well-raised", "well-raised-2"]) {
+        expect(own, role).toContain(`--${role}:`);
+      }
     }
-    const names = (selectors: string) => [...selectors.matchAll(/data-theme="([^"]+)"/g)].map((m) => m[1]);
-    const ownPlanes = new Set(
-      [...rules(themes).matchAll(/([^{}]*)\{([^{}]*)\}/g)]
-        .filter((m) => m[2]!.includes("--hsl-background:"))
-        .flatMap((m) => names(m[1]!)),
-    );
-    const tuned = new Set(["hospitality"]);
-    expect(new Set(names(flat![1]!))).toEqual(new Set([...ownPlanes].filter((name) => !tuned.has(name!))));
-  });
-});
+  });});
 
 describe("Inset workspace backdrop (canonical themes)", () => {
   // sandbox-ui WorkspaceSurface / WorkspaceLayout surface="inset" paint the
