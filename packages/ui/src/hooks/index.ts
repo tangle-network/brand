@@ -8,3 +8,6 @@ export * from "./use-auth";
 export * from "./use-realtime-session";
 export * from "./use-sdk-session";
 export * from "./use-sse-stream";
+
+export { useEventStream, type EventStreamHandlers, type EventStreamSource, type EventStreamOpener } from "./use-event-stream";
+export { useFollowTail } from "./use-follow-tail";

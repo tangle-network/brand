@@ -1,0 +1,65 @@
+/** Real packed UI consumers: named/default/header SSE and measured ChatContainer growth. */
+import assert from 'node:assert/strict'
+import { createServer } from 'node:http'
+import { mkdtemp, readFile, writeFile, mkdir, rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { test } from 'node:test'
+import { build } from 'vite'
+import { chromium } from 'playwright'
+
+const consumer=process.env.UI_HOOKS_CONSUMER,evidence=process.env.UI_HOOKS_EVIDENCE
+assert.ok(consumer,'Use a fresh installed UI package')
+const require=createRequire(resolve(consumer,'package.json'))
+async function openHost(){
+ const scratch=await mkdtemp(resolve(consumer,'.reader-host-')),entry=resolve(scratch,'host.js')
+ await writeFile(entry,`import React,{useMemo,useState}from'react';import{createRoot}from'react-dom/client';import{useSSEStream}from'@tangle-network/ui/hooks';import{ChatContainer}from'@tangle-network/ui/chat';import'@tangle-network/sandbox-ui/styles';
+const TYPES=['sample'];function Host(){const[count,set]=useState(21),[height,grow]=useState(24);const backend=new URL(location.href).searchParams.get('backend')??'native';const stream=useSSEStream({url:'/buffer?backend='+backend,authToken:backend==='headers'?'fixture-local':undefined,eventTypes:backend==='headers'?TYPES:undefined,maxRetries:2,reconnectDelay:20});const messages=useMemo(()=>Array.from({length:count},(_,i)=>({id:'m'+i,role:i%2?'assistant':'user'})),[count]);const parts=useMemo(()=>Object.fromEntries(messages.map((m,i)=>[m.id,[{type:'text',text:'Retained turn '+i+'. '+('Recorded evidence stays readable. '.repeat(8))}]])),[messages]);return React.createElement(React.Fragment,null,React.createElement('output',{'data-stream':''},JSON.stringify({state:stream.state,events:stream.events})),React.createElement('button',{onClick:stream.disconnect},'Disconnect'),React.createElement('button',{onClick:stream.connect},'Connect'),React.createElement('button',{onClick:()=>set(n=>n+1)},'Append message'),React.createElement('button',{onClick:()=>grow(n=>n+400)},'Load retained attachment'),React.createElement('div',{id:'chat',style:{height:360,position:'relative'}},React.createElement(ChatContainer,{messages,partMap:parts,isStreaming:false,renderUserMessageActions:m=>m.id==='m20'?React.createElement('aside',{'aria-label':'Retained attachment',style:{height}},'Retained attachment'):null})))}createRoot(document.getElementById('host')).render(React.createElement(Host));`)
+ const built=await build({configFile:false,logLevel:'silent',define:{'process.env.NODE_ENV':JSON.stringify('production')},build:{write:false,lib:{entry,formats:['es'],fileName:()=> 'host.js'},rollupOptions:{output:{chunkFileNames:'host/[name]-[hash].js'}}}})
+ const chunks=new Map((Array.isArray(built)?built:[built]).flatMap(r=>r.output).map(item=>[item.fileName,item.type==='chunk'?item.code:item.source])),requests=[],clients=new Set()
+ const server=createServer((req,res)=>{
+  const url=new URL(req.url,'http://localhost')
+  if(url.pathname==='/buffer'){
+   const prior=requests.filter(r=>r.backend===url.searchParams.get('backend')).length;requests.push({backend:url.searchParams.get('backend'),after:url.searchParams.get('lastEventId'),authorized:req.headers.authorization==='fixture-local'})
+   res.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache'});res.flushHeaders();clients.add(res);res.on('close',()=>clients.delete(res))
+   res.write(`id: ${prior+1}\n${url.searchParams.get('backend')==='headers'?'event: sample\n':''}data: ${JSON.stringify({value:prior+1})}\n\n`)
+   if(prior===0)res.end();return
+  }
+  if(url.pathname.startsWith('/assets/')){res.setHeader('content-type',url.pathname.endsWith('.css')?'text/css':'text/javascript');return res.end(chunks.get(url.pathname.slice(8)))}
+  const css=[...chunks.keys()].filter(n=>n.endsWith('.css')).map(n=>`<link rel="stylesheet" href="/assets/${n}">`).join('')
+  res.end(`<!doctype html><html class="${url.searchParams.get('theme')??'light'}" data-theme="${url.searchParams.get('theme')??'light'}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${css}<style>body{margin:0;padding:12px}output{display:block;max-height:100px;overflow:auto;white-space:pre-wrap}button{margin:4px}</style><div id="host"></div><script type="module" src="/assets/host.js"></script></html>`)
+ })
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve))
+ return {server,requests,url:`http://127.0.0.1:${server.address().port}`,close:async()=>{for(const response of clients)response.end();await new Promise(resolve=>server.close(resolve));await rm(scratch,{recursive:true,force:true})}}
+}
+
+for(const backend of ['native','headers'])test(`buffered SSE keeps existing ${backend} cursor and disconnect contract`,{timeout:60_000},async()=>{
+ const host=await openHost(),browser=await chromium.launch({headless:true}),page=await browser.newPage()
+ try{
+  await page.goto(host.url+'/?backend='+backend)
+  await page.waitForFunction(()=>JSON.parse(document.querySelector('[data-stream]').textContent).events.some(event=>event.data.value===2))
+  const state=JSON.parse(await page.locator('[data-stream]').textContent());assert.deepEqual(state.events.map(event=>event.data.value),[1,2],'one event per wire frame')
+  assert.deepEqual(host.requests.map(req=>req.after),[null,'1']);assert.ok(host.requests.every(req=>req.authorized===(backend==='headers')))
+  await page.getByRole('button',{name:'Disconnect',exact:true}).click();await page.waitForTimeout(100);assert.equal(host.requests.length,2)
+  await page.getByRole('button',{name:'Connect',exact:true}).click();await page.waitForFunction(()=>JSON.parse(document.querySelector('[data-stream]').textContent).events.some(event=>event.data.value===3));assert.equal(host.requests[2].after,'2')
+ }finally{await browser.close();await host.close()}
+})
+
+for(const theme of ['light','dark'])for(const width of [1512,390])test(`actual ChatContainer follows measured growth and respects reading ${theme} ${width}`,{timeout:60_000},async()=>{
+ const host=await openHost(),browser=await chromium.launch({headless:true});if(evidence)await mkdir(evidence,{recursive:true})
+ const context=await browser.newContext({viewport:{width,height:900},colorScheme:theme,...(evidence?{recordVideo:{dir:evidence,size:{width,height:900}}}:{})})
+ try{
+  const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url+'/?theme='+theme)
+  const pane=page.locator('#chat .overflow-y-auto')
+  await page.waitForFunction(()=>{const el=document.querySelector('#chat .overflow-y-auto');return el&&el.scrollTop>100&&el.scrollHeight-el.scrollTop-el.clientHeight<2})
+  await page.getByRole('button',{name:'Load retained attachment',exact:true}).click()
+  await page.waitForFunction(()=>document.querySelector('[aria-label="Retained attachment"]')?.getBoundingClientRect().height>=424)
+  await page.waitForFunction(()=>{const el=document.querySelector('#chat .overflow-y-auto');return el.scrollHeight-el.scrollTop-el.clientHeight<2})
+  await pane.hover();await page.mouse.wheel(0,-300);await page.waitForFunction(()=>{const el=document.querySelector('#chat .overflow-y-auto');return el.scrollHeight-el.scrollTop-el.clientHeight>100})
+  const before=await pane.evaluate(el=>el.scrollTop);await page.getByRole('button',{name:'Append message',exact:true}).click();await page.getByText('Retained turn 21.',{exact:false}).first().waitFor();await page.waitForTimeout(100)
+  assert.ok(Math.abs(await pane.evaluate(el=>el.scrollTop)-before)<=2,'new output cannot move the reader away from the tail')
+  await pane.hover();await page.mouse.wheel(0,100000);await page.waitForFunction(()=>{const el=document.querySelector('#chat .overflow-y-auto');return el.scrollHeight-el.scrollTop-el.clientHeight<2})
+  await page.getByRole('button',{name:'Load retained attachment',exact:true}).click();await page.waitForFunction(()=>{const el=document.querySelector('#chat .overflow-y-auto');return el.scrollHeight-el.scrollTop-el.clientHeight<2})
+  assert.deepEqual(errors,[]);if(evidence)await page.screenshot({path:`${evidence}/chat-${theme}-${width}.png`})
+ }finally{await context.close();await browser.close();await host.close()}
+})
