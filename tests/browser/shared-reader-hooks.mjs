@@ -73,6 +73,7 @@ for(const presentation of ['runs','timeline'])test(`packed ChatContainer preserv
   assert.equal(await page.getByRole('note').filter({hasText:'Same receipt'}).count(),2)
   const order=await page.locator('body').evaluate(el=>{const text=el.innerText;return ['Question','Request receipt','src/first.ts','<em>literal</em>','src/second.ts'].map(value=>text.indexOf(value))});assert.ok(order.every((value,i)=>value>=0&&(i===0||value>order[i-1])))
   await page.getByRole('button',{name:'Inspect second',exact:true}).click();assert.deepEqual(JSON.parse(await page.locator('[data-inspected]').textContent()),presentation==='runs'?{id:'second',index:2}:{id:'second'})
+  await (presentation==='timeline'?page.getByRole('status',{name:'Agent is thinking'}):page.getByText('Thinking',{exact:true})).waitFor({state:'visible'})
   await page.getByRole('button',{name:'Deliver answer',exact:true}).click();await page.getByText('Answer arrived',{exact:true}).waitFor();assert.equal(await notes.count(),4);assert.equal(await page.getByRole('status',{name:'Agent is thinking'}).count(),0)
  }finally{await browser.close();await host.close()}
 })
