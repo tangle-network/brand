@@ -1,5 +1,11 @@
 # @tangle-network/ui
 
+## 11.51.3
+
+### Patch Changes
+
+- Share the native event-stream lifecycle and measured-content following between existing UI chat hooks and retained-run consumers; preserve buffered-stream retries, authenticated host transports and existing exports.
+
 ## 11.51.2
 
 ### Patch Changes

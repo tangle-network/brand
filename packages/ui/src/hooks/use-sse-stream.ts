@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { openNativeStream } from "./use-event-stream";
 
 /**
  * SSE Event data structure
@@ -121,7 +122,7 @@ export function useSSEStream<T = unknown>(
   const [timeSinceLastEvent, setTimeSinceLastEvent] = React.useState(0);
 
   const retryCountRef = React.useRef(0);
-  const eventSourceRef = React.useRef<EventSource | null>(null);
+  const eventSourceRef = React.useRef<{ close(): void } | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const reconnectTimeoutRef = React.useRef<ReturnType<
     typeof setTimeout
@@ -330,60 +331,28 @@ export function useSSEStream<T = unknown>(
           }
         });
     } else {
-      // Use native EventSource for simple cases
-      const es = new EventSource(connectUrl.toString());
-      eventSourceRef.current = es;
-
-      es.onopen = () => {
-        setState("connected");
-        retryCountRef.current = 0;
-      };
-
-      es.onerror = () => {
-        const err = new Error("EventSource connection error");
-        setError(err);
-        onError?.(err);
-
-        if (autoReconnect && enabled && retryCountRef.current < maxRetries) {
-          setState("reconnecting");
-          es.close();
-          const delay = reconnectDelay * 2 ** retryCountRef.current;
-          reconnectTimeoutRef.current = setTimeout(
-            () => {
-              retryCountRef.current += 1;
-              connect();
-            },
-            Math.min(delay, 30000),
-          );
-        } else {
-          setState("error");
-        }
-      };
-
-      // Listen for specific event types or default 'message'
-      const types = eventTypes || ["message"];
-      for (const type of types) {
-        es.addEventListener(type, (e: MessageEvent) => {
-          try {
-            const data = JSON.parse(e.data) as T;
-            handleEvent(type, data, e.lastEventId);
-          } catch {
-            handleEvent(type, e.data as T, e.lastEventId);
-          }
-        });
-      }
-
-      // Also listen for unnamed events
-      if (!eventTypes) {
-        es.onmessage = (e: MessageEvent) => {
-          try {
-            const data = JSON.parse(e.data) as T;
-            handleEvent("message", data, e.lastEventId);
-          } catch {
-            handleEvent("message", e.data as T, e.lastEventId);
-          }
-        };
-      }
+      const events = Object.fromEntries((eventTypes ?? ["message"]).map(type => [type, (event: MessageEvent<string>) => {
+        let data: T
+        try { data = JSON.parse(event.data) as T } catch { data = event.data as T }
+        handleEvent(type, data, event.lastEventId)
+      }]))
+      eventSourceRef.current = openNativeStream(() => {
+        const target = new URL(url, window.location.origin)
+        if (lastEventIdRef.current) target.searchParams.set("lastEventId", lastEventIdRef.current)
+        return target.toString()
+      }, {
+        events,
+        onConnecting: attempt => { retryCountRef.current = attempt; setState("connecting"); setError(null) },
+        onLiveChange: live => {
+          if (live) { setState("connected"); retryCountRef.current = 0; return }
+          const error = new Error("EventSource connection error"); setError(error); onError?.(error)
+        },
+        retryDelay: attempt => {
+          if (!autoReconnect || !enabled || attempt >= maxRetries) { setState("error"); return undefined }
+          setState("reconnecting")
+          return Math.min(reconnectDelay * 2 ** attempt, 30000)
+        },
+      })
     }
   }, [
     url,
