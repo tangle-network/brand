@@ -1,3 +1,7 @@
+## 11.51.11
+
+- Keep tool-row actions and navigation reachable after a hover preview. HoverCard uses its anchor for placement, preserves keyboard inspection, and dismisses previews when a nested control commits an action. Touch actions do not become hover intent.
+
 ## 11.51.10
 
 - Render Runtime’s recorded `down` outcome as Failed; cancellation and no-winner remain Stopped.
