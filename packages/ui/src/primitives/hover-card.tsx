@@ -14,10 +14,10 @@ type HoverCardProps = React.ComponentProps<typeof Popover> & {
 /** One hover policy and Popover's keyboard/focus behavior; delays follow the trigger's fast token. */
 export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
   const element = anchor && ("contextElement" in anchor ? anchor.contextElement : anchor);
-  const [own, setOwn] = React.useState(defaultOpen);
+  const [own, setOwn] = React.useState({ anchor: element, open: defaultOpen });
   const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean }>({});
   if (element) intent.current.target = element;
-  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(next); onOpenChange?.(next); }, [controlled, onOpenChange]);
+  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn({ anchor: element, open: next }); onOpenChange?.(next); }, [controlled, onOpenChange, element]);
   const delay = (target: Element | null | undefined) => {
     if (typeof document === "undefined") return 0;
     const value = getComputedStyle(target ?? document.documentElement).getPropertyValue("--duration-fast").trim();
@@ -36,7 +36,7 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
     if (document.activeElement === document.body && intent.current.target instanceof HTMLElement) intent.current.target.focus({ preventScroll: true });
     queueMicrotask(() => { intent.current.restoring = false; });
   };
-  return <HoverIntent.Provider value={{ enter, leave, restore }}><Popover {...props} open={controlled ?? own} onOpenChange={change}>
+  return <HoverIntent.Provider value={{ enter, leave, restore }}><Popover {...props} open={anchor === null ? false : controlled ?? (own.anchor === element && own.open)} onOpenChange={change}>
     {anchor && <PopoverAnchor virtualRef={{ current: anchor }} />}{children}
   </Popover></HoverIntent.Provider>;
 }
