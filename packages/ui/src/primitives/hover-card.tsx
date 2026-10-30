@@ -1,9 +1,9 @@
 import { cn } from "../lib/utils";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "./popover";
+import { Popover, PopoverAnchor, PopoverContent } from "./popover";
 
-const HoverIntent = React.createContext({ enter: (_target: Element) => {}, leave: () => {}, restore: () => {} });
+const HoverIntent = React.createContext({ enter: (_target: Element) => {}, leave: () => {}, restore: () => {}, press: () => {} });
 type HoverCardProps = React.ComponentProps<typeof Popover> & {
   /** Existing DOM trigger for delegated canvas or virtual-list previews. */
   anchor?: HTMLElement | { getBoundingClientRect: () => DOMRect; contextElement: HTMLElement } | null;
@@ -15,15 +15,14 @@ type HoverCardProps = React.ComponentProps<typeof Popover> & {
 export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
   const element = anchor && ("contextElement" in anchor ? anchor.contextElement : anchor);
   const [own, setOwn] = React.useState({ anchor: element, open: defaultOpen });
-  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean }>({});
+  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean; pressed?: boolean }>({});
   if (element) intent.current.target = element;
   const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn({ anchor: element, open: next }); onOpenChange?.(next); }, [controlled, onOpenChange, element]);
   const delay = (target: Element | null | undefined) => {
-    if (typeof document === "undefined") return 0;
     const value = getComputedStyle(target ?? document.documentElement).getPropertyValue("--duration-fast").trim();
     return (parseFloat(value) || 0) * (value.endsWith("ms") ? 1 : 1000);
   };
-  const enter = React.useCallback((target: Element) => { if (intent.current.restoring) return; if (!target.closest("[data-hover-card]")) intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
+  const enter = React.useCallback((target: Element) => { if (intent.current.restoring || (intent.current.pressed && target.closest("[data-hover-card]"))) return; intent.current.pressed = false; if (!target.closest("[data-hover-card]")) intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
   const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(element ?? intent.current.target)); }, [change, closeDelay, element]);
   React.useEffect(() => {
     if (!element) return () => clearTimeout(intent.current.timer);
@@ -36,20 +35,21 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
     if (document.activeElement === document.body && intent.current.target instanceof HTMLElement) intent.current.target.focus({ preventScroll: true });
     queueMicrotask(() => { intent.current.restoring = false; });
   };
-  return <HoverIntent.Provider value={{ enter, leave, restore }}><Popover {...props} open={anchor === null ? false : controlled ?? (own.anchor === element && own.open)} onOpenChange={change}>
+  return <HoverIntent.Provider value={{ enter, leave, restore, press: () => { intent.current.pressed = true; change(false); } }}><Popover {...props} open={anchor === null ? false : controlled ?? (own.anchor === element && own.open)} onOpenChange={change}>
     {anchor && <PopoverAnchor virtualRef={{ current: anchor }} />}{children}
   </Popover></HoverIntent.Provider>;
 }
 
 export const HoverCardTrigger = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement> & { asChild?: boolean }>(
-  ({ className, onPointerEnter, onPointerLeave, onFocus, onBlur, asChild, ...props }, ref) => {
+  ({ className, onPointerEnter, onPointerLeave, onFocus, onBlur, onClickCapture, asChild, ...props }, ref) => {
     const intent = React.useContext(HoverIntent);
     const Trigger = asChild ? Slot : "a";
-    return <PopoverTrigger asChild><Trigger ref={ref} tabIndex={0} className={cn("cursor-pointer underline-offset-4 hover:underline", className)}
-      onPointerEnter={event => { onPointerEnter?.(event); if (!event.defaultPrevented) intent.enter(event.currentTarget); }}
+    return <PopoverAnchor asChild><Trigger ref={ref} tabIndex={0} className={cn("cursor-pointer underline-offset-4 hover:underline", className)}
+      onPointerEnter={event => { onPointerEnter?.(event); if (!event.defaultPrevented && event.pointerType !== "touch") intent.enter(event.currentTarget); }}
       onPointerLeave={event => { onPointerLeave?.(event); if (!event.defaultPrevented) intent.leave(); }}
-      onFocus={event => { onFocus?.(event); if (!event.defaultPrevented) intent.enter(event.currentTarget); }}
-      onBlur={event => { onBlur?.(event); if (!event.defaultPrevented && !(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) intent.leave(); }} {...props} /></PopoverTrigger>;
+      onFocus={event => { onFocus?.(event); if (!event.defaultPrevented && event.target.matches(":focus-visible")) intent.enter(event.currentTarget); }}
+      onClickCapture={event => { onClickCapture?.(event); const action = event.target instanceof Element ? event.target.closest('a,button,input,select,textarea,[role="button"]') : null; if (!event.defaultPrevented && action && action !== event.currentTarget) intent.press(); }}
+      onBlur={event => { onBlur?.(event); if (!event.defaultPrevented && !(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) intent.leave(); }} {...props} /></PopoverAnchor>;
   },
 );
 HoverCardTrigger.displayName = "HoverCardTrigger";
