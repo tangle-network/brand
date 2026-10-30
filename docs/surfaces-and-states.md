@@ -99,7 +99,7 @@ A soft wash, `--ix-hover-bg` (.07 light, .08 dark), replaces the glow where a gl
 | `TabsTrigger` default, pills | `ixControlSoft` + `ixSelected` |
 
 A product list row (sidebar nav, conversation rows, table rows) uses `ixRow` + `ixSelected` with `aria-current="page"` on the current item.
-`interaction-states.test.tsx` holds each primitive to its helper and compiles every helper class with Tailwind.
+Use the installed-package presentation fixture and `tests/visual/control-accessibility.spec.mjs` to check control geometry, focus and interaction.
 
 ## Status
 

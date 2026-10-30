@@ -1,6 +1,6 @@
 import { act, render, waitFor } from "@testing-library/react";
 import type { Editor } from "@tiptap/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { MarkdownDocumentEditor } from "./markdown-document-editor";
 import { CALL_SHEET, KITCHEN_SINK } from "./source-markdown.fixtures";
 
@@ -10,12 +10,12 @@ const PEERS_LOADED = { timeout: 15_000 };
 const LOADS_PEERS = 30_000;
 
 async function openEditor(value: string) {
-  const onChange = vi.fn<(markdown: string) => void>();
+  const changes: string[] = [];
   let editor: Editor | null = null;
   const view = render(
     <MarkdownDocumentEditor
       value={value}
-      onChange={(markdown) => onChange(markdown)}
+      onChange={(markdown) => changes.push(markdown)}
       onReady={(ready) => {
         editor = ready;
       }}
@@ -32,9 +32,9 @@ async function openEditor(value: string) {
     get editor() {
       return editor! as Editor;
     },
-    onChange,
+    changes,
     /** The Markdown the editor last reported, or the value it opened. */
-    saved: () => onChange.mock.calls.at(-1)?.[0] ?? value,
+    saved: () => changes.at(-1) ?? value,
   };
 }
 
@@ -63,13 +63,13 @@ function tableRows(markdown: string) {
 
 describe("MarkdownDocumentEditor source preservation", () => {
   it("opens every Markdown construct without reporting a change", async () => {
-    const { editor, onChange, view } = await openEditor(KITCHEN_SINK);
+    const { editor, changes, view } = await openEditor(KITCHEN_SINK);
     act(() => {
       editor.commands.setTextSelection(1);
       editor.setEditable(false);
       editor.setEditable(true);
     });
-    expect(onChange).not.toHaveBeenCalled();
+    expect(changes).toHaveLength(0);
     // The table is shown as a table, read-only, instead of a run-on paragraph.
     const table = view.container.querySelector('[data-md-kind="table"] table');
     expect(table?.querySelectorAll("tbody tr")).toHaveLength(1);

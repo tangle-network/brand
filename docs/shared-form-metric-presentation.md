@@ -98,8 +98,8 @@ The merged accessibility work (#191), canonical page work (#190), scoped theme
 work (#192), Dialog (#198), Charts and CodeBlock/import-boundary work are not
 rewritten. In particular, Button's activation/Slot implementation and the
 Select content/item implementation are byte-identical to the inspected base.
-Existing Input/Button accessibility tests stay unchanged. Prior results cover
-unchanged behavior only; they are not represented as tests of this new head.
+Mock-based Input/Button checks have been retired. The installed package fixture
+and focused browser proof below exercise their presentation and interaction.
 Existing page/theme screenshot directories remain untouched.
 
 The inspected package versions are UI 11.14.0 and Brand 1.10.0. The required
@@ -115,7 +115,6 @@ On the maintained Node/pnpm toolchain, run from repository root:
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm exec vitest run packages/ui/src/primitives/input.test.tsx packages/ui/src/primitives/button.test.tsx packages/ui/src/primitives/control-presentation.test.tsx packages/ui/src/primitives/metric-strip.test.tsx
 pnpm typecheck
 pnpm build
 node scripts/package-smoke.mjs packages/ui
