@@ -1,4 +1,5 @@
 "use client";
+import { useRunNow } from "./use-live-time";
 
 import * as React from "react";
 import { openNativeStream } from "./use-event-stream";
@@ -119,7 +120,7 @@ export function useSSEStream<T = unknown>(
   const [lastEvent, setLastEvent] = React.useState<SSEEvent<T> | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
   const [lastEventTime, setLastEventTime] = React.useState<number>(Date.now());
-  const [timeSinceLastEvent, setTimeSinceLastEvent] = React.useState(0);
+  const timeSinceLastEvent = Math.max(0, useRunNow() - lastEventTime);
 
   const retryCountRef = React.useRef(0);
   const eventSourceRef = React.useRef<{ close(): void } | null>(null);
@@ -128,14 +129,6 @@ export function useSSEStream<T = unknown>(
     typeof setTimeout
   > | null>(null);
   const lastEventIdRef = React.useRef<string | undefined>(undefined);
-
-  // Update time since last event
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeSinceLastEvent(Date.now() - lastEventTime);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastEventTime]);
 
   // Notify state changes
   React.useEffect(() => {
@@ -155,7 +148,7 @@ export function useSSEStream<T = unknown>(
         lastEventIdRef.current = id;
       }
 
-      setLastEventTime(Date.now());
+      setLastEventTime(event.timestamp);
       setLastEvent(event);
       setEvents((prev) => {
         const next = [...prev, event];

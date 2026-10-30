@@ -31,7 +31,7 @@ export interface UserMessageProps {
 }
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return Number.isFinite(date.valueOf()) ? date.toISOString().slice(11, 16) + " UTC" : "Invalid Date";
 }
 
 function MessageActions({ children, align = "end" }: { children: ReactNode; align?: "start" | "end" }) {
