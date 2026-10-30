@@ -1,5 +1,9 @@
 # @tangle-network/ui
 
+## 11.51.7
+
+- Expose the existing retained report component and follow-tail modules without optional chat stores. Derive all build entries from the package export map.
+
 ## 11.51.6
 
 - Expose the existing run-clock and status modules directly so minimal graph/server consumers do not load unrelated optional session stores.

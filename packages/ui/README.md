@@ -163,3 +163,5 @@ An http(s) `src` on another origin needs CORS, as any `fetch` does. When it fail
 Those entries create values at module scope, so consumers must install their peers before importing them.
 The package root also re-exports `./stores`, so a root import requires both nanostores peers.
 Consumers that use only other subpath entries do not need these three peers.
+
+Retained report readers can import existing `chat/agent-timeline`, `chat/speaker`, `run/expanded-tool-detail`, `run/inline-thinking-item`, `run/run-row-shell` and `hooks/use-follow-tail` modules directly. These entries preserve their broad-entry bindings without importing chat session stores.

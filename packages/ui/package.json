@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/ui",
-  "version": "11.51.6",
+  "version": "11.51.7",
   "description": "Generic React UI components for Tangle products \u2014 primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
@@ -135,6 +135,36 @@
       "types": "./dist/run/status-meta.d.ts",
       "import": "./dist/run/status-meta.js",
       "default": "./dist/run/status-meta.js"
+    },
+    "./chat/agent-timeline": {
+      "types": "./dist/chat/agent-timeline.d.ts",
+      "import": "./dist/chat/agent-timeline.js",
+      "default": "./dist/chat/agent-timeline.js"
+    },
+    "./chat/speaker": {
+      "types": "./dist/chat/speaker.d.ts",
+      "import": "./dist/chat/speaker.js",
+      "default": "./dist/chat/speaker.js"
+    },
+    "./run/expanded-tool-detail": {
+      "types": "./dist/run/expanded-tool-detail.d.ts",
+      "import": "./dist/run/expanded-tool-detail.js",
+      "default": "./dist/run/expanded-tool-detail.js"
+    },
+    "./run/inline-thinking-item": {
+      "types": "./dist/run/inline-thinking-item.d.ts",
+      "import": "./dist/run/inline-thinking-item.js",
+      "default": "./dist/run/inline-thinking-item.js"
+    },
+    "./run/run-row-shell": {
+      "types": "./dist/run/run-row-shell.d.ts",
+      "import": "./dist/run/run-row-shell.js",
+      "default": "./dist/run/run-row-shell.js"
+    },
+    "./hooks/use-follow-tail": {
+      "types": "./dist/hooks/use-follow-tail.d.ts",
+      "import": "./dist/hooks/use-follow-tail.js",
+      "default": "./dist/hooks/use-follow-tail.js"
     }
   },
   "scripts": {

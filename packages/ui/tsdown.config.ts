@@ -1,34 +1,20 @@
+import { existsSync } from "node:fs";
+import manifest from "./package.json" with { type: "json" };
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: {
-    index: "src/index.ts",
-    primitives: "src/primitives/index.ts",
-    chat: "src/chat/index.ts",
-    run: "src/run/index.ts",
-    "run/status-meta": "src/run/status-meta.tsx",
-    openui: "src/openui/index.ts",
-    "openui-schema": "src/openui/schema.ts",
-    files: "src/files/index.ts",
-    editor: "src/editor/index.ts",
-    markdown: "src/markdown/index.ts",
-    auth: "src/auth/index.ts",
-    hooks: "src/hooks/index.ts",
-    "hooks/use-live-time": "src/hooks/use-live-time.ts",
-    nav: "src/nav/index.tsx",
-    "sdk-hooks": "src/sdk-hooks.ts",
-    stores: "src/stores/index.ts",
-    types: "src/types/index.ts",
-    utils: "src/utils/index.ts",
-    "tool-previews": "src/tool-previews/index.ts",
-    "code-presentation": "src/code-presentation.ts",
-    presentation: "src/presentation.ts",
-    redaction: "src/redaction/index.ts",
-  },
+  entry: Object.fromEntries(Object.entries(manifest.exports).flatMap(([name, target]) => {
+    if (typeof target === "string") return [];
+    const key = name === "." ? "index" : name.slice(2);
+    const path = key === "openui-schema" ? "openui/schema" : key;
+    const source = [`src/${path}.ts`, `src/${path}.tsx`, `src/${path}/index.ts`, `src/${path}/index.tsx`].find(existsSync);
+    if (!source) throw new Error(`No source for public module ${name}`);
+    return [[key, source]];
+  })),
   // Keep component modules independently removable by consumers. In particular,
   // the existing primitives -> markdown CodeBlock re-export must not co-locate
   // syntax-highlighter initialization with Button/Input/Card in a shared chunk.
-  // Explicit entry names above retain every existing package export target.
+  // The package export map owns the module list for every build layout.
   unbundle: true,
   root: "src",
   platform: "neutral",
