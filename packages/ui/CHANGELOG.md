@@ -2,7 +2,7 @@
 
 ## 11.51.5
 
-- Share one clock across run duration, stream age and graph readers; keep replay timestamps fixed and export the canonical open-state predicate.
+- Render user-message times explicitly in UTC so server and browser hydration agree across timezones. Share one clock across run duration, stream age and graph readers; keep replay timestamps fixed and export the canonical open-state predicate.
 
 ## 11.51.4
 
