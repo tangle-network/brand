@@ -6,6 +6,7 @@ export default defineConfig({
     primitives: "src/primitives/index.ts",
     chat: "src/chat/index.ts",
     run: "src/run/index.ts",
+    "run/status-meta": "src/run/status-meta.tsx",
     openui: "src/openui/index.ts",
     "openui-schema": "src/openui/schema.ts",
     files: "src/files/index.ts",
@@ -13,6 +14,7 @@ export default defineConfig({
     markdown: "src/markdown/index.ts",
     auth: "src/auth/index.ts",
     hooks: "src/hooks/index.ts",
+    "hooks/use-live-time": "src/hooks/use-live-time.ts",
     nav: "src/nav/index.tsx",
     "sdk-hooks": "src/sdk-hooks.ts",
     stores: "src/stores/index.ts",
@@ -29,11 +31,9 @@ export default defineConfig({
   // Explicit entry names above retain every existing package export target.
   unbundle: true,
   root: "src",
-  format: ["esm"],
   platform: "neutral",
   dts: true,
   clean: true,
-  fixedExtension: false,
   // Consumers continue to own their client boundaries.
   checks: { moduleLevelDirective: false },
 });
