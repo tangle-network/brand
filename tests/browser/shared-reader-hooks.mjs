@@ -166,7 +166,7 @@ for(const [theme,width] of [['light',1512],['dark',1512],['light',390],['dark',3
 })
 
 for (const touch of [false, true]) test(`packed HoverCard lets nested ${touch ? 'touch' : 'mouse'} row actions navigate`, {timeout:60_000}, async () => {
- const host=await openHost(),browser=await chromium.launch({headless:true}),context=await browser.newContext({viewport:{width:390,height:900},hasTouch:touch}),page=await context.newPage();
+ const host=await openHost(),browser=await chromium.launch({headless:true}),context=await browser.newContext({viewport:{width:390,height:900},hasTouch:touch,...(evidence?{recordVideo:{dir:evidence,size:{width:390,height:900}}}:{})}),page=await context.newPage();
  try {
   await page.goto(host.url+'/?nested=1');const action=page.getByRole('button',{name:'Expand recorded tool',exact:true});
   if(touch)await action.tap();else await action.click();await page.waitForTimeout(350);
@@ -176,5 +176,7 @@ for (const touch of [false, true]) test(`packed HoverCard lets nested ${touch ? 
   await page.getByRole('button',{name:'All agents',exact:true}).focus();await page.keyboard.press('Tab');await card.waitFor({state:'visible'});await page.keyboard.press('Tab');await page.keyboard.press('Enter');
   await page.waitForFunction(()=>document.querySelector('[data-action-count]').textContent==='2');await card.waitFor({state:'hidden'});
   await page.getByRole('button',{name:'All agents',exact:true}).click();assert.equal(await page.locator('[data-route]').innerText(),'All agents');
- } finally {await context.close();await browser.close();await host.close()}
+  if(evidence)await page.screenshot({path:resolve(evidence,`nested-${touch?'touch':'mouse'}.png`)});
+ } catch(error){if(evidence){await page.screenshot({path:resolve(evidence,`nested-failure-${touch?'touch':'mouse'}.png`)});await writeFile(resolve(evidence,`nested-failure-${touch?'touch':'mouse'}.json`),JSON.stringify({error:String(error),body:await page.locator('body').innerText()},null,2))}throw error}
+ finally {await context.close();await browser.close();await host.close()}
 });
