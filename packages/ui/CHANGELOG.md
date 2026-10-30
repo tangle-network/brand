@@ -2,7 +2,7 @@
 
 ## 11.51.8
 
-- Remove mock-only component tests from source and package contents. Component implementations and built exports are unchanged; packed-consumer and browser integration checks remain.
+- Retire mock-dependent component tests while preserving the real editor source-saving integration without callback spies. Component implementations and built exports are unchanged; packed-consumer and browser checks remain.
 
 ## 11.51.7
 
