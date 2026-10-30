@@ -52,7 +52,7 @@ export function openNativeStream(url: string | (() => string), handlers: NativeP
 }
 
 /** Producer-owned named events; host transports keep their authenticated reconnect lifecycle. */
-export function useEventStream(url: string | undefined, handlers: EventStreamHandlers): void {
+export function useEventStream(url: string | (() => string) | undefined, handlers: EventStreamHandlers): void {
   const latest = useRef(handlers)
   latest.current = handlers
   const names = Object.keys(handlers.events).sort().join(',')
