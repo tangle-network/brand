@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/ui",
-  "version": "11.51.5",
+  "version": "11.51.6",
   "description": "Generic React UI components for Tangle products \u2014 primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
@@ -125,7 +125,17 @@
       "import": "./dist/code-presentation.js",
       "default": "./dist/code-presentation.js"
     },
-    "./styles/compat.css": "./src/styles/compat.css"
+    "./styles/compat.css": "./src/styles/compat.css",
+    "./hooks/use-live-time": {
+      "types": "./dist/hooks/use-live-time.d.ts",
+      "import": "./dist/hooks/use-live-time.js",
+      "default": "./dist/hooks/use-live-time.js"
+    },
+    "./run/status-meta": {
+      "types": "./dist/run/status-meta.d.ts",
+      "import": "./dist/run/status-meta.js",
+      "default": "./dist/run/status-meta.js"
+    }
   },
   "scripts": {
     "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node scripts/generate-presentation-css.mjs --check && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",

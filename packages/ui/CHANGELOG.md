@@ -1,5 +1,9 @@
 # @tangle-network/ui
 
+## 11.51.6
+
+- Expose the existing run-clock and status modules directly so minimal graph/server consumers do not load unrelated optional session stores.
+
 ## 11.51.5
 
 - Render user-message times explicitly in UTC so server and browser hydration agree across timezones. Share one clock across run duration, stream age and graph readers; keep replay timestamps fixed and export the canonical open-state predicate.
