@@ -67,7 +67,7 @@ export function formatCost(usd: number): string {
 
 /** 9.8k, 754.4k, 1.2M with the exact count left to a title. */
 export function formatCount(n: number): string {
-  return n == null || !Number.isFinite(n) || n < 0 ? '—' : formatCompact(n)
+  return !Number.isSafeInteger(n) || n < 0 ? '—' : formatCompact(n)
 }
 
 /** Elapsed clock at millisecond precision, so zoomed axis ticks keep distinct labels. */

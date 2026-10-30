@@ -1,5 +1,7 @@
 ## 11.51.9
 
+- Share HoverCard intent and Popover positioning/focus, with existing DOM anchors and local theme containers for virtualized canvases.
+
 - Share duration, clock, compact count, cost and UTC formatting through the pure `utils/format` export; remove private file/upload/chat formatters.
 
 # @tangle-network/ui
