@@ -1,3 +1,7 @@
+## 11.51.10
+
+- Render Runtime’s recorded `down` outcome as Failed; cancellation and no-winner remain Stopped.
+
 ## 11.51.9
 
 - Share HoverCard intent and Popover positioning/focus, with existing DOM anchors and local theme containers for virtualized canvases.
