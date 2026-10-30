@@ -6,13 +6,14 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "./popove
 const HoverIntent = React.createContext({ enter: (_target: Element) => {}, leave: () => {} });
 type HoverCardProps = React.ComponentProps<typeof Popover> & {
   /** Existing DOM trigger for delegated canvas or virtual-list previews. */
-  anchor?: HTMLElement | null;
+  anchor?: HTMLElement | { getBoundingClientRect: () => DOMRect; contextElement: HTMLElement } | null;
   openDelay?: number;
   closeDelay?: number;
 };
 
 /** One hover policy and Popover's keyboard/focus behavior; delays follow the trigger's fast token. */
 function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
+  const element = anchor && ("contextElement" in anchor ? anchor.contextElement : anchor);
   const [own, setOwn] = React.useState(defaultOpen);
   const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element }>({});
   const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(next); onOpenChange?.(next); }, [controlled, onOpenChange]);
@@ -22,14 +23,13 @@ function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange
     return (parseFloat(value) || 0) * (value.endsWith("ms") ? 1 : 1000);
   };
   const enter = React.useCallback((target: Element) => { intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
-  const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(anchor ?? intent.current.target)); }, [change, closeDelay, anchor]);
-  React.useEffect(() => () => clearTimeout(intent.current.timer), []);
+  const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(element ?? intent.current.target)); }, [change, closeDelay, element]);
   React.useEffect(() => {
-    if (!anchor) return;
-    const show = () => enter(anchor);
-    anchor.addEventListener("pointerenter", show); anchor.addEventListener("pointerleave", leave);
-    return () => { anchor.removeEventListener("pointerenter", show); anchor.removeEventListener("pointerleave", leave); };
-  }, [anchor, enter, leave]);
+    if (!element) return () => clearTimeout(intent.current.timer);
+    const show = () => enter(element);
+    element.addEventListener("pointerenter", show); element.addEventListener("pointerleave", leave);
+    return () => { clearTimeout(intent.current.timer); element.removeEventListener("pointerenter", show); element.removeEventListener("pointerleave", leave); };
+  }, [element, enter, leave]);
   return <HoverIntent.Provider value={{ enter, leave }}><Popover {...props} open={controlled ?? own} onOpenChange={change}>
     {anchor && <PopoverAnchor virtualRef={{ current: anchor }} />}{children}
   </Popover></HoverIntent.Provider>;
