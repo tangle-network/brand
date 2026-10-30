@@ -1,5 +1,9 @@
 # @tangle-network/ui
 
+## 11.51.4
+
+- Normalize retained record lifecycle aliases through the shared status vocabulary; stopped and absent terminal states remain distinct from success.
+
 ## 11.51.3
 
 ### Patch Changes
