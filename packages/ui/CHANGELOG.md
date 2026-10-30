@@ -1,5 +1,9 @@
 # @tangle-network/ui
 
+## 11.51.5
+
+- Share one clock across run duration, stream age and graph readers; keep replay timestamps fixed and export the canonical open-state predicate.
+
 ## 11.51.4
 
 - Normalize retained record lifecycle aliases through the shared status vocabulary; stopped and absent terminal states remain distinct from success.

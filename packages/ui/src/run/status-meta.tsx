@@ -57,6 +57,9 @@ export function runStatus(status: string): RunStatus {
   return Object.hasOwn(ALIASES, key) ? ALIASES[key] : "unknown";
 }
 
+/** Whether a canonical run state can still advance. */
+export const isOpen = (status: RunStatus | (string & {})): boolean => ["running", "waiting", "needs-you"].includes(runStatus(status));
+
 /** The label, glyph and colour token for a status, in every surface. */
 export function statusMeta(status: RunStatus | (string & {})): StatusMeta {
   return META[runStatus(status)];
