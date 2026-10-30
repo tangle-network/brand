@@ -25,7 +25,7 @@ export function openNativeStream(url: string | (() => string), handlers: NativeP
   const open = () => {
     handlers.onConnecting?.(attempt)
     const target = new URL(typeof url === 'function' ? url() : url, globalThis.location?.href), after = handlers.after?.()
-    if (after !== undefined && after > 0) target.searchParams.set('after', String(after))
+    if (after !== undefined && after >= 0) target.searchParams.set('after', String(after))
     let connection: EventStreamSource
     const live = (value: boolean) => { if (!stopped && (!connection || source === connection)) handlers.onLiveChange?.(value) }
     connection = handlers.opener ? handlers.opener(target.toString(), live) : new EventSource(target.toString())
@@ -61,7 +61,7 @@ export function useEventStream(url: string | undefined, handlers: EventStreamHan
     const current: EventStreamHandlers = {
       opener: handlers.opener,
       events: Object.fromEntries(Object.keys(handlers.events).map(name => [name, (event: MessageEvent<string>) => latest.current.events[name]?.(event)])),
-      after: () => latest.current.after?.() ?? 0,
+      after: () => latest.current.after?.() ?? -1,
       onStart: () => latest.current.onStart?.(),
       onLiveChange: live => latest.current.onLiveChange?.(live),
     }
