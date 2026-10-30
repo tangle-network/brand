@@ -186,7 +186,6 @@ try {
   }
 
   const workspacePackages = workspacePackageDirectories();
-  const workspacePeerTarballs = new Map();
   // A peer that is another package in this workspace must be installed from a
   // local tarball, never from the registry. The release PR bumps versions
   // before publish, so the repo version does not exist on npm yet — asking
@@ -197,16 +196,6 @@ try {
   // release workflow builds before test:package) so the tarball contains
   // dist/. Prefer the tarball even when npm already carries the repo version,
   // so the smoke test always exercises the exact code being released.
-  function workspacePeerTarball(name) {
-    if (!workspacePeerTarballs.has(name)) {
-      workspacePeerTarballs.set(
-        name,
-        packWorkspacePackage(workspacePackages.get(name)),
-      );
-    }
-    return workspacePeerTarballs.get(name);
-  }
-
   const optionalPeers = declaredOptionalPeers
     .filter((name) => !omittedOptionalPeers.includes(name))
     .map((name) => {
@@ -214,9 +203,12 @@ try {
       if (peerOverrides[name] !== undefined) {
         return `${name}@${peerOverrides[name]}`;
       }
-      if (workspacePackages.has(name)) return workspacePeerTarball(name);
-      const version =
-        manifest.devDependencies?.[name] ?? manifest.peerDependencies[name];
+      if (workspacePackages.has(name)) return packWorkspacePackage(workspacePackages.get(name));
+      // Qualify the installed lockfile cohort; a fresh caret resolution can
+      // select a newly advertised package whose tarball is not yet available.
+      const installed = join(packageDirectory, "node_modules", name, "package.json");
+      const version = existsSync(installed) ? JSON.parse(readFileSync(installed, "utf8")).version
+        : manifest.devDependencies?.[name] ?? manifest.peerDependencies[name];
       return `${name}@${version}`;
     });
 
@@ -230,7 +222,7 @@ try {
         manifest.peerDependenciesMeta?.[name]?.optional !== true &&
         workspacePackages.has(name),
     )
-    .map((name) => workspacePeerTarball(name));
+    .map((name) => packWorkspacePackage(workspacePackages.get(name)));
 
   writeFileSync(
     join(consumerDirectory, "package.json"),
