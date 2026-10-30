@@ -170,6 +170,11 @@
       "types": "./dist/utils/format.d.ts",
       "import": "./dist/utils/format.js",
       "default": "./dist/utils/format.js"
+    },
+    "./primitives/hover-card": {
+      "types": "./dist/primitives/hover-card.d.ts",
+      "import": "./dist/primitives/hover-card.js",
+      "default": "./dist/primitives/hover-card.js"
     }
   },
   "scripts": {
