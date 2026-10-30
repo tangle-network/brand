@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.3
+
+### Patch Changes
+
+- 2da4253: Own the categorical chart series palette in both themes so retained records, live charts and provenance graphs share one color source.
+
 ## 1.31.2
 
 ### Patch Changes
