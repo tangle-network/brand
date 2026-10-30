@@ -16,7 +16,7 @@ function schedule() {
     schedule();
   }, Math.max(0, Math.min(...[...subscribers].map(subscriber => subscriber.next)) - Date.now()));
 }
-function useClock(period: number, fixed: number | undefined, server: number) {
+function useClock(period: number, fixed: number | undefined, initial: number) {
   const subscribe = useCallback((notify: () => void) => {
     if (fixed !== undefined) return () => {};
     if (!subscribers.size) now = Date.now();
@@ -24,7 +24,7 @@ function useClock(period: number, fixed: number | undefined, server: number) {
     subscribers.add(subscriber); schedule();
     return () => { subscribers.delete(subscriber); schedule(); };
   }, [period, fixed]);
-  return useSyncExternalStore(subscribe, () => fixed ?? now, () => fixed ?? server);
+  return useSyncExternalStore(subscribe, () => fixed ?? Math.max(now, initial), () => fixed ?? initial);
 }
 /** One run clock; retained playback observes only its supplied timestamp. */
 export const useRunNow = (fixed?: number): number => useClock(1000, fixed, 0);
