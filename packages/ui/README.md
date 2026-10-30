@@ -1,5 +1,7 @@
 # @tangle-network/ui
 
+Minimal graph and server hosts can import the existing clock from `@tangle-network/ui/hooks/use-live-time` and status metadata/glyphs from `@tangle-network/ui/run/status-meta`. These module entries share the root bindings without loading optional session stores.
+
 Generic React UI components for Tangle products. Imports tokens from `@tangle-network/brand` (peer dep). Tailwind v4-native.
 
 Component visual precedent is governed by the repo-level [design bible](../../docs/design-bible.md) and [component audit](../../docs/component-audit.md). Storybook examples are test surfaces; they are not automatically approved brand patterns.
