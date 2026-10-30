@@ -1,3 +1,4 @@
+import { formatUtcTime } from "../utils/format";
 /**
  * ChatMessage — one message in the conversation.
  *
@@ -84,7 +85,7 @@ export function ChatMessage({
           )}
           {timestamp && (
             <span className="text-muted-foreground text-xs">
-              {formatTime(timestamp)}
+              {formatUtcTime(timestamp)}
             </span>
           )}
         </div>
@@ -122,9 +123,3 @@ export function ChatMessage({
   );
 }
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}

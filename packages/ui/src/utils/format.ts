@@ -1,13 +1,3 @@
-/** Format a duration in milliseconds to a human-readable string. */
-export function formatDuration(ms: number): string {
-  if (ms < 1000) return "<1s";
-  const seconds = Math.floor(ms / 1000);
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  const remaining = seconds % 60;
-  return remaining > 0 ? `${minutes}m ${remaining}s` : `${minutes}m`;
-}
-
 /**
  * Markdown read as plain text, for a one-line preview: code fences, emphasis,
  * headings, list and quote markers, and link syntax are removed, so a preview
@@ -33,29 +23,6 @@ export function truncateText(text: string, max: number): string {
 }
 
 /**
- * Format an uptime duration in milliseconds with progressive
- * granularity, so short-lived sandboxes don't render as "0d 0h".
- *  - < 60s        → "Ns"
- *  - < 60m        → "Nm Ss"
- *  - < 24h        → "Nh Mm"
- *  - otherwise    → "Nd Hh"
- */
-export function formatUptime(ms: number): string {
-  if (!Number.isFinite(ms) || ms < 0) return "—";
-  const totalSeconds = Math.floor(ms / 1000);
-  if (totalSeconds < 60) return `${totalSeconds}s`;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  if (minutes < 60) return `${minutes}m ${seconds}s`;
-  const hours = Math.floor(minutes / 60);
-  const remMinutes = minutes % 60;
-  if (hours < 24) return `${hours}h ${remMinutes}m`;
-  const days = Math.floor(hours / 24);
-  const remHours = hours % 24;
-  return `${days}d ${remHours}h`;
-}
-
-/**
  * Format a byte count using binary units (KiB/MiB/GiB, surfaced as
  * "KB/MB/GB" for readability). KB and MB use one decimal below 10 and
  * round above; GB keeps two decimals below 10 so half-GB changes stay
@@ -71,3 +38,53 @@ export function formatBytes(bytes: number): string {
   const gb = mb / 1024;
   return `${gb < 10 ? gb.toFixed(2) : gb.toFixed(1)} GB`;
 }
+
+export function formatAxisDuration(ms: number): string {
+  if (ms >= 86_400_000) { const days = Math.floor(ms / 86_400_000), hours = Math.floor(ms % 86_400_000 / 3_600_000); return `${days}d${hours ? ` ${hours}h` : ''}`; }
+  const s = ms / 1000;
+  if (s < 60) return `${Math.round(s)} s`;
+  if (s < 3600) return `${(s / 60).toFixed(1)} min`;
+  return `${(s / 3600).toFixed(1)} h`;
+}
+
+export const formatCompact = (value: number | null | undefined) =>
+  value === null || value === undefined || !Number.isFinite(value) ? '—' : new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
+
+/** Span milliseconds, tenths below ten seconds, then seconds/minutes; days stay compact. */
+export function formatSpanDuration(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return '—'
+  const precision = ms < 10_000 ? 100 : ms < 3_600_000 ? 1000 : 60_000
+  return ms >= 86_400_000 ? formatAxisDuration(ms) : ms < 1000 ? `${Math.round(ms)}ms` : formatClock(Math.round(ms / precision) * precision)
+}
+
+/** $0.12, $0.005, $12.40; never rounds a recorded nonzero cost to $0.00. */
+export function formatCost(usd: number): string {
+  if (!Number.isFinite(usd) || usd < 0) return '—'
+  if (usd === 0) return '$0.00'
+  if (usd < 0.01) return `$${usd.toPrecision(1)}`
+  return `$${usd.toFixed(2)}`
+}
+
+/** 9.8k, 754.4k, 1.2M with the exact count left to a title. */
+export function formatCount(n: number): string {
+  return !Number.isSafeInteger(n) || n < 0 ? '—' : formatCompact(n)
+}
+
+/** Elapsed clock at millisecond precision, so zoomed axis ticks keep distinct labels. */
+export function formatClock(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return '—'
+  const seconds = Math.round(ms) / 1000
+  const hours = Math.floor(seconds / 3600), minutes = Math.floor(seconds % 3600 / 60), rest = Number((seconds % 60).toFixed(3))
+  return [hours ? `${hours}h` : '', minutes ? `${minutes}m` : '', rest ? `${rest}s` : ''].filter(Boolean).join(' ') || '0s'
+}
+
+/** Normalize labels to UTC without rewriting the source timestamp. */
+export function formatUtcTime(value: string | Date, includeDate = false) {
+  const date = typeof value === "string" ? new Date(value) : value
+  if (!Number.isFinite(date.valueOf())) return 'Unknown time'
+  const iso = date.toISOString()
+  return `${includeDate ? iso.slice(0, 19).replace('T', ' ') : iso.slice(11, 19)} UTC`
+}
+
+// Existing names share the canonical duration implementation.
+export { formatSpanDuration as formatDuration, formatSpanDuration as formatUptime };

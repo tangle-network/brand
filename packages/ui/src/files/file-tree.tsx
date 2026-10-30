@@ -1,3 +1,4 @@
+import { formatBytes } from "../utils/format";
 /**
  * FileTree — directory browser with file type icons.
  *
@@ -179,7 +180,7 @@ function TreeNode({ node, depth, selectedPath, onSelect, defaultExpanded }: Tree
         <span className="truncate">{node.name}</span>
         {node.size !== undefined && !isDir && (
           <span className="text-muted-foreground text-xs ml-auto tabular-nums">
-            {formatSize(node.size)}
+            {formatBytes(node.size)}
           </span>
         )}
       </button>
@@ -204,12 +205,6 @@ function TreeNode({ node, depth, selectedPath, onSelect, defaultExpanded }: Tree
       )}
     </div>
   );
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)}K`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)}M`;
 }
 
 export function FileTree({
