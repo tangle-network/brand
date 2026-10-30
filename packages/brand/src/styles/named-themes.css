@@ -473,6 +473,7 @@
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-ring: hsl(var(--ring));
+  --chart-series-1: var(--chart-accent);
 }
 /* accent-scopes:end */
 /* palette:end */
