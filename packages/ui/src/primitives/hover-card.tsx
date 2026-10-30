@@ -14,16 +14,16 @@ type HoverCardProps = React.ComponentProps<typeof Popover> & {
 /** One hover policy and Popover's keyboard/focus behavior; delays follow the trigger's fast token. */
 function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
   const [own, setOwn] = React.useState(defaultOpen);
-  const timer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-  const change = React.useCallback((next: boolean) => { if (controlled === undefined) setOwn(next); onOpenChange?.(next); }, [controlled, onOpenChange]);
+  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element }>({});
+  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(next); onOpenChange?.(next); }, [controlled, onOpenChange]);
   const delay = (target: Element | null | undefined) => {
     if (typeof document === "undefined") return 0;
     const value = getComputedStyle(target ?? document.documentElement).getPropertyValue("--duration-fast").trim();
     return (parseFloat(value) || 0) * (value.endsWith("ms") ? 1 : 1000);
   };
-  const enter = React.useCallback((target: Element) => { clearTimeout(timer.current); timer.current = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
-  const leave = React.useCallback(() => { clearTimeout(timer.current); timer.current = setTimeout(() => change(false), closeDelay ?? delay(anchor)); }, [change, closeDelay, anchor]);
-  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const enter = React.useCallback((target: Element) => { intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
+  const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(anchor ?? intent.current.target)); }, [change, closeDelay, anchor]);
+  React.useEffect(() => () => clearTimeout(intent.current.timer), []);
   React.useEffect(() => {
     if (!anchor) return;
     const show = () => enter(anchor);
