@@ -1,5 +1,9 @@
 # @tangle-network/ui
 
+## 11.51.8
+
+- Remove mock-only component tests from source and package contents. Component implementations and built exports are unchanged; packed-consumer and browser integration checks remain.
+
 ## 11.51.7
 
 - Expose the existing retained report component and follow-tail modules without optional chat stores. Derive all build entries from the package export map.
