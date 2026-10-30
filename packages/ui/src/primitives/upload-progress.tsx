@@ -1,3 +1,4 @@
+import { formatBytes } from "../utils/format";
 /**
  * UploadProgress — file upload status indicators.
  *
@@ -23,12 +24,6 @@ export interface UploadProgressProps {
   onRemove?: (id: string) => void;
   onRetry?: (id: string) => void;
   className?: string;
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)}KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
 export function UploadProgress({ files, onRemove, onRetry, className }: UploadProgressProps) {
@@ -66,7 +61,7 @@ export function UploadProgress({ files, onRemove, onRetry, className }: UploadPr
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="truncate font-medium text-foreground">{file.name}</span>
-              <span className="shrink-0 text-[length:var(--font-size-help,0.75rem)] text-muted-foreground">{formatSize(file.size)}</span>
+              <span className="shrink-0 text-[length:var(--font-size-help,0.75rem)] text-muted-foreground">{formatBytes(file.size)}</span>
             </div>
             {/* Progress bar */}
             {file.status === "uploading" && file.progress !== undefined && (

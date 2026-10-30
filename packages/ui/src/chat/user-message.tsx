@@ -1,3 +1,4 @@
+import { formatUtcTime } from "../utils/format";
 import { TRANSCRIPT_TEXT } from "./transcript-text";
 import { memo, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { ChatAuthor, SessionMessage } from "../types/message";
@@ -30,9 +31,6 @@ export interface UserMessageProps {
   collapsedLines?: number;
 }
 
-function formatTime(date: Date): string {
-  return Number.isFinite(date.valueOf()) ? date.toISOString().slice(11, 16) + " UTC" : "Invalid Date";
-}
 
 function MessageActions({ children, align = "end" }: { children: ReactNode; align?: "start" | "end" }) {
   return (
@@ -104,7 +102,7 @@ function UserBubble({ text, timestamp, actions, lines }: {
               data-user-message-time=""
               className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
             >
-              {formatTime(timestamp)}
+              {formatUtcTime(timestamp)}
             </span>
           ) : null}
           <BubbleText text={text} lines={lines} />
@@ -138,7 +136,7 @@ function OtherPersonBubble({ text, timestamp, actions, author, lines }: {
               data-user-message-time=""
               className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
             >
-              {formatTime(timestamp)}
+              {formatUtcTime(timestamp)}
             </span>
           ) : null}
           <BubbleText text={text} lines={lines} />

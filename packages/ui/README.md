@@ -165,3 +165,7 @@ The package root also re-exports `./stores`, so a root import requires both nano
 Consumers that use only other subpath entries do not need these three peers.
 
 Retained report readers can import existing `chat/agent-timeline`, `chat/speaker`, `run/expanded-tool-detail`, `run/inline-thinking-item`, `run/run-row-shell` and `hooks/use-follow-tail` modules directly. These entries preserve their broad-entry bindings without importing chat session stores.
+
+### Shared formatters
+
+`@tangle-network/ui/utils/format` is a pure module for duration, clock, compact counts, USD, bytes and UTC labels. It loads without React. Charts re-exports these helpers for static figures and record views. `formatDuration` and `formatUptime` remain aliases of `formatSpanDuration`; chat timestamps use explicit UTC, and file/upload sizes share `formatBytes`.

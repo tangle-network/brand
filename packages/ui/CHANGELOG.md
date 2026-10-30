@@ -1,3 +1,7 @@
+## 11.51.9
+
+- Share duration, clock, compact count, cost and UTC formatting through the pure `utils/format` export; remove private file/upload/chat formatters.
+
 # @tangle-network/ui
 
 ## 11.51.8

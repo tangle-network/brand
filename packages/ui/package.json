@@ -1,6 +1,6 @@
 {
   "name": "@tangle-network/ui",
-  "version": "11.51.8",
+  "version": "11.51.9",
   "description": "Generic React UI components for Tangle products \u2014 primitives, chat, run, files, editor, markdown.",
   "type": "module",
   "license": "MIT",
@@ -165,6 +165,11 @@
       "types": "./dist/hooks/use-follow-tail.d.ts",
       "import": "./dist/hooks/use-follow-tail.js",
       "default": "./dist/hooks/use-follow-tail.js"
+    },
+    "./utils/format": {
+      "types": "./dist/utils/format.d.ts",
+      "import": "./dist/utils/format.js",
+      "default": "./dist/utils/format.js"
     }
   },
   "scripts": {
