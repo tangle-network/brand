@@ -69,7 +69,7 @@ export function ArtifactPane({
                 {!hideTitleBlock && (
                   <>
                     {eyebrow && (
-                      <div className="mb-1 inline-flex max-w-full items-center px-1 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <div className="mb-1 inline-flex max-w-full items-center px-1 py-0.5 text-xs font-medium text-muted-foreground">
                         {eyebrow}
                       </div>
                     )}

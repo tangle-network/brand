@@ -22,7 +22,7 @@ const VARIANT_CLASS: Record<HeadingVariant, string> = {
   subsection:
     "font-semibold text-foreground text-[length:var(--font-size-base,1rem)] leading-[1.4]",
   eyebrow:
-    "font-semibold uppercase text-muted-foreground text-[length:var(--font-size-xs,0.75rem)] leading-none tracking-[var(--tracking-wide,0.08em)]",
+    "font-medium text-muted-foreground text-[length:var(--font-size-xs,0.75rem)] leading-4",
 };
 
 const DEFAULT_TAG: Record<HeadingVariant, React.ElementType> = {

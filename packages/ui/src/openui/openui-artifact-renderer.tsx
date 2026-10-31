@@ -232,7 +232,7 @@ function renderNode(
       return (
         <div className="space-y-1">
           {node.kicker && (
-            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            <div className="text-xs font-medium text-muted-foreground">
               {node.kicker}
             </div>
           )}
@@ -275,7 +275,7 @@ function renderNode(
       return (
         <Card variant="glass" className="border-border shadow-[var(--shadow-card)]">
           <CardContent className="space-y-2 p-4">
-            <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <div className="text-xs text-muted-foreground">
               {node.label}
             </div>
             <div className="text-2xl font-semibold tracking-tight text-foreground">
@@ -310,7 +310,7 @@ function renderNode(
               key={item.id ?? `${item.label}-${index}`}
               className="rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3"
             >
-              <dt className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 {item.label}
               </dt>
               <dd
@@ -330,7 +330,7 @@ function renderNode(
       return (
         <div className="space-y-2">
           {node.title && (
-            <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <div className="text-xs text-muted-foreground">
               {node.title}
             </div>
           )}
@@ -365,7 +365,7 @@ function renderNode(
                   <TableHead
                     key={column.key}
                     className={cn(
-                      "h-10 text-[11px] uppercase tracking-[0.1em] text-muted-foreground",
+                      "h-10 text-xs text-muted-foreground",
                       column.align === "right" && "text-right",
                     )}
                   >
@@ -408,7 +408,7 @@ function renderNode(
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
           {node.label && (
-            <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {node.label}
             </span>
           )}
@@ -460,7 +460,7 @@ function renderNode(
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1 space-y-1">
                   {node.eyebrow && (
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    <div className="text-xs font-medium text-muted-foreground">
                       {node.eyebrow}
                     </div>
                   )}

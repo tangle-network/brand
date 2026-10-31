@@ -139,7 +139,7 @@ function ExitBadge({
 }) {
   if (status === "running" || status === "pending") {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
+      <span className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
         <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
         running
       </span>
@@ -171,7 +171,7 @@ function ExitBadge({
     <span
       className={cn(
         // Every badge has a border, so mixed rows keep one height.
-        "inline-flex shrink-0 items-center rounded-full border px-1.5 py-px font-sans text-[11px] font-medium tabular-nums",
+        "inline-flex shrink-0 items-center rounded-full border px-1.5 py-px font-sans text-xs font-medium tabular-nums",
         tone === "danger" &&
           "border-transparent bg-[var(--surface-danger-bg)] text-[var(--surface-danger-text)]",
         tone === "success" &&
@@ -253,7 +253,7 @@ function OutputRegion({
           type="button"
           onClick={() => setFull(true)}
           className={cn(
-            "w-full border-t border-white/10 px-3 py-1.5 text-left font-sans text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground",
+            "w-full border-t border-white/10 px-3 py-1.5 text-left font-sans text-xs font-medium text-muted-foreground transition-colors hover:text-foreground",
             focusRing,
           )}
         >

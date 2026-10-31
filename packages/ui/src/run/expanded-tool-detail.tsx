@@ -128,7 +128,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
         <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border bg-background px-3 py-2">
             <ArrowRight className="h-3 w-3 text-primary" />
-            <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground">
               Input
             </span>
           </div>
@@ -141,7 +141,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
         <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border bg-background px-3 py-2">
             <ArrowLeft className="h-3 w-3 text-primary" />
-            <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground">
               Output
             </span>
           </div>
@@ -164,7 +164,7 @@ export const ExpandedToolDetail = memo(({ part }: ExpandedToolDetailProps) => {
         <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--surface-danger-border)]">
           <div className="flex items-center gap-2 border-b border-[var(--surface-danger-border)] bg-[var(--surface-danger-bg)] px-3 py-2">
             <RunStatusIcon status="failed" aria-hidden className="size-3" />
-            <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--surface-danger-text)]">
+            <span className="text-xs font-medium text-[var(--surface-danger-text)]">
               Error
             </span>
           </div>
