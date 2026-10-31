@@ -12,7 +12,7 @@ const meta: Meta<typeof SidebarDropZone> = {
   decorators: [
     (Story) => (
       <div className="w-64 p-4 rounded-xl border border-border bg-background space-y-3">
-        <div className="text-xs text-muted-foreground font-mono uppercase tracking-widest">Workspace Files</div>
+        <div className="text-xs text-muted-foreground font-mono">Workspace files</div>
         <div className="space-y-1 text-sm text-foreground">
           <div className="px-2 py-1 rounded hover:bg-accent">index.ts</div>
           <div className="px-2 py-1 rounded hover:bg-accent">utils.ts</div>

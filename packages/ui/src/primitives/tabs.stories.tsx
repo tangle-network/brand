@@ -104,7 +104,7 @@ export const Overview: Story = {
   render: () => (
     <div className="flex flex-col gap-10 p-6 w-[480px]">
       <div>
-        <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">Default (segmented)</div>
+        <div className="text-muted-foreground text-xs font-mono mb-4">Default (segmented)</div>
         <Tabs defaultValue="overview">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -137,7 +137,7 @@ export const Overview: Story = {
       </div>
 
       <div>
-        <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">Pills</div>
+        <div className="text-muted-foreground text-xs font-mono mb-4">Pills</div>
         <Tabs defaultValue="all">
           <TabsList variant="pills">
             <TabsTrigger value="all" variant="pills">All</TabsTrigger>
@@ -157,7 +157,7 @@ export const Overview: Story = {
       </div>
 
       <div>
-        <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">Underline</div>
+        <div className="text-muted-foreground text-xs font-mono mb-4">Underline</div>
         <Tabs defaultValue="settings">
           <TabsList variant="underline">
             <TabsTrigger value="settings" variant="underline">Settings</TabsTrigger>

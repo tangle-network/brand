@@ -42,7 +42,7 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-8 p-6 w-[560px]">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Inline elements</div>
+      <div className="text-muted-foreground text-xs font-mono">Inline elements</div>
       <div className="flex flex-col gap-2">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
@@ -50,7 +50,7 @@ export const Overview: Story = {
         <Skeleton className="h-4 w-2/3" />
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Team list</div>
+      <div className="text-muted-foreground text-xs font-mono">Team list</div>
       <div className="flex flex-col gap-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3">
@@ -64,13 +64,13 @@ export const Overview: Story = {
         ))}
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Cards</div>
+      <div className="text-muted-foreground text-xs font-mono">Cards</div>
       <div className="flex gap-4">
         <SkeletonCard className="flex-1" />
         <SkeletonCard className="flex-1" />
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Table</div>
+      <div className="text-muted-foreground text-xs font-mono">Table</div>
       <div className="rounded-xl border border-border bg-card p-4">
         <SkeletonTable rows={3} />
       </div>

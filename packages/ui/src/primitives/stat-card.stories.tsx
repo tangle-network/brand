@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Activity, Cpu, DollarSign, HardDrive, Terminal, Users, Zap } from 'lucide-react'
+import { Terminal } from 'lucide-react'
 import { StatCard } from './stat-card'
 
 const meta: Meta<typeof StatCard> = {
@@ -13,7 +13,7 @@ type Story = StoryObj<typeof StatCard>
 
 export const Default: Story = {
   args: {
-    title: 'Active Sessions',
+    title: 'Active sessions',
     value: 24,
     subtitle: 'across 3 regions',
     icon: <Terminal className="h-5 w-5" />,
@@ -21,10 +21,10 @@ export const Default: Story = {
 }
 
 export const SandboxVariant: Story = {
-  name: 'Sandbox Variant',
+  name: 'Sandbox variant',
   args: {
     variant: 'sandbox',
-    title: 'Active Sessions',
+    title: 'Active sessions',
     value: 24,
     subtitle: 'across 3 regions',
     icon: <Terminal className="h-5 w-5" />,
@@ -33,103 +33,92 @@ export const SandboxVariant: Story = {
 }
 
 export const CpuUsage: Story = {
-  name: 'CPU Usage',
+  name: 'CPU usage',
   args: {
-    title: 'Avg CPU Usage',
+    title: 'Avg CPU usage',
     value: '68%',
     subtitle: 'p95: 94%',
-    icon: <Cpu className="h-5 w-5" />,
     trend: { value: -4, label: 'vs yesterday' },
   },
 }
 
 export const MemoryUsage: Story = {
-  name: 'Memory Usage',
+  name: 'Memory usage',
   args: {
-    title: 'Memory Allocated',
+    title: 'Memory allocated',
     value: '12.4 GB',
     subtitle: 'of 32 GB pool',
-    icon: <HardDrive className="h-5 w-5" />,
     trend: { value: 8, label: 'vs last hour' },
   },
 }
 
 export const MonthlyCost: Story = {
-  name: 'Monthly Cost',
+  name: 'Monthly cost',
   args: {
-    title: 'Estimated Cost',
+    title: 'Estimated cost',
     value: '$142.80',
     subtitle: 'current billing cycle',
-    icon: <DollarSign className="h-5 w-5" />,
     trend: { value: 0, label: 'vs last month' },
   },
 }
 
 export const TrendPositive: Story = {
-  name: 'Trend — Positive',
+  name: 'Trend up',
   args: {
-    title: 'Sessions Today',
+    title: 'Sessions today',
     value: 1284,
-    icon: <Activity className="h-5 w-5" />,
     trend: { value: 23, label: 'vs yesterday' },
   },
 }
 
 export const TrendNegative: Story = {
-  name: 'Trend — Negative',
+  name: 'Trend down',
   args: {
-    title: 'Error Rate',
+    title: 'Error rate',
     value: '1.2%',
-    icon: <Zap className="h-5 w-5" />,
     trend: { value: -18, label: 'vs last week' },
   },
 }
 
 export const InfraGrid: Story = {
-  name: 'Infrastructure Grid',
+  name: 'Infrastructure grid',
   render: () => (
     <div className="grid grid-cols-2 gap-4 w-[640px]">
       <StatCard
-        title="Active Sessions"
+        title="Active sessions"
         value={24}
         subtitle="across 3 regions"
-        icon={<Terminal className="h-5 w-5" />}
         trend={{ value: 12, label: 'vs last hour' }}
       />
       <StatCard
-        title="CPU Usage"
+        title="CPU usage"
         value="68%"
         subtitle="p95: 94%"
-        icon={<Cpu className="h-5 w-5" />}
         trend={{ value: -4, label: 'vs yesterday' }}
       />
       <StatCard
-        title="Memory Allocated"
+        title="Memory allocated"
         value="12.4 GB"
         subtitle="of 32 GB pool"
-        icon={<HardDrive className="h-5 w-5" />}
         trend={{ value: 8, label: 'vs last hour' }}
       />
       <StatCard
         variant="sandbox"
-        title="Estimated Cost"
+        title="Estimated cost"
         value="$142.80"
         subtitle="current billing cycle"
-        icon={<DollarSign className="h-5 w-5" />}
         trend={{ value: 3, label: 'vs last month' }}
       />
       <StatCard
-        title="Unique Users"
+        title="Unique users"
         value={312}
         subtitle="last 30 days"
-        icon={<Users className="h-5 w-5" />}
-        trend={{ value: 19, label: 'MoM' }}
+        trend={{ value: 19, label: 'vs last month' }}
       />
       <StatCard
-        title="Avg Startup Time"
+        title="Avg startup time"
         value="840ms"
         subtitle="p99: 1.4s"
-        icon={<Zap className="h-5 w-5" />}
         trend={{ value: -11, label: 'vs last week' }}
       />
     </div>

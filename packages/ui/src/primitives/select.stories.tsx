@@ -117,7 +117,7 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-6 p-6 w-72">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Region</div>
+      <div className="text-muted-foreground text-xs font-mono">Region</div>
       <Select defaultValue="us-east-1">
         <SelectTrigger>
           <SelectValue />
@@ -130,7 +130,7 @@ export const Overview: Story = {
         </SelectContent>
       </Select>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Runtime</div>
+      <div className="text-muted-foreground text-xs font-mono">Runtime</div>
       <Select>
         <SelectTrigger>
           <SelectValue placeholder="Select runtime..." />
@@ -150,7 +150,7 @@ export const Overview: Story = {
         </SelectContent>
       </Select>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Disabled</div>
+      <div className="text-muted-foreground text-xs font-mono">Disabled</div>
       <Select disabled>
         <SelectTrigger>
           <SelectValue placeholder="Locked to current plan" />

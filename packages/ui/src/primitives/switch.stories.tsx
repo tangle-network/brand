@@ -41,7 +41,7 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-6 p-6 w-80">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">States</div>
+      <div className="text-muted-foreground text-xs font-mono">States</div>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Off</span>
@@ -61,7 +61,7 @@ export const Overview: Story = {
         </div>
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mt-2">Settings panel</div>
+      <div className="text-muted-foreground text-xs font-mono mt-2">Settings panel</div>
       <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-4">
         {[
           { id: 'auto-sleep', label: 'Auto-sleep after idle', checked: true },

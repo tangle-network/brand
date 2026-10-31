@@ -30,7 +30,7 @@ Source: \`github.com/tangle-network/gtm-agent\` Live at: [gtm.tangle.tools](http
 
 ## What It Is
 
-GTM Agent is an AI-powered go-to-market workspace where founders get a sandboxed environment with an AI co-founder.
+GTM Agent is a go-to-market workspace where founders get a sandboxed environment and an agent that works alongside them.
 
 ## Architecture
 

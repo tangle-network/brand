@@ -15,7 +15,7 @@ const SampleCard = ({ variant, hover }: { variant?: 'default' | 'glass' | 'sandb
   <Card variant={variant} hover={hover} className="w-72">
     <CardHeader>
       <div className="flex items-center justify-between">
-        <CardTitle>Agent Session</CardTitle>
+        <CardTitle>Agent session</CardTitle>
         <Badge variant="running" dot>Running</Badge>
       </div>
       <CardDescription>GPT-4o · Tangle Cloud</CardDescription>

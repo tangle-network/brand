@@ -90,7 +90,7 @@ export const RegionSelector: Story = {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-52">
-        <DropdownMenuLabel className="text-xs text-muted-foreground font-normal tracking-widest uppercase">
+        <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
           Regions
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
