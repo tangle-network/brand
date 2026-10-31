@@ -1,3 +1,9 @@
+## 11.51.12
+
+### Patch Changes
+
+- e5f85bd: Preserve sequence zero when a named native stream reconnects; omit the cursor before any event arrives.
+
 ## 11.51.11
 
 - Keep tool-row actions and navigation reachable after a hover preview. HoverCard uses its anchor for placement, preserves keyboard inspection, and dismisses previews when a nested control commits an action. Touch actions do not become hover intent.
