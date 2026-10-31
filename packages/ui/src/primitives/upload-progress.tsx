@@ -67,8 +67,8 @@ export function UploadProgress({ files, onRemove, onRetry, className }: UploadPr
             {file.status === "uploading" && file.progress !== undefined && (
               <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted/50">
                 <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${file.progress}%` }}
+                  className="h-full w-full rounded-full bg-primary transition-transform duration-300 ease-out"
+                  style={{ transform: `translateX(-${100 - file.progress}%)` }}
                 />
               </div>
             )}

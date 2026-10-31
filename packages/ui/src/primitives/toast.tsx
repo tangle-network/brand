@@ -13,7 +13,7 @@ import { focusRing } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 const toastVariants = cva(
-  "pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border p-4 shadow-lg transition-all",
+  "pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border p-4 shadow-lg transition-[transform,opacity]",
   {
     variants: {
       variant: {

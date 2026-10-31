@@ -80,7 +80,7 @@ const DEFAULT_BRANDING: AgentBranding = {
 };
 
 const ASSISTANT_SHELL =
-  "min-w-0 flex-1 space-y-3 rounded-[26px] border border-[var(--border-subtle)] bg-[color:color-mix(in_srgb,var(--bg-card)_94%,transparent)] px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]";
+  "min-w-0 flex-1 space-y-3 rounded-[var(--radius-panel)] border border-[var(--border-subtle)] bg-[color:color-mix(in_srgb,var(--bg-card)_94%,transparent)] px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]";
 
 function AssistantShell({
   branding,
@@ -251,7 +251,7 @@ function CategoryBadges({ categories }: { categories: Set<ToolCategory> }) {
           <span
             key={cat}
             title={cat}
-            className="flex h-5 w-5 items-center justify-center rounded border border-border text-muted-foreground"
+            className="flex h-5 w-5 items-center justify-center text-muted-foreground"
           >
             <Icon className="h-3 w-3" />
           </span>
@@ -326,10 +326,10 @@ export const RunGroup = memo(
     const pendingResponse = (
       <AssistantShell branding={branding} isStreaming={true}>
         <div className="flex items-center gap-2 px-0.5 py-0.5 text-sm text-[var(--text-muted)]">
-          <span className="flex gap-[5px]">
-            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "0ms" }} />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "150ms" }} />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "300ms" }} />
+          <span className="flex gap-1">
+            <span className="h-2 w-2 animate-[tangle-breathe_var(--motion-ambient)_infinite] motion-reduce:animate-none rounded-full bg-[var(--brand-glow)]" />
+            <span className="h-2 w-2 animate-[tangle-breathe_var(--motion-ambient)_infinite] motion-reduce:animate-none rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "200ms" }} />
+            <span className="h-2 w-2 animate-[tangle-breathe_var(--motion-ambient)_infinite] motion-reduce:animate-none rounded-full bg-[var(--brand-glow)]" style={{ animationDelay: "400ms" }} />
           </span>
         </div>
       </AssistantShell>
@@ -474,16 +474,16 @@ export const RunGroup = memo(
                   {branding.label}
                 </span>
                 {renderSummary(run) ? (
-                  <span className="text-[11px] text-muted-foreground">{renderSummary(run)}</span>
+                  <span className="text-xs text-muted-foreground">{renderSummary(run)}</span>
                 ) : null}
                 {collapsed && run.summaryText ? (
-                  <span className="min-w-0 truncate text-[11px] text-foreground/70">
+                  <span className="min-w-0 truncate text-xs text-foreground/70">
                     {run.summaryText}
                   </span>
                 ) : null}
                 <span className="ml-auto flex shrink-0 items-center gap-1.5">
                   <CategoryBadges categories={stats.toolCategories} />
-                  <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-px text-[10px] font-semibold uppercase text-muted-foreground">
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                     <RunStatusIcon status={isStreaming ? "running" : "done"} aria-hidden className="size-3" />
                     {statusMeta(isStreaming ? "running" : "done").label}
                   </span>

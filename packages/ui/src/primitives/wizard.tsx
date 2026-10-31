@@ -137,7 +137,7 @@ export function Wizard({ children, step, defaultStep = 0, onStepChange, onFinish
           </p>
           <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted" role="progressbar"
             aria-valuemin={1} aria-valuemax={total} aria-valuenow={current + 1} aria-label={`Step ${current + 1} of ${total}`}>
-            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${((current + 1) / total) * 100}%` }} />
+            <div className="h-full w-full rounded-full bg-primary transition-transform duration-300 ease-out" style={{ transform: `translateX(-${100 - ((current + 1) / total) * 100}%)` }} />
           </div>
         </div>
         {steps.map((child, index) => index === current
