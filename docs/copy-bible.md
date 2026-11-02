@@ -40,6 +40,19 @@ A subline exists only to add a fact the headline lacks. If it restates, delete i
 - Buttons name the action and its object: "Create a sandbox", "Copy file", "See plans".
 - Meta descriptions say what the page gives in one sentence, in the reader's nouns.
 
+## Charts and benchmark pages
+
+A benchmark page is a title, its headline numbers, and one chart per question.
+
+- A chart is a title, marks and numbers. No subtitle, caption, note, run id, commit, sample count or "lower is better".
+- The title is the reader's question in their nouns: "100 sandboxes at once", "First reply from a coding agent".
+- A number sits at its bar's end or lined up at the row's end. Everything else goes on hover.
+- One row per entrant. A second run is history, not a second row.
+- One chart per measure. Never the same numbers as a chart and a table.
+- A printed rate comes from the record that states it. If a run failed a check, the row says so.
+- Sources and caveats get one short footer, not a line under every chart.
+- Every chart comes from [`@tangle-network/charts`](https://github.com/tangle-network/charts), rendered with `{ presentation: "plot" }`. Never hand-roll one in a page.
+
 ## Code comments in public examples
 
 One line, under 90 characters, saying what the code cannot: a fact about the platform the reader would otherwise have to test. Never what something does not do; a limitation is an issue, not a comment. If the code already says it, no comment.
@@ -67,6 +80,10 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
+| 2026-11-02 | "we need benchmark charts there if we don't alreaydhave them! and we need unified design and branding and an actual brand/copy bible, elimiante all this dumb extra text and labels its AI SLOP!" | A chart is a title, marks and numbers, drawn by `@tangle-network/charts`. |
+| 2026-11-02 | "theres no hover no tooltip in those benchmarks I think the page is a bit unclear like don't you think there's BETTER charts visualizations or ways to represnt the data clearly? places to put the numbers or w/e?" | Each number on its mark; every other fact on hover. |
+| 2026-11-02 | "what is "The same journey on the desktop shape"? consolidate!" | Plain words, and one table. Never a hidden second one. |
+| 2026-11-02 | "why do yo uhave 2 vesrions showing tangle not fulfilling all things?" | One row per entrant, and it prints what the run really reached. |
 | 2026-11-02 | "i don't like this run table around the billing area, stop with this nonsense! delete that, just one key one bill, for compute, inference, and observability, clean it up!" | A billing section states the offer in the reader's nouns; no receipts, ledgers or run tables as proof. |
 | 2026-11-02 | "the benchmarks page is bad, i don't like this waterfall blog style thing, it should look like artificial analysis and vals ai! … I mean seriously up to par competing on design vision!" | A benchmark page is a leaderboard: title beside its intro and a dated leader line, leader cards, dense sortable tables with the bar in the row. Never a waterfall of prose sections. |
 | 2026-11-02 | "this copy is SO BAD 'Every example ran on production.' … NO HUMAN USER CARES OR THINKS THIS IS GOOD" | A heading says what the reader gets or does, never what we did. |
