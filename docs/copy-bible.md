@@ -80,6 +80,7 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
+| 2026-11-02 | "delet this from brand kit too … and add it to anti pattners" on "Using the logo": "Use the supplied logo files without stretching, recoloring, or adding effects." | A brand kit is the files and the colors. No rules telling a reader what anyone already knows. |
 | 2026-11-02 | "we need benchmark charts there if we don't alreaydhave them! and we need unified design and branding and an actual brand/copy bible, elimiante all this dumb extra text and labels its AI SLOP!" | A chart is a title, marks and numbers, drawn by `@tangle-network/charts`. |
 | 2026-11-02 | "theres no hover no tooltip in those benchmarks I think the page is a bit unclear like don't you think there's BETTER charts visualizations or ways to represnt the data clearly? places to put the numbers or w/e?" | Each number on its mark; every other fact on hover. |
 | 2026-11-02 | "what is "The same journey on the desktop shape"? consolidate!" | Plain words, and one table. Never a hidden second one. |
