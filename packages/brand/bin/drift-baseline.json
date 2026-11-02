@@ -4,21 +4,22 @@
   "roots": [
    "src"
   ],
+  "exclude": [],
   "branch": "master",
-  "head": "32b7e40a9131",
-  "tsx_files": 33,
-  "css_files": 5,
+  "head": "57e634ee6384",
+  "tsx_files": 27,
+  "css_files": 4,
   "versions": {
    "brand": [
-    "1.15.7"
+    "1.31.3"
    ],
    "ui": [
-    "11.24.0"
+    "11.51.12"
    ]
   },
   "importing_files": {
-   "brand": 0,
-   "ui": 6,
+   "brand": 1,
+   "ui": 4,
    "sandbox-ui": 0,
    "agent-app": 0
   },
@@ -31,30 +32,25 @@
    "arbitrary_color": {},
    "css_var_defs": {
     "src/components/quickstart-code.css": 4,
-    "src/components/recorded-agent-timeline.css": 4,
-    "src/components/recorded-run-waterfall.css": 9
+    "src/components/run-replay.css": 1
    },
    "local_primitive_count": {},
    "font_size_literal": {
-    "src/components/BenchmarkExplorer.astro": 2,
-    "src/components/BenchmarkReport.astro": 27,
-    "src/components/BenchmarkTaskPrompts.astro": 5,
-    "src/components/BlogCover.astro": 2,
-    "src/components/Footer.astro": 7,
-    "src/components/RunActions.astro": 6,
-    "src/components/RunStory.astro": 7,
-    "src/components/SandboxQuickstart.astro": 2,
-    "src/components/quickstart-code.css": 6,
-    "src/components/recorded-agent-timeline.css": 1,
-    "src/components/recorded-run-waterfall.css": 1,
-    "src/layouts/BlogLayout.astro": 13,
+    "src/components/Bars.astro": 4,
+    "src/components/ComplianceBadge.astro": 1,
+    "src/components/Example.astro": 1,
+    "src/components/Footer.astro": 8,
+    "src/components/PostList.astro": 3,
+    "src/components/quickstart-code.css": 1,
+    "src/components/run-replay.css": 1,
+    "src/layouts/BlogLayout.astro": 16,
     "src/pages/404.astro": 4,
-    "src/pages/benchmarks/[id].astro": 2,
-    "src/pages/benchmarks/index.astro": 8,
-    "src/pages/blog/index.astro": 6,
+    "src/pages/benchmarks/index.astro": 10,
+    "src/pages/blog/index.astro": 5,
     "src/pages/blog/series/[series].astro": 2,
     "src/pages/brand-kit.astro": 9,
-    "src/pages/index.astro": 29,
+    "src/pages/data-deletion.astro": 1,
+    "src/pages/index.astro": 12,
     "src/pages/privacy-policy.astro": 1,
     "src/pages/security.astro": 1,
     "src/pages/sub-processors.astro": 1,
@@ -66,20 +62,18 @@
     "src/pages/releases.astro": 1
    },
    "native_control": {
-    "src/components/BenchmarkExplorer.astro": 1,
     "src/components/Header.astro": 3,
-    "src/components/QuickstartCode.tsx": 5
+    "src/components/QuickstartCode.tsx": 2
    },
    "control_override": {},
    "page_heading": {
     "src/layouts/BlogLayout.astro": 1,
     "src/pages/404.astro": 1,
-    "src/pages/benchmarks/[id].astro": 1,
     "src/pages/benchmarks/index.astro": 1,
-    "src/pages/benchmarks/preview/[campaign].astro": 1,
     "src/pages/blog/index.astro": 1,
     "src/pages/blog/series/[series].astro": 1,
     "src/pages/brand-kit.astro": 1,
+    "src/pages/data-deletion.astro": 1,
     "src/pages/index.astro": 1,
     "src/pages/privacy-policy.astro": 1,
     "src/pages/releases.astro": 1,
@@ -91,9 +85,7 @@
    },
    "shell_override": {},
    "header_height_literal": {
-    "src/components/RunStory.astro": 1,
-    "src/components/quickstart-code.css": 2,
-    "src/pages/index.astro": 1
+    "src/components/quickstart-code.css": 1
    },
    "transcript_type_override": {},
    "settings_layout": {}
@@ -101,19 +93,19 @@
   "raw_palette": 0,
   "hex": 29,
   "arbitrary_color": 0,
-  "css_var_defs": 17,
+  "css_var_defs": 5,
   "local_primitive_count": 0,
-  "font_size_literal": 155,
+  "font_size_literal": 94,
   "size_literal": 1,
-  "native_control": 9,
+  "native_control": 5,
   "control_override": 0,
-  "page_heading": 16,
+  "page_heading": 15,
   "shell_override": 0,
-  "header_height_literal": 4,
+  "header_height_literal": 1,
   "transcript_type_override": 0,
+  "settings_layout": 0,
   "palette_top": [],
-  "local_primitives": {},
-  "settings_layout": 0
+  "local_primitives": {}
  },
  "sandbox": {
   "repo": "tangle-network/agent-container",
