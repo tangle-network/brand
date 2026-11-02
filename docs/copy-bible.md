@@ -42,16 +42,19 @@ A subline exists only to add a fact the headline lacks. If it restates, delete i
 
 ## Charts and benchmark pages
 
-A benchmark page is a title, its headline numbers, and one chart per question.
+A benchmark page is a one-line head, its headline numbers, and a dense grid of small charts: every measure we have, as much of it on one screen as fits.
 
-- A chart is a title, marks and numbers. No subtitle, caption, note, run id, commit, sample count or "lower is better".
-- The title is the reader's question in their nouns: "100 sandboxes at once", "First reply from a coding agent".
-- A number sits at its bar's end or lined up at the row's end. Everything else goes on hover.
+- A chart is a title, marks and numbers. No subtitle, caption, note, run id, commit or "lower is better".
+- The title names the thing in the reader's nouns: "Lifecycle, base image", "First reply, from create".
+- Draw the uncertainty on the chart. A latency row is a p50 dot, a p95 diamond and each one's 95% confidence band, with p50, p95 and n lined up at the row's end.
+- A score board is columns: model and harness across, score up, a confidence whisker on each.
+- Hover adds what the chart cannot hold. A tooltip is a bold title, then aligned key and value lines, never wrapped or cut.
+- No competitors on a benchmark page until we are competitive.
 - One row per entrant. A second run is history, not a second row.
 - One chart per measure. Never the same numbers as a chart and a table.
-- A printed rate comes from the record that states it. If a run failed a check, the row says so.
+- A printed rate comes from the record that states it. If a run failed a check, the row says so. Nothing partial goes up: every cell shown ran to completion with a valid grade.
 - Sources and caveats get one short footer, not a line under every chart.
-- Every chart comes from [`@tangle-network/charts`](https://github.com/tangle-network/charts), rendered with `{ presentation: "plot" }`. Never hand-roll one in a page.
+- Every chart comes from [`@tangle-network/charts`](https://github.com/tangle-network/charts), rendered with `{ presentation: "panel" }` in a grid. Never hand-roll one in a page.
 
 ## Code comments in public examples
 
@@ -80,6 +83,10 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
+| 2026-11-02 | "these charts in ai applied benchmarks are bad … we had somthign 100x better months ago, when it was all sorts of verticals or tax or legal and stuff with clear bar charts tooltips, agentprofile/(model + harness) combinations as x axis and score on y" | A score board is columns of model and harness, with score on y. |
+| 2026-11-02 | "get rid of all the competitors or at least hide them from this chart for now until we're really competitive" | No competitors on a benchmark page until we are competitive. |
+| 2026-11-02 | "These ones just look like bar charts and the tooltips are kind of shit. I wish you could get that data in those tooltips somehow into the charts themselves or we have multiple charts (P50, P95, or whatever)" | Confidence is drawn on the mark, and p50, p95 and n print on the row. |
+| 2026-11-02 | "there's so much space taken up by this website. You could probably fit more, make more charts, and make the data much more compelling" | A one-line head and a dense grid. Show every measure. |
 | 2026-11-02 | "delet this from brand kit too … and add it to anti pattners" on "Using the logo": "Use the supplied logo files without stretching, recoloring, or adding effects." | A brand kit is the files and the colors. No rules telling a reader what anyone already knows. |
 | 2026-11-02 | "we need benchmark charts there if we don't alreaydhave them! and we need unified design and branding and an actual brand/copy bible, elimiante all this dumb extra text and labels its AI SLOP!" | A chart is a title, marks and numbers, drawn by `@tangle-network/charts`. |
 | 2026-11-02 | "theres no hover no tooltip in those benchmarks I think the page is a bit unclear like don't you think there's BETTER charts visualizations or ways to represnt the data clearly? places to put the numbers or w/e?" | Each number on its mark; every other fact on hover. |
