@@ -42,6 +42,8 @@ Cut taglines, helper text and secondary labels; if a screen needs them to make s
 
 Every major brand page needs a visual idea: a deliberate brand atmosphere, real product composition, routing/trace diagram or research figure. Label concepts. Reject uncontrolled gradients, icon rows and decorative copy cards.
 
+Charts come from [`@tangle-network/charts`](https://github.com/tangle-network/charts); the [copy bible](copy-bible.md#charts-and-benchmark-pages) owns what a chart may print.
+
 ## Component standard
 
 Show components that real products consume, in real states. Keep one canonical run/tool row; retain adapters only for active migration. Stories teach useful work, not process theater.
