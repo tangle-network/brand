@@ -34,7 +34,7 @@ Lead with Sandbox, Router and Intelligence. Open-source tools provide supporting
 
 ## Copy standard
 
-Name the product, value or decision directly. Explain what changes for the buyer or builder. Use evidence to carry detail; earn the CTA. Remove invented labels, internal taxonomy, obvious mechanics and repeated claims.
+The [copy bible](copy-bible.md) owns voice, headline patterns, example-comment rules and the running list of copy Drew rejected. Name the product, value or decision directly. Explain what changes for the buyer or builder. Use evidence to carry detail; earn the CTA. Remove invented labels, internal taxonomy, obvious mechanics and repeated claims.
 
 Cut taglines, helper text and secondary labels; if a screen needs them to make sense, fix the layout. Control labels stay visible (see Interaction).
 
