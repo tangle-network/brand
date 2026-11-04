@@ -95,7 +95,7 @@ export function ChatMessage({
         className={cn(
           "min-w-0 max-w-[85%] space-y-1",
           fromViewer
-            ? "rounded-[var(--radius-lg)] bg-foreground px-[var(--chat-message-px)] py-[var(--chat-message-py)] text-background"
+            ? "rounded-[var(--radius-lg)] bg-primary/15 px-[var(--chat-message-px)] py-[var(--chat-message-py)] text-foreground"
             : fromOtherPerson
               ? "rounded-[var(--radius-lg)] border border-border bg-card px-[var(--chat-message-px)] py-[var(--chat-message-py)] text-foreground"
               : isAssistant

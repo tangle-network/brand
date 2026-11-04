@@ -96,7 +96,7 @@ function UserBubble({ text, timestamp, actions, lines }: {
   return (
     <div className="flex justify-end">
       <div className="group flex min-w-0 max-w-[78%] flex-col items-end gap-2">
-        <div className="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background">
+        <div className="relative w-full min-w-0 rounded-2xl bg-primary/15 px-4 py-3 text-foreground">
           {timestamp ? (
             <span
               data-user-message-time=""

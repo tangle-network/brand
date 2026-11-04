@@ -38,7 +38,7 @@ describe("user text boundaries", () => {
 
   it("preserves a single joined bubble when no application note is present", () => {
     const { container } = render(<UserMessage parts={mixed.slice(0, 2)} />);
-    expect(container.querySelectorAll(".bg-foreground.text-background")).toHaveLength(1);
+    expect(container.querySelectorAll(".bg-primary\\/15")).toHaveLength(1);
     expect(container.querySelector(".whitespace-pre-wrap")?.textContent).toBe("First\nSecond");
     expect(screen.queryByRole("note")).not.toBeInTheDocument();
   });
@@ -61,7 +61,7 @@ describe("user text boundaries", () => {
     const { container } = render(<UserMessage parts={[mixed[2]]} actions={<button type="button">Inspect receipt</button>} />);
     expect(screen.getByRole("note")).toHaveTextContent("Receipt");
     expect(screen.getByRole("button", { name: "Inspect receipt" })).toBeInTheDocument();
-    expect(container.querySelector(".bg-foreground")).toBeNull();
+    expect(container.querySelector(".bg-primary\\/15")).toBeNull();
   });
 
   it("retains direct-content timestamps", () => {

@@ -12,7 +12,7 @@ type Part =
 function Turn({ parts, live = false }: { parts: Part[]; live?: boolean }) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
-      <p className={`ml-auto w-fit max-w-[78%] rounded-2xl bg-foreground px-4 py-3 text-background ${TRANSCRIPT_TEXT}`}>
+      <p className={`ml-auto w-fit max-w-[78%] rounded-2xl bg-primary/15 px-4 py-3 text-foreground ${TRANSCRIPT_TEXT}`}>
         @writer @research-lead plan the launch announcement for the roster feature.
       </p>
       {partitionBySpeaker(parts).map(({ speaker, parts: own }) => (

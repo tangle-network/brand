@@ -23,12 +23,12 @@ const segmentedParts: SessionPart[] = [
 describe("a transcript without authors", () => {
 
   it("renders UserMessage actions and application notes as before", () => {
-    expect(html(<UserMessage content="Can I break my lease early?" actions={<button type="button">Copy</button>} />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div><div class="flex flex-wrap items-center justify-end gap-1.5 text-sm text-muted-foreground"><button type="button">Copy</button></div></div></div>"`)
-    expect(html(<UserMessage parts={segmentedParts} actions={<button type="button">Copy</button>} />)).toMatchInlineSnapshot(`"<div class="space-y-2"><div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">I signed the lease in March.</div></div></div></div><div role="note" aria-label="Application note" data-synthetic-text="" class="min-w-0 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"><div class="mb-1 font-medium">Application note</div><div class="break-words whitespace-pre-wrap">Lease uploaded: lease.pdf</div></div><div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Here it is.</div></div></div></div><div class="flex flex-wrap items-center justify-end gap-1.5 text-sm text-muted-foreground"><button type="button">Copy</button></div></div>"`)
+    expect(html(<UserMessage content="Can I break my lease early?" actions={<button type="button">Copy</button>} />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-primary/15 px-4 py-3 text-foreground"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div><div class="flex flex-wrap items-center justify-end gap-1.5 text-sm text-muted-foreground"><button type="button">Copy</button></div></div></div>"`)
+    expect(html(<UserMessage parts={segmentedParts} actions={<button type="button">Copy</button>} />)).toMatchInlineSnapshot(`"<div class="space-y-2"><div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-primary/15 px-4 py-3 text-foreground"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">I signed the lease in March.</div></div></div></div><div role="note" aria-label="Application note" data-synthetic-text="" class="min-w-0 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"><div class="mb-1 font-medium">Application note</div><div class="break-words whitespace-pre-wrap">Lease uploaded: lease.pdf</div></div><div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-primary/15 px-4 py-3 text-foreground"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Here it is.</div></div></div></div><div class="flex flex-wrap items-center justify-end gap-1.5 text-sm text-muted-foreground"><button type="button">Copy</button></div></div>"`)
   })
 
   it("renders UserMessage as before", () => {
-    expect(html(<UserMessage content="Can I break my lease early?" />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-foreground px-4 py-3 text-background"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div></div></div>"`)
+    expect(html(<UserMessage content="Can I break my lease early?" />)).toMatchInlineSnapshot(`"<div class="flex justify-end"><div class="group flex min-w-0 max-w-[78%] flex-col items-end gap-2"><div class="relative w-full min-w-0 rounded-2xl bg-primary/15 px-4 py-3 text-foreground"><div class="break-words whitespace-pre-wrap tangle-transcript-text text-[length:var(--transcript-font-size)] leading-[var(--transcript-line-height)]">Can I break my lease early?</div></div></div></div>"`)
   })
 
 })
@@ -92,7 +92,7 @@ describe("UserMessage with an author", () => {
     const { container } = render(<UserMessage content="Did you give a forwarding address?" author={attorney} viewerId={client.id} />)
     expect(container.firstElementChild?.className).toContain("justify-start")
     expect(bubbleOf("Did you give a forwarding address?").className).toContain("bg-card")
-    expect(bubbleOf("Did you give a forwarding address?").className).not.toContain("bg-foreground")
+    expect(bubbleOf("Did you give a forwarding address?").className).not.toContain("bg-primary/15")
     expect(screen.getByText("Jane Doe")).toBeInTheDocument()
     expect(screen.getByText("Attorney")).toBeInTheDocument()
   })
@@ -148,7 +148,7 @@ describe("AgentTimeline with three participants", () => {
 
   it("sets the client's own words apart from the attorney's on the client's screen", () => {
     render(<AgentTimeline items={thread} viewerId={client.id} />)
-    expect(bubbleOf("My landlord kept my deposit.").className).toContain("bg-foreground")
+    expect(bubbleOf("My landlord kept my deposit.").className).toContain("bg-primary/15")
     expect(screen.queryByText("Maria Lopez")).not.toBeInTheDocument()
     expect(bubbleOf("Did you give a forwarding address?").className).toContain("bg-card")
     expect(screen.getByText("Jane Doe")).toBeInTheDocument()
@@ -156,7 +156,7 @@ describe("AgentTimeline with three participants", () => {
 
   it("mirrors the thread on the attorney's screen", () => {
     render(<AgentTimeline items={thread} viewerId={attorney.id} />)
-    expect(bubbleOf("Did you give a forwarding address?").className).toContain("bg-foreground")
+    expect(bubbleOf("Did you give a forwarding address?").className).toContain("bg-primary/15")
     expect(bubbleOf("My landlord kept my deposit.").className).toContain("bg-card")
     expect(screen.getByText("Maria Lopez")).toBeInTheDocument()
     expect(screen.queryByText("Jane Doe")).not.toBeInTheDocument()
