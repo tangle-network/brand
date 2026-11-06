@@ -1,3 +1,9 @@
+## 11.51.14
+
+### Patch Changes
+
+- 40a98a3: Add `ExpandablePanel` to `@tangle-network/ui/primitives`: any panel can fill the screen in place, keeping its subtree, and Escape closes the top-most one after inner popovers, menus and dialogs.
+
 ## 11.51.13
 
 ### Patch Changes
