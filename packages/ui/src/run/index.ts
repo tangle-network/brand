@@ -38,6 +38,7 @@ export { RunPhaseList, type RunPhase } from "./run-phase-list";
 export {
   RunStatusIcon,
   runStatus,
+  isOpen,
   statusMeta,
   type RunStatus,
   type RunStatusIconProps,

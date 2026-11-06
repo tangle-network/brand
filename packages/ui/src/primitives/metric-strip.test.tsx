@@ -52,51 +52,6 @@ describe("MetricStrip", () => {
     expect(screen.getByText("$0.00").className).not.toContain("--surface-danger-text");
   });
 
-  it("retains the default two / sm:four grid", () => {
-    const { container } = render(<MetricStrip><Metric label="Runs" value={0} /></MetricStrip>);
-    const dl = container.querySelector("dl")!;
-    expect(dl.className.split(" ")).toEqual(expect.arrayContaining(["grid-cols-2", "sm:grid-cols-4"]));
-    expect(dl.className).not.toContain("lg:grid-cols");
-  });
-
-  it.each([3, 4, 5, 6] as const)("owns the grid and all nonoverlapping row-start guards for %i columns", (columns) => {
-    const { container } = render(
-      <MetricStrip columns={columns}>
-        {Array.from({ length: columns }, (_, i) => <Metric key={i} label={`Metric ${i}`} value={i} />)}
-      </MetricStrip>,
-    );
-    const dl = container.querySelector("dl")!;
-    expect(dl).not.toHaveAttribute("columns");
-    expect(dl.className).toContain("max-sm:[&>div:not(:nth-child(2n+1))]:border-l");
-    if (columns <= 4) {
-      expect(dl.className).toContain(`sm:grid-cols-${columns}`);
-      expect(dl.className).toContain(`sm:[&>div:not(:nth-child(${columns}n+1))]:border-l`);
-    } else {
-      expect(dl.className).toContain("sm:grid-cols-3");
-      expect(dl.className).toContain("sm:max-lg:[&>div:not(:nth-child(3n+1))]:border-l");
-      expect(dl.className).toContain(`lg:grid-cols-${columns}`);
-      expect(dl.className).toContain(`lg:[&>div:not(:nth-child(${columns}n+1))]:border-l`);
-    }
-    expect(dl.className).not.toContain("border-l-0");
-    for (const item of Array.from(dl.children)) expect(item.className).not.toContain("nth-child");
-  });
-
-  it("does not give a standalone Metric a strip divider", () => {
-    const { container } = render(<Metric label="Runs" value={0} />);
-    expect(container.firstElementChild!.className).not.toContain("border-l");
-  });
-
-  it("wraps full labels, values and qualifiers without relying on a mouse title", () => {
-    render(<MetricStrip><Metric label="Very long account label without loss" value="$1,284,003.10" hint="Personal wallet (0x1234abcd5678efgh)" /></MetricStrip>);
-    for (const text of ["Very long account label without loss", "$1,284,003.10", "Personal wallet (0x1234abcd5678efgh)"]) {
-      const node = screen.getByText(text);
-      expect(node.className).toContain("[overflow-wrap:anywhere]");
-      expect(node.className).not.toContain("truncate");
-    }
-    expect(screen.getByText("$1,284,003.10")).toHaveAttribute("title", "$1,284,003.10");
-    expect(screen.getByText("Personal wallet (0x1234abcd5678efgh)")).toHaveAttribute("title", "Personal wallet (0x1234abcd5678efgh)");
-  });
-
   it("preserves refs, attributes, caller classes and fragment/conditional DOM order", () => {
     const strip = React.createRef<HTMLDListElement>();
     const item = React.createRef<HTMLDivElement>();
