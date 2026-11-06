@@ -1,3 +1,9 @@
+## 11.51.15
+
+### Patch Changes
+
+- ab4348b: Restore `isOpen` (`@tangle-network/ui/run`) and `formatCost` and `formatCount` (`@tangle-network/ui/utils`). 11.51.14 removed them as unused, but the Discovery viewer imports them, so the removal broke a public API in a patch release.
+
 ## 11.51.14
 
 ### Patch Changes
