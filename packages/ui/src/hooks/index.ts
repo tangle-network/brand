@@ -11,3 +11,4 @@ export * from "./use-sse-stream";
 
 export { useEventStream, type EventStreamHandlers, type EventStreamSource, type EventStreamOpener } from "./use-event-stream";
 export { useFollowTail } from "./use-follow-tail";
+export { usePhone, PHONE_MEDIA } from "./use-phone";
