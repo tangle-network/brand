@@ -1,26 +1,11 @@
 import { useState, type ReactNode } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { ChevronRight } from "lucide-react";
+import { focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 import { formatDuration } from "../utils/format";
 
 export type RunRowStatus = "running" | "success" | "error" | "idle";
-
-/**
- * A red dot for a failed row, for rows composed outside the shell. The shell
- * itself marks a failure on the row's own glyph, beside its name, never at the
- * far edge. Success is silence, and a running row carries its state in the
- * title — a `TextShimmer` sweep.
- */
-export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
-  if (status !== "error") return null;
-  return (
-    <span
-      data-run-row-status="error"
-      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--surface-danger-text)]"
-    />
-  );
-}
 
 export interface RunRowShellProps {
   /** Semantic lead glyph (14px). At rest it is the row's only ornament; on
@@ -35,10 +20,6 @@ export interface RunRowShellProps {
   /** Render the description in mono (tools) vs prose (reasoning). */
   descriptionMono?: boolean;
   status?: RunRowStatus;
-  /** @deprecated The shell no longer ticks a live duration while running; the
-   *  running state lives in the title (`TextShimmer`). Accepted and ignored so
-   *  existing callers keep compiling. */
-  startTime?: number;
   /** Static duration, revealed on hover once the row is no longer running. */
   durationMs?: number;
   /** Radius shaping when rows are stacked into a group. */
@@ -128,7 +109,10 @@ export function RunRowShell({
               // The header is the hover group, not the whole card: rows nested in an
               // open row (a fold's steps) keep their own glyphs while the
               // pointer is over them.
+              // Inset focus ring: the row clips overflow, so the shared ring
+              // must draw inside the trigger instead of around it.
               className={cn(
+                focusRingInset,
                 "group flex w-full items-center gap-2 text-left",
                 HEADER_INSET,
                 expandable ? "cursor-pointer" : "cursor-default",
