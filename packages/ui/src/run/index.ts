@@ -1,7 +1,6 @@
 export { RunGroup, type RunGroupProps } from "./run-group";
 export {
   RunRowShell,
-  RunRowStatusDot,
   type RunRowShellProps,
   type RunRowStatus,
 } from "./run-row-shell";
@@ -14,7 +13,6 @@ export {
   ExpandedToolDetail,
   type ExpandedToolDetailProps,
 } from "./expanded-tool-detail";
-export { LiveDuration } from "./run-item-primitives";
 // ToolCallStep/ToolCallGroup are internal adapters over InlineToolItem (used by
 // AgentTimeline + ToolCallFeed); only their status/type vocabulary is public
 // because ToolCallData references it.
@@ -40,7 +38,6 @@ export { RunPhaseList, type RunPhase } from "./run-phase-list";
 export {
   RunStatusIcon,
   runStatus,
-  isOpen,
   statusMeta,
   type RunStatus,
   type RunStatusIconProps,

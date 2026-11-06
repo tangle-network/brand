@@ -57,19 +57,6 @@ export function formatSpanDuration(ms: number): string {
   return ms >= 86_400_000 ? formatAxisDuration(ms) : ms < 1000 ? `${Math.round(ms)}ms` : formatClock(Math.round(ms / precision) * precision)
 }
 
-/** $0.12, $0.005, $12.40; never rounds a recorded nonzero cost to $0.00. */
-export function formatCost(usd: number): string {
-  if (!Number.isFinite(usd) || usd < 0) return '—'
-  if (usd === 0) return '$0.00'
-  if (usd < 0.01) return `$${usd.toPrecision(1)}`
-  return `$${usd.toFixed(2)}`
-}
-
-/** 9.8k, 754.4k, 1.2M with the exact count left to a title. */
-export function formatCount(n: number): string {
-  return !Number.isSafeInteger(n) || n < 0 ? '—' : formatCompact(n)
-}
-
 /** Elapsed clock at millisecond precision, so zoomed axis ticks keep distinct labels. */
 export function formatClock(ms: number): string {
   if (!Number.isFinite(ms) || ms < 0) return '—'
