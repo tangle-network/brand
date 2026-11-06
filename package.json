@@ -12,7 +12,7 @@
   "scripts": {
     "build": "pnpm -r run --if-present build",
     "dev": "pnpm -r --parallel run --if-present dev",
-    "test": "vitest run --passWithNoTests",
+    "test": "pnpm --filter @tangle-network/brand build && vitest run --passWithNoTests",
     "test:watch": "vitest",
     "typecheck": "pnpm --filter @tangle-network/brand build && pnpm -r exec tsc --noEmit",
     "storybook": "storybook dev -p 6006",
