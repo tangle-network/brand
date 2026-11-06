@@ -7,6 +7,22 @@ import { formatDuration } from "../utils/format";
 
 export type RunRowStatus = "running" | "success" | "error" | "idle";
 
+/**
+ * A red dot for a failed row, for rows composed outside the shell. The shell
+ * itself marks a failure on the row's own glyph, beside its name, never at the
+ * far edge. Success is silence, and a running row carries its state in the
+ * title — a `TextShimmer` sweep.
+ */
+export function RunRowStatusDot({ status }: { status: RunRowStatus }) {
+  if (status !== "error") return null;
+  return (
+    <span
+      data-run-row-status="error"
+      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--surface-danger-text)]"
+    />
+  );
+}
+
 export interface RunRowShellProps {
   /** Semantic lead glyph (14px). At rest it is the row's only ornament; on
    *  hover and while open the expand chevron takes its slot. */
