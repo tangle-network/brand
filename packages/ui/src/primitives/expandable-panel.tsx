@@ -15,15 +15,16 @@ export interface ExpandablePanelProps {
   actions?: React.ReactNode; // controls shown beside the toggle
 }
 
-// Expanded panels in the order they opened; Escape closes only the last one.
-const openPanels: symbol[] = [];
+// Expanded panels in opening order. Escape closes the last one that holds no other.
+const openPanels: HTMLElement[] = [];
 let bodyOverflow = "";
 
 /**
  * A panel that fills the viewport in place and returns on Escape. The subtree
  * never moves (no portal), so chart, canvas and conversation state and scroll
  * survive the switch. Radix popovers, menus and dialogs inside take Escape
- * first: they prevent its default, which this panel respects.
+ * first: they prevent its default, which this panel respects. An ancestor
+ * with a transform or filter would contain the fixed panel, so avoid one.
  */
 function ExpandablePanel({
   children,
@@ -36,6 +37,8 @@ function ExpandablePanel({
   const [expandedState, setExpandedState] = React.useState(false);
   const expanded = expandedProp ?? expandedState;
   const toggleRef = React.useRef<HTMLButtonElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const wasExpanded = React.useRef(expanded);
   const setExpanded = (next: boolean) => {
     if (expandedProp === undefined) setExpandedState(next);
     onExpandedChange?.(next);
@@ -45,16 +48,18 @@ function ExpandablePanel({
   setExpandedRef.current = setExpanded;
 
   React.useEffect(() => {
-    if (!expanded) return;
-    const id = Symbol(label);
+    if (wasExpanded.current && !expanded) toggleRef.current?.focus();
+    wasExpanded.current = expanded;
+    const id = panelRef.current;
+    if (!expanded || !id) return;
     if (openPanels.length === 0) bodyOverflow = document.body.style.overflow;
     openPanels.push(id);
     document.body.style.overflow = "hidden";
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.defaultPrevented || openPanels[openPanels.length - 1] !== id) return;
+      const top = openPanels.filter((p) => !openPanels.some((q) => q !== p && p.contains(q))).pop();
+      if (event.key !== "Escape" || event.defaultPrevented || top !== id) return;
       event.preventDefault();
       setExpandedRef.current(false);
-      toggleRef.current?.focus();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -62,16 +67,17 @@ function ExpandablePanel({
       openPanels.splice(openPanels.indexOf(id), 1);
       if (openPanels.length === 0) document.body.style.overflow = bodyOverflow;
     };
-  }, [expanded, label]);
+  }, [expanded]);
 
   return (
     <div
+      ref={panelRef}
       data-expandable-panel=""
       data-expanded={expanded ? "" : undefined}
       className={cn(
         "group/expandable relative flex min-h-0 flex-col",
         className, // before the expanded classes, so a caller's size cannot shrink it
-        expanded && "fixed inset-0 z-50 m-0 h-auto max-h-none w-auto max-w-none rounded-none bg-background",
+        expanded && "fixed inset-0 z-50 m-0 size-auto min-h-0 min-w-0 max-h-none max-w-none rounded-none transform-none bg-background",
       )}
     >
       {children}
