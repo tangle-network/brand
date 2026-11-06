@@ -279,3 +279,6 @@ export type {
 
 export { Toolbar, FilterField } from "./toolbar";
 export type { ToolbarProps, FilterFieldProps } from "./toolbar";
+
+export { ExpandablePanel } from "./expandable-panel";
+export type { ExpandablePanelProps } from "./expandable-panel";
