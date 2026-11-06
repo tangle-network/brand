@@ -299,19 +299,19 @@ function ConnectionIndicator({
 }) {
   const config = {
     disconnected: {
-      color: "bg-red-500",
+      color: "bg-[var(--surface-danger-text)]",
       label: "Disconnected",
     },
     connecting: {
-      color: "bg-yellow-500 animate-pulse",
+      color: "bg-[var(--surface-warning-text)] animate-pulse motion-reduce:animate-none",
       label: "Connecting...",
     },
     connected: {
-      color: "bg-blue-500",
+      color: "bg-[var(--surface-info-text)]",
       label: "Connected",
     },
     synced: {
-      color: "bg-green-500",
+      color: "bg-[var(--surface-success-text)]",
       label: "Synced",
     },
   }[state];

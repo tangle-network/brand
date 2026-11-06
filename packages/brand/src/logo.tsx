@@ -54,9 +54,9 @@ export function Logo({
     <div className={cls}>
       <TangleKnot size={cfg.icon} className="shrink-0" />
       <div className="flex items-baseline gap-1">
-        <span className={`font-bold tracking-tight ${cfg.text}`}>Tangle</span>
+        <span className={`font-semibold tracking-tight ${cfg.text}`}>Tangle</span>
         {suffix ? (
-          <span className={`font-medium text-gradient-brand ${cfg.suffix}`}>{suffix}</span>
+          <span className={`font-medium text-[var(--accent-text)] ${cfg.suffix}`}>{suffix}</span>
         ) : null}
       </div>
     </div>

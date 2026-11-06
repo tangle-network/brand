@@ -52,21 +52,21 @@ export const AllStates: Story = {
   name: 'All States',
   render: () => (
     <div className="flex flex-col gap-4 p-6">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">HIPAA</div>
+      <div className="text-muted-foreground text-xs font-mono">HIPAA</div>
       <div className="flex flex-wrap items-center gap-2">
         <ComplianceBadge status="ready" />
         <ComplianceBadge status="compliant" />
         <ComplianceBadge status="ready" size="md" />
         <ComplianceBadge status="compliant" size="md" />
       </div>
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mt-2">SOC 2</div>
+      <div className="text-muted-foreground text-xs font-mono mt-2">SOC 2</div>
       <div className="flex flex-wrap items-center gap-2">
         <ComplianceBadge product="soc2" status="ready" />
         <ComplianceBadge product="soc2" status="compliant" />
         <ComplianceBadge product="soc2" status="ready" size="md" />
         <ComplianceBadge product="soc2" status="compliant" size="md" />
       </div>
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mt-2">Linked</div>
+      <div className="text-muted-foreground text-xs font-mono mt-2">Linked</div>
       <div className="flex flex-wrap items-center gap-2">
         <ComplianceBadge status="ready" href="/trust" />
         <ComplianceBadge product="soc2" status="compliant" href="/trust" />

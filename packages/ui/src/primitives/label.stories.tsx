@@ -49,10 +49,10 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-6 p-6 w-80">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Standalone</div>
+      <div className="text-muted-foreground text-xs font-mono">Standalone</div>
       <Label>Standalone label</Label>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Paired with input</div>
+      <div className="text-muted-foreground text-xs font-mono">Paired with input</div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="overview-name">Sandbox name</Label>
         <Input id="overview-name" placeholder="my-sandbox-01" />
@@ -62,7 +62,7 @@ export const Overview: Story = {
         <Input id="overview-image" placeholder="ubuntu:22.04" />
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Paired with switch</div>
+      <div className="text-muted-foreground text-xs font-mono">Paired with switch</div>
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Switch id="overview-sleep" defaultChecked />

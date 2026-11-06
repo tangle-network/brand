@@ -90,7 +90,7 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-6 p-6 w-96">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Input variants</div>
+      <div className="text-muted-foreground text-xs font-mono">Input variants</div>
       <Input label="Sandbox name" placeholder="my-sandbox-01" />
       <Input
         variant="sandbox"
@@ -104,7 +104,7 @@ export const Overview: Story = {
         error="Must be a number between 1 and 32."
       />
       <Input label="Region" defaultValue="us-east-1" disabled />
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mt-2">Textarea</div>
+      <div className="text-muted-foreground text-xs font-mono mt-2">Textarea</div>
       <Textarea
         label="Environment variables"
         placeholder="NODE_ENV=production&#10;PORT=3000"

@@ -154,11 +154,11 @@ export const UnifiedWithToolRow: Story = {
 export const AllStates: Story = {
   render: () => (
     <div className="p-6 max-w-2xl space-y-3">
-      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground px-1">Active</p>
+      <p className="text-xs font-mono text-muted-foreground px-1">Active</p>
       <InlineThinkingItem part={thinkingActive} defaultOpen={true} autoCollapse={false} />
-      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground px-1 pt-2">Complete (collapsed)</p>
+      <p className="text-xs font-mono text-muted-foreground px-1 pt-2">Complete (collapsed)</p>
       <InlineThinkingItem part={thinkingComplete} defaultOpen={false} autoCollapse={false} />
-      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground px-1 pt-2">Complete (expanded)</p>
+      <p className="text-xs font-mono text-muted-foreground px-1 pt-2">Complete (expanded)</p>
       <InlineThinkingItem part={thinkingLong} defaultOpen={true} autoCollapse={false} />
     </div>
   ),

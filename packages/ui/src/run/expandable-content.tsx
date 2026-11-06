@@ -68,7 +68,7 @@ export function ExpandableContent({
           type="button"
           onClick={() => setExpanded((value) => !value)}
           className={cn(
-            "mt-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground",
+            "mt-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground",
             toggleClassName,
           )}
         >

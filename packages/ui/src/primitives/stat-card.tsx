@@ -57,7 +57,7 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm">{title}</p>
-            <p className="font-bold text-3xl tracking-tight">{value}</p>
+            <p className="font-medium text-3xl tabular-nums tracking-tight">{value}</p>
             {/* A token, never `opacity-70` over the muted tone: a translucent
                 foreground renders as the token COMPOSITED over whatever plane sits
                 behind it, so the same class lands a different colour — and a

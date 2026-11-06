@@ -29,10 +29,10 @@ export const Cold: Story = { args: { variant: 'cold', dot: true, children: 'Cold
 export const Deleted: Story = { args: { variant: 'deleted', dot: true, children: 'Deleted' } }
 
 export const AllVariants: Story = {
-  name: 'All Variants',
+  name: 'All variants',
   render: () => (
     <div className="flex flex-col gap-4 p-6">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Semantic</div>
+      <div className="text-muted-foreground text-xs font-mono">Semantic</div>
       <div className="flex flex-wrap gap-2">
         <Badge variant="default">Default</Badge>
         <Badge variant="secondary">Secondary</Badge>
@@ -43,7 +43,7 @@ export const AllVariants: Story = {
         <Badge variant="error">Error</Badge>
         <Badge variant="info">Info</Badge>
       </div>
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest mt-2">Operational Status</div>
+      <div className="text-muted-foreground text-xs font-mono mt-2">Operational status</div>
       <div className="flex flex-wrap gap-2">
         <Badge variant="running" dot>Running</Badge>
         <Badge variant="creating" dot>Creating</Badge>

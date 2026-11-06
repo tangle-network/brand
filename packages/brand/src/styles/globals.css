@@ -162,8 +162,12 @@
   }
 
   .status-dot-running { background: var(--status-running); box-shadow: var(--shadow-status-running); }
+  .status-dot-creating { background: var(--status-creating); }
   .status-dot-stopped { background: var(--status-stopped); }
+  .status-dot-warm { background: var(--status-warm); }
+  .status-dot-cold { background: var(--status-cold); }
   .status-dot-error { background: var(--status-error); box-shadow: var(--shadow-status-error); }
+  .status-dot-deleted { background: var(--status-deleted); }
 }
 
 /* Markdown prose — applied via `tangle-prose` on the Markdown renderer. The

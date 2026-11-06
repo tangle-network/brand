@@ -379,7 +379,7 @@ export function FilePreview({
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-medium text-foreground">{filename}</div>
-            <div className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            <div className="mt-0.5 text-xs text-muted-foreground">
               {previewLabel}
             </div>
           </div>

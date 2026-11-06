@@ -5,7 +5,7 @@
 .tangle-heading[data-variant="page"] { font-size: var(--font-size-3xl); }
 .tangle-heading[data-variant="section"] { font-size: var(--font-size-xl); }
 .tangle-heading[data-variant="subsection"] { font-size: var(--font-size-base); }
-.tangle-heading[data-variant="eyebrow"] { font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: hsl(var(--muted-foreground)); }
+.tangle-heading[data-variant="eyebrow"] { font-size: var(--font-size-xs); line-height: 1rem; font-weight: 500; letter-spacing: 0; color: hsl(var(--muted-foreground)); }
 .tangle-page-header { min-width: 0; margin-bottom: 1.5rem; }
 .tangle-page-header-main { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; }
 .tangle-intro .tangle-page-header-main { display: block; }

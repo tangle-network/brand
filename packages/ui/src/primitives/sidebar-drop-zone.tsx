@@ -108,7 +108,7 @@ export function SidebarDropZone({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       className={cn(
-        "rounded-lg border-2 border-dashed transition-all duration-150",
+        "rounded-lg border-2 border-dashed transition-colors duration-150",
         isVisible ? "p-4" : "p-0 border-transparent",
         dragOver
           ? "border-[var(--brand-cool,hsl(var(--ring)))] bg-[var(--accent-surface-soft)]"

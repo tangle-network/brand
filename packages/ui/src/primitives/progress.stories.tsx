@@ -60,27 +60,27 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="flex flex-col gap-8 p-6 w-96">
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Default variant</div>
+      <div className="text-muted-foreground text-xs font-mono">Default variant</div>
       <div className="flex flex-col gap-4">
         {[0, 25, 50, 75, 100].map((v) => (
           <div key={v} className="flex items-center gap-3">
             <span className="text-muted-foreground text-xs w-8 text-right">{v}%</span>
-            <Progress value={v} className="flex-1" />
+            <div className="flex-1"><Progress value={v} /></div>
           </div>
         ))}
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Sandbox variant</div>
+      <div className="text-muted-foreground text-xs font-mono">Sandbox variant</div>
       <div className="flex flex-col gap-4">
         {[0, 25, 50, 75, 100].map((v) => (
           <div key={v} className="flex items-center gap-3">
             <span className="text-muted-foreground text-xs w-8 text-right">{v}%</span>
-            <Progress value={v} variant="sandbox" className="flex-1" />
+            <div className="flex-1"><Progress value={v} variant="sandbox" /></div>
           </div>
         ))}
       </div>
 
-      <div className="text-muted-foreground text-xs font-mono uppercase tracking-widest">Sandbox task list</div>
+      <div className="text-muted-foreground text-xs font-mono">Sandbox task list</div>
       <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-4">
         {[
           { label: 'Pulling image', value: 100 },

@@ -264,7 +264,7 @@ export const cardPresentation = {
  variants: {
     default: "bg-card border-border shadow-[var(--edge-highlight),var(--shadow-card)]",
     elevated: "bg-muted/50 border-border shadow-[var(--shadow-card)]",
-    glass: "bg-card/80 backdrop-blur-xl border-border shadow-[var(--shadow-card)]",
+    glass: "bg-card border-border shadow-[var(--shadow-card)]",
     sandbox: "bg-muted/50 border-primary/20 shadow-[var(--shadow-accent)]",
   },
 } as const;
