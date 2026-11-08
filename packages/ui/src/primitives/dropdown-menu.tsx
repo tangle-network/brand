@@ -16,6 +16,22 @@ const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
+// One surface for a menu and its submenus, one row for its items.
+const menuRow = cn(
+  "relative flex cursor-pointer select-none items-center rounded-md py-1.5 text-sm outline-none transition-[color,background-color,box-shadow]",
+  "focus:text-foreground",
+  ixRow,
+  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+);
+const menuSurface = cn(
+  "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-[var(--edge-highlight),var(--shadow-card)]",
+  "data-[state=closed]:animate-out data-[state=open]:animate-in",
+  "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+  "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+  "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+  "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+);
+
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
@@ -46,15 +62,7 @@ const DropdownMenuSubContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.SubContent
     ref={ref}
-    className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-[var(--edge-highlight),var(--shadow-card)]",
-      "data-[state=closed]:animate-out data-[state=open]:animate-in",
-      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-      "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-      "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      className,
-    )}
+    className={cn(menuSurface, className)}
     {...props}
   />
 ));
@@ -64,20 +72,21 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 4, onPointerDown, onCloseAutoFocus, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-[var(--edge-highlight),var(--shadow-card)]",
-        "data-[state=closed]:animate-out data-[state=open]:animate-in",
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-        "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className,
-      )}
+      // A choice made with a pointer returns focus to the trigger without the keyboard ring.
+      onPointerDown={(event) => { event.currentTarget.dataset.pointer = ""; onPointerDown?.(event); }}
+      onCloseAutoFocus={(event) => {
+        const content = event.currentTarget as HTMLElement;
+        onCloseAutoFocus?.(event);
+        if (content.dataset.pointer === undefined || event.defaultPrevented || document.activeElement !== document.body) return;
+        event.preventDefault();
+        document.getElementById(content.getAttribute("aria-labelledby") ?? "")?.focus({ focusVisible: false });
+      }}
+      className={cn(menuSurface, className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -92,14 +101,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none transition-[color,background-color,box-shadow]",
-      "focus:text-foreground",
-      ixRow,
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      inset && "pl-8",
-      className,
-    )}
+    className={cn(menuRow, "px-2", inset && "pl-8", className)}
     {...props}
   />
 ));
@@ -111,13 +113,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-md py-1.5 pr-2 pl-8 text-sm outline-none transition-[color,background-color,box-shadow]",
-      "focus:text-foreground",
-      ixRow,
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className,
-    )}
+    className={cn(menuRow, "pr-2 pl-8", className)}
     checked={checked}
     {...props}
   >
@@ -138,13 +134,7 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-md py-1.5 pr-2 pl-8 text-sm outline-none transition-[color,background-color,box-shadow]",
-      "focus:text-foreground",
-      ixRow,
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className,
-    )}
+    className={cn(menuRow, "pr-2 pl-8", className)}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
