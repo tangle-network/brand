@@ -1,3 +1,10 @@
+## 11.51.19
+
+### Patch Changes
+
+- 76fef41: `DropdownMenuContent` returns focus to its trigger without the keyboard focus ring when the menu closed after a pointer choice. Radix restores focus with a plain `focus()`, which Chromium draws as `:focus-visible`. Every bordered trigger therefore kept a ring after a mouse selection until focus moved elsewhere. A keyboard choice still shows the ring.
+- 09487a5: Menu separators (`DropdownMenuSeparator`, `ContextMenuSeparator`, `SelectSeparator`) draw in `--border-strong` instead of `--border`. On the dark popover the old line measured 1.1:1 against its surface and disappeared, so a closing action such as Billing read as one more choice in the list above it. It now measures 1.8:1 in dark and 2.3:1 in light.
+
 ## 11.51.18
 
 ### Patch Changes
