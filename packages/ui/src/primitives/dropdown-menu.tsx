@@ -72,27 +72,25 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, onPointerDown, onCloseAutoFocus, ...props }, ref) => {
-  // A choice made with a pointer returns focus to the trigger without the keyboard ring.
-  const pointer = React.useRef(false);
-  return (
-    <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.Content
-        ref={ref}
-        sideOffset={sideOffset}
-        onPointerDown={(event) => { pointer.current = true; onPointerDown?.(event); }}
-        onCloseAutoFocus={(event) => {
-          onCloseAutoFocus?.(event);
-          if (!pointer.current || event.defaultPrevented || document.activeElement !== document.body) return;
-          event.preventDefault();
-          document.getElementById((event.currentTarget as HTMLElement).getAttribute("aria-labelledby") ?? "")?.focus({ focusVisible: false });
-        }}
-        className={cn(menuSurface, className)}
-        {...props}
-      />
-    </DropdownMenuPrimitive.Portal>
-  );
-});
+>(({ className, sideOffset = 4, onPointerDown, onCloseAutoFocus, ...props }, ref) => (
+  <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      // A choice made with a pointer returns focus to the trigger without the keyboard ring.
+      onPointerDown={(event) => { event.currentTarget.dataset.pointer = ""; onPointerDown?.(event); }}
+      onCloseAutoFocus={(event) => {
+        const content = event.currentTarget as HTMLElement;
+        onCloseAutoFocus?.(event);
+        if (content.dataset.pointer === undefined || event.defaultPrevented || document.activeElement !== document.body) return;
+        event.preventDefault();
+        document.getElementById(content.getAttribute("aria-labelledby") ?? "")?.focus({ focusVisible: false });
+      }}
+      className={cn(menuSurface, className)}
+      {...props}
+    />
+  </DropdownMenuPrimitive.Portal>
+));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<
