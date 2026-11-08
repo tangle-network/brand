@@ -1,3 +1,9 @@
+## 11.51.18
+
+### Patch Changes
+
+- df719a3: `timeAgo` counts days past 24 hours (`3d ago`) instead of hours.
+
 ## 11.51.17
 
 ### Patch Changes
