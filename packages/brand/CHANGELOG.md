@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.8
+
+### Patch Changes
+
+- 0eb4b3f: `tangle-drift` disco baseline lowered from disco-app main 0b218855: nav_row_hand_painted 2 -> 0.
+
 ## 1.31.7
 
 ### Patch Changes
