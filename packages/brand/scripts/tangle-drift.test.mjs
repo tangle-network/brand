@@ -375,7 +375,7 @@ test("contradictory or unsafe arguments are refused", () => {
 
 test("the shipped baseline has a row with every gated count for each surface", () => {
   const baseline = readBaseline(DEFAULT_BASELINE);
-  assert.deepEqual(Object.keys(baseline), ["website", "sandbox", "platform", "intelligence", "gtm", "tax", "legal", "insurance", "creative", "physim", "hospitality", "audits", "browser", "builder", "blueprint", "super"]);
+  assert.deepEqual(Object.keys(baseline), ["website", "sandbox", "platform", "intelligence", "gtm", "tax", "legal", "insurance", "creative", "physim", "hospitality", "audits", "browser", "builder", "blueprint", "super", "disco"]);
   for (const row of Object.values(baseline)) {
     for (const metric of GATED) assert.equal(typeof row[metric], "number", metric);
     assert.match(row.head, /^[0-9a-f]{12}$/);

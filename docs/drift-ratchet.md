@@ -25,6 +25,9 @@ Counts are regex matches on source read from a git tree with `git grep`, not ren
 | `header_height_literal` | A header row given its own height: a CSS rule whose last compound is `header` or a class ending in `-header`, `-head`, `-bar`, `-toolbar` (not a progress, scroll, side or meter bar) with a literal `height`, `min-height` or `max-height`; a `<header>` or header-row class with `h-16`, `min-h-[58px]` | `.css .tsx .jsx .astro .vue .svelte` |
 | `transcript_type_override` | Product CSS setting `font-size`, `line-height`, `font-family` or `font` on `.tangle-prose`, `.tangle-transcript-text` or a timeline step, or a `tangle-prose` className with a text size or leading | `.css .tsx .jsx` |
 | `settings_layout` | A settings page file that imports nothing from `@tangle-network/agent-app/settings-react` and sits under no settings layout that does | `.tsx .jsx .astro` |
+| `primitive_control_composition` | One per `import { … }` from `@tangle-network/ui/primitives` naming a `DropdownMenu`, `Popover`, `Select` or `Command` part (`import type` is not counted); sandbox-ui owns the pickers (`HarnessPicker`, `BackendSelector`, `ReasoningLevelPicker`, `Chip`) | `.tsx .jsx .ts` |
+| `local_mark_composition` | Each `<HarnessLogo>` or `<ModelBrandStack>` in product code, a seat or model mark assembled by hand; sandbox-ui `SeatMark` draws the mark beside its name | `.tsx .jsx` |
+| `nav_row_hand_painted` | A selected row painted by hand instead of `ixRow` + `ixSelected` on `aria-current`: CSS on `[data-state=selected]`, `[aria-selected]`, `[aria-current]` or `[data-selected/active/current]` in the selector's last compound setting a colour, background, border, shadow or outline, or an `aria-current:`/`data-[active=true]:` colour utility; or an action nav item (`label: "New …"`, `Create`, `Add`, `Start`) whose id an `activeId` names, so the action reads as the current location | `.tsx .jsx .css` |
 
 `font_size_literal` through `page_heading` measure deviation from the [control and type scale](control-scale.md); token references such as `h-[var(--control-height-sm)]` are not counted.
 `shell_override` keeps products inside the shared chat shell: the companion draws the conversation's raised surface, gutter and header, and the header's top-right corner holds the tools toggle.
@@ -80,6 +83,32 @@ The first run of all fifteen surfaces (now sixteen, with insurance) took about s
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.
+
+## Disco surface and composition baseline, 2026-11-08
+
+Discovery (`disco`, tangle-network/disco-app `web`) joined as a surface, read at main `845397ddd`, the same counts as `4ac7e5ac9`.
+Its three new-metric hits: `primitive_control_composition` 1 (`chat/SeatPicker.tsx`, the Model, Harness, Budget and Templates chips on `DropdownMenu` and `Popover`), `local_mark_composition` 6 (`SeatPicker.tsx` 4, `profiles/ProfilePage.tsx`, `run/TemplateCard.tsx`), `nav_row_hand_painted` 2 (`App.tsx` "New session" as `activeId` `new`, `profiles/profiles.css` `[data-state='selected']`).
+Platform's `font_size_literal` (32 to 33), intelligence's `font_size_literal` (14 to 18) and blueprint's `native_control` (393 to 394) rose, so those rows kept their earlier counts and head and only recorded the new metrics, read at the head the table names. Router still has no row.
+
+| Surface | Head | Primitive control composition | Local mark composition | Nav row hand painted |
+| --- | --- | ---: | ---: | ---: |
+| website | `0bddb92cf` | 0 | 0 | 3 |
+| sandbox | `cff0e333f` | 13 | 0 | 0 |
+| platform | `cff0e333f` | 3 | 1 | 1 |
+| intelligence | `cff0e333f` | 7 | 0 | 0 |
+| gtm | `3b8c0f3fa` | 1 | 0 | 0 |
+| tax | `98dc77419` | 1 | 0 | 0 |
+| legal | `e36435e47` | 0 | 0 | 0 |
+| insurance | `5ce0764e4` | 0 | 0 | 0 |
+| creative | `fc5fa1340` | 1 | 0 | 0 |
+| physim | `bcea358a3` | 0 | 0 | 1 |
+| hospitality | `e0eb9aef9` | 2 | 0 | 1 |
+| audits | `dc46bd0a9` | 0 | 0 | 0 |
+| browser | `cc9280f16` | 13 | 0 | 1 |
+| builder | `62880b666` | 2 | 0 | 1 |
+| blueprint | `96d17baa6` | 44 | 0 | 1 |
+| super | `8f30c56cf` | 0 | 0 | 0 |
+| disco | `845397ddd` | 1 | 6 | 2 |
 
 ## Settings layout ratchet, 2026-10-17
 
