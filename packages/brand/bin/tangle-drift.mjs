@@ -48,6 +48,7 @@ export const SURFACES = {
   blueprint: { repo: "tangle-network/blueprint-agent", roots: ["apps/web"] },
   // SUPER's interface is plain JavaScript and HTML, so its colors live in those files.
   super: { repo: "tangle-network/super-agent", roots: ["public"], extraExt: ["*.js", "*.html"] },
+  disco: { repo: "tangle-network/disco-app", roots: ["web"] },
 };
 
 const SRC_EXT = ["*.tsx", "*.ts", "*.jsx", "*.astro", "*.css", "*.vue", "*.svelte"];
@@ -79,6 +80,8 @@ export const PATTERNS = {
   // recessed backdrop for a gutter, its own pane expander icons, or a WorkspaceLayout seam
   // that moves the shell's controls or flattens its surface.
   shell_override: String.raw`md3-surface-dim|\bPanel(?:Right|Left)(?:Open|Close)?\b|\b(?:collapsedControlsPlacement|centerHeaderVisibility)\b|\bsurface=["'{]+flat\b`,
+  // A seat or model mark assembled in product code; sandbox-ui's SeatMark owns the logo beside its name.
+  local_mark_composition: String.raw`<(?:HarnessLogo|ModelBrandStack)\b`,
 };
 
 // Header-like: an element named `header`, or a class/id ending in one of the words below. It must be
@@ -124,6 +127,22 @@ export const RULE_PATTERNS = {
     patterns: [
       String.raw`(?:tangle-prose|tangle-transcript-text|data-timeline-step|transcript|data-(?:message-)?role=["']?(?:assistant|user|agent)|data-assistant-prose)[^{};]*?(?<![\s>+~](?:h[1-6]|code|pre|kbd|table|th|td)\s*)\{[^{}]*?(?<![\w-])(?:font-size|line-height|font-family|font)\s*:`,
       String.raw`\bclassName=\{?["'\x60](?=[^"'\x60]*\btangle-(?:prose|transcript-text)\b)[^"'\x60]*?(?<![\w-])(?:text-(?:xs|sm|base|lg|xl|\[)|leading-|font-(?:sans|serif|mono))`,
+    ],
+  },
+  // A selection control composed from ui primitives: one per import that names a DropdownMenu, Popover,
+  // Select or Command part. sandbox-ui owns the pickers (HarnessPicker, BackendSelector, Chip, ...).
+  primitive_control_composition: {
+    prefilter: String.raw`@tangle-network/ui/primitives`,
+    patterns: [String.raw`\bimport\s*\{[^}]*?\b(?:DropdownMenu|Popover|Select|Command)\w*[^}]*\}\s*from\s*["']@tangle-network/ui/primitives(?:/[^"']*)?["']`],
+  },
+  // A selected row painted by hand instead of ixRow + ixSelected keyed on aria-current, or an action
+  // nav item (New, Create, Add, Start) made the active location, so the action reads as where you are.
+  nav_row_hand_painted: {
+    prefilter: String.raw`selected|current|active`,
+    patterns: [
+      String.raw`\[(?:data-state=["']?selected|aria-selected|aria-current|data-(?:selected|active|current))[^\]]*\](?:[\w:.()-]|\[[^\]]*\])*\s*(?:,[^{};]*)?\{[^{}]*?(?<![\w-])(?:background(?:-color)?|color|border(?:-color)?|box-shadow|outline)\s*:`,
+      String.raw`(?<![\w-])(?:aria-(?:current|selected)|data-\[(?:state=selected|selected|active|current)[^\]]*\]|aria-\[(?:current|selected)[^\]]*\]):(?:bg|text|border|ring|shadow)-`,
+      String.raw`\{\s*id:\s*(["'])([\w-]+)\1,\s*label:\s*["'](?:New|Create|Add|Start)\b[\s\S]*?\bactiveId=\{[^}]*?(["'])\2\3`,
     ],
   },
 };
@@ -181,6 +200,9 @@ function extensions(surface, metric) {
     case "header_height_literal": return ["*.tsx", "*.jsx", "*.astro", "*.css", "*.vue", "*.svelte"];
     case "transcript_type_override": return ["*.tsx", "*.jsx", "*.css"];
     case "settings_layout": return ["*.tsx", "*.jsx", "*.astro"];
+    case "local_mark_composition": return ["*.tsx", "*.jsx"];
+    case "primitive_control_composition": return ["*.tsx", "*.jsx", "*.ts"];
+    case "nav_row_hand_painted": return ["*.tsx", "*.jsx", "*.css"];
     case "imports": return ["*.tsx", "*.ts", "*.astro", "*.jsx"];
     default: return SRC_EXT;
   }
