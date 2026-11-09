@@ -2057,7 +2057,7 @@
   ],
   "exclude": [],
   "branch": "main",
-  "head": "1f892abf0c6e",
+  "head": "0b218855fba5",
   "tsx_files": 17,
   "css_files": 4,
   "versions": {
@@ -2114,10 +2114,7 @@
    },
    "transcript_type_override": {},
    "primitive_control_composition": {},
-   "nav_row_hand_painted": {
-    "web/App.tsx": 1,
-    "web/disco/profiles/profiles.css": 1
-   },
+   "nav_row_hand_painted": {},
    "settings_layout": {}
   },
   "raw_palette": 0,
@@ -2135,7 +2132,7 @@
   "header_height_literal": 1,
   "transcript_type_override": 0,
   "primitive_control_composition": 0,
-  "nav_row_hand_painted": 2,
+  "nav_row_hand_painted": 0,
   "settings_layout": 0,
   "palette_top": [],
   "local_primitives": {}
