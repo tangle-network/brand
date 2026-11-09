@@ -2057,18 +2057,18 @@
   ],
   "exclude": [],
   "branch": "main",
-  "head": "a750796c9eed",
+  "head": "1f892abf0c6e",
   "tsx_files": 17,
   "css_files": 4,
   "versions": {
    "agent-app": [
-    "3.0.6"
+    "3.0.11"
    ],
    "brand": [
-    "1.31.5"
+    "1.31.6"
    ],
    "sandbox-ui": [
-    "7.0.9"
+    "8.0.6"
    ],
    "ui": [
     "11.51.18"
@@ -2108,11 +2108,7 @@
    "shell_override": {
     "web/disco/layout/TwoRegions.tsx": 4
    },
-   "local_mark_composition": {
-    "web/disco/chat/SeatPicker.tsx": 2,
-    "web/disco/profiles/ProfilePage.tsx": 1,
-    "web/disco/run/TemplateCard.tsx": 1
-   },
+   "local_mark_composition": {},
    "header_height_literal": {
     "web/disco/profiles/profiles.css": 1
    },
@@ -2135,7 +2131,7 @@
   "control_override": 0,
   "page_heading": 2,
   "shell_override": 4,
-  "local_mark_composition": 4,
+  "local_mark_composition": 0,
   "header_height_literal": 1,
   "transcript_type_override": 0,
   "primitive_control_composition": 0,
