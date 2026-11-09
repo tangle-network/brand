@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.7
+
+### Patch Changes
+
+- 734f672: `tangle-drift` disco baseline lowered from disco-app main 1f892abf: local_mark_composition 4 -> 0.
+
 ## 1.31.6
 
 ### Patch Changes
