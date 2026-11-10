@@ -23,7 +23,7 @@ export interface FileTabsProps {
   tabs: FileTabData[];
   activeId?: string;
   onSelect: (id: string) => void;
-  onClose: (id: string) => void;
+  onClose?: (id: string) => void; // without it the tabs have no close buttons and Delete does nothing
   /** Accessible name of the tab list. Defaults to "Open files". */
   label?: string;
   className?: string;
@@ -84,14 +84,14 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
     const at = tabButtons().indexOf(event.target as HTMLButtonElement);
     const last = tabs.length - 1;
     const next = ({ ArrowRight: at === last ? 0 : at + 1, ArrowLeft: at === 0 ? last : at - 1, Home: 0, End: last } as Record<string, number>)[event.key];
-    if (at < 0 || (next === undefined && event.key !== "Delete")) return;
+    if (at < 0 || (next === undefined && (event.key !== "Delete" || !onClose))) return;
     event.preventDefault();
     if (next !== undefined) {
       tabButtons()[next]?.focus();
       onSelect(tabs[next]!.id);
       return;
     }
-    onClose(tabs[at]!.id);
+    onClose?.(tabs[at]!.id);
     // Once the host has re-rendered, keep focus on the tab it opened.
     requestAnimationFrame(() => (tabButtons().find((tab) => tab.getAttribute("aria-selected") === "true") ?? tabButtons().at(-1))?.focus());
   };
@@ -136,7 +136,7 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
               aria-label={`${tab.name}${hint ? ` in ${hint}` : ""}${tab.dirty ? ", unsaved changes" : ""}`}
               tabIndex={isActive || (!activeId && tab === tabs[0]) ? 0 : -1}
               onClick={() => onSelect(tab.id)}
-              className={cn("flex h-full min-w-0 items-center gap-1.5 rounded-t-lg pl-3 pr-1", focusRingInset)}
+              className={cn("flex h-full min-w-0 items-center gap-1.5 rounded-t-lg pl-3", onClose ? "pr-1" : "pr-3", focusRingInset)}
             >
               <Icon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
               <span className="flex min-w-0">
@@ -146,7 +146,7 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
               {hint && <span className="min-w-0 truncate text-muted-foreground">· {hint}</span>}
               {tab.dirty && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--accent-text)]" />}
             </button>
-            <button
+            {onClose && <button
               type="button"
               tabIndex={-1}
               aria-label={`Close ${tab.name}`}
@@ -158,7 +158,7 @@ export function FileTabs({ tabs, activeId, onSelect, onClose, label = "Open file
               )}
             >
               <X aria-hidden className="size-3" />
-            </button>
+            </button>}
           </div>
         );
       })}
