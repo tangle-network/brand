@@ -1,3 +1,9 @@
+## 11.51.20
+
+### Patch Changes
+
+- 9d50cbe: `FileTabs`: `onClose` is optional. Without it the tabs render no close buttons and Delete does nothing, for tab strips that only switch between files.
+
 ## 11.51.19
 
 ### Patch Changes
