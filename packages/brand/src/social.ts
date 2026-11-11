@@ -91,3 +91,37 @@ export function socialMetadata(page: SocialPage): {
     ],
   };
 }
+
+export type PageMetadataTag = SocialMetaTag
+  | { title: string }
+  | { tagName: "link"; rel: "canonical"; href: string };
+
+/** Compose document metadata after a route replaces its parent's descriptors. */
+export function pageMetadata<Descriptor extends object = never>(
+  page: SocialPage,
+  { pathname, overrides = [] }: { pathname?: string; overrides?: readonly Descriptor[] } = {},
+): Array<PageMetadataTag | Descriptor> {
+  let { title, description } = page;
+  const extra: Descriptor[] = [];
+  for (const tag of overrides) {
+    const data = tag as Record<string, unknown>;
+    if ([data.property, data.name].some(key => typeof key === "string" && /^(og|twitter):/.test(key))) {
+      throw new Error("Pass verified social fields on the page, not partial route overrides");
+    }
+    if ("title" in data) {
+      if (typeof data.title === "string" && data.title.trim()) title = data.title;
+    } else if (data.name === "description") {
+      if (typeof data.content === "string" && data.content.trim()) description = data.content;
+    } else if (!(data.tagName === "link" && data.rel === "canonical")) extra.push(tag);
+  }
+  const url = httpsUrl(page.url);
+  if (pathname !== undefined) url.pathname = pathname;
+  const social = socialMetadata({ ...page, title, description, url: url.href });
+  return [
+    { title },
+    { name: "description", content: description },
+    ...social.tags,
+    { tagName: "link", rel: "canonical", href: social.canonicalUrl },
+    ...extra,
+  ];
+}

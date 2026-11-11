@@ -28,6 +28,14 @@ current supported contract and a real preview check. This helper does not fetch
 media, prove its MIME/codec/duration/range/cache behavior, or approve publication.
 Verify those against the served files. Canonical URLs omit query and fragment.
 
+For routers that replace parent metadata, `pageMetadata(page, { pathname,
+overrides })` returns the document title, description, social tags and canonical
+link as descriptors. Route title/description overrides update both preview
+formats; blank overrides retain the page defaults. Other descriptors, such as
+robots and JSON-LD, pass through. The pathname stays on the page's origin.
+Set verified media on `page`; partial
+Open Graph or Twitter overrides are rejected to prevent contradictory cards.
+
 ### Tailwind v4
 
 ```css
