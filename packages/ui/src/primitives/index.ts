@@ -192,7 +192,7 @@ export type { ArtifactPaneProps } from "./artifact-pane";
 export { CodeBlock, CopyButton, InlineCode } from "./code-block";
 export type { CodeBlockProps, InlineCodeProps } from "./code-block";
 
-export { ThemeToggle, useTheme } from "./theme-toggle";
+export { ThemeToggle, useTheme, createThemeController } from "./theme-toggle";
 
 export { Heading } from "./heading";
 export type { HeadingProps, HeadingVariant } from "./heading";
@@ -282,3 +282,6 @@ export type { ToolbarProps, FilterFieldProps } from "./toolbar";
 
 export { ExpandablePanel } from "./expandable-panel";
 export type { ExpandablePanelProps } from "./expandable-panel";
+
+export type { ThemeControllerOptions } from "./theme-toggle";
+export type { TableHeadProps } from "./table";

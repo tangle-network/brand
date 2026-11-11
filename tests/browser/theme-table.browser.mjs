@@ -22,8 +22,6 @@ try {
       const page = await context.newPage(), errors = [];
       page.on("pageerror", error => errors.push(error.message));
       await page.goto(url);
-      const appearance = page.getByRole("region", { name: "Appearance" });
-      // Sections without headings are not landmarks, so locate the explicit label.
       const primary = page.locator('section[aria-label="Appearance"] output'), secondary = page.locator('section[aria-label="Terminal"] output');
       await primary.getByText("light:light", { exact: true }).waitFor();
       assert.equal(await page.locator("html").getAttribute("data-sandbox-theme"), "vault");
@@ -47,7 +45,7 @@ try {
       await other.getByRole("button", { name: "dark", exact: true }).click();
       await primary.getByText("dark:dark", { exact: true }).waitFor();
       await other.close();
-      const header = page.getByRole("columnheader", { name: "Requests" }), button = page.getByRole("button", { name: "Sort by Requests" });
+      const header = page.getByRole("columnheader"), button = page.getByRole("button", { name: "Sort by Requests" });
       for (const [key, expected, first] of [["Enter", "descending", "9"], ["Space", "ascending", "2"], ["Enter", "none", "9"]]) {
         await button.focus(); await button.press(key);
         assert.equal(await header.getAttribute("aria-sort"), expected);
