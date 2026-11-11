@@ -15,10 +15,14 @@ const namedModes = [
   { dark: "agents", light: "agents-light" },
 ] as const;
 
-// Client-only preference cache also keeps the control usable when storage is
-// denied, and lets multiple useTheme consumers share the same preference.
-// Server renders ONLY read getServerTheme; no request state is stored here.
-let preference: Theme | undefined;
+export interface ThemeControllerOptions {
+  storageKey?: string;
+  defaultTheme?: Theme;
+  /** Persisted spellings, including null to remove a system preference. */
+  storageValues?: Partial<Record<Theme, string | null>>;
+  /** Product mode attribute; absent mode values remove the attribute. */
+  attribute?: { name: string; light?: string; dark?: string };
+}
 
 function isTheme(value: unknown): value is Theme {
   return value === "light" || value === "dark" || value === "system";
@@ -29,72 +33,6 @@ function getSystemTheme(): Mode {
   return window.matchMedia(systemQuery).matches ? "dark" : "light";
 }
 
-function getServerTheme(): Theme { return "system"; }
-function getServerMode(): Mode { return "dark"; }
-
-function readInitialTheme(): Theme {
-  try {
-    const stored = window.localStorage.getItem("theme");
-    if (isTheme(stored)) return stored;
-  } catch { /* Storage is optional, not a prerequisite for changing mode. */ }
-
-  const root = document.documentElement;
-  const named = root.getAttribute("data-theme");
-  if (named === "light" || named === "dark") return named;
-  for (const pair of namedModes) {
-    if (named === pair.light) return "light";
-    if (named === pair.dark) return "dark";
-  }
-  if (root.classList.contains("light")) return "light";
-  if (root.classList.contains("dark")) return "dark";
-  const legacy = root.getAttribute("data-sandbox-theme");
-  if (legacy === "vault" || legacy === "dawn") return "light";
-  return "system";
-}
-
-function getTheme(): Theme {
-  if (typeof window === "undefined") return "system";
-  return preference ??= readInitialTheme();
-}
-
-function applyMode(mode: Mode) {
-  const root = document.documentElement;
-  root.classList.toggle("dark", mode === "dark");
-  root.classList.toggle("light", mode === "light");
-  const named = root.getAttribute("data-theme");
-  if (named === "dark" || named === "light") {
-    root.setAttribute("data-theme", mode);
-  } else {
-    const pair = namedModes.find((pair) => named === pair.dark || named === pair.light);
-    if (pair) root.setAttribute("data-theme", pair[mode]);
-  }
-}
-
-function setTheme(next: Theme) {
-  if (!isTheme(next) || typeof window === "undefined") return;
-  preference = next;
-  try {
-    if (next === "system") window.localStorage.removeItem("theme");
-    else window.localStorage.setItem("theme", next);
-  } catch { /* Keep the in-memory preference when storage is unavailable. */ }
-  applyMode(next === "system" ? getSystemTheme() : next);
-  window.dispatchEvent(new Event(preferenceEvent));
-}
-
-function subscribeTheme(notify: () => void) {
-  const onStorage = (event: StorageEvent) => {
-    if (event.key !== "theme" && event.key !== null) return;
-    preference = isTheme(event.newValue) ? event.newValue : "system";
-    notify();
-  };
-  window.addEventListener(preferenceEvent, notify);
-  window.addEventListener("storage", onStorage);
-  return () => {
-    window.removeEventListener(preferenceEvent, notify);
-    window.removeEventListener("storage", onStorage);
-  };
-}
-
 function subscribeSystem(notify: () => void) {
   if (!window.matchMedia) return () => {};
   const media = window.matchMedia(systemQuery);
@@ -102,19 +40,99 @@ function subscribeSystem(notify: () => void) {
   return () => media.removeEventListener("change", notify);
 }
 
-export function useTheme() {
-  const theme = useSyncExternalStore(subscribeTheme, getTheme, getServerTheme);
-  const system = useSyncExternalStore(subscribeSystem, getSystemTheme, getServerMode);
-  const resolvedTheme = theme === "system" ? system : theme;
-  useEffect(() => {
-    // Hydration first renders the stable server snapshot. Apply the real client
-    // preference, not that placeholder, so we never repaint a persisted light
-    // page dark while React is catching up.
-    const selected = getTheme();
-    applyMode(selected === "system" ? getSystemTheme() : selected);
-  }, [resolvedTheme]);
-  return { theme, setTheme, resolvedTheme };
+/** Create once at module scope. Each product owns its persisted names, not a second theme engine. */
+export function createThemeController({ storageKey = "theme", defaultTheme = "system", storageValues, attribute }: ThemeControllerOptions = {}) {
+  const values = { light: "light", dark: "dark", system: null, ...storageValues };
+  const eventName = `${preferenceEvent}:${storageKey}`;
+  // Client-only cache keeps storage-denied controls usable. SSR never writes it.
+  let preference: Theme | undefined;
+  const decode = (value: string | null): Theme =>
+    (Object.keys(values) as Theme[]).find(theme => value !== null && values[theme] === value) ??
+    (value === "system" && values.system === null ? "system" : defaultTheme);
+  const serverTheme = () => defaultTheme;
+  const serverMode = (): Mode => defaultTheme === "system" ? "dark" : defaultTheme;
+  function readInitialTheme(): Theme {
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (stored !== null && (Object.values(values).includes(stored) || (stored === "system" && values.system === null))) return decode(stored);
+    } catch { /* Storage is optional. */ }
+    if (attribute || defaultTheme !== "system") return defaultTheme;
+    const root = document.documentElement;
+    const named = root.getAttribute("data-theme");
+    if (named === "light" || named === "dark") return named;
+    for (const pair of namedModes) {
+      if (named === pair.light) return "light";
+      if (named === pair.dark) return "dark";
+    }
+    if (root.classList.contains("light")) return "light";
+    if (root.classList.contains("dark")) return "dark";
+    const legacy = root.getAttribute("data-sandbox-theme");
+    return legacy === "vault" || legacy === "dawn" ? "light" : defaultTheme;
+  }
+  function getTheme(): Theme {
+    if (typeof window === "undefined") return defaultTheme;
+    return preference ??= readInitialTheme();
+  }
+  /** Apply a temporary page mode without overwriting the user's preference. */
+  function applyTheme(theme: Theme = getTheme()) {
+    if (typeof document === "undefined") return;
+    const mode = theme === "system" ? getSystemTheme() : theme;
+    const root = document.documentElement;
+    root.classList.toggle("dark", mode === "dark");
+    root.classList.toggle("light", !attribute && mode === "light");
+    if (attribute) {
+      const value = attribute[mode];
+      if (value === undefined) root.removeAttribute(attribute.name);
+      else root.setAttribute(attribute.name, value);
+    } else {
+      const named = root.getAttribute("data-theme");
+      if (named === "dark" || named === "light") root.setAttribute("data-theme", mode);
+      else {
+        const pair = namedModes.find(pair => named === pair.dark || named === pair.light);
+        if (pair) root.setAttribute("data-theme", pair[mode]);
+      }
+    }
+  }
+  function setTheme(next: Theme) {
+    if (!isTheme(next) || typeof window === "undefined") return;
+    preference = next;
+    try {
+      const value = values[next];
+      if (value === null) window.localStorage.removeItem(storageKey);
+      else window.localStorage.setItem(storageKey, value);
+    } catch { /* Keep the in-memory preference when storage is unavailable. */ }
+    applyTheme(next);
+    window.dispatchEvent(new CustomEvent(eventName, { detail: next }));
+  }
+  function subscribeTheme(notify: () => void) {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== storageKey && event.key !== null) return;
+      preference = decode(event.newValue);
+      notify();
+    };
+    const onPreference = (event: Event) => {
+      const next = (event as CustomEvent<Theme>).detail;
+      if (isTheme(next)) preference = next;
+      notify();
+    };
+    window.addEventListener(eventName, onPreference);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(eventName, onPreference);
+      window.removeEventListener("storage", onStorage);
+    };
+  }
+  function useTheme() {
+    const theme = useSyncExternalStore(subscribeTheme, getTheme, serverTheme);
+    const system = useSyncExternalStore(subscribeSystem, getSystemTheme, serverMode);
+    const resolvedTheme = theme === "system" ? system : theme;
+    useEffect(() => { applyTheme(getTheme()); }, [resolvedTheme]);
+    return { theme, setTheme, resolvedTheme };
+  }
+  return { useTheme, getTheme, setTheme, applyTheme };
 }
+
+export const { useTheme } = createThemeController();
 
 const iconClass = "h-4 w-4";
 

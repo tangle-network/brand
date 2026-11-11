@@ -87,19 +87,38 @@ const TableRow = React.forwardRef<
 ));
 TableRow.displayName = "TableRow";
 
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      tablePresentation.columnHeader,
-      className,
-    )}
-    {...props}
-  />
-));
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  /** Controlled sort affordance. The caller retains row order and sort policy. */
+  sort?: {
+    direction?: "asc" | "desc";
+    onSort: () => void;
+    label?: string;
+    buttonClassName?: string;
+  };
+}
+
+const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
+  ({ className, children, sort, ...props }, ref) => (
+    <th
+      ref={ref}
+      className={cn(tablePresentation.columnHeader, className)}
+      {...props}
+      aria-sort={sort ? (sort.direction === "asc" ? "ascending" : sort.direction === "desc" ? "descending" : "none") : props["aria-sort"]}
+    >
+      {sort ? (
+        <button
+          type="button"
+          onClick={sort.onSort}
+          aria-label={sort.label ?? (typeof children === "string" ? `Sort by ${children}` : undefined)}
+          className={cn("inline-flex cursor-pointer items-center gap-1 rounded-sm font-inherit text-inherit hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2", sort.buttonClassName)}
+        >
+          {children}
+          <span aria-hidden="true" className="text-xs">{sort.direction === "asc" ? "↑" : sort.direction === "desc" ? "↓" : "↕"}</span>
+        </button>
+      ) : children}
+    </th>
+  ),
+);
 TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<
