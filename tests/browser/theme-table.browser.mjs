@@ -8,9 +8,9 @@ import { createServer } from "vite";
 const out = process.env.UI_THEME_EVIDENCE;
 if (out) await mkdir(out, { recursive: true });
 const server = await createServer({ configFile: false, optimizeDeps: { entries: ["tests/browser/theme-table.fixture.tsx"], include: ["react", "react-dom/client", "react/jsx-runtime"] }, server: { host: "127.0.0.1", port: 0 }, plugins: [{ name: "theme-table-contract", configureServer(vite) {
-  vite.middlewares.use("/theme-table", (_req, res) => {
+  vite.middlewares.use("/theme-table", (req, res) => {
     res.setHeader("content-type", "text/html");
-    res.end('<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><body><div id="root"></div><script type="module" src="/tests/browser/theme-table.fixture.tsx"></script></body></html>');
+    res.end('<!doctype html><html class="' + (new URL(req.url, 'http://fixture').searchParams.get('boot') ?? '') + '"><meta name="viewport" content="width=device-width,initial-scale=1"><body><div id="root"></div><script type="module" src="/tests/browser/theme-table.fixture.tsx"></script></body></html>');
   });
 } }] });
 await server.listen();
@@ -55,6 +55,17 @@ try {
       assert.deepEqual(errors, []);
       if (out) await page.screenshot({ path: resolve(out, `theme-table-${width}.png`) });
       cases.push({ width, status: "PASS", assertions: "default, persistence, public-page restoration, OS updates, cross-tab/component synchronization, keyboard three-state sorting, reflow" });
+    } finally { await context.close(); }
+  }
+  {
+    const context = await browser.newContext({ colorScheme: "dark" });
+    try {
+      await context.addInitScript(() => localStorage.setItem("theme", "system"));
+      const page = await context.newPage(); await page.goto(url + "?default&boot=dark");
+      await page.getByText("system:dark", { exact: true }).waitFor();
+      await page.emulateMedia({ colorScheme: "light" });
+      await page.getByText("system:light", { exact: true }).waitFor();
+      cases.push({ status: "PASS", assertions: "legacy persisted system survives dark first paint and follows OS" });
     } finally { await context.close(); }
   }
   for (const storageDenied of [false, true]) {

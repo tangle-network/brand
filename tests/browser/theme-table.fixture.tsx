@@ -3,14 +3,15 @@ import { createRoot } from "react-dom/client";
 import { createThemeController, useTheme } from "../../packages/ui/src/primitives/theme-toggle";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../packages/ui/src/primitives/table";
 
-const sandbox = createThemeController({
+const options = {
   storageKey: "sandbox-theme",
   defaultTheme: "light",
   storageValues: { light: "vault", dark: "midnight", system: "system" },
   attribute: { name: "data-sandbox-theme", light: "vault" },
-});
+} as const;
+const sandbox = createThemeController(options), mirror = createThemeController(options);
 function Preference({ second = false }) {
-  const { theme, setTheme, resolvedTheme } = sandbox.useTheme();
+  const { theme, setTheme, resolvedTheme } = (second ? mirror : sandbox).useTheme();
   return <section aria-label={second ? "Terminal" : "Appearance"}>
     <output>{theme}:{resolvedTheme}</output>
     {!second && ["light", "dark", "system"].map(value => <button key={value} onClick={() => setTheme(value as "light" | "dark" | "system")}>{value}</button>)}
