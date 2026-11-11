@@ -46,6 +46,7 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
   const eventName = `${preferenceEvent}:${storageKey}`;
   // Client-only cache keeps storage-denied controls usable. SSR never writes it.
   let preference: Theme | undefined;
+  let persisted: string | null | undefined;
   const decode = (value: string | null): Theme =>
     (Object.keys(values) as Theme[]).find(theme => value !== null && values[theme] === value) ??
     (value === "system" && values.system === null ? "system" : defaultTheme);
@@ -54,6 +55,7 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
   function readInitialTheme(): Theme {
     try {
       const stored = window.localStorage.getItem(storageKey);
+      persisted = stored;
       if (stored !== null && (Object.values(values).includes(stored) || (stored === "system" && values.system === null))) return decode(stored);
     } catch { /* Storage is optional. */ }
     if (attribute || defaultTheme !== "system") return defaultTheme;
@@ -71,7 +73,12 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
   }
   function getTheme(): Theme {
     if (typeof window === "undefined") return defaultTheme;
-    return preference ??= readInitialTheme();
+    if (preference === undefined) return preference = readInitialTheme();
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (stored !== persisted) { persisted = stored; preference = decode(stored); }
+    } catch { /* Keep the last choice when storage becomes unavailable. */ }
+    return preference;
   }
   /** Apply a temporary page mode without overwriting the user's preference. */
   function applyTheme(theme: Theme = getTheme()) {
@@ -100,6 +107,7 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
       const value = values[next];
       if (value === null) window.localStorage.removeItem(storageKey);
       else window.localStorage.setItem(storageKey, value);
+      persisted = value;
     } catch { /* Keep the in-memory preference when storage is unavailable. */ }
     applyTheme(next);
     window.dispatchEvent(new CustomEvent(eventName, { detail: next }));
@@ -107,6 +115,7 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
   function subscribeTheme(notify: () => void) {
     const onStorage = (event: StorageEvent) => {
       if (event.key !== storageKey && event.key !== null) return;
+      persisted = event.newValue;
       preference = decode(event.newValue);
       notify();
     };
