@@ -47,13 +47,14 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
   // Client-only cache keeps storage-denied controls usable. SSR never writes it.
   let preference: Theme | undefined;
   const decode = (value: string | null): Theme =>
-    (Object.keys(values) as Theme[]).find(theme => value !== null && values[theme] === value) ?? defaultTheme;
+    (Object.keys(values) as Theme[]).find(theme => value !== null && values[theme] === value) ??
+    (value === "system" && values.system === null ? "system" : defaultTheme);
   const serverTheme = () => defaultTheme;
   const serverMode = (): Mode => defaultTheme === "system" ? "dark" : defaultTheme;
   function readInitialTheme(): Theme {
     try {
       const stored = window.localStorage.getItem(storageKey);
-      if (stored !== null && Object.values(values).includes(stored)) return decode(stored);
+      if (stored !== null && (Object.values(values).includes(stored) || (stored === "system" && values.system === null))) return decode(stored);
     } catch { /* Storage is optional. */ }
     if (attribute || defaultTheme !== "system") return defaultTheme;
     const root = document.documentElement;
@@ -101,7 +102,7 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
       else window.localStorage.setItem(storageKey, value);
     } catch { /* Keep the in-memory preference when storage is unavailable. */ }
     applyTheme(next);
-    window.dispatchEvent(new Event(eventName));
+    window.dispatchEvent(new CustomEvent(eventName, { detail: next }));
   }
   function subscribeTheme(notify: () => void) {
     const onStorage = (event: StorageEvent) => {
@@ -109,10 +110,15 @@ export function createThemeController({ storageKey = "theme", defaultTheme = "sy
       preference = decode(event.newValue);
       notify();
     };
-    window.addEventListener(eventName, notify);
+    const onPreference = (event: Event) => {
+      const next = (event as CustomEvent<Theme>).detail;
+      if (isTheme(next)) preference = next;
+      notify();
+    };
+    window.addEventListener(eventName, onPreference);
     window.addEventListener("storage", onStorage);
     return () => {
-      window.removeEventListener(eventName, notify);
+      window.removeEventListener(eventName, onPreference);
       window.removeEventListener("storage", onStorage);
     };
   }

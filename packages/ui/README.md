@@ -171,3 +171,9 @@ Retained report readers can import existing `chat/agent-timeline`, `chat/speaker
 `@tangle-network/ui/utils/format` is a pure module for duration, clock, compact counts, USD, bytes and UTC labels. It loads without React. Charts re-exports these helpers for static figures and record views. `formatDuration` and `formatUptime` remain aliases of `formatSpanDuration`; chat timestamps use explicit UTC, and file/upload sizes share `formatBytes`.
 
 `HoverCard` shares Popover positioning, portal and keyboard behavior. Its optional `anchor` accepts an existing DOM element for virtualized rows or canvas nodes. Hover delays default to the trigger's `--duration-fast` token. `HoverCardContent` and `PopoverContent` accept the local theme container, so previews preserve inherited tokens without copying computed styles.
+
+### Product theme and table sorting
+
+Create a `createThemeController({ storageKey, defaultTheme, storageValues, attribute })` once outside React components when a product has established persisted names or a mode attribute. Its `useTheme` shares state across components and tabs; `setTheme` persists the preference, while `applyTheme` applies a temporary page mode without replacing it. The parameterless `useTheme` keeps the default `theme` key and named Brand themes.
+
+`TableHead` accepts `sort={{ direction, onSort, label, buttonClassName }}`. It owns the native button, keyboard activation, indicator and column `aria-sort`; the consumer owns row ordering, comparator, URL state and sort cycle. `direction` is `asc`, `desc` or omitted. Supply `label` when the header is not plain text.
