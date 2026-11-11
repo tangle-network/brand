@@ -44,6 +44,10 @@ try {
       await other.goto(url);
       await other.getByRole("button", { name: "dark", exact: true }).click();
       await primary.getByText("dark:dark", { exact: true }).waitFor();
+      await page.getByRole("button", { name: "Public page", exact: true }).click();
+      await other.getByRole("button", { name: "light", exact: true }).click();
+      await page.getByRole("button", { name: "Dashboard", exact: true }).click();
+      await primary.getByText("light:light", { exact: true }).waitFor();
       await other.close();
       const header = page.getByRole("columnheader"), button = page.getByRole("button", { name: "Sort by Requests" });
       for (const [key, expected, first] of [["Enter", "descending", "9"], ["Space", "ascending", "2"], ["Enter", "none", "9"]]) {
