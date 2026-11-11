@@ -1,3 +1,10 @@
+## 11.51.21
+
+### Patch Changes
+
+- b1f7c14: Reconcile preferences changed by another tab while theme consumers are unmounted, retaining in-memory preferences when browser storage is unavailable.
+- 66a2c78: Add configurable theme persistence and product attributes through the existing theme engine, and controlled accessible sorting on TableHead. Existing useTheme callers retain their default behavior.
+
 ## 11.51.20
 
 ### Patch Changes
