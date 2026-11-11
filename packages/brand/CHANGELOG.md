@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.9
+
+### Patch Changes
+
+- d5ff1b5: Compose route and document metadata through one shared owner, keeping canonical URLs on the product origin and rejecting partial social overrides.
+
 ## 1.31.8
 
 ### Patch Changes
