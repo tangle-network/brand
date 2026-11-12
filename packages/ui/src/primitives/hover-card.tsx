@@ -11,13 +11,13 @@ type HoverCardProps = React.ComponentProps<typeof Popover> & {
   closeDelay?: number;
 };
 
-/** One hover policy and Popover's keyboard/focus behavior; delays follow the trigger's fast token. */
 export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
   const element = anchor && ("contextElement" in anchor ? anchor.contextElement : anchor);
   const [own, setOwn] = React.useState({ anchor: element, open: defaultOpen });
-  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean; pressed?: boolean }>({});
+  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean; pressed?: boolean; onOpenChange?: HoverCardProps["onOpenChange"] }>({});
+  intent.current.onOpenChange = onOpenChange;
   if (element) intent.current.target = element;
-  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn({ anchor: element, open: next }); onOpenChange?.(next); }, [controlled, onOpenChange, element]);
+  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(current => current.anchor === element && current.open === next ? current : { anchor: element, open: next }); intent.current.onOpenChange?.(next); }, [controlled, element]);
   const delay = (target: Element | null | undefined) => {
     const value = getComputedStyle(target ?? document.documentElement).getPropertyValue("--duration-fast").trim();
     return (parseFloat(value) || 0) * (value.endsWith("ms") ? 1 : 1000);
@@ -25,11 +25,12 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
   const enter = React.useCallback((target: Element) => { if (intent.current.restoring || (intent.current.pressed && target.closest("[data-hover-card]"))) return; intent.current.pressed = false; if (!target.closest("[data-hover-card]")) intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
   const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(element ?? intent.current.target)); }, [change, closeDelay, element]);
   React.useEffect(() => {
-    if (!element) return () => clearTimeout(intent.current.timer);
+    if (!element) { if (anchor === null) setOwn(current => current.open ? { anchor: element, open: false } : current); return () => clearTimeout(intent.current.timer); }
     const show = () => enter(element), blur = (event: FocusEvent) => { if (!(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) leave(); };
     element.addEventListener("pointerenter", show); element.addEventListener("pointerleave", leave); element.addEventListener("focusin", show); element.addEventListener("focusout", blur);
+    if (element.matches(":hover,:focus-within")) show();
     return () => { clearTimeout(intent.current.timer); element.removeEventListener("pointerenter", show); element.removeEventListener("pointerleave", leave); element.removeEventListener("focusin", show); element.removeEventListener("focusout", blur); };
-  }, [anchor, element, enter, leave]);
+  }, [element, enter, leave]);
   const restore = () => {
     intent.current.restoring = true;
     if (document.activeElement === document.body && intent.current.target instanceof HTMLElement) intent.current.target.focus({ preventScroll: true });
