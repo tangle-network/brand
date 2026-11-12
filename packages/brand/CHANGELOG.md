@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.11
+
+### Patch Changes
+
+- f9822bd: `tangle-drift` disco baseline lowered from disco-agent main 1ff92f4c (served): css_var_defs 4 -> 3, font_size_literal 17 -> 12.
+
 ## 1.31.10
 
 ### Patch Changes
