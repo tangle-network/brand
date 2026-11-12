@@ -125,3 +125,13 @@ export function pageMetadata<Descriptor extends object = never>(
     ...extra,
   ];
 }
+
+/** Head links for the Tangle icon set. Copy `src/assets/icons/` unchanged into the site root;
+ * `/favicon.ico` and `/apple-touch-icon.png` also answer clients that skip these links.
+ * A new artwork gets a new version in the linked names.
+ */
+export const iconLinks = [
+  { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+  { rel: "icon", href: "/favicon-v1.svg", type: "image/svg+xml" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon-v1.png", sizes: "180x180" },
+] as const;
