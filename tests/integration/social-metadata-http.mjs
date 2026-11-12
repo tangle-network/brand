@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { Hono } from 'hono';
 import { html } from 'hono/html';
-import { pageMetadata } from '@tangle-network/brand/social';
+import { iconLinks, pageMetadata } from '@tangle-network/brand/social';
 
 const page = {
   url: 'https://product.tangle.tools/?source=share#preview',
@@ -94,3 +95,15 @@ try {
   server.close();
   server.closeAllConnections();
 }
+
+const icons = new URL('../../packages/brand/src/assets/icons/', import.meta.url);
+for (const { href, sizes } of iconLinks) {
+  const file = readFileSync(new URL(href.slice(1), icons));
+  if (href.endsWith('.png')) {
+    assert.deepEqual(file, readFileSync(new URL('apple-touch-icon.png', icons)));
+    assert.equal(`${file.readUInt32BE(16)}x${file.readUInt32BE(20)}`, sizes);
+    assert.equal(file[25], 2, 'Touch icons are opaque RGB');
+  } else if (href.endsWith('.ico')) assert.equal(`${file[6]}x${file[7]}`, sizes);
+  else assert.match(file.toString(), /^<svg /);
+}
+console.log(`PASS ${iconLinks.length} icon links name shipped files`);
