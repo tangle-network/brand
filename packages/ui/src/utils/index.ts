@@ -1,6 +1,7 @@
 export { copyText } from './copy-text';
 export * from './format';
 export { timeAgo } from './time-ago';
+export { tokenMilliseconds } from './token-milliseconds';
 export {
   getToolCategory,
   getToolDisplayMetadata,
