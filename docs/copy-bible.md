@@ -23,10 +23,11 @@ Shapes to never copy, from the same market: "Your AI Agent Accelerator" (Runloop
 
 ## Headline patterns
 
-1. **Verb + what you get.** "Run any coding agent. On any cloud." "Pick a job. Copy the file. Run it."
-2. **The reader's noun first.** "Every coding agent, installed." "Every agent gets a machine."
-3. **A fact with a number.** "Pay only for the seconds they run." Only with today's measurement and its benchmark link.
-4. **Division of labor.** "You ship the agent. We run the machine."
+1. **What Tangle does, then why.** "Tangle gives each agent run its own machine." A statement with a subject, then one sentence of reason. Never a string of commands.
+2. **Verb + what you get.** "Run any coding agent. On any cloud." One command at most; two or three in a row shout at the reader.
+3. **The reader's noun first.** "Every coding agent, installed." "Every agent gets a machine."
+4. **A fact with a number.** "Pay only for the seconds they run." Only with today's measurement and its benchmark link.
+5. **Division of labor.** "You ship the agent. We run the machine."
 
 A subline exists only to add a fact the headline lacks. If it restates, delete it.
 
@@ -34,7 +35,7 @@ A subline exists only to add a fact the headline lacks. If it restates, delete i
 
 - Nouns developers already use: coding agent, sandbox, key, bill, file, command, snapshot. Not harness (code only), primitive, substrate, surface, tile, tooling.
 - Sentence case. One claim per sentence. Verbs over adjectives. No adjective you cannot measure.
-- A heading is never about us. "Ran on production", "built with", "powered by", "proof over positioning" go next to the thing as a dated fact, never as the headline.
+- A heading may say what Tangle does. It is never about our proof: "Ran on production", "built with", "powered by", "proof over positioning" go next to the thing as a dated fact, never as the headline.
 - Counts are not quality. Thirty-five examples is a number in a table; the page shows the examples.
 - No labels above headings. No slogan a competitor could paste onto their page.
 - Buttons name the action and its object: "Create a sandbox", "Copy file", "See plans".
@@ -71,7 +72,8 @@ One line, under 90 characters, saying what the code cannot: a fact about the pla
 
 | Was | Now | Why |
 |---|---|---|
-| Every example ran on production. | Pick a job. Copy the file. Run it. | The old line is about our proof; the new one is what the reader does with the editor below it. |
+| Every example ran on production. | Tangle gives each agent run its own machine. | The old line is about our proof; the new one says what Tangle does. |
+| Pick a job. Copy the file. Run it. | Tangle gives each agent run its own machine. Under it: Coding agents run commands and edit files. On Tangle they do it on a machine made for that run, and you get the changes back with a record of each step. | Three commands in a row shout at the reader. A statement tells them what we do, and the next sentence says why. |
 | Run any harness. On any cloud. | Run any coding agent. On any cloud. | "Harness" is our word. |
 | Installed in every sandbox, keys set. Click one to start it. (under "Every coding agent, installed.") | Click one to start it in a new sandbox. | The subline restated the heading. |
 | One SDK. | Run any coding agent. | A slogan any SDK could use. |
@@ -83,6 +85,7 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
+| 2026-11-12 | "fix the copy its so gimmicky, Copy the file, run it, like wtf, we're like yelling at the reader, why not just tell them what our compnay does? and why?" on "Pick a job. Copy the file. Run it." | Say what Tangle does and why, as statements. Never a string of commands. |
 | 2026-11-02 | "these charts in ai applied benchmarks are bad … we had somthign 100x better months ago, when it was all sorts of verticals or tax or legal and stuff with clear bar charts tooltips, agentprofile/(model + harness) combinations as x axis and score on y" | A score board is columns of model and harness, with score on y. |
 | 2026-11-02 | "get rid of all the competitors or at least hide them from this chart for now until we're really competitive" | No competitors on a benchmark page until we are competitive. |
 | 2026-11-02 | "These ones just look like bar charts and the tooltips are kind of shit. I wish you could get that data in those tooltips somehow into the charts themselves or we have multiple charts (P50, P95, or whatever)" | Confidence is drawn on the mark, and p50, p95 and n print on the row. |
