@@ -1,3 +1,12 @@
+## 11.51.22
+
+### Patch Changes
+
+- df08ce7: Keep delegated previews readable across their own anchor, content and focused actions. Share the existing scoped CSS time reader with previews, canvas consumers and clipboard feedback; preserve zero and missing budgets and resolve scoped calc() values.
+- 5219d82: Export the existing native event-stream lifecycle from hooks so imperative adapters share the hook's cursor, reconnect, terminal-event and cleanup behavior. Native retries now back off during outages; buffered streams retain their configured policy.
+  
+  Delegated hover anchors that attach after pointer entry now open through the same token delay as direct triggers.
+
 ## 11.51.21
 
 ### Patch Changes
