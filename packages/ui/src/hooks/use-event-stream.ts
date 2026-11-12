@@ -15,7 +15,6 @@ export interface EventStreamHandlers {
   onLiveChange?: (live: boolean) => void
 }
 
-/** Internal policy preserves the buffered hook's existing bounded exponential retries. */
 type NativePolicy = EventStreamHandlers & { terminalEvent?: string; onConnecting?: (attempt: number) => void; retryDelay?: (attempt: number) => number | undefined }
 
 /** The sole native EventSource lifecycle, shared by buffered and producer-owned streams. */
@@ -42,7 +41,7 @@ export function openNativeStream(url: string | (() => string), handlers: NativeP
         connection.close()
         if (stopped || source !== connection) return
         live(false)
-        const delay = handlers.retryDelay ? handlers.retryDelay(attempt++) : 1_000
+        const delay = handlers.retryDelay ? handlers.retryDelay(attempt++) : [1_000, 2_000, 5_000, 10_000][Math.min(attempt++, 3)]
         if (delay !== undefined) retry = setTimeout(open, delay)
       }
     }

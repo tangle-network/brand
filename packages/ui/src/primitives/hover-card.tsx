@@ -25,9 +25,10 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
   const enter = React.useCallback((target: Element) => { if (intent.current.restoring || (intent.current.pressed && target.closest("[data-hover-card]"))) return; intent.current.pressed = false; if (!target.closest("[data-hover-card]")) intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? delay(target)); }, [change, openDelay]);
   const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? delay(element ?? intent.current.target)); }, [change, closeDelay, element]);
   React.useEffect(() => {
-    if (!element) return () => clearTimeout(intent.current.timer);
+    if (!element) { if (anchor === null) setOwn(current => current.open ? { anchor: element, open: false } : current); return () => clearTimeout(intent.current.timer); }
     const show = () => enter(element), blur = (event: FocusEvent) => { if (!(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) leave(); };
     element.addEventListener("pointerenter", show); element.addEventListener("pointerleave", leave); element.addEventListener("focusin", show); element.addEventListener("focusout", blur);
+    if (element.matches(":hover,:focus-within")) show();
     return () => { clearTimeout(intent.current.timer); element.removeEventListener("pointerenter", show); element.removeEventListener("pointerleave", leave); element.removeEventListener("focusin", show); element.removeEventListener("focusout", blur); };
   }, [anchor, element, enter, leave]);
   const restore = () => {
