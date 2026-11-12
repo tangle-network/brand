@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { Popover, PopoverAnchor, PopoverContent } from "./popover";
 import { tokenMilliseconds } from "../utils/token-milliseconds";
 
-const HoverIntent = React.createContext({ enter: (_target: Element) => {}, leave: () => {}, restore: () => {}, press: () => {}, owns: (_target: EventTarget | null) => false });
+const HoverIntent = React.createContext({ enter: (_target: Element) => {}, leave: (_event?: { relatedTarget: EventTarget | null }) => {}, restore: () => {}, press: () => {}, owns: (_target: EventTarget | null) => false });
 type HoverCardProps = React.ComponentProps<typeof Popover> & {
   /** Existing DOM trigger for delegated canvas or virtual-list previews. */
   anchor?: HTMLElement | { getBoundingClientRect: () => DOMRect; contextElement: HTMLElement } | null;
@@ -20,7 +20,7 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
   if (element) intent.current.target = element;
   const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(current => current.anchor === element && current.open === next ? current : { anchor: element, open: next }); intent.current.onOpenChange?.(next); }, [controlled, element]);
   const enter = React.useCallback((target: Element) => { if (intent.current.restoring || (intent.current.pressed && target.closest("[data-hover-card]"))) return; intent.current.pressed = false; if (!target.closest("[data-hover-card]")) intent.current.target = target; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(true), openDelay ?? tokenMilliseconds("--duration-fast", target)); }, [change, openDelay]);
-  const leave = React.useCallback(() => { clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? tokenMilliseconds("--duration-fast", element ?? intent.current.target)); }, [change, closeDelay, element]);
+  const leave = React.useCallback((event?: { relatedTarget: EventTarget | null }) => { const target = event?.relatedTarget; if (target instanceof Element && (target.closest("[data-hover-card]") || (element ?? intent.current.target)?.contains(target))) return; clearTimeout(intent.current.timer); intent.current.timer = setTimeout(() => change(false), closeDelay ?? tokenMilliseconds("--duration-fast", element ?? intent.current.target)); }, [change, closeDelay, element]);
   React.useEffect(() => {
     if (!element) { if (anchor === null) setOwn(current => current.open ? { anchor: element, open: false } : current); return () => clearTimeout(intent.current.timer); }
     const show = () => enter(element), blur = (event: FocusEvent) => { if (!(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) leave(); };
@@ -44,23 +44,24 @@ export const HoverCardTrigger = React.forwardRef<HTMLAnchorElement, React.Anchor
     const Trigger = asChild ? Slot : "a";
     return <PopoverAnchor asChild><Trigger ref={ref} tabIndex={0} className={cn("cursor-pointer underline-offset-4 hover:underline", className)}
       onPointerEnter={event => { onPointerEnter?.(event); if (!event.defaultPrevented && event.pointerType !== "touch") intent.enter(event.currentTarget); }}
-      onPointerLeave={event => { onPointerLeave?.(event); if (!event.defaultPrevented) intent.leave(); }}
+      onPointerLeave={event => { onPointerLeave?.(event); if (!event.defaultPrevented) intent.leave(event); }}
       onFocus={event => { onFocus?.(event); if (!event.defaultPrevented && event.target.matches(":focus-visible")) intent.enter(event.currentTarget); }}
       onClickCapture={event => { onClickCapture?.(event); const action = event.target instanceof Element ? event.target.closest('a,button,input,select,textarea,[role="button"]') : null; if (!event.defaultPrevented && action && action !== event.currentTarget) intent.press(); }}
-      onBlur={event => { onBlur?.(event); if (!event.defaultPrevented && !(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) intent.leave(); }} {...props} /></PopoverAnchor>;
+      onBlur={event => { onBlur?.(event); if (!event.defaultPrevented && !(event.relatedTarget instanceof Element && event.relatedTarget.closest("[data-hover-card]"))) intent.leave(event); }} {...props} /></PopoverAnchor>;
   },
 );
 HoverCardTrigger.displayName = "HoverCardTrigger";
 
 export const HoverCardContent = React.forwardRef<React.ElementRef<typeof PopoverContent>, React.ComponentPropsWithoutRef<typeof PopoverContent>>(
-  ({ className, onPointerEnter, onPointerLeave, onOpenAutoFocus, onCloseAutoFocus, onFocusOutside, ...props }, ref) => {
+  ({ className, onPointerEnter, onPointerLeave, onOpenAutoFocus, onCloseAutoFocus, onFocusOutside, onFocusCapture, ...props }, ref) => {
     const intent = React.useContext(HoverIntent);
     return <PopoverContent ref={ref} data-hover-card className={cn("w-64", className)}
       onOpenAutoFocus={event => { onOpenAutoFocus?.(event); event.preventDefault(); }}
       onCloseAutoFocus={event => { onCloseAutoFocus?.(event); if (!event.defaultPrevented) { event.preventDefault(); intent.restore(); } }}
+      onFocusCapture={event => { onFocusCapture?.(event); if (!event.defaultPrevented) intent.enter(event.currentTarget); }}
       onFocusOutside={event => { onFocusOutside?.(event); if (intent.owns(event.detail.originalEvent.target)) event.preventDefault(); }}
       onPointerEnter={event => { onPointerEnter?.(event); if (!event.defaultPrevented) intent.enter(event.currentTarget); }}
-      onPointerLeave={event => { onPointerLeave?.(event); if (!event.defaultPrevented) intent.leave(); }} {...props} />;
+      onPointerLeave={event => { onPointerLeave?.(event); if (!event.defaultPrevented) intent.leave(event); }} {...props} />;
   },
 );
 HoverCardContent.displayName = "HoverCardContent";
