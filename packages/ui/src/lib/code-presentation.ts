@@ -1,3 +1,4 @@
+import { tokenMilliseconds } from "../utils/token-milliseconds";
 import { tabsPresentation } from "../presentation";
 import type { HighlighterCore, LanguageRegistration, ThemedToken } from "shiki/core";
 // Leave variables unresolved: the browser resolves them on each token span,
@@ -171,17 +172,8 @@ const COPY_FEEDBACK_MS=2000;
 export interface InteractionBudgets { feedback?:number; pending?:number; longWork?:number; mutation?:number; }
 /** Resolve scoped Brand times, including calc(), without duplicating token values. */
 export function interactionBudgets(scope:HTMLElement):InteractionBudgets {
- const view=scope.ownerDocument.defaultView;if(!view)return {};
- const probe=scope.ownerDocument.createElement("i");probe.hidden=true;scope.append(probe);
- const read=(role:string)=>{
-  const name=`--interaction-${role}`;
-  if(!view.getComputedStyle(scope).getPropertyValue(name).trim())return undefined;
-  probe.style.animationDuration=`var(${name})`;
-  const time=/^(\d+(?:\.\d+)?)(ms|s)$/.exec(view.getComputedStyle(probe).animationDuration);
-  return time?Number(time[1])*(time[2]==="s"?1000:1):undefined;
- };
- try{return {feedback:read("feedback-budget"),pending:read("pending-delay"),longWork:read("long-work-delay"),mutation:read("mutation-budget")};}
- finally{probe.remove();}
+ const read=(role:string)=>tokenMilliseconds(`--interaction-${role}`,scope);
+ return scope.ownerDocument.defaultView?{feedback:read("feedback-budget"),pending:read("pending-delay"),longWork:read("long-work-delay"),mutation:read("mutation-budget")} : {};
 }
 export interface CopyFeedback {
  copied:boolean;status:string;pending:boolean;loading?:boolean;longRunning?:boolean;elapsedMs?:number;
