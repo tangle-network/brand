@@ -11,13 +11,13 @@ type HoverCardProps = React.ComponentProps<typeof Popover> & {
   closeDelay?: number;
 };
 
-/** One hover policy and Popover's keyboard/focus behavior; delays follow the trigger's fast token. */
 export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpenChange, openDelay, closeDelay, children, ...props }: HoverCardProps) {
   const element = anchor && ("contextElement" in anchor ? anchor.contextElement : anchor);
   const [own, setOwn] = React.useState({ anchor: element, open: defaultOpen });
-  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean; pressed?: boolean }>({});
+  const intent = React.useRef<{ timer?: ReturnType<typeof setTimeout>; target?: Element; restoring?: boolean; pressed?: boolean; onOpenChange?: HoverCardProps["onOpenChange"] }>({});
+  intent.current.onOpenChange = onOpenChange;
   if (element) intent.current.target = element;
-  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn({ anchor: element, open: next }); onOpenChange?.(next); }, [controlled, onOpenChange, element]);
+  const change = React.useCallback((next: boolean) => { clearTimeout(intent.current.timer); if (controlled === undefined) setOwn(current => current.anchor === element && current.open === next ? current : { anchor: element, open: next }); intent.current.onOpenChange?.(next); }, [controlled, element]);
   const delay = (target: Element | null | undefined) => {
     const value = getComputedStyle(target ?? document.documentElement).getPropertyValue("--duration-fast").trim();
     return (parseFloat(value) || 0) * (value.endsWith("ms") ? 1 : 1000);
@@ -30,7 +30,7 @@ export function HoverCard({ anchor, open: controlled, defaultOpen = false, onOpe
     element.addEventListener("pointerenter", show); element.addEventListener("pointerleave", leave); element.addEventListener("focusin", show); element.addEventListener("focusout", blur);
     if (element.matches(":hover,:focus-within")) show();
     return () => { clearTimeout(intent.current.timer); element.removeEventListener("pointerenter", show); element.removeEventListener("pointerleave", leave); element.removeEventListener("focusin", show); element.removeEventListener("focusout", blur); };
-  }, [anchor, element, enter, leave]);
+  }, [element, enter, leave]);
   const restore = () => {
     intent.current.restoring = true;
     if (document.activeElement === document.body && intent.current.target instanceof HTMLElement) intent.current.target.focus({ preventScroll: true });
