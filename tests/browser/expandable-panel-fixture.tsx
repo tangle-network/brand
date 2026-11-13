@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { ExpandablePanel } from '@tangle-network/ui/primitives'
 import { TraceWorkspace } from '@tangle-network/sandbox-ui/run'
+import '@tangle-network/charts/react/flow-waterfall.css'
 
 const trace = {
   totalMs: 1000,
