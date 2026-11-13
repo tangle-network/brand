@@ -14,7 +14,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
   for (const width of [1512, 390]) for (const theme of ['light', 'dark']) {
     const dir = join(output, `${width}-${theme}`)
     await mkdir(dir, { recursive: true })
-    const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce', recordVideo: { dir, size: { width, height: 900 } } })
+    const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme, reducedMotion: 'reduce', recordVideo: { dir, size: { width, height: 900 } } })
     const page = await context.newPage(), errors = [], samples = []
     page.on('pageerror', error => errors.push(error.message))
     const input = page.getByRole('combobox', { name: 'Find recorded choice', exact: true })
@@ -49,7 +49,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
     }
     try {
       await page.goto(url)
-      await page.evaluate(theme => { document.documentElement.className = theme }, theme)
+      await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
       const results = []
       for (const count of [1000, 122]) {
         await page.getByRole('button', { name: `Use ${count} choices`, exact: true }).click()
@@ -111,7 +111,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
       await page.getByRole('button', { name: 'Use 1000 choices', exact: true }).click()
       await open(key(999)); await input.fill(key(8)); await active(key(8)); await input.press('Enter')
       await input.waitFor({ state: 'hidden' })
-      await page.reload(); await page.evaluate(theme => { document.documentElement.className = theme }, theme)
+      await page.reload(); await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
       assert.equal(await committed(), key(8)); await open(key(8))
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
       assert.deepEqual(errors, [])
