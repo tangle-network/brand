@@ -1,3 +1,9 @@
+## 11.51.23
+
+### Patch Changes
+
+- d14e215: Reserve space for expandable-panel controls so they remain visible and never intercept controls in the panel content.
+
 ## 11.51.22
 
 ### Patch Changes
