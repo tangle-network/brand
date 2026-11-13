@@ -88,6 +88,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         await escape()
         await open(last); await input.fill('Twin label'); await active(key(7))
         const twin = list.locator(`[data-command-value="${key(8)}"]`)
+        await twin.waitFor({ state: 'visible' })
         assert.equal(await list.getByRole('option', { name: 'Twin label', exact: true }).count(), 2)
         await twin.hover(); await active(key(8))
         assert.equal(await commits(), before + 1, 'Pointer highlight does not commit')
