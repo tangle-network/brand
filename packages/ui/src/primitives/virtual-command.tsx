@@ -127,7 +127,7 @@ export function VirtualCommand(props: VirtualCommandProps) {
     <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
     <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0">
       <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
-        shouldFilter={false} vimBindings={false} onKeyDown={state.onKeyDown}>
+        shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
           <input autoFocus aria-activedescendant={activeId} />
         </Command.Input>
