@@ -1,3 +1,9 @@
+## 11.51.29
+
+### Patch Changes
+
+- 219d5be: Give each VirtualCommand opening its own native focus lifecycle while preserving consumer inspector handoff and Escape return after rapid same-value selection.
+
 ## 11.51.28
 
 ### Patch Changes
