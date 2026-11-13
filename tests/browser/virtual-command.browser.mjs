@@ -184,6 +184,8 @@ export async function proveRapidReopen(browser, { url, output, sourceSha, archiv
     })
     try {
       await page.goto(url)
+      const originalTrigger = await trigger.elementHandle()
+      const focus = () => trigger.evaluate((node, original) => ({ activeTag: document.activeElement?.tagName, activeEqualsOriginal: document.activeElement === original, activeEqualsCurrent: document.activeElement === node, originalConnected: original.isConnected, currentConnected: node.isConnected, sameTrigger: original === node, inputs: document.querySelectorAll('[cmdk-input]').length, dialogs: document.querySelectorAll('[role=dialog]').length }), originalTrigger)
       await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
       for (const count of [122, 1000]) {
         await page.getByRole('button', { name: `Use ${count} choices`, exact: true }).click()
@@ -207,7 +209,29 @@ export async function proveRapidReopen(browser, { url, output, sourceSha, archiv
         assert.equal(failure, undefined, 'Rapid reopen preserves the committed far highlight and native input focus')
         assert.equal(settled.committed, far); assert.equal(settled.commits, attempts.length * 2)
         assert.equal(settled.matchingId, true); assert.equal(settled.visible, true); assert.ok(settled.mounted <= 40)
-        await input.press('Escape'); await input.waitFor({ state: 'hidden' })
+        // The same reopened instance must later return native focus after an empty search.
+        await input.fill('no-recorded-agent-matches-this-needle')
+        await page.getByRole('status').filter({ hasText: 'No results.' }).waitFor()
+        await page.keyboard.press('Enter')
+        const afterEmpty = await observe(); assert.equal(afterEmpty.committed, far); assert.equal(afterEmpty.commits, attempts.length * 2)
+        const escape = { before: await focus() }
+        await page.keyboard.press('Escape'); escape.immediate = await focus()
+        await input.waitFor({ state: 'hidden' })
+        escape.hidden = await focus()
+        try { await page.waitForFunction(node => node.isConnected && document.activeElement === node, originalTrigger, { timeout: 2000 }) }
+        catch (error) { escape.failure = String(error) }
+        escape.settled = await focus(); attempts.at(-1).escape = escape
+        await writeFile(join(dir, 'observations.json'), JSON.stringify({ sourceSha, archiveSha256, attempts, errors }, null, 2))
+        await page.screenshot({ path: join(dir, `escape-after-reopen-${count}.png`) })
+        assert.equal(escape.failure, undefined, 'Escape after rapid pointer-reopen/empty search returns focus to the same connected trigger')
+        assert.equal(escape.settled.sameTrigger, true)
+        const afterEscape = await observe(); assert.equal(afterEscape.committed, far); assert.equal(afterEscape.commits, attempts.length * 2)
+        // A real outside action keeps its own focus; trigger handling must stay narrow.
+        await trigger.click(); await input.waitFor()
+        const outside = page.getByRole('button', { name: `Use ${count} choices`, exact: true })
+        await outside.click(); await input.waitFor({ state: 'hidden' })
+        assert.equal(await outside.evaluate(node => document.activeElement === node), true)
+        attempts.at(-1).outsideActionKeptFocus = true
       }
       assert.deepEqual(errors, [])
       checks.push({ width, theme, sourceSha, archiveSha256, attempts, result: 'PASS' })
