@@ -54,7 +54,9 @@ function useViewport(scroller: Scroller, origin?: Scroller) {
   const [viewport, setViewport] = useState({ top: 0, height: 900 })
   const originTop = () => {
     const element = scroller.current, node = origin?.current
-    return element && node ? node.getBoundingClientRect().top - (element === document.scrollingElement ? 0 : element.getBoundingClientRect().top + element.clientTop) + element.scrollTop : 0
+    return element && node
+      ? node.getBoundingClientRect().top - (element === document.scrollingElement ? 0 : element.getBoundingClientRect().top + element.clientTop)
+        + element.scrollTop : 0
   }
   useEffect(() => {
     const element = scroller.current
@@ -143,8 +145,10 @@ function useArrival(scroller: Scroller, rows: Rows, arrival: { identity: unknown
     const frame = requestAnimationFrame(() => {
       const element = scroller.current, row = rows.current.get(arrival.key!)?.firstElementChild
       if (!element || !row || !arrival.following.current) return
-      const style = getComputedStyle(element), value = style.getPropertyValue('--duration-stream').trim(), duration = parseFloat(value) * (value.endsWith('ms') ? 1 : 1000)
-      if (duration > 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches) row.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing: style.getPropertyValue('--ease-expo').trim() || 'linear' })
+      const style = getComputedStyle(element), value = style.getPropertyValue('--duration-stream').trim()
+      const duration = parseFloat(value) * (value.endsWith('ms') ? 1 : 1000)
+      if (duration > 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+        row.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing: style.getPropertyValue('--ease-expo').trim() || 'linear' })
     })
     return () => cancelAnimationFrame(frame)
   }, [identity, arrival?.id])
