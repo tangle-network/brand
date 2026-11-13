@@ -112,6 +112,8 @@ function useSettleTarget<T>(scroller: Scroller, { target, targetRevision, align,
   useLayoutEffect(() => {
     pending.current = target ? goal(target) : null
     settle()
+    const frame = requestAnimationFrame(settle) // Parent refs may reattach after this child layout effect.
+    return () => cancelAnimationFrame(frame)
   }, [target, targetRevision]) // eslint-disable-line react-hooks/exhaustive-deps
   useLayoutEffect(settle, [version, viewport, items]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
