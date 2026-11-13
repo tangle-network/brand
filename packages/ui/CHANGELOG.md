@@ -1,3 +1,9 @@
+## 11.51.25
+
+### Patch Changes
+
+- c0ea6af: Keep running-status glyphs still under reduced motion, expose cmdk's exact public scorer and share command heading styling with virtualized owner compositions.
+
 ## 11.51.24
 
 ### Patch Changes
