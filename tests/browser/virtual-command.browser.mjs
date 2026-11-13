@@ -38,7 +38,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
       await page.waitForFunction(value => {
         const input = document.querySelector('input[role="combobox"]'), list = document.querySelector('[role="listbox"][aria-label="Recorded choices"]')
         const id = input?.getAttribute('aria-activedescendant'), row = id && document.getElementById(id)
-        if (!row || list?.getAttribute('aria-activedescendant') !== id || row.dataset.commandValue !== value || row.getAttribute('aria-selected') !== 'true') return false
+        if (!row || [...document.querySelectorAll('[id]')].filter(node => node.id === id).length !== 1 || row.getAttribute('role') !== 'option' || Number(row.getAttribute('aria-posinset')) < 1 || Number(row.getAttribute('aria-setsize')) < Number(row.getAttribute('aria-posinset')) || list?.getAttribute('aria-activedescendant') !== id || row.dataset.commandValue !== value || row.getAttribute('aria-selected') !== 'true') return false
         const r = row.getBoundingClientRect(), box = list.getBoundingClientRect()
         return r.top >= box.top - 1 && r.bottom <= box.bottom + 1 && r.top >= 0 && r.bottom <= innerHeight
       }, expected)
@@ -62,7 +62,6 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         await page.getByRole('button', { name: `Use ${count} choices`, exact: true }).click()
         const before = await commits(), last = key(count - 1)
         await open(last)
-        await page.evaluate(() => { window.commandHomeFrames = []; let remaining = 12; const sample = () => { const list = document.querySelector('[cmdk-list]'), input = document.querySelector('[cmdk-input]'); window.commandHomeFrames.push({ top: list.scrollTop, height: list.scrollHeight, active: input.getAttribute('aria-activedescendant'), selected: [...list.querySelectorAll('[aria-selected=true]')].map(node => ({ value: node.dataset.commandValue, top: node.getBoundingClientRect().top })) }); if (--remaining) requestAnimationFrame(sample) }; requestAnimationFrame(sample) })
         await input.press('Home'); await active(key(0))
         const enabled = Array.from({ length: count }, (_, at) => at).filter(at => at !== 3)
         for (let at = 1; at <= 40; at++) { await input.press('ArrowDown'); await active(key(enabled[at])) }
@@ -90,7 +89,8 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         await page.getByRole('status', { name: '', exact: true }).filter({ hasText: 'No results.' }).waitFor()
         assert.equal(await input.getAttribute('aria-activedescendant'), null)
         await input.press('Enter'); assert.equal(await commits(), before + 2)
-        await input.fill(key(3))
+        await input.fill('disabled-only-zqx')
+        assert.equal(await list.getByRole('option').count(), 1)
         assert.equal(await list.getByRole('option').getAttribute('aria-disabled'), 'true')
         assert.equal(await input.getAttribute('aria-activedescendant'), null)
         await input.press('Enter'); assert.equal(await commits(), before + 2)
@@ -134,7 +134,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
       checks.push({ width, theme, sourceSha, archiveSha256, results, manyGroups: 1000, liveRemovalAndDisable: true, retainedRoute: key(8), maximumMounted: Math.max(...samples.map(row => row.mounted)), maximumGroupDOM: Math.max(...samples.map(row => row.headings + row.groups)), samples, errors, result: 'PASS' })
     } catch (error) {
       await page.screenshot({ path: join(dir, 'failure.png') })
-      await writeFile(join(dir, 'failure.json'), JSON.stringify({ error: String(error), errors, samples, body: await page.locator('body').innerText(), dom: await list.evaluate(node => ({ html: node.outerHTML, top: node.scrollTop, height: node.clientHeight, scrollHeight: node.scrollHeight })), input: await input.evaluate(node => node.outerHTML), frames: await page.evaluate(() => window.commandHomeFrames) }, null, 2))
+      await writeFile(join(dir, 'failure.json'), JSON.stringify({ error: String(error), errors, samples, body: await page.locator('body').innerText(), dom: await list.evaluate(node => ({ html: node.outerHTML, top: node.scrollTop, height: node.clientHeight, scrollHeight: node.scrollHeight })), input: await input.evaluate(node => node.outerHTML) }, null, 2))
       throw error
     } finally {
       await context.close()

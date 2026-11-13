@@ -16,7 +16,7 @@ export function VirtualCommandConsumer() {
   const choices = useMemo(() => Array.from({ length: size }, (_, at) => ({
     value: key(at), label: at === 7 || at === 8 ? 'Twin label' : `Recorded choice ${String(at).padStart(4, '0')}`,
     group: many ? { value: `group:${at}`, label: `Group ${at}` } : { value: at < size / 2 ? 'A' : 'B', label: at < size / 2 ? 'Group A' : 'Group B' },
-    disabled: at === 3 || key(at) === disabled,
+    disabled: at === 3 || key(at) === disabled, keywords: at === 3 ? ['disabled-only-zqx'] : undefined,
   })).filter(item => item.value !== removed), [size, many, removed, disabled])
   const configure = (count: number, grouped = false) => {
     setSize(count); setMany(grouped); setRemoved(''); setDisabled(''); route(key(count - 1), count)
