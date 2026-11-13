@@ -71,7 +71,8 @@ function moveTarget(items: readonly VirtualCommandItem[], current: string | unde
 
 function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const [open, setOpen] = useState(false)
-  const instance = useRef(0)
+  const [instance, setInstance] = useState(0)
+  const currentInstance = useRef(0)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState<string>()
   const [request, setRequest] = useState(0)
@@ -79,7 +80,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const collection = useMemo(() => project(items, query), [items, query])
   const active = collection.enabled.some(item => item.value === highlight) ? highlight : collection.enabled[0]?.value
   const changeOpen = (next: boolean) => {
-    if (next) { instance.current++; setQuery(''); setHighlight(value) }
+    if (next) { setInstance(++currentInstance.current); setQuery(''); setHighlight(value) }
     setOpen(next)
   }
   const changeQuery = (next: string) => {
@@ -102,13 +103,12 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
       setHighlight(previous => moveTarget(collection.enabled, collection.enabled.some(item => item.value === previous) ? previous : active, event))
     }
   }
-  return { open, instance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
+  return { open, instance, currentInstance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
 /** Each opening owns its search and outside intent; a retired opening cannot reclaim focus. */
 export function VirtualCommand(props: VirtualCommandProps) {
   const state = useCommandCollection(props)
-  const instance = state.instance.current
   const prefix = useId()
   const optionId = (value: string) => `${prefix}-${encodeURIComponent(value)}`
   const activeId = state.active === undefined ? undefined : optionId(state.active)
@@ -125,9 +125,9 @@ export function VirtualCommand(props: VirtualCommandProps) {
   ) : <div data-command-group-heading="">{row.heading}</div>
   return <Popover open={state.open} onOpenChange={state.changeOpen}>
     <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
-    <PopoverContent key={instance} align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
+    <PopoverContent key={state.instance} align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
       onCloseAutoFocus={event => {
-        if (state.open || state.instance.current !== instance) event.preventDefault()
+        if (state.open || state.currentInstance.current !== state.instance) event.preventDefault()
       }}>
       <Command label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
         shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
