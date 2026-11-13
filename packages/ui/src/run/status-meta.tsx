@@ -72,8 +72,7 @@ export interface RunStatusIconProps extends Omit<LucideProps, "ref"> {
 /**
  * A status glyph on the icon grid, in its token colour and labelled with its
  * word. Pass `aria-hidden` where the label is already printed beside it.
- * Running breathes on `--motion-ambient`, the page's one loop period; the
- * breathe is opacity only, so it is the essential motion reduced motion keeps.
+ * Running breathes on `--motion-ambient`; reduced motion keeps the still glyph.
  */
 export function RunStatusIcon({ status, className, style, ...props }: RunStatusIconProps) {
   const key = runStatus(status);
@@ -86,8 +85,7 @@ export function RunStatusIcon({ status, className, style, ...props }: RunStatusI
       size={16}
       strokeWidth={1.75}
       data-run-status={key}
-      data-motion={running ? "essential" : undefined}
-      className={cn("shrink-0", running && "animate-[tangle-breathe_var(--motion-ambient)_infinite]", className)}
+      className={cn("shrink-0", running && "animate-[tangle-breathe_var(--motion-ambient)_infinite] motion-reduce:animate-none", className)}
       style={{ color: `var(${token})`, ...style }}
       {...props}
     />
