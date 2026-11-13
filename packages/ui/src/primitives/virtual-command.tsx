@@ -126,7 +126,9 @@ export function VirtualCommand(props: VirtualCommandProps) {
   return <Popover open={state.open} onOpenChange={state.changeOpen}>
     <PopoverTrigger asChild ref={trigger}>{props.trigger}</PopoverTrigger>
     <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
-      onInteractOutside={event => { const target = event.detail.originalEvent.target; if (target instanceof Node && trigger.current?.contains(target)) event.preventDefault() }}>
+      onInteractOutside={event => {
+        if (event.target instanceof Node && trigger.current?.contains(event.target)) event.preventDefault()
+      }}>
       <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
         shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
