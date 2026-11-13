@@ -37,6 +37,9 @@ const TYPES=['sample'];function States(){return React.createElement('ul',{'aria-
    const prior=requests.filter(r=>r.backend===url.searchParams.get('backend')).length;requests.push({backend:url.searchParams.get('backend'),after:url.searchParams.get('lastEventId'),authorized:req.headers.authorization==='Bearer fixture-local'})
    res.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache'});res.flushHeaders();clients.add(res);res.on('close',()=>clients.delete(res))
    res.write(`id: ${prior+1}\n${url.searchParams.get('backend')==='headers'?'event: sample\n':''}data: ${JSON.stringify({value:prior+1})}\n\n`)
+   if(url.searchParams.get('backend')==='command'){
+    let value=prior+1;const timer=setInterval(()=>res.write(`id: ${++value}\ndata: ${JSON.stringify({value})}\n\n`),200);res.on('close',()=>clearInterval(timer));return
+   }
    if(prior===0)res.end();return
   }
   if(url.pathname.startsWith('/assets/')){res.setHeader('content-type',url.pathname.endsWith('.css')?'text/css':'text/javascript');return res.end(chunks.get(url.pathname.slice(8)))}
@@ -293,12 +296,24 @@ for (const theme of ['light', 'dark']) for (const width of [1512, 390]) test(`pa
  try {
   await page.goto(host.url + '/?command=1&theme=' + theme)
   assert.equal(await page.locator('[data-command-identity]').innerText(), 'true', 'the public namespace and parts are the exact upstream bindings')
+  facts.motion = []
+  for (const preference of ['no-preference', 'reduce', 'no-preference']) {
+   await page.emulateMedia({ reducedMotion: preference })
+   await page.waitForFunction(reduce => { const icon=document.querySelector('[data-proof-status]');return matchMedia('(prefers-reduced-motion: reduce)').matches===reduce && icon?.getAnimations().filter(a=>a.playState==='running').length===(reduce?0:1) }, preference==='reduce')
+   const before=await page.locator('[data-status-clock],[data-status-stream]').allTextContents()
+   await page.waitForFunction(before=>[...document.querySelectorAll('[data-status-clock],[data-status-stream]')].every((node,i)=>Number(node.textContent)>Number(before[i])),before)
+   const state=await page.locator('[data-proof-status]').evaluate(icon=>({label:icon.getAttribute('aria-label'),visible:icon.checkVisibility(),animations:icon.getAnimations().filter(a=>a.playState==='running').map(a=>a.animationName)}))
+   assert.equal(state.label,'Running');assert.equal(state.visible,true);assert.deepEqual(state.animations,preference==='reduce'?[]:['tangle-breathe'])
+   facts.motion.push({preference,...state,liveBefore:before,liveAfter:await page.locator('[data-status-clock],[data-status-stream]').allTextContents()})
+   if(evidence)await page.screenshot({path:resolve(evidence,`status-motion-${facts.motion.length}-${theme}-${width}.png`)})
+  }
   await page.keyboard.press('Tab'); assert.equal(await trigger.evaluate(node => node === document.activeElement), true)
   await page.keyboard.press('Enter'); await input.waitFor()
   assert.equal(await input.evaluate(node => node === document.activeElement), true)
   assert.deepEqual(await page.evaluate(() => window.commandRefs()), { root: true, input: true }, 'refs reach the real root and input elements')
   assert.equal(await page.getByRole('option').count(), 1000)
   assert.deepEqual(await page.locator('[cmdk-group-heading]').allTextContents(), ['Workers', 'Reviewers'])
+  const headingStyle=locator=>locator.first().evaluate(node=>{const style=getComputedStyle(node);return [style.padding,style.color,style.fontSize]});assert.deepEqual(await headingStyle(page.locator('[data-command-group-heading]')),await headingStyle(page.locator('[cmdk-group-heading]')))
   const list = page.getByRole('listbox', { name: 'Recorded choices', exact: true })
   const bounds = await list.evaluate(node => ({ height: node.clientHeight, scroll: node.scrollHeight })); facts.bounds = bounds
   assert.ok(bounds.height > 0 && bounds.height < 500 && bounds.scroll > bounds.height * 10, 'the scroll viewport stays bounded while cmdk registers all choices')

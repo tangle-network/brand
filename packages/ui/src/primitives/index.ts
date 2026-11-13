@@ -286,4 +286,4 @@ export type { ExpandablePanelProps } from "./expandable-panel";
 export type { ThemeControllerOptions } from "./theme-toggle";
 export type { TableHeadProps } from "./table";
 
-export { Command } from "cmdk";
+export { Command, defaultFilter } from "cmdk";

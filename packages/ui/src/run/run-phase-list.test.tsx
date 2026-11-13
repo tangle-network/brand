@@ -23,11 +23,4 @@ describe("RunPhaseList", () => {
     expect(screen.getByRole("img", { name: "Failed" }).getAttribute("class")).toMatch(/circle-x/);
   });
 
-  it("marks a running phase with the breathing status glyph, not a spinner", () => {
-    const { container } = render(
-      <RunPhaseList phases={[{ id: "a", title: "Prove it", status: "running", content: null }]} />,
-    );
-    expect(screen.getByRole("img", { name: "Running" }).getAttribute("data-motion")).toBe("essential");
-    expect(container.querySelector(".animate-spin")).toBeNull();
-  });
 });

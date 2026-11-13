@@ -8,4 +8,4 @@
 [cmdk-item][aria-disabled="true"] { pointer-events: none; opacity: .5; }
 [cmdk-item] > svg { flex: none; }
 [cmdk-item] > [aria-current="true"] { margin-inline-start: auto; }
-[cmdk-group-heading], [cmdk-empty] { padding: .5rem .75rem; color: hsl(var(--muted-foreground)); font-size: var(--font-size-xs); }
+[cmdk-group-heading], [data-command-group-heading], [cmdk-empty] { padding: .5rem .75rem; color: hsl(var(--muted-foreground)); font-size: var(--font-size-xs); }
