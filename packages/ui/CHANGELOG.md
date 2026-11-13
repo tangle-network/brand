@@ -1,3 +1,9 @@
+## 11.51.26
+
+### Patch Changes
+
+- 6996e75: Own measured VirtualList and add VirtualCommand with full-collection cmdk filtering and navigation, bounded option and group DOM, and separate highlight and committed selection. Sandbox's existing VirtualList path can forward this canonical primitive.
+
 ## 11.51.25
 
 ### Patch Changes
