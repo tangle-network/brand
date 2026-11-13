@@ -75,6 +75,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState<string>()
+  const [request, setRequest] = useState(0)
   const scroller = useRef<HTMLDivElement | null>(null)
   const collection = useMemo(() => project(items, query), [items, query])
   const active = collection.enabled.some(item => item.value === highlight) ? highlight : collection.enabled[0]?.value
@@ -83,7 +84,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
     setOpen(next)
   }
   const changeQuery = (next: string) => {
-    if (scroller.current) scroller.current.scrollTop = 0
+    setRequest(previous => previous + 1)
     setQuery(next)
     setHighlight(undefined)
   }
@@ -98,10 +99,11 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
     // Movement uses logical items; cmdk retains Enter and pointer activation.
     if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key) || event.ctrlKey && ['n', 'j', 'p', 'k'].includes(event.key)) {
       event.preventDefault()
+      setRequest(previous => previous + 1)
       setHighlight(previous => moveTarget(collection.enabled, collection.enabled.some(item => item.value === previous) ? previous : active, event))
     }
   }
-  return { open, query, active, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
+  return { open, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
 /** Public cmdk semantics over one measured virtual collection, with a separate committed value. */
@@ -133,7 +135,7 @@ export function VirtualCommand(props: VirtualCommandProps) {
           <ListElement aria-activedescendant={activeId}>
             {!state.collection.options.length && <Command.Empty><span role="status">No results.</span></Command.Empty>}
             <VirtualList items={state.collection.rows} keyOf={keyOf} render={render} scroller={state.scroller} estimate={40} overscan={160}
-              target={state.active === undefined ? undefined : `item:${state.active}`} targetAlign="nearest"
+              target={state.active === undefined ? undefined : `item:${state.active}`} targetRevision={state.request} targetAlign="nearest"
               keepMounted={state.active === undefined ? undefined : `item:${state.active}`} groups={groups} />
           </ListElement>
         </Command.List>

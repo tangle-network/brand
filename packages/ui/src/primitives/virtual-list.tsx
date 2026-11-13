@@ -87,8 +87,8 @@ function useViewport(scroller: Scroller, origin?: Scroller) {
  * moves it. Each measurement, viewport move and change of the rows (a record that arrived late) re-aligns it until the
  * reader scrolls, or after two seconds. Home and End settle the first and last row the same way.
  */
-function useSettleTarget<T>(scroller: Scroller, { target, align, items, keyOf, offsets, originTop, rows, version, viewport }: {
-  target?: string; align: 'start' | 'nearest'; items: readonly T[]; keyOf: (item: T) => string; offsets: Float64Array
+function useSettleTarget<T>(scroller: Scroller, { target, targetRevision, align, items, keyOf, offsets, originTop, rows, version, viewport }: {
+  target?: string; targetRevision?: number; align: 'start' | 'nearest'; items: readonly T[]; keyOf: (item: T) => string; offsets: Float64Array
   originTop: () => number; rows: Rows; version: number; viewport: { top: number; height: number }
 }) {
   const pending = useRef<{ key: string; until: number } | null>(null)
@@ -112,7 +112,7 @@ function useSettleTarget<T>(scroller: Scroller, { target, align, items, keyOf, o
   useLayoutEffect(() => {
     pending.current = target ? goal(target) : null
     settle()
-  }, [target]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [target, targetRevision]) // eslint-disable-line react-hooks/exhaustive-deps
   useLayoutEffect(settle, [version, viewport, items]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const element = scroller.current
@@ -160,6 +160,7 @@ export function VirtualList<T>({
   estimate = 96,
   overscan = 900,
   target,
+  targetRevision,
   origin,
   targetAlign = 'start',
   virtualize = true,
@@ -176,6 +177,8 @@ export function VirtualList<T>({
   overscan?: number
   /** Bring this row to the top of the scroller (and into the page's view) whenever it changes. */
   target?: string
+  /** Repeat a navigation request for the same target after the reader scrolled away. */
+  targetRevision?: number
   /** Offset within an outer scroller, such as a file tree below its search header. */
   origin?: RefObject<HTMLElement | null>
   targetAlign?: 'start' | 'nearest'
@@ -198,7 +201,7 @@ export function VirtualList<T>({
     return result
     // `version` changes when a measured height changes.
   }, [items, keyOf, estimate, version]) // eslint-disable-line react-hooks/exhaustive-deps
-  useSettleTarget(scroller, { target, align: targetAlign, items, keyOf, offsets, originTop, rows, version, viewport })
+  useSettleTarget(scroller, { target, targetRevision, align: targetAlign, items, keyOf, offsets, originTop, rows, version, viewport })
 
   const find = (y: number) => {
     let low = 0, high = items.length
