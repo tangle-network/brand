@@ -159,6 +159,63 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
   return checks
 }
 
+/** Reopen during the real exit, without a locator key/focus call repairing native focus. */
+export async function proveRapidReopen(browser, { url, output, sourceSha, archiveSha256 }) {
+  const checks = []
+  for (const width of [1512, 390]) for (const theme of ['light', 'dark']) {
+    const dir = join(output, `reopen-${width}-${theme}`)
+    await mkdir(dir, { recursive: true })
+    const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme, reducedMotion: 'no-preference', recordVideo: { dir, size: { width, height: 900 } } })
+    const page = await context.newPage(), errors = [], attempts = []
+    page.on('pageerror', error => errors.push(error.message))
+    const input = page.getByRole('combobox', { name: 'Find recorded choice', exact: true })
+    const trigger = page.getByRole('button', { name: 'Choose recorded item', exact: true })
+    const observe = () => page.evaluate(() => {
+      const input = document.querySelector('[cmdk-input]'), list = document.querySelector('[cmdk-list]')
+      const id = input?.getAttribute('aria-activedescendant'), row = id && document.getElementById(id)
+      const box = list?.getBoundingClientRect(), rect = row?.getBoundingClientRect()
+      return { focus: document.activeElement?.tagName, inputFocused: !!input && document.activeElement === input,
+        value: row?.dataset.commandValue, selected: row?.getAttribute('aria-selected'), query: input?.value,
+        matchingId: !!id && list?.getAttribute('aria-activedescendant') === id,
+        visible: !!rect && !!box && rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1,
+        mounted: list?.querySelectorAll('[role="option"]').length,
+        committed: document.querySelector('[aria-label="Committed choice"]')?.textContent,
+        commits: Number(document.querySelector('[aria-label="Choice commits"]')?.textContent) }
+    })
+    try {
+      await page.goto(url)
+      await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
+      for (const count of [122, 1000]) {
+        await page.getByRole('button', { name: `Use ${count} choices`, exact: true }).click()
+        await trigger.click(); await input.press('Home'); await input.press('Enter')
+        await input.waitFor({ state: 'hidden' })
+        await trigger.click(); await input.waitFor()
+        const far = `choice:${String(count - 1).padStart(4, '0')}`
+        await input.fill(far)
+        await page.locator(`[data-command-value="${far}"]`).click()
+        await trigger.click()
+        const immediate = await observe()
+        let failure
+        try { await page.waitForFunction(expected => {
+          const input = document.querySelector('[cmdk-input]'), id = input?.getAttribute('aria-activedescendant'), row = id && document.getElementById(id)
+          return document.activeElement === input && input?.value === '' && row?.dataset.commandValue === expected && row?.getAttribute('aria-selected') === 'true'
+        }, far, { timeout: 2000 }) } catch (error) { failure = String(error) }
+        const settled = await observe()
+        attempts.push({ count, far, immediate, settled, failure })
+        await writeFile(join(dir, 'observations.json'), JSON.stringify({ sourceSha, archiveSha256, attempts, errors }, null, 2))
+        await page.screenshot({ path: join(dir, `reopened-${count}.png`) })
+        assert.equal(failure, undefined, 'Rapid reopen preserves the committed far highlight and native input focus')
+        assert.equal(settled.committed, far); assert.equal(settled.commits, attempts.length * 2)
+        assert.equal(settled.matchingId, true); assert.equal(settled.visible, true); assert.ok(settled.mounted <= 40)
+        await input.press('Escape'); await input.waitFor({ state: 'hidden' })
+      }
+      assert.deepEqual(errors, [])
+      checks.push({ width, theme, sourceSha, archiveSha256, attempts, result: 'PASS' })
+    } finally { await context.close(); await writeFile(join(output, 'rapid-reopen-checks.json'), JSON.stringify(checks, null, 2)) }
+  }
+  return checks
+}
+
 /** Build only installed UI/Brand exports with the documented consumer source scan. */
 async function commandHost(consumer) {
   const scratch = await mkdtemp(join(consumer, '.virtual-command-'))
@@ -193,6 +250,10 @@ test('packed VirtualCommand keeps full navigation and active descendants with bo
   assert.ok(consumer && output, 'Use a fresh installed UI package and retained native output')
   const { chromium } = await import('playwright')
   const host = await commandHost(consumer), browser = await chromium.launch({ headless: true })
-  try { await proveVirtualCommand(browser, { url: host.url, output, sourceSha: process.env.UI_PROOF_SOURCE, archiveSha256: process.env.UI_PROOF_SHA256 }) }
+  try {
+    const proof = { url: host.url, output, sourceSha: process.env.UI_PROOF_SOURCE, archiveSha256: process.env.UI_PROOF_SHA256 }
+    await proveRapidReopen(browser, proof)
+    await proveVirtualCommand(browser, proof)
+  }
   finally { await browser.close(); await host.close() }
 })

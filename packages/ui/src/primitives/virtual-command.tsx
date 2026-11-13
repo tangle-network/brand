@@ -24,7 +24,6 @@ type Row = { key: string; group: string; heading?: string; item?: VirtualCommand
 type Bucket = { label?: string; score: number; items: { item: VirtualCommandItem; score: number }[] }
 const keyOf = (row: Row) => row.key
 const valueOf = (item: VirtualCommandItem) => item.value
-const unfiltered = () => 1
 // cmdk's List asChild resolves a component child; a raw host string throws in its child resolver.
 const ListElement = (props: ComponentPropsWithoutRef<'div'>) => <div {...props} />
 
@@ -73,6 +72,7 @@ function moveTarget(items: readonly VirtualCommandItem[], current: string | unde
 
 function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const [open, setOpen] = useState(false)
+  const [instance, setInstance] = useState(0)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState<string>()
   const [request, setRequest] = useState(0)
@@ -80,7 +80,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const collection = useMemo(() => project(items, query), [items, query])
   const active = collection.enabled.some(item => item.value === highlight) ? highlight : collection.enabled[0]?.value
   const changeOpen = (next: boolean) => {
-    if (next) { setQuery(''); setHighlight(value) }
+    if (next) { setInstance(previous => previous + 1); setQuery(''); setHighlight(value) }
     setOpen(next)
   }
   const changeQuery = (next: string) => {
@@ -103,10 +103,10 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
       setHighlight(previous => moveTarget(collection.enabled, collection.enabled.some(item => item.value === previous) ? previous : active, event))
     }
   }
-  return { open, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
+  return { open, instance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
-/** Public cmdk semantics over one measured virtual collection, with a separate committed value. */
+/** A fresh cmdk search store on each opening; the measured collection keeps a separate committed value. */
 export function VirtualCommand(props: VirtualCommandProps) {
   const state = useCommandCollection(props)
   const prefix = useId()
@@ -126,10 +126,10 @@ export function VirtualCommand(props: VirtualCommandProps) {
   return <Popover open={state.open} onOpenChange={state.changeOpen}>
     <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
     <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0">
-      <Command label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
-        shouldFilter={false} filter={unfiltered} vimBindings={false} onKeyDown={state.onKeyDown}>
+      <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
+        shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
-          <input aria-activedescendant={activeId} />
+          <input autoFocus aria-activedescendant={activeId} />
         </Command.Input>
         <Command.List asChild label={props.listLabel} ref={state.scroller}>
           <ListElement aria-activedescendant={activeId}>
