@@ -23,6 +23,12 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
     const key = at => `choice:${String(at).padStart(4, '0')}`
     const committed = () => page.getByLabel('Committed choice', { exact: true }).innerText()
     const commits = async () => Number(await page.getByLabel('Choice commits', { exact: true }).innerText())
+    const wheel = async delta => {
+      const selected = await input.getAttribute('aria-activedescendant'), box = await list.boundingBox()
+      await page.mouse.move(box.x + box.width - 1, box.y + box.height / 2)
+      await page.mouse.wheel(0, delta)
+      assert.equal(await input.getAttribute('aria-activedescendant'), selected, 'Native scrollbar wheel input preserves the highlight')
+    }
     const open = async expected => { await trigger.click(); await input.waitFor(); if (expected) await active(expected) }
     const escape = async () => {
       await input.press('Escape'); await input.waitFor({ state: 'hidden' })
@@ -88,14 +94,14 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         await input.press('Enter'); assert.equal(await commits(), before + 2)
         await escape()
         await open(key(8)); await input.press('Home'); await active(key(0))
-        await list.hover({ position: { x: 2, y: 2 } }); await page.mouse.wheel(0, 1400)
+        await wheel(1400)
         await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Recorded choices"]').scrollTop > 300)
         await input.press('Home'); await active(key(0))
-        await list.hover({ position: { x: 2, y: 2 } }); await page.mouse.wheel(0, 1400)
+        await wheel(1400)
         await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Recorded choices"]').scrollTop > 300)
         await input.fill('Recorded'); await active(key(0))
         await input.press('End'); await active(last)
-        await list.hover({ position: { x: 2, y: 2 } }); await page.mouse.wheel(0, -1400)
+        await wheel(-1400)
         await page.waitForFunction(() => { const list = document.querySelector('[role="listbox"][aria-label="Recorded choices"]'); return list.scrollTop + list.clientHeight < list.scrollHeight - 300 })
         await input.press('End'); await active(last)
         assert.equal(await committed(), key(8), 'Filtering preserves the committed route')
