@@ -240,6 +240,87 @@ export async function proveRapidReopen(browser, { url, output, sourceSha, archiv
   return checks
 }
 
+/** A consumer may focus its mobile inspector on every commit, including the current value. */
+export async function proveInspectorReopen(browser, { url, output, sourceSha, archiveSha256 }) {
+  const checks = []
+  for (const width of [390, 1512]) for (const theme of ['light', 'dark']) {
+    const dir = join(output, `inspector-${width}-${theme}`)
+    await mkdir(dir, { recursive: true })
+    const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme, reducedMotion: 'no-preference', recordVideo: { dir, size: { width, height: 900 } } })
+    const page = await context.newPage(), errors = [], attempts = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.addInitScript(() => {
+      const events = [], closed = [], ids = new WeakMap(), bound = new WeakSet(); let next = 0
+      const id = node => node instanceof Element ? ids.has(node) ? ids.get(node) : (ids.set(node, ++next), next) : null
+      const describe = node => ({ id: id(node), tag: node?.tagName, label: node?.getAttribute?.('aria-label'), connected: node?.isConnected })
+      const record = (type, target) => ({ type, atMilliseconds: performance.now(), target: describe(target), active: describe(document.activeElement),
+        content: [...document.querySelectorAll('[role=dialog]')].map(node => ({ ...describe(node), state: node.getAttribute('data-state') })) })
+      document.addEventListener('focusin', event => events.push(record('focusin', event.target)), true)
+      new MutationObserver(() => {
+        for (const node of document.querySelectorAll('[role=dialog]')) if (!bound.has(node)) {
+          bound.add(node)
+          node.addEventListener('focusScope.autoFocusOnUnmount', event => queueMicrotask(() => {
+            const observation = { ...record('close-autofocus', node), defaultPrevented: event.defaultPrevented }
+            events.push(observation); closed.push(observation)
+          }), { passive: true })
+        }
+      }).observe(document, { childList: true, subtree: true })
+      window.__inspectorCommand = { events, closed, id }
+    })
+    const trigger = page.getByRole('button', { name: 'Choose recorded item', exact: true })
+    const input = page.getByRole('combobox', { name: 'Find recorded choice', exact: true })
+    const active = async far => page.waitForFunction(expected => {
+      const input = document.querySelector('[cmdk-input]'), row = document.getElementById(input?.getAttribute('aria-activedescendant'))
+      return document.activeElement === input && input?.value === '' && row?.dataset.commandValue === expected && row.getAttribute('aria-selected') === 'true'
+    }, far)
+    try {
+      for (const count of [122, 1000]) {
+        const far = `choice:${String(count - 1).padStart(4, '0')}`
+        await page.goto(`${url}?inspector=mobile&choice=choice:0000&choice-count=${count}`)
+        await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
+        const original = await trigger.elementHandle(), attempt = { count, far }; attempts.push(attempt)
+        const focus = () => trigger.evaluate((node, original) => ({ tag: document.activeElement?.tagName,
+          originalConnected: original.isConnected, currentConnected: node.isConnected, sameTrigger: original === node,
+          originalFocused: document.activeElement === original, inspectorFocused: document.activeElement?.getAttribute('aria-label') === 'Recorded inspector',
+          inputs: document.querySelectorAll('[cmdk-input]').length, choice: new URLSearchParams(location.search).get('choice'),
+          commits: Number(document.querySelector('[aria-label="Choice commits"]').textContent) }), original)
+        await trigger.click(); await input.fill(far); await page.locator(`[data-command-value="${far}"]`).click()
+        await trigger.click(); await active(far)
+        await input.fill(far)
+        // No hidden/unmount/focus wait between the same-value pointer commit and reopen.
+        await page.locator(`[data-command-value="${far}"]`).click(); await trigger.click(); await active(far)
+        await input.fill('no-recorded-agent-matches-this-needle')
+        await page.getByRole('status').filter({ hasText: 'No results.' }).waitFor()
+        await page.keyboard.press('Enter'); await page.keyboard.press('Escape'); await input.waitFor({ state: 'hidden' })
+        try { await page.waitForFunction(node => node.isConnected && document.activeElement === node, original, { timeout: 2000 }) }
+        catch (error) { attempt.failure = String(error) }
+        attempt.escape = await focus()
+        attempt.events = await page.evaluate(() => window.__inspectorCommand.events)
+        await writeFile(join(dir, 'observations.json'), JSON.stringify({ sourceSha, archiveSha256, attempts, errors }, null, 2))
+        await page.screenshot({ path: join(dir, `same-value-escape-${count}.png`) })
+        assert.equal(attempt.failure, undefined, 'Escape restores the same trigger after a consumer inspector handoff and rapid same-value reopen')
+        assert.equal(attempt.escape.sameTrigger, true); assert.equal(attempt.escape.choice, far); assert.equal(attempt.escape.commits, 2)
+        assert.equal(attempt.escape.inputs, 0); assert.equal(attempt.escape.originalConnected, true)
+        if (width === 390) assert.ok(attempt.events.some(event => event.type === 'focusin' && event.target.tag === 'ASIDE' && event.content.some(node => node.state === 'closed')),
+          'The real consumer effect focused its inspector while the closing surface was retained')
+        // An ordinary committed close must keep the consumer's inspector focus instead of stealing it back.
+        await trigger.click(); await active(far)
+        const popup = await input.evaluate(node => window.__inspectorCommand.id(node.closest('[role=dialog]')))
+        await input.fill(far); await page.locator(`[data-command-value="${far}"]`).click()
+        await page.waitForFunction(id => window.__inspectorCommand.closed.some(event => event.target.id === id), popup)
+        attempt.ordinaryClose = await focus()
+        assert.equal(attempt.ordinaryClose.inspectorFocused, width === 390)
+        assert.equal(attempt.ordinaryClose.originalFocused, width !== 390)
+        attempt.events = await page.evaluate(() => window.__inspectorCommand.events)
+        await writeFile(join(dir, 'observations.json'), JSON.stringify({ sourceSha, archiveSha256, attempts, errors }, null, 2))
+      }
+      assert.deepEqual(errors, [])
+      checks.push({ width, theme, sourceSha, archiveSha256, attempts, result: 'PASS' })
+    } finally { await context.close(); await writeFile(join(output, 'inspector-reopen-checks.json'), JSON.stringify(checks, null, 2)) }
+  }
+  return checks
+}
+
 /** Build only installed UI/Brand exports with the documented consumer source scan. */
 async function commandHost(consumer) {
   const scratch = await mkdtemp(join(consumer, '.virtual-command-'))
@@ -276,6 +357,7 @@ test('packed VirtualCommand keeps full navigation and active descendants with bo
   const host = await commandHost(consumer), browser = await chromium.launch({ headless: true })
   try {
     const proof = { url: host.url, output, sourceSha: process.env.UI_PROOF_SOURCE, archiveSha256: process.env.UI_PROOF_SHA256 }
+    await proveInspectorReopen(browser, proof)
     await proveRapidReopen(browser, proof)
     await proveVirtualCommand(browser, proof)
   }

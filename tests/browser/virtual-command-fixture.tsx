@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, VirtualCommand } from '@tangle-network/ui/primitives'
 import '@tangle-network/ui/styles/command.css'
 
@@ -8,6 +8,12 @@ export function VirtualCommandConsumer() {
   const [size, setSize] = useState(Number(initial.get('choice-count')) || 122)
   const [many, setMany] = useState(false), [removed, setRemoved] = useState(''), [disabled, setDisabled] = useState('')
   const [value, setValue] = useState(initial.get('choice') ?? 'choice:0121'), [commits, setCommits] = useState(0)
+  const inspector = initial.get('inspector') === 'mobile', panel = useRef<HTMLElement>(null)
+  useEffect(() => {
+    if (!inspector || !commits || !matchMedia('(max-width: 720px)').matches) return
+    panel.current?.focus({ preventScroll: true })
+    panel.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
+  }, [value, commits, inspector])
   const key = (at: number) => `choice:${String(at).padStart(4, '0')}`
   const route = (next: string, count = size) => {
     const url = new URL(location.href); url.searchParams.set('choice', next); url.searchParams.set('choice-count', String(count))
@@ -36,5 +42,6 @@ export function VirtualCommandConsumer() {
     <output aria-label="Disabled choice">{disabled}</output>
     <VirtualCommand items={choices} value={value} onSelect={next => { setCommits(count => count + 1); route(next) }}
       label="Find recorded choice" listLabel="Recorded choices" trigger={<Button>Choose recorded item</Button>} />
+    {inspector && <aside ref={panel} tabIndex={-1} aria-label="Recorded inspector">Selected record: {value}</aside>}
   </section>
 }
