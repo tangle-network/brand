@@ -213,7 +213,7 @@ export async function proveRapidReopen(browser, { url, output, sourceSha, archiv
         await input.fill('no-recorded-agent-matches-this-needle')
         await page.getByRole('status').filter({ hasText: 'No results.' }).waitFor()
         await page.keyboard.press('Enter')
-        assert.equal(await committed(), far); assert.equal(await commits(), attempts.length * 2)
+        const afterEmpty = await observe(); assert.equal(afterEmpty.committed, far); assert.equal(afterEmpty.commits, attempts.length * 2)
         const escape = { before: await focus() }
         await page.keyboard.press('Escape'); escape.immediate = await focus()
         await input.waitFor({ state: 'hidden' })
@@ -225,7 +225,7 @@ export async function proveRapidReopen(browser, { url, output, sourceSha, archiv
         await page.screenshot({ path: join(dir, `escape-after-reopen-${count}.png`) })
         assert.equal(escape.failure, undefined, 'Escape after rapid pointer-reopen/empty search returns focus to the same connected trigger')
         assert.equal(escape.settled.sameTrigger, true)
-        assert.equal(await committed(), far); assert.equal(await commits(), attempts.length * 2)
+        const afterEscape = await observe(); assert.equal(afterEscape.committed, far); assert.equal(afterEscape.commits, attempts.length * 2)
         // A real outside action keeps its own focus; trigger handling must stay narrow.
         await trigger.click(); await input.waitFor()
         const outside = page.getByRole('button', { name: `Use ${count} choices`, exact: true })
