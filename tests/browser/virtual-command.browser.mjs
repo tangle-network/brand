@@ -40,6 +40,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
     const open = async expected => { await trigger.click(); await input.waitFor(); if (expected) await active(expected) }
     const escape = async () => {
       await input.press('Escape'); await input.waitFor({ state: 'hidden' })
+      await page.waitForFunction(() => document.activeElement?.textContent === 'Choose recorded item')
       assert.equal(await trigger.evaluate(node => node === document.activeElement), true, 'Escape restores the trigger')
     }
     const active = async expected => {
