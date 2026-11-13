@@ -55,6 +55,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
     }
     try {
       await page.goto(url)
+      assert.deepEqual(errors, [], 'The packed browser host rendered without startup errors')
       await page.evaluate(theme => { document.documentElement.className = theme; document.documentElement.dataset.theme = theme }, theme)
       const results = []
       for (const count of [1000, 122]) {
@@ -157,7 +158,7 @@ async function commandHost(consumer) {
 @source "../node_modules/@tangle-network/ui/src/**/*.tsx";
 @source "../node_modules/@tangle-network/ui/src/**/*.ts";
 `)
-  const built = await build({ configFile: false, root: scratch, logLevel: 'warn', css: { postcss: { plugins: [tailwindcss()] } }, build: { write: false, lib: { entry: join(scratch, 'main.tsx'), formats: ['es'], fileName: () => 'host.js' } } })
+  const built = await build({ configFile: false, root: scratch, logLevel: 'warn', define: { 'process.env.NODE_ENV': JSON.stringify('production') }, css: { postcss: { plugins: [tailwindcss()] } }, build: { write: false, lib: { entry: join(scratch, 'main.tsx'), formats: ['es'], fileName: () => 'host.js' } } })
   const chunks = new Map((Array.isArray(built) ? built : [built]).flatMap(result => result.output).map(item => [item.fileName, item.type === 'chunk' ? item.code : item.source]))
   const server = createServer((request, response) => {
     const url = new URL(request.url, 'http://localhost')
