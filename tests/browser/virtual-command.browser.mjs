@@ -145,7 +145,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
       checks.push({ width, theme, sourceSha, archiveSha256, results, manyGroups: 1000, liveRemovalAndDisable: true, retainedRoute: key(8), maximumMounted: Math.max(...samples.map(row => row.mounted)), maximumGroupDOM: Math.max(...samples.map(row => row.headings + row.groups)), samples, errors, result: 'PASS' })
     } catch (error) {
       await page.screenshot({ path: join(dir, 'failure.png') })
-      await writeFile(join(dir, 'failure.json'), JSON.stringify({ error: String(error), errors, samples, body: await page.locator('body').innerText(), dom: await list.evaluate(node => ({ html: node.outerHTML, top: node.scrollTop, height: node.clientHeight, scrollHeight: node.scrollHeight })), input: await input.evaluate(node => node.outerHTML) }, null, 2))
+      await writeFile(join(dir, 'failure.json'), JSON.stringify({ error: String(error), errors, samples, body: await page.locator('body').innerText(), dom: await page.evaluate(() => { const node = document.querySelector('[cmdk-list]'); return node && { html: node.outerHTML, top: node.scrollTop, height: node.clientHeight, scrollHeight: node.scrollHeight } }), input: await page.evaluate(() => document.querySelector('[cmdk-input]')?.outerHTML) }, null, 2))
       throw error
     } finally {
       await context.close()
