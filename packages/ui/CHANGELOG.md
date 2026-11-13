@@ -1,3 +1,9 @@
+## 11.51.28
+
+### Patch Changes
+
+- 0c0d93e: Return native focus to the VirtualCommand trigger on Escape after rapid pointer selection and reopen, preserving nonmodal outside-action focus and popup motion.
+
 ## 11.51.27
 
 ### Patch Changes
