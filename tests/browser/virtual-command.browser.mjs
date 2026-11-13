@@ -29,6 +29,14 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
       await page.mouse.wheel(0, delta)
       assert.equal(await input.getAttribute('aria-activedescendant'), selected, 'Native scrollbar wheel input preserves the highlight')
     }
+    const offscreen = async expected => {
+      const state = await input.evaluate(node => {
+        const row = document.getElementById(node.getAttribute('aria-activedescendant')), list = document.querySelector('[cmdk-list]')
+        const r = row?.getBoundingClientRect(), box = list.getBoundingClientRect()
+        return { value: row?.dataset.commandValue, selected: row?.getAttribute('aria-selected'), outside: !!r && (r.bottom <= box.top || r.top >= box.bottom) }
+      })
+      assert.deepEqual(state, { value: expected, selected: 'true', outside: true }, 'The same highlighted option stays mounted but offscreen after native wheel displacement')
+    }
     const open = async expected => { await trigger.click(); await input.waitFor(); if (expected) await active(expected) }
     const escape = async () => {
       await input.press('Escape'); await input.waitFor({ state: 'hidden' })
@@ -98,13 +106,16 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         await open(key(8)); await input.press('Home'); await active(key(0))
         await wheel(1400)
         await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Recorded choices"]').scrollTop > 300)
+        await offscreen(key(0))
         await input.press('Home'); await active(key(0))
         await wheel(1400)
         await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Recorded choices"]').scrollTop > 300)
+        await offscreen(key(0))
         await input.fill('Recorded'); await active(key(0))
         await input.press('End'); await active(last)
         await wheel(-1400)
         await page.waitForFunction(() => { const list = document.querySelector('[role="listbox"][aria-label="Recorded choices"]'); return list.scrollTop + list.clientHeight < list.scrollHeight - 300 })
+        await offscreen(last)
         await input.press('End'); await active(last)
         assert.equal(await committed(), key(8), 'Filtering preserves the committed route')
         await escape()
