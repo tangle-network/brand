@@ -177,3 +177,7 @@ Retained report readers can import existing `chat/agent-timeline`, `chat/speaker
 Create a `createThemeController({ storageKey, defaultTheme, storageValues, attribute })` once outside React components when a product has established persisted names or a mode attribute. Its `useTheme` shares state across components and tabs; `setTheme` persists the preference, while `applyTheme` applies a temporary page mode without replacing it. The parameterless `useTheme` keeps the default `theme` key and named Brand themes.
 
 `TableHead` accepts `sort={{ direction, onSort, label, buttonClassName }}`. It owns the native button, keyboard activation, indicator and column `aria-sort`; the consumer owns row ordering, comparator, URL state and sort cycle. `direction` is `asc`, `desc` or omitted. Supply `label` when the header is not plain text.
+
+### Searchable command menus
+
+`Command` from `@tangle-network/ui/primitives` is the exact upstream cmdk namespace, including its Input, List, Item, Group and Empty parts. Compose it inside the public Popover and import `@tangle-network/ui/styles/command.css` beside Brand styles for the owned token treatment. Use stable item IDs and searchable label keywords; cmdk owns filtering, highlighting and keyboard selection. The stylesheet bounds the scroll viewport; it does not virtualize item registration. Keep selection commits in Item.onSelect, separately from the highlighted value.

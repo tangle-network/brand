@@ -175,7 +175,8 @@
       "types": "./dist/primitives/hover-card.d.ts",
       "import": "./dist/primitives/hover-card.js",
       "default": "./dist/primitives/hover-card.js"
-    }
+    },
+    "./styles/command.css": "./src/styles/command.css"
   },
   "scripts": {
     "build": "node scripts/generate-openui-validators.mjs --check && tsdown && node scripts/generate-presentation-css.mjs --check && node ../../scripts/validate-dist.mjs && node scripts/probe-openui-worker.mjs",
@@ -206,6 +207,7 @@
     "@tangle-network/agent-interface": "^5.10.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "github-slugger": "^2.0.0",
     "lucide-react": "^1.61.0",
     "marked": "^18.1.1",
