@@ -100,6 +100,7 @@ export async function proveVirtualCommand(browser, { url, output, sourceSha, arc
         assert.equal(await input.getAttribute('aria-activedescendant'), null)
         await input.press('Enter'); assert.equal(await commits(), before + 2)
         await input.fill('disabled-only-zqx')
+        await list.getByRole('option').waitFor({ state: 'visible' })
         assert.equal(await list.getByRole('option').count(), 1)
         assert.equal(await list.getByRole('option').getAttribute('aria-disabled'), 'true')
         assert.equal(await input.getAttribute('aria-activedescendant'), null)
