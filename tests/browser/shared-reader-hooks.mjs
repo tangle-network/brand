@@ -219,7 +219,9 @@ for (const theme of ['light', 'dark']) for (const width of [1512, 390]) test(`pa
  const inspector = page.locator('aside[aria-label="Recorded root conversation"]')
  const hit = async locator => locator.evaluate(node => {
    const b = node.getBoundingClientRect(), target = document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2)
-   return { rect: b.toJSON(), hit: node === target || node.contains(target), target: target?.getAttribute('aria-label') }
+   let visible = b.width > 0 && b.height > 0 && b.x >= 0 && b.y >= 0 && b.right <= innerWidth && b.bottom <= innerHeight
+   for (let e = node; e; e = e.parentElement) { const s = getComputedStyle(e); if (s.display === 'none' || s.visibility === 'hidden' || Number(s.opacity) === 0) visible = false }
+   return { rect: b.toJSON(), visible, hit: node === target || node.contains(target), target: target?.getAttribute('aria-label') }
  })
  try {
   await page.goto(host.url + '/?panels=1&theme=' + theme)
@@ -232,13 +234,15 @@ for (const theme of ['light', 'dark']) for (const width of [1512, 390]) test(`pa
   await page.getByRole('textbox', { name: 'Retained note' }).fill('Keep this exact note')
   const scroller = page.locator('.fw-scroller')
   await scroller.hover(); await page.mouse.wheel(0, 360); await page.waitForTimeout(100)
+  await page.waitForFunction(() => document.querySelector('.fw-scroller').scrollTop > 0)
   const scrollBefore = await scroller.evaluate(node => node.scrollTop)
+  assert.ok(scrollBefore > 0, 'the native wheel establishes a real scrolled position')
   await page.getByRole('textbox', { name: 'Retained note' }).click()
   const toggle = page.getByRole('button', { name: 'Expand Recorded timeline', exact: true })
   for (let i = 0; i < 6 && !await toggle.evaluate(node => node === document.activeElement); i++) await page.keyboard.press('Tab')
   assert.equal(await toggle.evaluate(node => node === document.activeElement), true)
   receipts.push({ phase: 'keyboard-expand', ...await hit(toggle), scrollBefore })
-  assert.equal(receipts.at(-1).hit, true, 'the keyboard-focused toggle remains visible and reachable')
+  assert.equal(receipts.at(-1).hit && receipts.at(-1).visible, true, 'the keyboard-focused toggle remains visible and reachable')
   await page.keyboard.press('Enter')
   assert.equal(await panel.getAttribute('data-expanded'), '')
   const full = await panel.boundingBox(); assert.ok(Math.abs(full.x) <= 1 && Math.abs(full.y) <= 1 && Math.abs(full.width - width) <= 1 && Math.abs(full.height - 982) <= 1, 'expanded panel fills the viewport')
@@ -253,6 +257,14 @@ for (const theme of ['light', 'dark']) for (const width of [1512, 390]) test(`pa
   await page.getByRole('button', { name: 'Close full screen Recorded timeline', exact: true }).click()
   assert.equal(await panel.getAttribute('data-expanded'), null)
   assert.equal(await toggle.evaluate(node => node === document.activeElement), true, 'collapse returns focus to the control')
+  assert.equal(await page.getByRole('textbox', { name: 'Retained note' }).inputValue(), 'Keep this exact note')
+  assert.ok(Math.abs(await scroller.evaluate(node => node.scrollTop) - scrollBefore) <= 2, 'collapse retains the real chart scroll')
+  await page.keyboard.press('Space'); assert.equal(await panel.getAttribute('data-expanded'), '')
+  await page.getByRole('button', { name: 'Reopen conversation', exact: true }).click(); await inspector.waitFor()
+  await inspector.locator('summary').click(); await page.keyboard.press('Escape'); await inspector.waitFor({ state: 'hidden' })
+  assert.equal(await panel.getAttribute('data-expanded'), '', 'inspector Escape does not collapse its containing panel')
+  await page.keyboard.press('Escape'); assert.equal(await panel.getAttribute('data-expanded'), null)
+  assert.equal(await toggle.evaluate(node => node === document.activeElement), true)
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
   assert.deepEqual(errors, [])
   if (evidence) await page.screenshot({ path: resolve(evidence, `panel-${theme}-${width}.png`) })
