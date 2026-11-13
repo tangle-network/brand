@@ -1,3 +1,9 @@
+## 11.51.27
+
+### Patch Changes
+
+- 248f5ff: Preserve the committed VirtualCommand choice and native input focus when reopening during popover exit after a search selection.
+
 ## 11.51.26
 
 ### Patch Changes
