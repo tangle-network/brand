@@ -71,7 +71,7 @@ function moveTarget(items: readonly VirtualCommandItem[], current: string | unde
 
 function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const [open, setOpen] = useState(false)
-  const [instance, setInstance] = useState(0)
+  const instance = useRef(0)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState<string>()
   const [request, setRequest] = useState(0)
@@ -79,7 +79,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   const collection = useMemo(() => project(items, query), [items, query])
   const active = collection.enabled.some(item => item.value === highlight) ? highlight : collection.enabled[0]?.value
   const changeOpen = (next: boolean) => {
-    if (next) { setInstance(previous => previous + 1); setQuery(''); setHighlight(value) }
+    if (next) { instance.current++; setQuery(''); setHighlight(value) }
     setOpen(next)
   }
   const changeQuery = (next: string) => {
@@ -105,10 +105,10 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   return { open, instance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
-/** Reset cmdk search on opening; keep trigger toggles inside the nonmodal popup's focus ownership across reversed exits. */
+/** Each opening owns its search and outside intent; a retired opening cannot reclaim focus. */
 export function VirtualCommand(props: VirtualCommandProps) {
   const state = useCommandCollection(props)
-  const trigger = useRef<HTMLButtonElement>(null)
+  const instance = state.instance.current
   const prefix = useId()
   const optionId = (value: string) => `${prefix}-${encodeURIComponent(value)}`
   const activeId = state.active === undefined ? undefined : optionId(state.active)
@@ -124,12 +124,12 @@ export function VirtualCommand(props: VirtualCommandProps) {
     </Command.Item>
   ) : <div data-command-group-heading="">{row.heading}</div>
   return <Popover open={state.open} onOpenChange={state.changeOpen}>
-    <PopoverTrigger asChild ref={trigger}>{props.trigger}</PopoverTrigger>
-    <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
-      onInteractOutside={event => {
-        if (event.target instanceof Node && trigger.current?.contains(event.target)) event.preventDefault()
+    <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
+    <PopoverContent key={instance} align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
+      onCloseAutoFocus={event => {
+        if (state.open || state.instance.current !== instance) event.preventDefault()
       }}>
-      <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
+      <Command label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
         shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
           <input autoFocus aria-activedescendant={activeId} />
