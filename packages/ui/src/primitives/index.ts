@@ -287,3 +287,6 @@ export type { ThemeControllerOptions } from "./theme-toggle";
 export type { TableHeadProps } from "./table";
 
 export { Command, defaultFilter } from "cmdk";
+
+export { VirtualList, collectionTarget, type VirtualListProps } from "./virtual-list";
+export { VirtualCommand, type VirtualCommandItem, type VirtualCommandProps } from "./virtual-command";

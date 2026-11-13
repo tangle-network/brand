@@ -181,3 +181,7 @@ Create a `createThemeController({ storageKey, defaultTheme, storageValues, attri
 ### Searchable command menus
 
 `Command` from `@tangle-network/ui/primitives` is the exact upstream cmdk namespace, including its Input, List, Item, Group and Empty parts. Compose it inside the public Popover and import `@tangle-network/ui/styles/command.css` beside Brand styles for the owned token treatment. Use stable item IDs and searchable label keywords; cmdk owns filtering, highlighting and keyboard selection. The stylesheet bounds the scroll viewport; it does not virtualize item registration. Keep selection commits in Item.onSelect, separately from the highlighted value.
+
+`VirtualCommand` composes that menu and Popover over the shared `VirtualList`. Supply `items`, a committed `value`, `onSelect`, accessible `label`/`listLabel` and a button `trigger`; items carry stable unique values, labels and optional keywords, groups, disabled state or display content. It searches the full collection with the public scorer while mounting the viewport and active option. Highlighting never commits. Load the same command stylesheet and scan UI sources as above.
+
+`VirtualList` measures rows in a supplied `scroller`; `target` settles a logical key and `keepMounted` retains one active row. Optional semantic `groups` wrap only rendered rows without adding layout height: headings belong in measured items. `collectionTarget` moves through the full logical collection, independently of mounted DOM. Sandbox's existing VirtualList entry forwards this exact binding.
