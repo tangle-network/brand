@@ -106,7 +106,7 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   return { open, instance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
-/** Public cmdk semantics over one measured virtual collection, with a separate committed value. */
+/** A fresh cmdk search store on each opening; the measured collection keeps a separate committed value. */
 export function VirtualCommand(props: VirtualCommandProps) {
   const state = useCommandCollection(props)
   const prefix = useId()
@@ -129,7 +129,7 @@ export function VirtualCommand(props: VirtualCommandProps) {
       <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
         shouldFilter={false} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
-          <input aria-activedescendant={activeId} />
+          <input autoFocus aria-activedescendant={activeId} />
         </Command.Input>
         <Command.List asChild label={props.listLabel} ref={state.scroller}>
           <ListElement aria-activedescendant={activeId}>
