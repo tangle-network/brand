@@ -80,10 +80,9 @@ function ExpandablePanel({
         expanded && "fixed inset-0 z-50 m-0 size-auto min-h-0 min-w-0 max-h-none max-w-none rounded-none transform-none bg-background",
       )}
     >
-      {children}
       <div
         className={cn(
-          "absolute right-2 top-2 z-10 flex items-center gap-1 transition-opacity",
+          "sticky top-0 z-10 flex shrink-0 items-center justify-end gap-1 p-2 transition-opacity",
           expanded
             ? "opacity-100"
             : "opacity-0 group-hover/expandable:opacity-100 group-focus-within/expandable:opacity-100 pointer-coarse:opacity-100",
@@ -101,6 +100,7 @@ function ExpandablePanel({
           {expanded ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
         </Button>
       </div>
+      {children}
     </div>
   );
 }
