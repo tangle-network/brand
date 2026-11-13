@@ -15,9 +15,9 @@ export function CommandMenuFixture() {
   return <>
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild><Button aria-label="Choose recorded item">Choose item</Button></PopoverTrigger>
-      <PopoverContent align="start" className="p-0"><Command label="Recorded choices" defaultValue={selected} ref={root}>
+      <PopoverContent align="start" className="p-0"><Command label="Find recorded item" defaultValue={selected} ref={root}>
         <Command.Input ref={input} aria-label="Find recorded item" placeholder="Find a recorded item…" />
-        <Command.List label="Recorded choices"><Command.Empty role="status">No choices found.</Command.Empty>
+        <Command.List label="Recorded choices"><Command.Empty><span role="status">No choices found.</span></Command.Empty>
           {groups.map(group => <Command.Group key={group.heading} heading={group.heading}>{group.items.map(item => <Command.Item key={item.id} value={item.id} keywords={[item.name]}
             onSelect={value => { select(value); commit(n => n + 1); setOpen(false) }}>{item.name}</Command.Item>)}</Command.Group>)}
         </Command.List>
