@@ -23,7 +23,6 @@ export type VirtualCommandProps = {
 type Row = { key: string; group: string; heading?: string; item?: VirtualCommandItem; position?: number }
 type Bucket = { label?: string; score: number; items: { item: VirtualCommandItem; score: number }[] }
 const keyOf = (row: Row) => row.key
-const valueOf = (item: VirtualCommandItem) => item.value
 // cmdk's List asChild resolves a component child; a raw host string throws in its child resolver.
 const ListElement = (props: ComponentPropsWithoutRef<'div'>) => <div {...props} />
 
@@ -67,7 +66,7 @@ function moveTarget(items: readonly VirtualCommandItem[], current: string | unde
     const next = group && collectionTarget(heads, item => item.group!.value, group, move)
     if (next && next !== group) return heads.find(item => item.group!.value === next)?.value
   }
-  return collectionTarget(items, valueOf, current, move)
+  return collectionTarget(items, item => item.value, current, move)
 }
 
 function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
@@ -106,9 +105,10 @@ function useCommandCollection({ items, value, onSelect }: VirtualCommandProps) {
   return { open, instance, query, active, request, scroller, collection, changeOpen, changeQuery, changeHighlight, select, onKeyDown }
 }
 
-/** A fresh cmdk search store on each opening; the measured collection keeps a separate committed value. */
+/** Reset cmdk search on opening; keep trigger toggles inside the nonmodal popup's focus ownership across reversed exits. */
 export function VirtualCommand(props: VirtualCommandProps) {
   const state = useCommandCollection(props)
+  const trigger = useRef<HTMLButtonElement>(null)
   const prefix = useId()
   const optionId = (value: string) => `${prefix}-${encodeURIComponent(value)}`
   const activeId = state.active === undefined ? undefined : optionId(state.active)
@@ -124,8 +124,9 @@ export function VirtualCommand(props: VirtualCommandProps) {
     </Command.Item>
   ) : <div data-command-group-heading="">{row.heading}</div>
   return <Popover open={state.open} onOpenChange={state.changeOpen}>
-    <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
-    <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0">
+    <PopoverTrigger asChild ref={trigger}>{props.trigger}</PopoverTrigger>
+    <PopoverContent align="start" className="w-[min(24rem,calc(100vw-24px))] p-0"
+      onInteractOutside={event => { const target = event.detail.originalEvent.target; if (target instanceof Node && trigger.current?.contains(target)) event.preventDefault() }}>
       <Command key={state.instance} label={props.label} value={state.active ?? ''} onValueChange={state.changeHighlight}
         shouldFilter={false} filter={() => 1} vimBindings={false} onKeyDown={state.onKeyDown}>
         <Command.Input asChild value={state.query} onValueChange={state.changeQuery} placeholder={props.label}>
