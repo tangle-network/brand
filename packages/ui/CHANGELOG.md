@@ -1,3 +1,9 @@
+## 11.51.24
+
+### Patch Changes
+
+- d8acf16: Expose the maintained cmdk Command namespace through public primitives, with a token-based command-menu stylesheet for searchable pickers.
+
 ## 11.51.23
 
 ### Patch Changes
