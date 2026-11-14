@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { Popover, PopoverAnchor, PopoverContent } from "./popover";
 import { tokenMilliseconds } from "../utils/token-milliseconds";
 
-const HoverIntent = React.createContext({ content: { current: null as HTMLDivElement | null }, enter: (_target: Element) => {}, leave: (_event?: { relatedTarget: EventTarget | null }) => {}, restore: () => {}, press: () => {}, owns: (_target: EventTarget | null) => false });
+const HoverIntent = React.createContext({ content: { current: null as HTMLDivElement | null }, enter: (_target: Element) => {}, leave: (_event?: { relatedTarget: EventTarget | null }) => {}, restore: () => {}, press: () => {}, owns: (_target: EventTarget | null): boolean => false });
 type HoverCardProps = React.ComponentProps<typeof Popover> & {
   /** Existing DOM trigger for delegated canvas or virtual-list previews. */
   anchor?: HTMLElement | { getBoundingClientRect: () => DOMRect; contextElement: HTMLElement } | null;
