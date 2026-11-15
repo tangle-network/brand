@@ -47,6 +47,14 @@ I'll grep for all callsites to confirm before patching.`,
   time: { start: NOW - 18000, end: NOW - 9000 },
 }
 
+// A one-line answer the model reasoned to, "391.", parses as an ordered list
+// starting at 391: its three-digit marker must stay inside the row's clip.
+const thinkingNumbered: ReasoningPart = {
+  type: 'reasoning',
+  text: '391.',
+  time: { start: NOW - 900, end: NOW - 600 },
+}
+
 const thinkingEmpty: ReasoningPart = {
   type: 'reasoning',
   text: '',
@@ -160,6 +168,16 @@ export const AllStates: Story = {
       <InlineThinkingItem part={thinkingComplete} defaultOpen={false} autoCollapse={false} />
       <p className="text-xs font-mono text-muted-foreground px-1 pt-2">Complete (expanded)</p>
       <InlineThinkingItem part={thinkingLong} defaultOpen={true} autoCollapse={false} />
+    </div>
+  ),
+}
+
+export const NumberedAnswer: Story = {
+  name: 'Numbered answer (expanded)',
+  args: { part: thinkingNumbered, defaultOpen: true, autoCollapse: false },
+  render: (args) => (
+    <div className="p-6 max-w-2xl">
+      <InlineThinkingItem {...args} />
     </div>
   ),
 }
