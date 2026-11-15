@@ -2,7 +2,7 @@
 
 The reader is a developer who has never heard of Tangle, deciding in five seconds whether this does their job. Every heading, subline, button, meta description and example comment on tangle.tools, in the docs and in launches passes one test: **would that developer care?** If the line is about us (our process, our proof, our effort, our architecture) and not about what they get, it fails.
 
-[Copywriting anti-patterns](https://github.com/drewstone/dotfiles/blob/main/docs/anti-patterns/copywriting.md) owns the editing procedure (slop patterns, banned words, CTA rules). This page owns Tangle's voice, the headline patterns we copy from, and the running list of copy Drew rejected.
+[Copywriting anti-patterns](https://github.com/drewstone/dotfiles/blob/main/docs/anti-patterns/copywriting.md) owns the editing procedure (slop patterns, banned words, CTA rules). This page owns Tangle's voice, the headline patterns we copy from, and the running list of copy Drew rejected. The [post bible](post-bible.md) owns posts: what to show and what to write, measured on real developer posts.
 
 ## How the best pages in our market write
 
@@ -85,6 +85,11 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
+| 2026-11-15 | Rejected every draft; asked for rules measured on real posts | The [post bible](post-bible.md), every rule measured on real posts. |
+| 2026-11-15 | Counting the commands ("Three commands: create the sandbox, prompt the agent, start a preview.") | Say the items, not how many there are. |
+| 2026-11-15 | "Just tell the commands"; "have the video show a time duration" instead of saying it is sped up | Put the command in the post. A clock in the frame keeps the time; the text says nothing about speed. |
+| 2026-11-15 | "We want examples! We want to visualize!" | Show it running, and show the result. |
+| 2026-11-13 | Demos the way real people want to see them, not labelled and captioned; "visual like a movie! motion!" | A clip of the real screen with no caption text over the product. |
 | 2026-11-12 | "fix the copy its so gimmicky, Copy the file, run it, like wtf, we're like yelling at the reader, why not just tell them what our compnay does? and why?" on "Pick a job. Copy the file. Run it." | Say what Tangle does and why, as statements. Never a string of commands. |
 | 2026-11-02 | "these charts in ai applied benchmarks are bad … we had somthign 100x better months ago, when it was all sorts of verticals or tax or legal and stuff with clear bar charts tooltips, agentprofile/(model + harness) combinations as x axis and score on y" | A score board is columns of model and harness, with score on y. |
 | 2026-11-02 | "get rid of all the competitors or at least hide them from this chart for now until we're really competitive" | No competitors on a benchmark page until we are competitive. |
