@@ -148,6 +148,21 @@ function MarkdownCode({ node, className: codeClass, children: codeChildren, ...r
   );
 }
 
+/**
+ * An ordered list widens its marker gutter for its widest number. The prose
+ * gutter (1.4em) fits "9."; a reply of "391." parsed as a list starting at 391,
+ * its marker hung past the gutter, and a clipping parent cut its first digits.
+ */
+function MarkdownOrderedList({ node, start, style, children, ...props }: ComponentProps<"ol"> & ExtraProps) {
+  const items = node?.children.filter((child) => child.type === "element" && child.tagName === "li").length ?? 0;
+  const digits = String((start ?? 1) + Math.max(items, 1) - 1).length;
+  return (
+    <ol {...props} start={start} style={digits > 1 ? { ...style, paddingLeft: `calc(1.4em + ${digits - 1}ch)` } : style}>
+      {children}
+    </ol>
+  );
+}
+
 // The default schema plus a fence's info string on <code>, which names its file.
 const sanitizeSchema = {
   ...defaultSchema,
@@ -252,6 +267,7 @@ export const Markdown = memo(({ children, className, urlTransform, linkChip }: M
             img: MarkdownImage,
             pre: MarkdownPre,
             code: MarkdownCode,
+            ol: MarkdownOrderedList,
             table: MarkdownTable,
             thead: MarkdownTableHead,
             tbody: MarkdownTableBody,
