@@ -85,11 +85,11 @@ Add to this list every time Drew rejects a line. Date, quote, rule. Never remove
 
 | Date | Drew | Rule |
 |---|---|---|
-| 2026-11-15 | "I give all these prompts 0/10, you need to do a deep research into actual well performing tweets in tech, from competitors, from founders, for real developers, and completely shift your perspective and approach and CEMENT it in a BIBLE" | The [post bible](post-bible.md), every rule measured on real posts. |
-| 2026-11-15 | "COUNTING THINGS SOUNDS SO DUMB! and AI SLOP!" on "Three commands: create the sandbox, prompt the agent, start a preview." | Say the items, not how many there are. |
-| 2026-11-15 | "Just tell the commands! no 'three commands', 'the video is sped up' this is so stupid! wtf, just have the video show a time duration and if it moves fast users will see, do you think humans are retarded?" | Put the commands in the post. A clock in the frame keeps the time; the text never describes the video. |
+| 2026-11-15 | Rejected every draft; asked for rules measured on real posts | The [post bible](post-bible.md), every rule measured on real posts. |
+| 2026-11-15 | Counting the commands ("Three commands: create the sandbox, prompt the agent, start a preview.") | Say the items, not how many there are. |
+| 2026-11-15 | "Just tell the commands"; "have the video show a time duration" instead of saying it is sped up | Put the command in the post. A clock in the frame keeps the time; the text says nothing about speed. |
 | 2026-11-15 | "We want examples! We want to visualize!" | Show it running, and show the result. |
-| 2026-11-13 | demos "the way users REAL PEOPLE want to see it, not some ai slop overly labelled overly text chrome crap"; "visual hand-holding"; "seriously visual like a movie! motion!" | A clip of the real screen with no caption text over the product. |
+| 2026-11-13 | Demos the way real people want to see them, not labelled and captioned; "visual like a movie! motion!" | A clip of the real screen with no caption text over the product. |
 | 2026-11-12 | "fix the copy its so gimmicky, Copy the file, run it, like wtf, we're like yelling at the reader, why not just tell them what our compnay does? and why?" on "Pick a job. Copy the file. Run it." | Say what Tangle does and why, as statements. Never a string of commands. |
 | 2026-11-02 | "these charts in ai applied benchmarks are bad … we had somthign 100x better months ago, when it was all sorts of verticals or tax or legal and stuff with clear bar charts tooltips, agentprofile/(model + harness) combinations as x axis and score on y" | A score board is columns of model and harness, with score on y. |
 | 2026-11-02 | "get rid of all the competitors or at least hide them from this chart for now until we're really competitive" | No competitors on a benchmark page until we are competitive. |

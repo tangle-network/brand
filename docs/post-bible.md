@@ -84,8 +84,8 @@ Drew's rule (2026-11-02, 2026-11-15). The corpus does not penalize counts: the 7
 ### 12. Post what you made, not where you will be.
 Events, meetups, conference talks, office news: 0.4x (n=99; higher in 6 of 32 accounts). [Modal at re:Invent](https://x.com/modal/status/2121279422397587584): 0.1x.
 
-### 13. Do not post five in the same shape.
-A blind reader marked all five of our rewritten posts as written by a company's AI in three rounds, and none of ten real posts; its words: "the same template: did a thing, here is the line", "very polished and uniform". A second reader marked none of ours. Vary the opening, the length and the media from post to post.
+### 13. Do not post five in the same shape: vary the opening, the length and the media.
+Not measured in the corpus. The 12 best clips open on eight different screens: a chat window, a terminal, a prompt box, a desktop, a diagram, a live demo page, two empty panes, a 3D box.
 
 ## Who posts
 
@@ -93,7 +93,7 @@ A founder's own account reaches more people per follower than the company's: med
 
 ## How it was checked
 
-Rules were written before a held-out set was scored. 20 % of posts were set aside by a hash before any analysis; 60 were drawn at random and coded without their counts. The rules called 38 of 60 right (63 %) against its account's median, and 23 of 30 (77 %) on the five kinds above. The second number was computed after the scope was narrowed.
+20 % of posts were set aside by a hash before any analysis; 60 of them, drawn at random, were coded without their counts. Scored one point per rule, the rules called 38 of 60 right against the account's median (63 %), and 23 of 30 (77 %) on the five kinds above.
 
 ## The running list: copy Drew rejected
 
@@ -101,8 +101,8 @@ Added here and in the [copy bible's list](copy-bible.md#the-running-list-copy-dr
 
 | Date | Drew | Rule |
 |---|---|---|
-| 2026-11-15 | "I give all these prompts 0/10, you need to do a deep research into actual well performing tweets in tech, from competitors, from founders, for real developers, and completely shift your perspective and approach and CEMENT it in a BIBLE" | This page. |
-| 2026-11-15 | "COUNTING THINGS SOUNDS SO DUMB! and AI SLOP!" on "Three commands: create the sandbox, prompt the agent, start a preview." | 11 |
-| 2026-11-15 | "Just tell the commands! no 'three commands', 'the video is sped up' this is so stupid! wtf, just have the video show a time duration and if it moves fast users will see, do you think humans are retarded?" | 3, 7 |
+| 2026-11-15 | Rejected every draft; asked for rules measured on real posts | This page. |
+| 2026-11-15 | Counting the commands ("Three commands: create the sandbox, prompt the agent, start a preview.") | 11 |
+| 2026-11-15 | "Just tell the commands"; "have the video show a time duration" instead of saying it is sped up | 3, 7 |
 | 2026-11-15 | "We want examples! We want to visualize!" | 1, 2 |
-| 2026-11-13 | demos "the way users REAL PEOPLE want to see it, not some ai slop overly labelled overly text chrome crap"; "visual hand-holding"; "seriously visual like a movie! motion!" | 1, 4 |
+| 2026-11-13 | Demos the way real people want to see them, not labelled and captioned; "visual like a movie! motion!" | 1, 4 |
