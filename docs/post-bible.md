@@ -50,15 +50,14 @@ Images of text: 0.6x; code stills: 0.6x; a UI at rest: 0.7x; no media at all: 1.
 
 ## What to write
 
-### 7. Put the input in the post: the command, the code or the prompt.
-Posts a reader can copy from are saved more: 2.6 against 2.0 (n=28 and 263). Views are no higher (1.3x either way): this rule is for saves.
+### 7. Put the input in the post: one command, the one that does the work.
+Posts a reader can copy from are saved more: 2.6 against 2.0 (n=28 and 263). Views are no higher (1.3x either way): this rule is for saves. Of 45 posts with a command line, 44 carry exactly one; setup goes in the reply.
 - [aidenybai](https://x.com/aidenybai/status/2059303624266977296): ends `npx react-doctor@latest`. 28x.
 - [mlejva](https://x.com/mlejva/status/2074879556713132064): one line, `e2b sbx create grok`. 3.3x.
 ```diff
 - Three commands: create the sandbox, prompt the agent, start a preview.
-+ tangle sandbox create --name particles --backend claude-code --backend-model zai/glm-5.3
 + tangle agent prompt particles "Build a page in ~/app: ..." --stream
-+ tangle preview start particles --cwd app
++ (create and preview start go in the reply)
 ```
 
 ### 8. Name the thing in the first line. Never open with a question.
@@ -79,11 +78,14 @@ Over 280 characters: 3.0x; 100 or fewer: 0.7x (higher in 21 of 33 accounts). Thr
 Drew's rule (2026-11-02, 2026-11-15). The corpus does not penalize counts: the 7 posts that announce a count ran 6.4x, and Railway's "Zero sign-up. One command." ran 27x. Those posts then show every item. Ours counted instead of showing.
 ```diff
 - Three commands: create the sandbox, prompt the agent, start a preview.
-+ (the three commands themselves)
++ (the command itself, in the post; the others in the reply)
 ```
 
 ### 12. Post what you made, not where you will be.
 Events, meetups, conference talks, office news: 0.4x (n=99; higher in 6 of 32 accounts). [Modal at re:Invent](https://x.com/modal/status/2121279422397587584): 0.1x.
+
+### 13. Do not post five in the same shape.
+A blind reader marked all five of our rewritten posts as written by a company's AI in three rounds, and none of ten real posts; its words: "the same template: did a thing, here is the line", "very polished and uniform". A second reader marked none of ours. Vary the opening, the length and the media from post to post.
 
 ## Who posts
 
