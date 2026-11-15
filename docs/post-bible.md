@@ -93,7 +93,7 @@ A founder's own account reaches more people per follower than the company's: med
 
 ## How it was checked
 
-20 % of posts were set aside by a hash before any analysis; 60 of them, drawn at random, were coded without their counts. Scored one point per rule, the rules called 38 of 60 right against the account's median (63 %), and 23 of 30 (77 %) on the five kinds above.
+20 % of posts were set aside by a hash before any analysis; 60 of them, drawn at random, were coded without their counts. Scored one point per rule, the rules called 38 of 60 right against the account's median (63 %), and 23 of 30 (77 %) on the five kinds above. A second scorer, its weights learned from the analysis set and frozen before 60 fresh held-out posts were read, called 30 of 60 (50 %). The rules tell the best posts from the worst; they do not predict whether an ordinary post lands just above or below its account's median.
 
 ## The running list: copy Drew rejected
 
