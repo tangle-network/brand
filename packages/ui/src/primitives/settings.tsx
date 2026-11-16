@@ -102,9 +102,12 @@ export interface SettingsRowProps {
   children?: React.ReactNode;
 }
 
+// A label column is never narrower than its longest word: at minmax(0,1fr) the
+// control column grew to 20rem first and squeezed a short label such as "Harness"
+// to nothing beside a select outside a settings section.
 const ROW_COLUMNS: Record<SettingsRowLayout, string> = {
-  inline: "grid-cols-[minmax(0,1fr)_minmax(13rem,20rem)] @max-[34rem]/settings-section:grid-cols-1",
-  compact: "grid-cols-[minmax(0,1fr)_auto]",
+  inline: "grid-cols-[minmax(min-content,1fr)_minmax(13rem,20rem)] @max-[34rem]/settings-section:grid-cols-1",
+  compact: "grid-cols-[minmax(min-content,1fr)_auto]",
   stacked: "grid-cols-1",
 };
 
