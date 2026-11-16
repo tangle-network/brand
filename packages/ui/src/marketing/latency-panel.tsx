@@ -11,7 +11,7 @@ export function LatencyPanel({
   more: SiteLink;
 }) {
   return (
-    <div className="mk mk-latency">
+    <div className="mk mk-frame mk-latency">
       <div className="mk-latency-figure" dangerouslySetInnerHTML={{ __html: figureHtml }} />
       <div className="mk-source">
         <span>{source}</span>

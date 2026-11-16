@@ -348,7 +348,9 @@ body > astro-island:has(.mk-nav) { display: contents; }
 .mk-closer-code { margin: 0; }
 .mk-closer-code > span:not(.mk-deleted):not(.mk-added) { display: block; }
 .mk-chrome .mk-line { color: var(--ink-4); }
-.mk-latency { border: calc(var(--font-size-base) / 16) solid var(--border-accent); border-radius: var(--radius-panel); background: var(--well); overflow: hidden; }
+.mk-latency .tgc-row-p95 { fill: var(--surface-warning-text); }
+.mk-latency .tgc-row-band-p95 { fill: color-mix(in srgb, var(--surface-warning-text) 26%, transparent); }
+.mk-latency .tgc-row-link { display: none; }
 .mk-source { display: flex; justify-content: space-between; gap: var(--font-size-base); padding: var(--font-size-base); border-top: calc(var(--font-size-base) / 16) solid var(--line); font: var(--font-size-xs)/1.4 var(--font-mono); color: var(--ink-3); }
 .mk-source a { color: var(--accent-text); }
 .mk-status i[data-up="false"] { background: var(--surface-warning-text); box-shadow: none; }
