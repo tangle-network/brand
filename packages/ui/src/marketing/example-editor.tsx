@@ -160,6 +160,14 @@ function Workspace({ idea, folder, install }: { idea: Idea; folder: string; inst
   </div>;
 }
 
+/** Scrolls a sideways row the least that shows `item` whole, from a label's start, so the row opens on a whole word unless scrolled to its end. */
+function reveal(row: HTMLElement, item: HTMLElement, labels: HTMLElement[]) {
+  if (row.scrollWidth <= row.clientWidth) return;
+  const box = row.getBoundingClientRect(), left = (el: HTMLElement) => el.getBoundingClientRect().left - box.left + row.scrollLeft;
+  const inset = left(labels[0]), at = left(item), end = at + item.offsetWidth + inset;
+  row.scrollTo({ left: (labels.map(left).find((start) => start <= at && end - start <= row.clientWidth) ?? at) - inset });
+}
+
 /** Slides one marker to the chosen job: its list reads the job's box from --thumb-* variables. */
 function useThumb(root: React.RefObject<HTMLElement | null>, picked: string) {
   useLayoutEffect(() => {
@@ -167,10 +175,9 @@ function useThumb(root: React.RefObject<HTMLElement | null>, picked: string) {
       const item = root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]'), list = item?.parentElement;
       if (!item || !list) return;
       for (const [name, value] of [['x', item.offsetLeft], ['y', item.offsetTop], ['w', item.offsetWidth], ['h', item.offsetHeight]] as const) list.style.setProperty(`--thumb-${name}`, `${value}px`);
-      const rows = list.parentElement!;
-      if (rows.scrollWidth > rows.clientWidth) rows.scrollTo({ left: item.offsetLeft - (rows.clientWidth - item.offsetWidth) / 2 });
-      const nav = rows.parentElement!, group = rows.previousElementSibling as HTMLElement; // a narrow screen scrolls subjects sideways
-      if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: group.offsetLeft - 12 });
+      const rows = list.parentElement!, nav = rows.parentElement!; // a narrow screen scrolls jobs and subjects sideways
+      reveal(rows, item, [...list.children] as HTMLElement[]);
+      reveal(nav, rows.previousElementSibling as HTMLElement, [...nav.querySelectorAll<HTMLElement>(':scope > .qs-group')]);
     };
     place();
     const observer = new ResizeObserver(place);
