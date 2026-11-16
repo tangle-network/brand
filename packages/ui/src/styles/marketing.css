@@ -155,7 +155,7 @@
   --h2: clamp(1.875rem, 1.1rem + 2.3vw, 2.875rem);
   --gutter: calc(var(--font-size-base) * 1.25);
 }
-.mk-wrap { width: min(75rem, calc(100% - 2 * var(--gutter))); margin-inline: auto; }
+.mk-wrap { width: min(calc(var(--font-size-base) * 75), calc(100% - 2 * var(--gutter))); margin-inline: auto; }
 .mk-sr { position: absolute; width: calc(var(--font-size-base) * 0.0625); height: calc(var(--font-size-base) * 0.0625); overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---------- SiteNav ---------- */
@@ -184,7 +184,7 @@
 /* ---------- Section, SectionHead ---------- */
 .mk-section { position: relative; padding: calc(var(--font-size-base) * 7.5) 0 0; }
 .mk-section:last-of-type { padding-bottom: calc(var(--font-size-base) * 7.5); }
-.mk-glow::before { content: ""; position: absolute; inset: calc(var(--font-size-base) * 11.25) 0 auto; height: calc(var(--font-size-base) * 38.75); pointer-events: none; background: radial-gradient(60rem 26rem at 50% 50%, color-mix(in srgb, var(--brand-cool) 13%, transparent), transparent 70%); }
+.mk-glow::before { content: ""; position: absolute; inset: calc(var(--font-size-base) * 11.25) 0 auto; height: calc(var(--font-size-base) * 38.75); pointer-events: none; background: radial-gradient(calc(var(--font-size-base) * 60) calc(var(--font-size-base) * 26) at 50% 50%, color-mix(in srgb, var(--brand-cool) 13%, transparent), transparent 70%); }
 .mk-heading { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: calc(var(--font-size-base) * 2); margin-bottom: calc(var(--font-size-base) * 2.5); }
 .mk-heading h1, .mk-heading h2 { margin: 0; font-weight: 600; color: var(--ink); text-wrap: balance; }
 .mk-heading h1 { font-size: var(--h1); line-height: 1.02; letter-spacing: -0.038em; }
@@ -319,7 +319,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .mk code, .mk pre, .mk-mono { font-family: var(--font-mono); }
 .mk a:focus-visible, .mk button:focus-visible { outline: calc(var(--font-size-base) / 8) solid var(--accent-text); outline-offset: calc(var(--font-size-base) / 4); }
 .mk-brand svg { flex: none; }
-.mk-brand > svg { width: calc(var(--font-size-base) * 1.625); height: calc(var(--font-size-base) * 1.625); padding: calc(var(--font-size-base) * .1875); border-radius: 50%; background: var(--text-primary); }
+.mk-brand > svg { width: calc(var(--font-size-base) * 1.625); height: calc(var(--font-size-base) * 1.625); padding: calc(var(--font-size-base) * .1875); border-radius: 50%; background: var(--btn-primary-text); }
 .mk-trace-tools .mk-good { font-weight: 400; }
 .mk-command-block { border: 0; border-radius: 0; background: transparent; --code-padding-x: 0; --code-padding-y: 0; --code-font-size: calc(var(--font-size-base) * .8125); --code-line-height: 1.85; }
 .mk-command-block.mk-comment { --syntax-foreground: var(--ink-4); }
@@ -367,6 +367,7 @@ body > astro-island:has(.mk-nav) { display: contents; }
  .mk-last { padding-bottom: calc(var(--font-size-base) * 4.5); }
  .mk-section .mk-heading { flex-direction: column; align-items: stretch; gap: var(--font-size-sm); margin-bottom: calc(var(--font-size-base) * 1.625); }
  .mk-hero { padding-top: calc(var(--font-size-base) * 3); }
+ .mk-hero > .mk-wrap > .mk-actions { margin-top: calc(var(--font-size-base) * -.125); }
  .mk-heading h1 { font-size: calc(var(--font-size-base) * 2.5); line-height: 1.05; letter-spacing: -0.034em; }
  .mk-heading h2 { font-size: var(--font-size-3xl); line-height: 1.12; }
  .mk-heading p { font-size: calc(var(--font-size-base) * 1.0625); margin-top: var(--font-size-sm); }
