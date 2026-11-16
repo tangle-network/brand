@@ -324,6 +324,9 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .mk-command-block { border: 0; border-radius: 0; background: transparent; --code-padding-x: 0; --code-padding-y: 0; --code-font-size: calc(var(--font-size-base) * .8125); --code-line-height: 1.85; }
 .mk-command-block.mk-comment { --syntax-foreground: var(--ink-4); }
 .mk-github-mark { width: var(--font-size-xl); height: var(--font-size-xl); }
+.mk-copy > svg { width: calc(var(--font-size-base) * .9375); height: calc(var(--font-size-base) * .9375); }
+.mk-result > svg, .mk-receipt-lead > svg { flex: none; width: calc(var(--font-size-base) * 1.0625); height: calc(var(--font-size-base) * 1.0625); }
+.mk-menu > svg { width: calc(var(--font-size-base) * 1.125); height: calc(var(--font-size-base) * 1.125); }
 body > astro-island:has(.mk-nav) { display: contents; }
 .mk-phone-nav { position: absolute; inset: 100% 0 auto; padding: var(--font-size-xl); border-bottom: calc(var(--font-size-base) / 16) solid var(--line); background: var(--depth-1); display: flex; flex-direction: column; gap: var(--font-size-base); }
 .mk-section > .mk-wrap { position: relative; }
