@@ -1,3 +1,9 @@
+## 11.51.33
+
+### Patch Changes
+
+- 5ef9813: `ExampleEditor` on a narrow screen no longer opens with its tab rows cut at the left edge. Each row scrolls the least that shows the chosen subject or job whole and starts on a whole label, measured against the row itself rather than the page.
+
 ## 11.51.32
 
 ### Patch Changes
