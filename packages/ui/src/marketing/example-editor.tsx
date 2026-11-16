@@ -51,7 +51,7 @@ function activity(events: Ev[], t: number, source: string[]) {
   const lines = new Map<number, { atMs: number; label: string; done: number; total: number; turn: boolean; state?: string; last?: Ev }>();
   const items = new Map<string, Item>();
   const streamed = events.some((event) => event.data?.part?.type === 'text'); // a newer record carries the agent's own words
-  let active: number | undefined, busy = false;
+  let busy = false;
   for (const event of events) {
     if (event.atMs > t) break;
     const part = event.type === 'message.part.updated' ? event.data?.part : undefined;
@@ -60,7 +60,7 @@ function activity(events: Ev[], t: number, source: string[]) {
       let line = lines.get(event.line);
       if (!line) lines.set(event.line, line = { atMs: event.atMs, label: event.label ?? '', done: 0, total: 0, turn: typeof event.result?.response === 'string' });
       line.total++;
-      if (done) { line.done++; line.last = event; } else active = event.line;
+      if (done) { line.done++; line.last = event; }
       if (done && line.turn && !streamed) items.set(`a${event.atMs}`, { id: `a${event.atMs}`, atMs: event.atMs + (event.durationMs ?? 0), kind: 'message', role: 'assistant', content: event.result.response });
     } else if (part?.type === 'tool') {
       const status = part.state?.status === 'completed' ? 'success' : part.state?.status === 'error' ? 'error' : 'running';
@@ -85,7 +85,7 @@ function activity(events: Ev[], t: number, source: string[]) {
   }
   const list = [...items.values()].sort((a, b) => a.atMs - b.atMs);
   const quiet = !list.some((item) => (item.kind === 'tool' && item.call.status === 'running') || (item.kind === 'message' && item.isStreaming));
-  return { items: list, lines, active, thinking: busy && quiet };
+  return { items: list, thinking: busy && quiet };
 }
 
 /** Return rows reserve space below the highlighted statement instead of covering source. */

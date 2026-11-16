@@ -12,7 +12,6 @@ function GenericResult({ events, t }: { events: Ev[]; t: number }) {
     const outputs = calls.filter((event) => typeof event.result?.stdout === 'string' && event.result.stdout.trim());
     const patch = outputs.findLast((event) => event.result.stdout.startsWith('diff --git '))?.result.stdout as string | undefined;
     const tests = outputs.findLast((event) => /^# tests \d/m.test(event.result.stdout))?.result.stdout as string | undefined;
-    const pass = tests?.match(/^# pass (\d+)/m)?.[1], fail = tests?.match(/^# fail (\d+)/m)?.[1];
     const answers = events.flatMap((event, key) => {
       const agent = event.type === 'agent.finished' && event.atMs <= t ? event.data?.result : undefined;
       const text = agent?.result?.response;
@@ -30,7 +29,7 @@ function GenericResult({ events, t }: { events: Ev[]; t: number }) {
     const shown = [...answers.map((answer) => answer.text), ...calls.map((event) => event.result?.response)].filter((text): text is string => typeof text === 'string' && !!text.trim()); // the transcript already shows each answer
     const remainingConsole = shown.reduce((text, answer) => text.replace(answer.trim(), ''), consoleText);
     const consoleOutput = assessments.length || answers.some((answer) => answer.agent) || /\b(?:inputTokens|outputTokens|cacheReadTokens)\b/.test(remainingConsole) || !remainingConsole.trim() ? '' : remainingConsole;
-    return { patch, tests, pass, fail, answers, assessments, errors, consoleText: consoleOutput,
+    return { patch, tests, answers, assessments, errors, consoleText: consoleOutput,
       output: outputs.filter((event) => event.result.stdout !== patch && event.result.stdout !== tests && !consoleOutput.includes(event.result.stdout.trim())).map((event) => event.result.stdout).join('\n') };
   }, [events, t]);
 
