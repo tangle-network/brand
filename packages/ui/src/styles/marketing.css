@@ -323,6 +323,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .mk-trace-tools .mk-good { font-weight: 400; }
 .mk-command-block { border: 0; border-radius: 0; background: transparent; --code-padding-x: 0; --code-padding-y: 0; --code-font-size: calc(var(--font-size-base) * .8125); --code-line-height: 1.85; }
 .mk-command-block.mk-comment { --syntax-foreground: var(--ink-4); }
+.mk-command-block pre, .mk-command-block code { white-space: pre-wrap !important; }
 .mk-github-mark { width: var(--font-size-xl); height: var(--font-size-xl); }
 .mk-copy > svg { width: calc(var(--font-size-base) * .9375); height: calc(var(--font-size-base) * .9375); }
 .mk-result > svg, .mk-receipt-lead > svg { flex: none; width: calc(var(--font-size-base) * 1.0625); height: calc(var(--font-size-base) * 1.0625); }
@@ -393,11 +394,12 @@ body > astro-island:has(.mk-nav) { display: contents; }
  .mk-harness b { font-size: calc(var(--font-size-base) * .90625); }
  .mk-harness code { margin: calc(var(--font-size-sm) * -1) 0 0; width: 100%; padding-left: calc(var(--font-size-base) * 2.625); font-size: calc(var(--font-size-base) * .71875); }
  .mk-live-slot { position: relative; bottom: auto; margin-bottom: calc(var(--font-size-base) * 1.625); }
- .mk-proof { grid-template-columns: minmax(0, 1fr); }
+ .mk-proof { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
  .mk-proof > * { min-width: 0; }
- .mk-proof > :last-child { order: -1; border: 0; border-bottom: calc(var(--font-size-base) / 16) solid var(--line); }
+ .mk-proof > :last-child { order: -1; border: 0; }
  .mk-commands { padding: var(--font-size-base); font-size: var(--font-size-xs); overflow-x: auto; }
- table.mk-billing { font-size: var(--font-size-sm); table-layout: fixed; }
+ .mk-command-block { --code-font-size: var(--font-size-xs); }
+ table.mk-billing { font-size: var(--font-size-sm); }
  table.mk-billing th, table.mk-billing td { padding: var(--font-size-xs) var(--font-size-sm); }
  .mk-section:has(.mk-plan-table) .mk-heading { padding-right: 0; min-height: 0; }
  .mk-plan-table .mk-rate { position: relative; min-width: 0; width: 100%; margin-bottom: var(--font-size-2xl); }
