@@ -36,7 +36,7 @@ export function PlanTable({ plans, names, rate, actions, more }: PlanTableProps)
             <small> / hour</small>
           </strong>
         </div>
-        <a href={rate.href}>/v1/pricing/sandboxes ↗</a>
+        <a href={rate.href}>{rate.href.replace(/^https?:\/\/[^/]+/, '')} ↗</a>
       </div>
       <div className="mk-plans" data-plans>
         {data
