@@ -1,3 +1,9 @@
+## 11.51.31
+
+### Patch Changes
+
+- 22987a0: SettingsRow's inline layout no longer squeezes a short label to nothing beside a wide control outside a settings section: the label cell keeps its minimum content width (normally the label's longest word) and the control column gives up width instead. Wide rows are unchanged.
+
 ## 11.51.30
 
 ### Patch Changes
