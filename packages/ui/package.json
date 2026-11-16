@@ -120,6 +120,12 @@
       "default": "./dist/presentation.js"
     },
     "./styles/presentation.css": "./src/styles/presentation.css",
+    "./marketing": {
+      "types": "./dist/marketing.d.ts",
+      "import": "./dist/marketing.js",
+      "default": "./dist/marketing.js"
+    },
+    "./styles/marketing.css": "./src/styles/marketing.css",
     "./code-presentation": {
       "types": "./dist/code-presentation.d.ts",
       "import": "./dist/code-presentation.js",

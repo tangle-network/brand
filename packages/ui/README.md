@@ -101,6 +101,10 @@ Both validators return `{ ok: true, value }` with a typed renderer node, or `{ o
 They reject unknown node types, hidden fields, malformed cells, and unsupported nested children.
 The renderer reports an unsupported saved node at its path instead of silently omitting it.
 
+### Marketing
+
+`@tangle-network/ui/marketing` holds the components the public sites share. `ExampleEditor` is the tangle.tools example editor: pass `subjects` (each with its ideas' source, install line and optional recorded-run `url`) and an optional `initial` key; it fetches each run record from its `url` and replays it. Import `@tangle-network/ui/styles/marketing.css` beside Brand styles, and set `class="dark" data-theme="website"` on an ancestor for the tangle.tools look.
+
 ### Markdown and OpenUI links
 
 `Markdown` adds GitHub-style heading IDs before sanitising the rendered document.
