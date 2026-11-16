@@ -164,8 +164,8 @@ function Workspace({ idea, folder, install }: { idea: Idea; folder: string; inst
 function reveal(row: HTMLElement, item: HTMLElement, labels: HTMLElement[]) {
   if (row.scrollWidth <= row.clientWidth) return;
   const box = row.getBoundingClientRect(), left = (el: HTMLElement) => el.getBoundingClientRect().left - box.left + row.scrollLeft;
-  const inset = left(labels[0]), end = left(item) + item.offsetWidth + inset;
-  row.scrollTo({ left: (labels.map(left).find((start) => end - start <= row.clientWidth) ?? left(item)) - inset });
+  const inset = left(labels[0]), at = left(item), end = at + item.offsetWidth + inset;
+  row.scrollTo({ left: (labels.map(left).find((start) => start <= at && end - start <= row.clientWidth) ?? at) - inset });
 }
 
 /** Slides one marker to the chosen job: its list reads the job's box from --thumb-* variables. */
