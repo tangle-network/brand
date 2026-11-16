@@ -152,7 +152,7 @@
   --sans: var(--font-sans);
   --mono: var(--font-mono);
   --h1: var(--font-size-display);
-  --h2: clamp(1.875rem, 1.1rem + 2.3vw, 2.875rem);
+  --h2: clamp(calc(var(--font-size-base) * 1.875), calc(var(--font-size-base) * 1.1 + 2.3vw), calc(var(--font-size-base) * 2.875));
   --gutter: calc(var(--font-size-base) * 1.25);
 }
 .mk-wrap { width: min(calc(var(--font-size-base) * 75), calc(100% - 2 * var(--gutter))); margin-inline: auto; }
@@ -190,7 +190,7 @@
 .mk-heading h1 { font-size: var(--h1); line-height: 1.02; letter-spacing: -0.038em; }
 .mk-heading h2 { font-size: var(--h2); line-height: 1.06; letter-spacing: -0.032em; max-width: 22ch; }
 .mk-heading p code { font-size: .86em; padding: calc(var(--font-size-base) * 0.0625) calc(var(--font-size-base) * 0.375); border-radius: calc(var(--font-size-base) * 0.375); background: color-mix(in srgb, var(--depth-3) 70%, transparent); color: var(--ink); }
-.mk-heading p { margin: calc(var(--font-size-base) * 1.25) 0 0; max-width: 41rem; font-size: calc(var(--font-size-base) * 1.1875); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.mk-heading p { margin: calc(var(--font-size-base) * 1.25) 0 0; max-width: calc(var(--font-size-base) * 41); font-size: calc(var(--font-size-base) * 1.1875); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .mk-heading .mk-section-link { flex: none; padding-bottom: calc(var(--font-size-base) * 0.25); color: var(--accent-text); font-size: calc(var(--font-size-base) * 1.0625); white-space: nowrap; }
 .mk-center .mk-heading { justify-content: center; text-align: center; }
 .mk-center .mk-heading > div { display: flex; flex-direction: column; align-items: center; }
