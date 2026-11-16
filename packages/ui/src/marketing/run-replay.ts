@@ -125,5 +125,5 @@ export function returnRows(events: Ev[], t: number, code: string[], cost?: numbe
   const usage = events.find(e => e.kind === 'stdout' && e.atMs <= t && /inputTokens/.test(e.text ?? ''));
   const usageLine = usage && code.findIndex(line => /console\.log\(.*\.usage/.test(line));
   if (usageLine != null && usageLine >= 0 && cost != null) rows.set(statementEnd(code, usageLine), { value: usd(cost), time: '' });
-  return rows;
+  return new Map([...rows].sort(([a], [b]) => a - b));
 }
