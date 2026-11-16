@@ -102,8 +102,11 @@ export interface SettingsRowProps {
   children?: React.ReactNode;
 }
 
+// Inline: the label keeps its longest word and the control gives up width
+// instead. At minmax(0,1fr) beside a 13rem-minimum control, a row outside a
+// settings section squeezed a short label such as "Harness" to nothing.
 const ROW_COLUMNS: Record<SettingsRowLayout, string> = {
-  inline: "grid-cols-[minmax(0,1fr)_minmax(13rem,20rem)] @max-[34rem]/settings-section:grid-cols-1",
+  inline: "grid-cols-[minmax(min-content,1fr)_minmax(0,20rem)] @max-[34rem]/settings-section:grid-cols-1",
   compact: "grid-cols-[minmax(0,1fr)_auto]",
   stacked: "grid-cols-1",
 };
