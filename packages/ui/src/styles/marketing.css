@@ -319,6 +319,10 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .mk code, .mk pre, .mk-mono { font-family: var(--font-mono); }
 .mk a:focus-visible, .mk button:focus-visible { outline: calc(var(--font-size-base) / 8) solid var(--accent-text); outline-offset: calc(var(--font-size-base) / 4); }
 .mk-brand svg { flex: none; }
+.mk-brand > svg { width: calc(var(--font-size-base) * 1.625); height: calc(var(--font-size-base) * 1.625); padding: calc(var(--font-size-base) * .1875); border-radius: 50%; background: var(--text-primary); }
+.mk-trace-tools .mk-good { font-weight: 400; }
+.mk-command-block { border: 0; border-radius: 0; background: transparent; --code-padding-x: 0; --code-padding-y: 0; --code-font-size: calc(var(--font-size-base) * .8125); --code-line-height: 1.85; }
+.mk-command-block.mk-comment { --syntax-foreground: var(--ink-4); }
 .mk-github-mark { width: var(--font-size-xl); height: var(--font-size-xl); }
 body > astro-island:has(.mk-nav) { display: contents; }
 .mk-phone-nav { position: absolute; inset: 100% 0 auto; padding: var(--font-size-xl); border-bottom: calc(var(--font-size-base) / 16) solid var(--line); background: var(--depth-1); display: flex; flex-direction: column; gap: var(--font-size-base); }
@@ -332,9 +336,10 @@ body > astro-island:has(.mk-nav) { display: contents; }
 .mk-harnesses { position: relative; }
 .mk-live-slot { position: absolute; right: 0; bottom: calc(100% + var(--font-size-base) * 2.5); }
 .mk-live-slot:has(.live-demo-panel) { position: relative; bottom: auto; margin-bottom: var(--font-size-xl); }
+.mk-live-slot:has(.live-demo-note) { position: relative; bottom: auto; margin-bottom: var(--font-size-xl); }
 .mk-proof { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
 .mk-proof > :last-child { border-left: calc(var(--font-size-base) / 16) solid var(--line); }
-.mk-proof-foot { border-top: calc(var(--font-size-base) / 16) solid var(--line); padding: var(--font-size-base); font-size: var(--font-size-base); color: var(--ink-2); }
+.mk-proof-foot { border-top: calc(var(--font-size-base) / 16) solid var(--line); padding: calc(var(--font-size-base) * .625) var(--font-size-base); min-height: calc(var(--font-size-base) * 3.5); display: flex; align-items: center; font-size: calc(var(--font-size-base) * .9375); line-height: 1.4; color: var(--ink-2); }
 .mk-plan-table .mk-rate { position: absolute; top: 0; right: 0; }
 .mk-section:has(.mk-plan-table) .mk-heading { min-height: calc(var(--font-size-base) * 7.5); padding-right: calc(var(--font-size-base) * 25); }
 .mk-credit { margin-bottom: 0; }
@@ -348,6 +353,8 @@ body > astro-island:has(.mk-nav) { display: contents; }
 .mk-source a { color: var(--accent-text); }
 .mk-status i[data-up="false"] { background: var(--surface-warning-text); box-shadow: none; }
 @media (max-width: 860px) {
+ .mk-section:has(.mk-harnesses) { padding-top: calc(var(--font-size-base) * 4.5); }
+ .mk-section:has(.mk-harnesses) .mk-heading { margin-bottom: var(--font-size-sm); }
  .mk-nav-links, .mk-nav-right .mk-hide-phone { display: none; }
  .mk-nav .mk-wrap { gap: var(--font-size-xs); }
  .mk-nav .mk-menu { display: grid; place-items: center; width: calc(var(--font-size-base) * 2.375); height: calc(var(--font-size-base) * 2.375); border: calc(var(--font-size-base) / 16) solid var(--line); border-radius: var(--radius-lg); }
@@ -379,7 +386,7 @@ body > astro-island:has(.mk-nav) { display: contents; }
  .mk-harness img { width: calc(var(--font-size-base) * 2); height: calc(var(--font-size-base) * 2); }
  .mk-harness b { font-size: calc(var(--font-size-base) * .90625); }
  .mk-harness code { margin: calc(var(--font-size-sm) * -1) 0 0; width: 100%; padding-left: calc(var(--font-size-base) * 2.625); font-size: calc(var(--font-size-base) * .71875); }
- .mk-live-slot { position: relative; bottom: auto; margin-bottom: var(--font-size-xl); }
+ .mk-live-slot { position: relative; bottom: auto; margin-bottom: calc(var(--font-size-base) * 1.625); }
  .mk-proof { grid-template-columns: 1fr; }
  .mk-proof > :last-child { order: -1; border: 0; border-bottom: calc(var(--font-size-base) / 16) solid var(--line); }
  .mk-commands { padding: var(--font-size-base); font-size: var(--font-size-xs); }
@@ -395,5 +402,6 @@ body > astro-island:has(.mk-nav) { display: contents; }
  .mk-footer-bottom { flex-wrap: wrap; gap: var(--font-size-xs) var(--font-size-lg); }
  .mk-chrome { padding: 0 var(--radius-sm) 0 var(--font-size-xs); gap: var(--radius-lg); }
  .mk-chrome .mk-line { display: none; }
+ .mk-chrome-left > .mk-copy { display: none; }
  .mk-source { flex-direction: column; }
 }
