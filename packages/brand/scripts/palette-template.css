@@ -202,6 +202,10 @@
   --transition-medium: 0.24s ease;
   --font-sans: "Inter Variable", "Inter", "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; --font-display: "Inter Variable", "Inter", "Geist", sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+  /* Long-form reading: the article face and a warm paper/ink pair (16.0:1; muted ink 8.4:1) for posts and docs read end to end, in --reading-max-width. */
+  --font-reading: "Source Serif 4 Variable", "Source Serif 4", "Source Serif Pro", Charter, "Iowan Old Style", Georgia, serif;
+  --longform-paper: #faf9f5; --longform-ink: #1d1c24; --longform-ink-muted: #4a4954;
+  --longform-rule: #e4e1d8; --longform-figure: #ffffff;
 }
 [data-sandbox-theme="vault"]:where(:not(.dark)),
 [data-sandbox-theme="dawn"]:where(:not(.dark)),

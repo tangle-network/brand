@@ -703,3 +703,19 @@ describe("data-accent scopes retint the accent and nothing else", () => {
     expect(declared.filter((t) => untouchable.test(t))).toEqual([]);
   });
 });
+
+describe("long-form reading pair", () => {
+  // Articles read end to end hold ink at 12:1 or better on their paper, and muted ink at AAA (7:1).
+  // Declared once on the canonical spine (`:root, …, .dark`), so every theme inherits the same pair.
+  const ROOT = DARK;
+  const paper = hexIn(ROOT, "longform-paper");
+  it("ink reads at 12:1 or better and muted ink at 7:1 or better on the paper", () => {
+    expect(contrastRatio(hexIn(ROOT, "longform-ink"), paper)).toBeGreaterThanOrEqual(12);
+    expect(contrastRatio(hexIn(ROOT, "longform-ink-muted"), paper)).toBeGreaterThanOrEqual(7);
+  });
+  it("reading face leads with the self-hosted variable family and ends in a generic serif", () => {
+    const stack = declIn(ROOT, "font-reading");
+    expect(stack.startsWith('"Source Serif 4 Variable", "Source Serif 4"')).toBe(true);
+    expect(stack.endsWith(", serif")).toBe(true);
+  });
+});

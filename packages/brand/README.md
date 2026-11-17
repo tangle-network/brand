@@ -155,6 +155,21 @@ import "@fontsource/geist-mono/500.css";
 
 The `--font-sans` and `--font-display` stacks name `"Inter Variable"` (the family that package registers) ahead of `"Inter"`, so static `@fontsource/inter` imports keep working. Omitted families fall back through the `--font-*` stacks. Keep external font imports out of library CSS: they can break reordered CSS imports and should not impose a font download on every consumer.
 
+### Long-form reading
+
+Articles and docs read end to end use `--font-reading` for body text, in `--reading-max-width` (42rem), on `--longform-paper` with `--longform-ink` (16.0:1). Muted text uses `--longform-ink-muted` (8.4:1), hairlines use `--longform-rule`, and figure plates use `--longform-figure`. Headings, figures, code and controls keep `--font-sans`, `--font-display` and `--font-mono`, so a page still reads as Tangle. Load the reading face only where it renders:
+
+```sh
+pnpm add @fontsource-variable/source-serif-4
+```
+
+```tsx
+import "@fontsource-variable/source-serif-4/opsz.css";
+import "@fontsource-variable/source-serif-4/opsz-italic.css";
+```
+
+The stack names `"Source Serif 4 Variable"` (that package's family) ahead of `"Source Serif 4"` (Google Fonts), then Charter- and Georgia-class fallbacks.
+
 ## Policy and development
 
 Shared tokens land here, not in copied app palettes. Additions require a cross-app reason. Version the package with semver; breaking public token changes require a major release. Shared UI and actual consuming apps are the stress-test surfaces.
