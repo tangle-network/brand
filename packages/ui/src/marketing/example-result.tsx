@@ -3,7 +3,7 @@ import { AgentTimeline, type AgentTimelineItem } from '../chat/agent-timeline';
 import type { Idea } from './example-editor';
 import { Markdown } from '../markdown/markdown';
 import { useMemo } from 'react';
-import { clock, seconds, usd, diffStats, type Ev } from './run-replay';
+import { clock, seconds, usd, diffStats, callValue, type Ev } from './run-replay';
 
 /** What the run has produced by recorded time `t`: printed output, test results, the patch, scores and each fleet agent's answer. The timeline beside it shows the work. */
 function GenericResult({ events, t }: { events: Ev[]; t: number }) {
@@ -116,7 +116,9 @@ export function ExampleReceipt({ idea, events, t, ended }: { idea: Idea; events:
     lead ??= download && read ? `${file} and ${readPath} written` : undefined;
     facts = download && idea.run?.exitCode != null ? [`exit ${idea.run.exitCode}`] : [];
   } else if (idea.view === 'tree' || idea.view === 'states') facts = [`exit ${calls.filter(e => e.name === 'exec').at(-1)?.result.exitCode}`];
-  lead ??= calls.at(-1)?.result?.outcome ?? '';
+  const lastCall = calls.at(-1);
+  lead ??= lastCall ? callValue(lastCall, idea.code.trimEnd().split('\n')) : '';
+  if (!lead && idea.run?.exitCode != null) lead = `exit ${idea.run.exitCode}`;
   if (idea.view !== 'spend') {
     facts.push(clock(idea.run?.ms ?? t));
     if (idea.run?.costUsd != null && idea.run.costUsd > 0) facts.push(`${usd(idea.run.costUsd)} in model calls`);
