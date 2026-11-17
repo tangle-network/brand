@@ -1,5 +1,5 @@
 import { CircleCheck } from 'lucide-react';
-import type { Ev, RunMeta } from './run-replay';
+import { clock, seconds, diffStats, type Ev, type RunMeta } from './run-replay';
 
 export interface RunTraceProps {
   run: RunMeta;
@@ -8,7 +8,6 @@ export interface RunTraceProps {
   repo: string;
   backend: string;
 }
-const duration = (ms = 0) => (ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`);
 
 export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
   const calls = events.filter((event) => event.kind === 'call');
@@ -18,15 +17,8 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
   );
   const diff = calls.find((event) => event.result?.stdout?.startsWith('diff --git '))?.result
     .stdout as string | undefined;
-  const stats: { file: string; added: number; deleted: number }[] = [];
-  for (const line of (diff ?? '').split('\n')) {
-    if (line.startsWith('diff --git '))
-      stats.push({ file: line.split(' b/')[1], added: 0, deleted: 0 });
-    else if (stats.length && line.startsWith('+') && !line.startsWith('+++'))
-      stats[stats.length - 1].added++;
-    else if (stats.length && line.startsWith('-') && !line.startsWith('---'))
-      stats[stats.length - 1].deleted++;
-  }
+  const stats = diffStats(diff ?? '');
+  const repoDirectory = repo.split('/').at(-1) ?? '';
   const tools = events.flatMap((event) =>
     event.kind === 'stream' &&
     event.data?.part?.type === 'tool' &&
@@ -41,7 +33,7 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
     ...new Set<string>(
       tools
         .filter((tool) => tool.tool === 'Edit')
-        .map((tool) => String(tool.state.input.file_path).replace(/^.*?sandbox-demo\//, '')),
+        .map((tool) => String(tool.state.input.file_path).split(`${repoDirectory}/`).at(-1)!),
     ),
   ];
   const passed = String(test?.result?.stdout ?? '').match(/^# pass (\d+)/m)?.[1];
@@ -52,7 +44,6 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
     .join('\n');
   const tokens = (field: string) =>
     Number(usage.match(new RegExp(`${field}: (\\d+)`))?.[1] ?? 0).toLocaleString('en-US');
-  const total = Math.floor(run.ms / 1000);
   const date = new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
     month: 'short',
@@ -92,7 +83,7 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
       </div>
       <div className="mk-arrow">
         <span>create</span>
-        <em>{duration(create?.durationMs)}</em>
+        <em>{seconds(create?.durationMs)}</em>
       </div>
       <div className="mk-zone">
         <span className="mk-zone-label">Tangle</span>
@@ -141,7 +132,7 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
       </div>
       <div className="mk-arrow">
         <span>exec</span>
-        <em>{duration(test?.durationMs)}</em>
+        <em>{seconds(test?.durationMs)}</em>
       </div>
       <div className="mk-trace-card mk-back">
         <div className="mk-trace-title">
@@ -155,18 +146,18 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
           </div>
           <div className="mk-file-stats">
             {stats.map((stat) => (
-              <div key={stat.file}>
-                <span>{stat.file.split('/').pop()}</span>
+              <div key={stat.name}>
+                <span>{stat.name.split('/').pop()}</span>
                 <span>
-                  <b>+{stat.added}</b>
-                  <s>−{stat.deleted}</s>
+                  <b>+{stat.add}</b>
+                  <s>−{stat.del}</s>
                 </span>
               </div>
             ))}
           </div>
           <div className="mk-clock">
             <strong>
-              {Math.floor(total / 60)}:{String(total % 60).padStart(2, '0')}
+              {clock(run.ms)}
             </strong>
             <span>
               from create

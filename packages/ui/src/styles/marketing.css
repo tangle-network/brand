@@ -183,8 +183,6 @@
   .qs-score-head span { overflow: hidden; text-overflow: ellipsis; }
 }
 
-@keyframes rr-fade { from { opacity: 0; transform: translateX(8px); } }
-
 /* Shared site sections. Keep these scoped apart from the example editor. */
 .mk {
   --ink: var(--text-primary);

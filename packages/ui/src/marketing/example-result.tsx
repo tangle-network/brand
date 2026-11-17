@@ -3,7 +3,7 @@ import { AgentTimeline, type AgentTimelineItem } from '../chat/agent-timeline';
 import type { Idea } from './example-editor';
 import { Markdown } from '../markdown/markdown';
 import { useMemo } from 'react';
-import { clock, seconds, usd, type Ev } from './run-replay';
+import { clock, seconds, usd, diffStats, type Ev } from './run-replay';
 
 /** What the run has produced by recorded time `t`: printed output, test results, the patch, scores and each fleet agent's answer. The timeline beside it shows the work. */
 function GenericResult({ events, t }: { events: Ev[]; t: number }) {
@@ -68,15 +68,6 @@ function GenericResult({ events, t }: { events: Ev[]; t: number }) {
 
 const completed = (events: Ev[], t: number) => events.filter(e => e.kind === 'call' && e.atMs + (e.durationMs ?? 0) <= t);
 const printed = (events: Ev[], t: number) => events.filter(e => e.kind === 'stdout' && e.atMs <= t).map(e => (e.text ?? '').trim());
-function diffStats(patch: string) {
-  const files: { name: string; add: number; del: number }[] = [];
-  for (const line of patch.split('\n')) {
-    if (line.startsWith('diff --git ')) files.push({ name: line.split(' b/')[1], add: 0, del: 0 });
-    else if (files.length && line.startsWith('+') && !line.startsWith('+++')) files.at(-1)!.add++;
-    else if (files.length && line.startsWith('-') && !line.startsWith('---')) files.at(-1)!.del++;
-  }
-  return files;
-}
 function scoreRows(events: Ev[], code: string) {
   const split = events.find(e => e.kind === 'stdout')?.atMs ?? Infinity;
   const names = [...code.matchAll(/backend:\s*\{\s*type:\s*"([^"]+)"/g)].map(m => m[1]);

@@ -77,6 +77,16 @@ export const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.fl
 export const seconds = (ms = 0) => ms < 1000 ? `${Math.round(ms)} ms` : ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms);
 export const usd = (n: number) => `$${n.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.00').replace(/(\.\d)$/, '$10')}`;
 
+export function diffStats(patch: string) {
+  const files: { name: string; add: number; del: number }[] = [];
+  for (const line of patch.split('\n')) {
+    if (line.startsWith('diff --git ')) files.push({ name: line.split(' b/')[1], add: 0, del: 0 });
+    else if (files.length && line.startsWith('+') && !line.startsWith('+++')) files.at(-1)!.add++;
+    else if (files.length && line.startsWith('-') && !line.startsWith('---')) files.at(-1)!.del++;
+  }
+  return files;
+}
+
 export function statementEnd(lines: string[], start: number) {
   let depth = 0;
   for (let i = start; i < lines.length; i++) {
