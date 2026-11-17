@@ -86,6 +86,8 @@
 .qs-files { margin-top: var(--font-size-xs); border: calc(var(--qs-u) / 16) solid var(--qs-line); border-radius: var(--radius-lg); overflow: hidden; font: calc(var(--qs-u) * .78125)/1.5 var(--font-mono); }
 .qs-files > div { display: flex; justify-content: space-between; gap: var(--font-size-xs); padding: calc(var(--qs-u) * .4375) var(--font-size-xs); border-top: calc(var(--qs-u) / 16) solid var(--qs-softline); color: var(--text-secondary); }
 .qs-files > div:first-child { border-top: 0; }
+.qs-files > div > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qs-files > div > span:last-child { flex: none; white-space: nowrap; }
 .qs-files b { color: var(--surface-success-text); font-weight: 400; }
 .qs-files s { color: var(--surface-danger-text); text-decoration: none; }
 .qs-diff { margin-top: var(--font-size-xs); border: calc(var(--qs-u) / 16) solid var(--qs-softline); border-radius: var(--radius-lg); overflow: hidden; font: var(--font-size-xs)/1.65 var(--font-mono); color: var(--qs-muted); }
