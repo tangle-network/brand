@@ -1,3 +1,9 @@
+## 11.51.34
+
+### Patch Changes
+
+- c56c23e: Add shared marketing sections with data-only content and layout props. Extend the example editor with featured tabs, recorded returns, result views and receipts.
+
 ## 11.51.33
 
 ### Patch Changes
