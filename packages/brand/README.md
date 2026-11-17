@@ -164,9 +164,11 @@ pnpm add @fontsource-variable/source-serif-4
 ```
 
 ```tsx
-import "@fontsource-variable/source-serif-4/opsz.css";
-import "@fontsource-variable/source-serif-4/opsz-italic.css";
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/source-serif-4/wght-italic.css";
 ```
+
+`wght.css` keeps the default optical size: its latin file is 50,936 bytes, against 122,360 for `opsz.css`, and body text at 17-19 px reads the same. Preload the latin file (`files/source-serif-4-latin-wght-normal.woff2`) on long-form pages so the face is usually in place before the first paint.
 
 The stack names `"Source Serif 4 Variable"` (that package's family) ahead of `"Source Serif 4"` (Google Fonts), then Charter- and Georgia-class fallbacks.
 
