@@ -439,7 +439,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
  .mk-harness { flex-direction: row; justify-content: flex-start; text-align: left; padding: var(--font-size-sm) var(--font-size-xs); gap: var(--radius-lg); flex-wrap: wrap; }
  .mk-harness img { width: calc(var(--font-size-base) * 2); height: calc(var(--font-size-base) * 2); }
  .mk-harness b { font-size: calc(var(--font-size-base) * .90625); }
- .mk-harness code { margin: calc(var(--font-size-sm) * -1) 0 0; width: 100%; padding-left: calc(var(--font-size-base) * 2.625); font-size: calc(var(--font-size-base) * .71875); }
+ .mk-harness code { margin: calc(var(--font-size-sm) * -1) 0 0; width: 100%; font-size: calc(var(--font-size-base) * .71875); }
  .mk-live-slot { position: relative; bottom: auto; margin-bottom: calc(var(--font-size-base) * 1.625); }
  .mk-proof { grid-template-columns: minmax(0, 1fr); }
  .mk-proof > * { min-width: 0; }
