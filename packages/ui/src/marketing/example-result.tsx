@@ -135,8 +135,7 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
   const browser = idea.code.includes('.download(');
   const downloadPath = idea.code.match(/\.download\("([^"]+)"/)?.[1] ?? '';
   const facts = runFacts(events.filter(e => e.atMs <= t));
-  const verified = runFacts(events).test;
-  const testCommand = facts.testCommand ?? (verified?.line ? idea.code.split('\n')[verified.line - 1].match(/\.exec\("([^"]+)"/)?.[1] : undefined);
+  const testTools = list.filter(tool => { const result = facts.outputs.get(String(tool.part.state.output ?? '')); return result?.passed != null || result?.failure; });
   const promptStart = idea.code.indexOf('.prompt('), promptEnd = idea.code.indexOf(');', promptStart);
   const prompt = [...idea.code.slice(promptStart, promptEnd).matchAll(/"((?:\\.|[^"\\])*)"/g)].map(m => JSON.parse(`"${m[1]}"`)).join('');
   const items: AgentTimelineItem[] = [{ id: 'prompt', kind: 'custom', content: <div className="qs-bubble">{prompt.split(/(`[^`]+`)/g).map((part, i) => part.startsWith('`') ? <code key={i}>{part.slice(1, -1)}</code> : part)}</div> }];
@@ -148,7 +147,7 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
     written,
     list.findLast(tool => tool.part.tool === 'Bash' && !!script && commandOf(tool).includes(script)),
     list.find(tool => commandOf(tool).startsWith('ls -la ') && !!downloadPath && commandOf(tool).includes(downloadPath)),
-  ].filter((tool): tool is typeof list[number] => !!tool) : list.filter(tool => !!testCommand && commandOf(tool).startsWith(testCommand) || tool.part.tool === 'Edit' && tool.part.state.status === 'completed');
+  ].filter((tool): tool is typeof list[number] => !!tool) : list.filter(tool => testTools.includes(tool) || tool.part.tool === 'Edit' && tool.part.state.status === 'completed');
   const folded = browser ? list.filter(tool => /pip install/.test(commandOf(tool))).slice(0, 1) : list.slice(0, Math.max(0, list.indexOf(visible[0])));
   const summary = folded.map(tool => {
     const command = commandOf(tool);
@@ -168,7 +167,6 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
     if (repo && command.startsWith(`${repo}/`)) command = command.slice(repo.length + 1);
     if (p.tool === 'Edit' && seen.has(command)) continue;
     seen.add(command);
-    if (!browser && p.tool === 'Bash' && testCommand && command.startsWith(testCommand)) command = testCommand;
     if (browser && p.tool === 'Bash') {
       command = command.match(/ -m (.*?)(?: 2>&1|$)/)?.[1]
         ?? (script && command.includes(script) ? `python ${script}` : command.split(';')[0].replace(/\/[^ ]*\/([^ /]+)/g, '$1'));
