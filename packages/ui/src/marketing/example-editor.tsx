@@ -4,6 +4,7 @@ import { InlineThinkingItem } from '../run/inline-thinking-item';
 import { Button } from '../primitives/button';
 import { Slider } from '../primitives/slider';
 import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
 import ExampleResult, { ExampleReceipt } from './example-result';
 import { useReplay, clock, seconds, usd, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
 
@@ -122,7 +123,7 @@ function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
       <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && <><span className="qs-run-id">{idea.run.runId}</span><span className="qs-stamp">recorded {idea.run.recordedAt.slice(0, 10)} {idea.run.recordedAt.slice(11, 16)} UTC</span><span className="qs-clock">{clock(line ? t : idea.run.ms)}</span>
-        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={replay.toggle} aria-label={replay.playing ? 'Pause the recorded run' : 'Replay the recorded run'}><span aria-hidden="true">{replay.playing ? 'Ⅱ' : '▸'}</span><span className="qs-run-label">{label}</span></Button>
+        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={replay.toggle} aria-label={replay.playing ? 'Pause the recorded run' : 'Replay the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
         <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line ? r / line.total : 1]} onValueChange={([part]) => replay.seek(part)} /></>}
     </div>
     <div className="qs-panes">
