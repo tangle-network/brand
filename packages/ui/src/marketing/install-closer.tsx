@@ -1,6 +1,6 @@
 import { Button } from '../primitives/button';
 import { Frame } from './frame';
-import { CommandCopy } from './install-row';
+import { CopyButton } from '../markdown/code-block';
 
 export interface InstallCloserProps {
   heading: string;
@@ -33,13 +33,13 @@ export function InstallCloser({
                   <a href={action.href}>{action.label}</a>
                 </Button>
               ) : (
-                <CommandCopy
+                <CopyButton
                   key={action.label}
                   text={action.copy ?? file.source}
                   label={action.label}
-                >
-                  {action.label}
-                </CommandCopy>
+                  className="mk-btn mk-ghost"
+                  data-marketing-copy={action.copy ?? file.source}
+                />
               ),
             )}
           </div>
@@ -49,7 +49,7 @@ export function InstallCloser({
             <>
               <span className="mk-path">{file.path}</span>
               <span className="mk-line">line {line}</span>
-              <CommandCopy label="Copy commands" text={commands.join('\n')} />
+              <CopyButton aria-label="Copy commands" className="mk-copy" text={commands.join('\n')} data-marketing-copy={commands.join('\n')} />
             </>
           }
         >

@@ -77,6 +77,31 @@ export const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.fl
 export const seconds = (ms = 0) => ms < 1000 ? `${Math.round(ms)} ms` : ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms);
 export const usd = (n: number) => `$${n.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.00').replace(/(\.\d)$/, '$10')}`;
 
+/** Recorded test output and commands, shared by the trace and editor. */
+export function runFacts(events: Ev[]) {
+  const calls = events.filter(event => event.kind === 'call');
+  const tools = events.flatMap(event => event.kind === 'stream' && event.data?.part?.type === 'tool' && event.data.part.state?.status === 'completed' ? [event.data.part] : []);
+  const parse = (output: string) => ({
+    passed: output.match(/^# pass (\d+)/m)?.[1],
+    failed: output.match(/^# fail (\d+)/m)?.[1],
+    failure: output.split('\n').find(line => line.startsWith('not ok ')),
+  });
+  const outputs = new Map([...calls.map(event => event.result?.stdout), ...tools.map(tool => tool.state.output)]
+    .filter((output): output is string => typeof output === 'string').map(output => [output, parse(output)]));
+  const test = calls.findLast(event => outputs.get(event.result?.stdout)?.passed != null);
+  const patch = calls.findLast(event => typeof event.result?.stdout === 'string' && event.result.stdout.startsWith('diff --git '))?.result.stdout as string | undefined;
+  const testTools = tools.filter(tool => outputs.get(tool.state.output)?.passed != null || outputs.get(tool.state.output)?.failure);
+  const failedTest = testTools.find(tool => outputs.get(tool.state.output)?.failure);
+  // Shell redirection and display filters are not part of the test invocation.
+  const command = (tool: any) => tool?.state.input?.command?.split(/\s+(?:\d?>|\|)/)[0];
+  const usage = events.filter(event => event.kind === 'stdout').map(event => event.text ?? '').join('\n');
+  const tokens = ['inputTokens', 'cacheReadTokens', 'outputTokens'].map(field => usage.match(new RegExp(`${field}: (\\d+)`))?.[1]);
+  return { calls, tools, outputs, test, patch, tests: test?.result.stdout as string | undefined,
+    ...outputs.get(test?.result.stdout), failure: outputs.get(failedTest?.state.output)?.failure,
+    testCommand: command(testTools.at(-1)), failedCommand: command(failedTest),
+    tokens: tokens.every(value => value != null) ? tokens.map(value => Number(value).toLocaleString('en-US')) : undefined };
+}
+
 export function diffStats(patch: string) {
   const files: { name: string; add: number; del: number }[] = [];
   for (const line of patch.split('\n')) {

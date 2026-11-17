@@ -3,15 +3,14 @@ import { AgentTimeline, type AgentTimelineItem } from '../chat/agent-timeline';
 import type { Idea } from './example-editor';
 import { Markdown } from '../markdown/markdown';
 import { useMemo } from 'react';
-import { clock, seconds, usd, diffStats, callValue, type Ev } from './run-replay';
+import { clock, seconds, usd, diffStats, runFacts, callValue, type Ev } from './run-replay';
 
 /** What the run has produced by recorded time `t`: printed output, test results, the patch, scores and each fleet agent's answer. The timeline beside it shows the work. */
 function GenericResult({ events, t }: { events: Ev[]; t: number }) {
   const result = useMemo(() => {
     const calls = events.filter((event) => event.kind === 'call' && event.atMs + (event.durationMs ?? 0) <= t);
     const outputs = calls.filter((event) => typeof event.result?.stdout === 'string' && event.result.stdout.trim());
-    const patch = outputs.findLast((event) => event.result.stdout.startsWith('diff --git '))?.result.stdout as string | undefined;
-    const tests = outputs.findLast((event) => /^# tests \d/m.test(event.result.stdout))?.result.stdout as string | undefined;
+    const { patch, tests } = runFacts(calls);
     const answers = events.flatMap((event, key) => {
       const agent = event.type === 'agent.finished' && event.atMs <= t ? event.data?.result : undefined;
       const text = agent?.result?.response;
@@ -90,12 +89,11 @@ function scoreRows(events: Ev[], code: string) {
 export function ExampleReceipt({ idea, events, t, ended }: { idea: Idea; events: Ev[]; t: number; ended: boolean }) {
   if (!ended) return <div className="qs-receipt" aria-live="polite"><span>{clock(t)}</span></div>;
   const calls = completed(events, t);
-  const patch = calls.find(e => e.result?.stdout?.startsWith('diff --git '))?.result.stdout as string | undefined;
-  const tests = calls.findLast(e => /^# pass /m.test(e.result?.stdout ?? ''))?.result.stdout as string | undefined;
+  const { patch, tests, passed } = runFacts(calls);
   let lead = idea.lead, facts: string[] = [];
   if (patch && tests) {
     const files = diffStats(patch);
-    lead ??= `${tests.match(/^# pass (\d+)/m)?.[1]} tests passed`;
+    lead ??= `${passed} tests passed`;
     facts = [`${files.length} files changed`, `+${files.reduce((n, f) => n + f.add, 0)} −${files.reduce((n, f) => n + f.del, 0)}`];
   } else if (idea.view === 'page') {
     const fetch = calls.find(e => e.name === 'fetch');
@@ -136,8 +134,8 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
   const list = [...tools.values()].filter(tool => tool.part.state.status !== 'running');
   const browser = idea.code.includes('.download(');
   const downloadPath = idea.code.match(/\.download\("([^"]+)"/)?.[1] ?? '';
-  const verified = events.find(e => /^# tests \d/m.test(e.result?.stdout ?? ''));
-  const testCommand = verified?.line ? idea.code.split('\n')[verified.line - 1].match(/\.exec\("([^"]+)"/)?.[1] : undefined;
+  const facts = runFacts(events.filter(e => e.atMs <= t));
+  const testTools = list.filter(tool => { const result = facts.outputs.get(String(tool.part.state.output ?? '')); return result?.passed != null || result?.failure; });
   const promptStart = idea.code.indexOf('.prompt('), promptEnd = idea.code.indexOf(');', promptStart);
   const prompt = [...idea.code.slice(promptStart, promptEnd).matchAll(/"((?:\\.|[^"\\])*)"/g)].map(m => JSON.parse(`"${m[1]}"`)).join('');
   const items: AgentTimelineItem[] = [{ id: 'prompt', kind: 'custom', content: <div className="qs-bubble">{prompt.split(/(`[^`]+`)/g).map((part, i) => part.startsWith('`') ? <code key={i}>{part.slice(1, -1)}</code> : part)}</div> }];
@@ -149,7 +147,7 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
     written,
     list.findLast(tool => tool.part.tool === 'Bash' && !!script && commandOf(tool).includes(script)),
     list.find(tool => commandOf(tool).startsWith('ls -la ') && !!downloadPath && commandOf(tool).includes(downloadPath)),
-  ].filter((tool): tool is typeof list[number] => !!tool) : list.filter(tool => !!testCommand && commandOf(tool).startsWith(testCommand) || tool.part.tool === 'Edit' && tool.part.state.status === 'completed');
+  ].filter((tool): tool is typeof list[number] => !!tool) : list.filter(tool => testTools.includes(tool) || tool.part.tool === 'Edit' && tool.part.state.status === 'completed');
   const folded = browser ? list.filter(tool => /pip install/.test(commandOf(tool))).slice(0, 1) : list.slice(0, Math.max(0, list.indexOf(visible[0])));
   const summary = folded.map(tool => {
     const command = commandOf(tool);
@@ -169,15 +167,14 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
     if (repo && command.startsWith(`${repo}/`)) command = command.slice(repo.length + 1);
     if (p.tool === 'Edit' && seen.has(command)) continue;
     seen.add(command);
-    if (!browser && p.tool === 'Bash' && testCommand && command.startsWith(testCommand)) command = testCommand;
     if (browser && p.tool === 'Bash') {
       command = command.match(/ -m (.*?)(?: 2>&1|$)/)?.[1]
         ?? (script && command.includes(script) ? `python ${script}` : command.split(';')[0].replace(/\/[^ ]*\/([^ /]+)/g, '$1'));
     }
     const refusal = output.match(/"code":"(\w+)","host":"([^"]+)"/);
-    const line = refusal ? `403 ${refusal[1]} ${refusal[2]}` : output.split('\n').find(l => /^not ok |^# pass |^-rw/.test(l));
-    const pass = output.match(/^# pass (\d+)/m), fail = output.match(/^# fail (\d+)/m);
-    items.push({ id: `tool-${i}`, kind: 'custom', content: <div className="qs-tool"><span>{p.tool}</span><b>{command}</b><i>{seconds(tool.end - tool.start)}</i>{line && <div data-tone={refusal || line.startsWith('not ok') ? 'error' : pass ? 'success' : undefined}>{pass ? `# pass ${pass[1]}  # fail ${fail?.[1]}` : line}</div>}</div> });
+    const { passed, failed, failure } = facts.outputs.get(output) ?? {};
+    const line = refusal ? `403 ${refusal[1]} ${refusal[2]}` : failure ?? (passed != null ? `# pass ${passed}` : output.split('\n').find(l => /^-rw/.test(l)));
+    items.push({ id: `tool-${i}`, kind: 'custom', content: <div className="qs-tool"><span>{p.tool}</span><b>{command}</b><i>{seconds(tool.end - tool.start)}</i>{line && <div data-tone={refusal || failure ? 'error' : passed != null ? 'success' : undefined}>{passed != null ? `# pass ${passed}  # fail ${failed}` : line}</div>}</div> });
     if (i === 0 && firstSay) items.push({ id: 'say', kind: 'custom', content: <div className="qs-say">{String(firstSay.data.part.text).split(/(`[^`]+`)/g).map((part, i) => part.startsWith('`') ? <code key={i}>{part.slice(1, -1)}</code> : part)}</div> });
   }
   if (browser) {
@@ -189,7 +186,7 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
     if (download) items.push({ id: 'image', kind: 'custom', content: <div className="qs-artifact"><span><File aria-hidden="true" /></span><b>{idea.code.match(/\.download\("([^"]+)"/)?.[1]?.split('/').at(-1)}</b><i>{dims && `${dims[1]}×${dims[2]} · `}{download.result.sizeBytes.toLocaleString('en-US')} bytes</i></div> });
     if (read) items.push({ id: 'json', kind: 'custom', content: <div className="qs-artifact"><span><File aria-hidden="true" /></span><b>{idea.code.match(/\.read\("([^"]+)"/)?.[1]?.split('/').at(-1)}</b><i>JSON array · {new TextEncoder().encode(read.result).length} bytes</i></div> });
   }
-  const patch = calls.find(e => e.result?.stdout?.startsWith('diff --git '))?.result.stdout as string | undefined;
+  const { patch } = runFacts(calls);
   return <><AgentTimeline items={items} className="qs-record-timeline" />{patch && <><div className="qs-files">{diffStats(patch).map(f => <div key={f.name}><span>{f.name}</span><span><b>+{f.add}</b> <s>−{f.del}</s></span></div>)}</div><pre className="qs-diff">{patch.split('\n').slice(4, 18).map((line, i) => <span key={i} data-line={line.startsWith('@@') ? 'hunk' : line.startsWith('+') ? 'add' : line.startsWith('-') ? 'del' : undefined}>{line}{'\n'}</span>)}</pre></>}</>;
 }
 

@@ -1,5 +1,5 @@
 import { CircleCheck } from 'lucide-react';
-import { clock, seconds, diffStats, type Ev, type RunMeta } from './run-replay';
+import { clock, seconds, diffStats, runFacts, type Ev, type RunMeta } from './run-replay';
 
 export interface RunTraceProps {
   run: RunMeta;
@@ -10,25 +10,10 @@ export interface RunTraceProps {
 }
 
 export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
-  const calls = events.filter((event) => event.kind === 'call');
-  const create = calls.find((event) => event.label === 'client.create');
-  const test = calls.find(
-    (event) => typeof event.result?.stdout === 'string' && /^# pass /m.test(event.result.stdout),
-  );
-  const diff = calls.find((event) => event.result?.stdout?.startsWith('diff --git '))?.result
-    .stdout as string | undefined;
-  const stats = diffStats(diff ?? '');
+  const { calls, tools, test, patch, passed, failed, failure, testCommand, failedCommand, tokens } = runFacts(events);
+  const create = calls.find(event => event.label === 'client.create');
+  const stats = diffStats(patch ?? '');
   const repoDirectory = repo.split('/').at(-1) ?? '';
-  const tools = events.flatMap((event) =>
-    event.kind === 'stream' &&
-    event.data?.part?.type === 'tool' &&
-    event.data.part.state?.status === 'completed'
-      ? [event.data.part]
-      : [],
-  );
-  const fail = tools
-    .flatMap((tool) => String(tool.state.output ?? '').split('\n'))
-    .find((line) => line.startsWith('not ok'));
   const edits = [
     ...new Set<string>(
       tools
@@ -36,14 +21,6 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
         .map((tool) => String(tool.state.input.file_path).split(`${repoDirectory}/`).at(-1)!),
     ),
   ];
-  const passed = String(test?.result?.stdout ?? '').match(/^# pass (\d+)/m)?.[1];
-  const failed = String(test?.result?.stdout ?? '').match(/^# fail (\d+)/m)?.[1];
-  const usage = events
-    .filter((event) => event.kind === 'stdout')
-    .map((event) => event.text ?? '')
-    .join('\n');
-  const tokens = (field: string) =>
-    Number(usage.match(new RegExp(`${field}: (\\d+)`))?.[1] ?? 0).toLocaleString('en-US');
   const date = new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
     month: 'short',
@@ -95,11 +72,11 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
           <div className="mk-trace-body mk-trace-tools">
             <div>
               <span>Bash</span>
-              <code>npm test</code>
+              <code>{failedCommand ?? testCommand}</code>
             </div>
             <div>
               <span />
-              <code className="mk-bad">{fail}</code>
+              <code className="mk-bad">{failure}</code>
             </div>
             {edits.map((file) => (
               <div key={file}>
@@ -110,7 +87,7 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
             <div>
               <span>Bash</span>
               <code>
-                npm test{' '}
+                {testCommand}{' '}
                 <b className="mk-good">
                   {' '}
                   # pass {passed} # fail {failed}
@@ -124,10 +101,10 @@ export function RunTrace({ run, events, task, repo, backend }: RunTraceProps) {
             <b>Tangle Router</b>
             <i>${run.costUsd?.toFixed(4)}</i>
           </div>
-          <span>
-            <i>{tokens('inputTokens')}</i> tokens in + <i>{tokens('cacheReadTokens')}</i> from cache
-            · <i>{tokens('outputTokens')}</i> out
-          </span>
+          {tokens && <span>
+            <i>{tokens[0]}</i> tokens in + <i>{tokens[1]}</i> from cache
+            · <i>{tokens[2]}</i> out
+          </span>}
         </div>
       </div>
       <div className="mk-arrow">

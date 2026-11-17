@@ -7,10 +7,9 @@ interface Plan {
   creditsPerMonth: number;
   features: string[];
   isPopular?: boolean;
-  popular?: boolean;
 }
 export interface PlanTableProps {
-  plans: { data: Plan[] } | Plan[];
+  plans: Plan[];
   names: Record<string, string>;
   rate: { size: string; perHour: number; minimum: number; href: string };
   actions: (SiteLink & { primary?: boolean })[];
@@ -18,7 +17,6 @@ export interface PlanTableProps {
 }
 
 export function PlanTable({ plans, names, rate, actions, more }: PlanTableProps) {
-  const data = Array.isArray(plans) ? plans : plans.data;
   return (
     <div className="mk mk-plan-table">
       <div className="mk-rate">
@@ -39,7 +37,7 @@ export function PlanTable({ plans, names, rate, actions, more }: PlanTableProps)
         <a href={rate.href}>{rate.href.replace(/^https?:\/\/[^/]+/, '')} ↗</a>
       </div>
       <div className="mk-plans" data-plans>
-        {data
+        {plans
           .filter((plan) => names[plan.id])
           .map((plan) => {
             const dollars = plan.monthlyPriceCents / 100,
@@ -47,7 +45,7 @@ export function PlanTable({ plans, names, rate, actions, more }: PlanTableProps)
             return (
               <article
                 key={plan.id}
-                className={`mk-plan${plan.isPopular || plan.popular ? ' mk-popular' : ''}`}
+                className={`mk-plan${plan.isPopular ? ' mk-popular' : ''}`}
                 data-plan={plan.id}
               >
                 <h3>{names[plan.id]}</h3>
@@ -57,7 +55,7 @@ export function PlanTable({ plans, names, rate, actions, more }: PlanTableProps)
                 </div>
                 <p className="mk-credit">
                   {plan.creditsPerMonth
-                    ? `Your ${price} comes back as credit each month`
+                    ? `$${(plan.creditsPerMonth / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })} credit each month`
                     : 'No included credit'}
                 </p>
                 <ul className="plan-features">
