@@ -439,12 +439,13 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
  .mk-harness b { font-size: calc(var(--font-size-base) * .90625); }
  .mk-harness code { margin: calc(var(--font-size-sm) * -1) 0 0; width: 100%; padding-left: calc(var(--font-size-base) * 2.625); font-size: calc(var(--font-size-base) * .71875); }
  .mk-live-slot { position: relative; bottom: auto; margin-bottom: calc(var(--font-size-base) * 1.625); }
- .mk-proof { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+ .mk-proof { grid-template-columns: minmax(0, 1fr); }
  .mk-proof > * { min-width: 0; }
  .mk-proof > :last-child { order: -1; border: 0; }
- .mk-commands { padding: var(--font-size-base); font-size: var(--font-size-xs); overflow-x: auto; }
- .mk-command-block { --code-font-size: var(--font-size-xs); }
- table.mk-billing { font-size: var(--font-size-sm); }
+ .mk-commands { padding: var(--font-size-base); font-size: calc(var(--font-size-base) * .8125); }
+ .mk-command-block { --code-font-size: calc(var(--font-size-base) * .8125); }
+ .mk-command-block code { overflow-wrap: anywhere; }
+ table.mk-billing { font-size: var(--font-size-sm); table-layout: fixed; border-bottom: calc(var(--font-size-base) / 16) solid var(--line); }
  table.mk-billing th, table.mk-billing td { padding: var(--font-size-xs) var(--font-size-sm); }
  .mk-section:has(.mk-plan-table) .mk-heading { padding-right: 0; min-height: 0; }
  .mk-plan-table .mk-rate { position: relative; min-width: 0; width: 100%; margin-bottom: var(--font-size-2xl); }
@@ -459,10 +460,6 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
  .mk-chrome-left > .mk-copy { display: none; }
  .mk-source { flex-direction: column; align-items: flex-start; justify-content: center; padding: var(--font-size-xs) var(--font-size-base); gap: var(--radius-sm); }
  .mk-latency-figure { padding: calc(var(--font-size-base) * 1.125) calc(var(--font-size-base) * .875) calc(var(--font-size-base) * .875); }
-}
-@media (max-width: 360px) {
- .mk-proof { grid-template-columns: minmax(0, 1fr); }
- table.mk-billing { table-layout: fixed; border-bottom: calc(var(--font-size-base) / 16) solid var(--line); }
 }
 
 /* Split sections alternate prose and evidence without adding a second component. */
