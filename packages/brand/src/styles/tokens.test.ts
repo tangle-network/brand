@@ -711,7 +711,14 @@ describe("long-form reading pair", () => {
   const paper = hexIn(ROOT, "longform-paper");
   it("ink reads at 12:1 or better and muted ink at 7:1 or better on the paper", () => {
     expect(contrastRatio(hexIn(ROOT, "longform-ink"), paper)).toBeGreaterThanOrEqual(12);
+    // The same 16:1 comfort ceiling as every other body ink.
+    expect(contrastRatio(hexIn(ROOT, "longform-ink"), paper)).toBeLessThanOrEqual(16);
     expect(contrastRatio(hexIn(ROOT, "longform-ink-muted"), paper)).toBeGreaterThanOrEqual(7);
+  });
+  it("is declared once, on the canonical spine, and no theme redeclares it", () => {
+    expect(tokens.match(/--longform-[a-z-]+:/g)).toHaveLength(5);
+    const named = readFileSync(path.resolve(import.meta.dirname, "named-themes.css"), "utf8");
+    expect(named).not.toMatch(/--longform-|--font-reading/);
   });
   it("reading face leads with the self-hosted variable family and ends in a generic serif", () => {
     const stack = declIn(ROOT, "font-reading");

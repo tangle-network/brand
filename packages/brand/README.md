@@ -157,7 +157,7 @@ The `--font-sans` and `--font-display` stacks name `"Inter Variable"` (the famil
 
 ### Long-form reading
 
-Articles and docs read end to end use `--font-reading` for body text, in `--reading-max-width` (42rem), on `--longform-paper` with `--longform-ink` (16.0:1). Muted text uses `--longform-ink-muted` (8.4:1), hairlines use `--longform-rule`, and figure plates use `--longform-figure`. Headings, figures, code and controls keep `--font-sans`, `--font-display` and `--font-mono`, so a page still reads as Tangle. Load the reading face only where it renders:
+Articles and docs read end to end use `--font-reading` for body text, in `--reading-max-width` (42rem), on `--longform-paper` with `--longform-ink` (15.9:1, under the 16:1 body ceiling). Muted text uses `--longform-ink-muted` (8.4:1), hairlines use `--longform-rule`, and figure plates use `--longform-figure` with a `1px solid var(--longform-rule)` border, since the plate alone is 1.05:1 on the paper. The paper is light in every mode, so the article root sets `color-scheme: light` and maps every text role (`--text-primary`, `--text-secondary`, `--text-muted`) to the long-form ink; otherwise `light-dark()` colours and dark text tokens resolve for a dark page on light paper. Headings, figures, code and controls keep `--font-sans`, `--font-display` and `--font-mono`, so a page still reads as Tangle. Load the reading face only where it renders:
 
 ```sh
 pnpm add @fontsource-variable/source-serif-4
