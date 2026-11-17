@@ -174,7 +174,7 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
           focusRing,
           className,
         )}
-        aria-label={pending?"Copying to clipboard":label}
+        aria-label={pending?"Copying to clipboard":copied?copiedLabel:props["aria-label"]??label}
         aria-busy={pending||props["aria-busy"]}
         aria-disabled={pending||props["aria-disabled"]}
         title={label}
