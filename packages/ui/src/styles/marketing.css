@@ -469,10 +469,13 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 
 /* Split sections alternate prose and evidence without adding a second component. */
 @media (min-width: 861px) {
+  .qs-main[data-example-view="spend"] .qs-panes { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
   .mk-split > .mk-wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: calc(var(--font-size-base) * 3); align-items: center; }
   .mk-split .mk-heading { display: flex; flex-direction: column; align-items: flex-start; gap: var(--font-size-xl); margin-bottom: 0; }
   .mk-split .mk-proof { grid-template-columns: minmax(0, 1fr); }
   .mk-split .mk-proof > :last-child { border-left: 0; border-top: calc(var(--font-size-base) / 16) solid var(--line); }
+  .mk-split .mk-harness-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .mk-split .mk-live-slot { position: static; display: flex; justify-content: flex-end; margin-bottom: var(--font-size-xl); }
   .qs-tabs button > span, .qs-list span, .qs-ret, .qs-tool, .qs-bubble code, .qs-say code,
   .qs-record-timeline [data-run-row][data-state="closed"] > button > span:nth-child(2),
   .qs-files, .qs-diff, .qs-artifact, .qs-url, .qs-url b, .qs-score-head,
@@ -482,4 +485,9 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
   .mk-harness code, table.mk-billing th, .mk-rate strong small, .mk-rate > a, .mk-source {
     font-size: calc(var(--font-size-base) * .8125);
   }
+}
+@media (min-width: 861px) and (max-width: 1200px) {
+  .qs-spend .tgc-figure-panel .tgc-wide { display: none; }
+  .qs-spend .tgc-figure-panel .tgc-narrow { display: block; }
+  .qs-spend .tgc-figure-panel .tgc-phone-plot svg { min-width: 0; width: 100%; height: auto; }
 }
