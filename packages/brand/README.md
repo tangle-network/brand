@@ -155,6 +155,23 @@ import "@fontsource/geist-mono/500.css";
 
 The `--font-sans` and `--font-display` stacks name `"Inter Variable"` (the family that package registers) ahead of `"Inter"`, so static `@fontsource/inter` imports keep working. Omitted families fall back through the `--font-*` stacks. Keep external font imports out of library CSS: they can break reordered CSS imports and should not impose a font download on every consumer.
 
+### Long-form reading
+
+Articles and docs read end to end use `--font-reading` for body text, in `--reading-max-width` (42rem), on `--longform-paper` with `--longform-ink` (15.9:1, under the 16:1 body ceiling). Muted text uses `--longform-ink-muted` (8.4:1), hairlines use `--longform-rule`, and figure plates use `--longform-figure` with a `1px solid var(--longform-rule)` border, since the plate alone is 1.05:1 on the paper. The paper is light in every mode, so the article root sets `color-scheme: light` and maps every text role (`--text-primary`, `--text-secondary`, `--text-muted`) to the long-form ink; otherwise `light-dark()` colours and dark text tokens resolve for a dark page on light paper. Headings, figures, code and controls keep `--font-sans`, `--font-display` and `--font-mono`, so a page still reads as Tangle. Load the reading face only where it renders:
+
+```sh
+pnpm add @fontsource-variable/source-serif-4
+```
+
+```tsx
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/source-serif-4/wght-italic.css";
+```
+
+`wght.css` keeps the default optical size: its latin file is 50,936 bytes, against 122,360 for `opsz.css`, and body text at 17-19 px reads the same. Preload the latin file (`files/source-serif-4-latin-wght-normal.woff2`) on long-form pages so the face is usually in place before the first paint.
+
+The stack names `"Source Serif 4 Variable"` (that package's family) ahead of `"Source Serif 4"` (Google Fonts), then Charter- and Georgia-class fallbacks.
+
 ## Policy and development
 
 Shared tokens land here, not in copied app palettes. Additions require a cross-app reason. Version the package with semver; breaking public token changes require a major release. Shared UI and actual consuming apps are the stress-test surfaces.
