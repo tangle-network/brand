@@ -118,7 +118,7 @@ function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
   const tops = useReturns(source, rows, idea.code);
   const run = useMemo(() => activity(events ?? [], t, code), [events, t, code]);
   const label = replay.playing ? 'Pause' : 'Replay';
-  return <div className="qs-main" ref={replay.root} data-state={!idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : 'idle'}>
+  return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={!idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : 'idle'}>
     <div className="qs-actions">
       <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
       <CopyButton text={idea.code} label="Copy file" />

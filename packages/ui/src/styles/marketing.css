@@ -166,6 +166,7 @@
   .qs-panes { grid-template-columns: minmax(0, 1fr); height: auto; }
   .qs-source { order: 2; height: calc(var(--qs-u) * 23.75); border-right: 0; border-top: 1px solid var(--qs-line); }
   .qs-machine { order: 1; height: calc(var(--qs-u) * 32.5); }
+  .qs-main[data-example-view="spend"] .qs-machine { height: calc(var(--qs-u) * 20); }
   .qs-actions { padding: 0 calc(var(--qs-u) * .375) 0 var(--font-size-xs); gap: calc(var(--qs-u) * .625); }
   .qs-actions > button[title="Copy file"], .qs-actions > button[title="Copied"] { display: none; }
   .qs-run-label { display: none; }
