@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.12
+
+### Patch Changes
+
+- 8a5049f: Add long-form reading tokens: `--font-reading` (Source Serif 4, with Charter- and Georgia-class fallbacks) and a warm paper/ink pair for articles, `--longform-paper` / `--longform-ink` (15.9:1), with `--longform-ink-muted` (8.4:1), `--longform-rule` and `--longform-figure`. Headings, figures and controls keep the existing faces.
+
 ## 1.31.11
 
 ### Patch Changes
