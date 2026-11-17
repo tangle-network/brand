@@ -1,6 +1,5 @@
 import { Frame } from './frame';
-import { CommandCopy } from './install-row';
-import { CodeBlock } from '../markdown/code-block';
+import { CodeBlock, CopyButton } from '../markdown/code-block';
 
 export interface BillingProofProps {
   title: string;
@@ -10,14 +9,17 @@ export interface BillingProofProps {
 }
 
 export function BillingProof({ title, commands, rows, foot }: BillingProofProps) {
+  const copyText = commands.filter(command => !command.startsWith('#')).join('\n');
   return (
     <Frame
       left={
         <>
           <span className="mk-path"><b>{title}</b></span>
-          <CommandCopy
-            label="Copy commands"
-            text={commands.filter((command) => !command.startsWith('#')).join('\n')}
+          <CopyButton
+            aria-label="Copy commands"
+            className="mk-copy"
+            text={copyText}
+            data-marketing-copy={copyText}
           />
         </>
       }
