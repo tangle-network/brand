@@ -23,7 +23,7 @@
 .qs-tabs button > span { font: var(--font-size-xs)/1 var(--font-mono); color: var(--qs-dim); }
 .qs-tabs .qs-all { margin-left: auto; }
 @container (max-width: 38rem) {
-  .qs-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - var(--qs-u) / 16) / 2); scroll-padding-inline: calc(var(--qs-u) * .375); }
+  .qs-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; scrollbar-width: thin; scroll-padding-inline: calc(var(--qs-u) * .375); }
   .qs-tabs button { justify-content: center; }
   .qs-tabs .qs-all { margin-left: 0; }
 }
