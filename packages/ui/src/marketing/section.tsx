@@ -9,6 +9,7 @@ export interface SectionProps {
   link?: SiteLink;
   align?: 'start' | 'center';
   glow?: boolean;
+  layout?: 'stack' | 'split';
   children?: ReactNode;
 }
 
@@ -20,13 +21,14 @@ export function Section({
   link,
   align = 'start',
   glow,
+  layout = 'stack',
   children,
 }: SectionProps) {
   const Heading = level === 1 ? 'h1' : 'h2';
   return (
     <section
       id={id}
-      className={`mk mk-section${level === 1 ? ' mk-hero' : ''}${glow ? ' mk-glow' : ''}${align === 'center' ? ' mk-center' : ''}`}
+      className={`mk mk-section${level === 1 ? ' mk-hero' : ''}${glow ? ' mk-glow' : ''}${align === 'center' ? ' mk-center' : ''}${layout === 'split' ? ' mk-split' : ''}`}
       aria-labelledby={`${id}-title`}
     >
       <div className="mk-wrap">
