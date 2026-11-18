@@ -29,7 +29,11 @@ const recordAt = (anchors: [number, number][], r: number) => {
 };
 
 /** The replay's clock. Visibility pauses work; reduced motion opens the finished record. */
-export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[]) {
+/** `read` turns the fetched file into events (a run record by default); `autoplay` starts from the beginning once the replay is on screen. */
+export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean }
+const readRecord = async (res: Response) => (await res.json()).events as Ev[];
+
+export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[], { read = readRecord, autoplay = false }: ReplayOptions = {}) {
   const root = useRef<HTMLDivElement>(null);
   const [events, setEvents] = useState<Ev[] | null>(initialEvents ?? null), [failed, setFailed] = useState(false);
   const [r, setR] = useState<number | null>(null), [enabled, setEnabled] = useState(false);
@@ -37,8 +41,8 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   useEffect(() => {
     if (!url || initialEvents) return; // a file with no record has nothing to replay
     const controller = new AbortController();
-    fetch(url, { signal: controller.signal }).then((res) => { if (!res.ok) throw new Error('Record unavailable'); return res.json(); })
-      .then((record) => setEvents([...record.events].sort((a: Ev, b: Ev) => a.atMs - b.atMs)))
+    fetch(url, { signal: controller.signal }).then((res) => { if (!res.ok) throw new Error('Record unavailable'); return read(res); })
+      .then((events) => setEvents([...events].sort((a, b) => a.atMs - b.atMs)))
       .catch((error) => { if (error.name !== 'AbortError') setFailed(true); });
     return () => controller.abort();
   }, [url]);
@@ -56,6 +60,8 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
     update(); document.addEventListener('visibilitychange', update);
     return () => { io.disconnect(); document.removeEventListener('visibilitychange', update); };
   }, []);
+  const started = useRef(false);
+  useEffect(() => { if (autoplay && line && visible && !hidden && !still && !started.current) { started.current = true; setR(0); setEnabled(true); } }, [autoplay, line, visible, hidden, still]);
   const playing = enabled && visible && !hidden && !!line && (r ?? line.total) < line.total;
   useEffect(() => {
     if (!playing || !line) return;
