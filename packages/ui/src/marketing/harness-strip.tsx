@@ -74,6 +74,7 @@ export function HarnessStrip({ harnesses, hrefTemplate, liveLabel, children, com
   const keys = (event: KeyboardEvent) => {
     const step: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns };
     if (event.key === 'Escape' && picked != null) { event.preventDefault(); setPicked(null); move(picked); return; }
+    if (!(event.target as HTMLElement).matches('.mk-harness')) return; // keys inside the open panel belong to its controls
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? harnesses.length - 1 : step[event.key] != null ? focus + step[event.key] : null;
     if (next == null || next < 0 || next >= harnesses.length) return;
     event.preventDefault(); move(next);
