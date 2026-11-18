@@ -246,6 +246,11 @@ export interface MarkdownProps {
   linkChip?: MarkdownLinkChipResolver;
 }
 
+// This subset has exactly one CommonMark interpretation, a literal paragraph.
+// Delegate every possible block marker, inline construct and GFM autolink to
+// the full parser. React escapes the text on both the server and the client.
+const literalParagraph = /^[\p{L}][\p{L}\p{M}\p{N} ,.!?'’()-]*$/u;
+
 /**
  * Renders Markdown content with GFM support and XSS sanitisation: Shiki code
  * blocks that name their file, tables as cards with right-aligned figures and
@@ -253,10 +258,12 @@ export interface MarkdownProps {
  * optional chips for links to known objects.
  */
 export const Markdown = memo(({ children, className, urlTransform, linkChip }: MarkdownProps) => {
+  const proseClass = cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
+  if (literalParagraph.test(children) && !/www\./i.test(children)) {
+    return <div className={proseClass}><p>{children.trimEnd()}</p></div>;
+  }
   return (
-    <div
-      className={cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className)}
-    >
+    <div className={proseClass}>
       <LinkChipContext.Provider value={linkChip}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkCodeMeta]}

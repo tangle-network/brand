@@ -4,7 +4,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type ButtonHTMLAttributes,
   type MouseEvent,
   type HTMLAttributes,
@@ -14,7 +13,7 @@ import type { ThemedToken } from "shiki/core";
 import { Check, Copy, FileCode2 } from "lucide-react";
 import { focusRing, focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
-import { SYNTAX, LANGUAGE_NAMES, PLAIN_TEXT, codeBlockGrammar, tokenize, tokenStyle, codePreStyle, codeTextStyle, codePresentation, createCopyFeedback, bindCodeTabs, apiMetadataText, type CopyFeedback, type CodeExample, type ApiMetadata } from "../lib/code-presentation";
+import { SYNTAX, LANGUAGE_NAMES, PLAIN_TEXT, codeBlockGrammar, createCodeTokenizer, tokenStyle, codePreStyle, codeTextStyle, codePresentation, createCopyFeedback, bindCodeTabs, apiMetadataText, type CopyFeedback, type CodeExample, type ApiMetadata } from "../lib/code-presentation";
 export { codeBlockGrammar } from "../lib/code-presentation";
 
 
@@ -36,6 +35,25 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
+const CodeLine = memo(function CodeLine({ line, number, last }: {
+  line: ThemedToken[] | string;
+  number?: number;
+  last: boolean;
+}) {
+  return (
+    <span>
+      {number !== undefined && (
+        <span aria-hidden="true" data-line-number className="inline-block select-none pr-4 text-right"
+          style={{ color: SYNTAX.comment, minWidth: "2.5em" }}>{number}</span>
+      )}
+      {typeof line === "string" ? line : line.map((token, index) => (
+        <span key={index} style={tokenStyle(token)}>{token.content}</span>
+      ))}
+      {!last && "\n"}
+    </span>
+  );
+});
+
 /**
  * Code with Shiki highlighting in Brand's syntax colors. It renders readable
  * plain code first (and on the server), then highlights once its grammar loads.
@@ -50,26 +68,35 @@ export const CodeBlock = memo(
     useEffect(()=>{if(tabList.current)return bindCodeTabs(tabList.current,setSelected);},[examples?.length]);
     const grammar = codeBlockGrammar(language);
     const [highlighted, setHighlighted] = useState<{ code: string; grammar: string; lines: ThemedToken[][] } | null>(null);
+    const [tokenize] = useState(createCodeTokenizer);
     useEffect(() => {
       if (!grammar) return;
-      let active = true;
-      void tokenize(code, grammar).then((lines) => {
-        if (active) setHighlighted({ code, grammar, lines });
+      const controller = new AbortController();
+      void tokenize(code, grammar, controller.signal).then((lines) => {
+        if (lines && !controller.signal.aborted) setHighlighted({ code, grammar, lines });
       }).catch(() => {
         // A failed chunk leaves the code readable; a later mount can retry.
       });
-      return () => { active = false; };
-    }, [code, grammar]);
+      return () => controller.abort();
+    }, [code, grammar, tokenize]);
 
     // A plain-text fence names no language worth showing; it keeps its copy control.
     const languageName = grammar ? LANGUAGE_NAMES[grammar] : PLAIN_TEXT.has(language?.toLowerCase() ?? "") ? undefined : language;
     const headerLabel = label ?? (filename ? undefined : languageName);
     const hasHeader = Boolean(filename || headerLabel || metadata || examples?.length);
     const mode = light === undefined ? {} : { "data-theme": light ? "light" : "dark" };
-    const isHighlighted = Boolean(highlighted && highlighted.code === code && highlighted.grammar === grammar);
-    const lines: Array<Array<{ content: string; style?: CSSProperties }>> = isHighlighted
-      ? highlighted!.lines.map((line) => line.map((token) => ({ content: token.content, style: tokenStyle(token) })))
-      : code.split("\n").map((line) => [{ content: line }]);
+    const isHighlighted = highlighted?.grammar === grammar && highlighted?.code === code;
+    let lines: Array<ThemedToken[] | string> | undefined;
+    if (highlighted && isHighlighted) {
+      lines = highlighted.lines;
+    } else if (highlighted && highlighted.grammar === grammar && code.startsWith(highlighted.code) && highlighted.lines.length > 1) {
+      // Keep completed rows mounted and colored while the new tail waits for
+      // its grammar. A replacement or language switch shows its own text.
+      const offset = highlighted.code.lastIndexOf("\n") + 1;
+      lines = [...highlighted.lines.slice(0, -1), ...code.slice(offset).split(/\r?\n/)];
+    } else if (showLineNumbers) {
+      lines = code.split(/\r?\n/);
+    }
     const regionName = filename ?? headerLabel;
 
     return (
@@ -115,25 +142,9 @@ export const CodeBlock = memo(
           style={codePreStyle}
         >
           <code style={codeTextStyle}>
-            {/* Plain code without line numbers stays one text node, as the server renders it. */}
-            {!isHighlighted && !showLineNumbers ? code : lines.map((line, index) => (
-              <span key={index}>
-                {showLineNumbers && (
-                  <span
-                    aria-hidden="true"
-                    data-line-number
-                    className="inline-block select-none pr-4 text-right"
-                    style={{ color: SYNTAX.comment, minWidth: "2.5em" }}
-                  >
-                    {index + 1}
-                  </span>
-                )}
-                {line.map((token, tokenIndex) => (
-                  <span key={tokenIndex} style={token.style}>{token.content}</span>
-                ))}
-                {index < lines.length - 1 ? "\n" : null}
-              </span>
-            ))}
+            {lines ? lines.map((line, index) => (
+              <CodeLine key={index} line={line} number={showLineNumbers ? index + 1 : undefined} last={index === lines.length - 1} />
+            )) : code}
           </code>
         </pre>
         </div>
