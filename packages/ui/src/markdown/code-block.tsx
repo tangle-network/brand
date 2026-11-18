@@ -188,7 +188,7 @@ export const CopyButton = memo(({ text, label: actionLabel, copiedLabel="Copied"
         aria-label={pending?"Copying to clipboard":copied?copiedLabel:props["aria-label"]??label}
         aria-busy={pending||props["aria-busy"]}
         aria-disabled={pending||props["aria-disabled"]}
-        title={label}
+        title={copied || pending || status ? label : props.title ?? label}
       >
         {copied ? (
           <Check aria-hidden="true" className="w-3.5 h-3.5 text-[var(--surface-success-text)]" />
