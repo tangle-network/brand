@@ -28,7 +28,8 @@ function parseCast(text: string): Cast {
   return { width: header.width ?? 80, height: header.height ?? 24, events };
 }
 
-const plain = (text: string) => text.replace(/\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?<>=]*[ -/]*[@-~]|\x1b[@-_]|[\x00-\x1f\x7f]/g, ' ').replace(/\s+/g, ' ');
+// Screen text with escapes and all whitespace removed, so a line the TUI wrapped still matches what was typed.
+const plain = (text: string) => text.replace(/\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?<>=]*[ -/]*[@-~]|\x1b[@-_]|[\x00-\x1f\x7f]/g, '').replace(/\s+/g, '');
 
 /** Input markers: `i` keystrokes up to each Enter, `m` markers, and given input text where the screen first shows it whole. */
 function castInputs(events: Ev[], inputs: string[] = []): CastInput[] {
@@ -47,9 +48,11 @@ function castInputs(events: Ev[], inputs: string[] = []): CastInput[] {
   const starts: number[] = [];
   let screen = '';
   for (const event of output) { starts.push(screen.length); screen += plain(event.text ?? ''); }
+  let from = 0; // inputs are in the order they were typed
   for (const input of inputs) {
-    const needle = plain(input).trim().slice(0, 48), at = needle ? screen.indexOf(needle) : -1;
+    const needle = plain(input), at = needle ? screen.indexOf(needle, from) : -1;
     if (at < 0) continue;
+    from = at + needle.length;
     const end = at + needle.length, index = starts.findLastIndex((start) => start < end);
     found.push({ atMs: output[index].atMs, label: input });
   }
