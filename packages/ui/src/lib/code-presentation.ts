@@ -1,6 +1,6 @@
 import { tokenMilliseconds } from "../utils/token-milliseconds";
 import { tabsPresentation } from "../presentation";
-import type { HighlighterCore, LanguageRegistration, ThemedToken } from "shiki/core";
+import type { GrammarState, HighlighterCore, LanguageRegistration, ThemedToken } from "shiki/core";
 // Leave variables unresolved: the browser resolves them on each token span,
 // including nested themes, inline overrides and CSS/media changes. No document
 // sampling, observers, layout reads or React re-render are needed to recolor code.
@@ -108,7 +108,7 @@ function loadHighlighter(): Promise<HighlighterCore> {
     });
 }
 
-export async function tokenize(code: string, grammar: string): Promise<ThemedToken[][]> {
+async function loadGrammar(grammar: string) {
   const highlighter = await loadHighlighter();
   let load = grammarLoads.get(grammar);
   if (!load) {
@@ -117,7 +117,52 @@ export async function tokenize(code: string, grammar: string): Promise<ThemedTok
     grammarLoads.set(grammar, load);
   }
   await load;
+  return highlighter;
+}
+
+export async function tokenize(code: string, grammar: string): Promise<ThemedToken[][]> {
+  const highlighter = await loadGrammar(grammar);
   return highlighter.codeToTokensBase(code, { lang: grammar, theme: SHIKI_THEME });
+}
+
+/** A growing code block resumes the TextMate grammar after its last complete line. */
+export function createCodeTokenizer() {
+  let last: { code: string; grammar: string } | undefined;
+  let offset = 0;
+  let lines: ThemedToken[][] = [];
+  let state: GrammarState | undefined;
+
+  return async (code: string, grammar: string, signal: AbortSignal) => {
+    const highlighter = await loadGrammar(grammar);
+    if (signal.aborted) return;
+    const options = { lang: grammar, theme: SHIKI_THEME };
+    const appended = last?.grammar === grammar && code.length > last.code.length && code.startsWith(last.code);
+    last = { code, grammar };
+
+    // A static example needs one ordinary render. An edit, language change
+    // or replacement starts a new stream without inheriting its grammar stack.
+    if (!appended) {
+      offset = 0;
+      lines = [];
+      state = undefined;
+      return highlighter.codeToTokensBase(code, options);
+    }
+    const end = code.lastIndexOf("\n") + 1;
+    if (end > offset) {
+      const complete = code.slice(offset, end - 1).replace(/\r$/, "");
+      const addition = highlighter.codeToTokensBase(complete, { ...options, grammarState: state });
+      state = highlighter.getLastGrammarState(addition);
+      // Some grammars cannot supply a reusable state.
+      if (!state) {
+        offset = 0;
+        lines = [];
+        return highlighter.codeToTokensBase(code, options);
+      }
+      lines = lines.concat(addition);
+      offset = end;
+    }
+    return lines.concat(highlighter.codeToTokensBase(code.slice(end), { ...options, grammarState: state }));
+  };
 }
 
 export function tokenStyle(token: ThemedToken): TokenStyle | undefined {

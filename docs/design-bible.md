@@ -76,7 +76,7 @@ Keep the shell anchored and controls locally responsive. Panels emerge from trig
 | Reverse halfway | Retarget current geometry and velocity; never restart or queue opposite intent. |
 | Close or Back | Restore meaningful origin, focus and reading context; skip routine entrance choreography. |
 | Phone navigation | Reveal anchored overlay/expansion, preserve page position and keep dismissal available. |
-| Stream or complete | Render available output immediately; preserve the reader’s anchor. |
+| Stream or complete | Render new text on arrival. Keep completed lines, keyboard focus and the reader's scroll position stable as chunks arrive. |
 
 Consume Brand’s `--motion-control`, `--motion-surface`, `--motion-dismiss`, `--motion-stream` and `--motion-arrive` [roles](../packages/brand/src/styles/tokens.css). Prefer transform/opacity; justify layout animation with a trace. Never use `transition: all`, delay input, stagger actions or animate individual output tokens. Reduced motion removes spatial movement, blur, parallax, smooth scrolling and loops. State, focus and cancellation must work without animation-end events. Decorative loops need pause/still alternatives and stop during task work.
 

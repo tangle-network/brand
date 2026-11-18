@@ -1,3 +1,9 @@
+## 11.51.36
+
+### Patch Changes
+
+- Keep completed code lines highlighted and selectable while an answer streams. Literal replies render without starting the Markdown parser, and Markdown tables use the shared clipboard control.
+
 ## 11.51.35
 
 ### Patch Changes

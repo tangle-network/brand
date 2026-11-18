@@ -2,17 +2,13 @@ import {
   Children,
   createContext,
   isValidElement,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useRef,
-  useState,
   type ComponentProps,
 } from "react";
 import type { ExtraProps } from "react-markdown";
-import { Check, Copy } from "lucide-react";
-import { focusRing, focusRingInset } from "../lib/focus";
+import { CopyButton } from "./code-block";
+import { focusRingInset } from "../lib/focus";
 import { cn } from "../lib/utils";
 
 type Element = NonNullable<ExtraProps["node"]>;
@@ -91,42 +87,6 @@ const PROSE_CELL = "[.tangle-prose_&]:px-3! [.tangle-prose_&]:py-2! [.tangle-pro
 const TableColumns = createContext<Array<"figure" | "short" | "long">>([]);
 const CellColumn = createContext(-1);
 
-function CopyCsvButton({ csv }: { csv: string }) {
-  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
-  const copy = useCallback(async () => {
-    if (timer.current) clearTimeout(timer.current);
-    try {
-      await navigator.clipboard.writeText(csv);
-      setState("copied");
-    } catch {
-      setState("failed");
-    }
-    timer.current = setTimeout(() => setState("idle"), 2000);
-  }, [csv]);
-  return (
-    <>
-      <button
-        type="button"
-        onClick={copy}
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-          focusRing,
-        )}
-      >
-        {state === "copied"
-          ? <Check aria-hidden className="size-4 text-[var(--surface-success-text)]" />
-          : <Copy aria-hidden className="size-4" />}
-        {state === "copied" ? "Copied" : "Copy CSV"}
-      </button>
-      <span className="sr-only" role="status" aria-live="polite">
-        {state === "copied" ? "Table copied as CSV" : state === "failed" ? "Copy failed" : ""}
-      </span>
-    </>
-  );
-}
-
 /**
  * A Markdown table as a card: a header row, subtle row lines, figures
  * right-aligned in tabular numerals, a copy-as-CSV control, and horizontal
@@ -145,7 +105,7 @@ export function MarkdownTable({ node, className, children, ...props }: Component
     <div className="not-prose relative my-4 overflow-hidden rounded-lg border border-border bg-card">
       <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-1">
         <span className="text-sm text-muted-foreground">{rowCount === 1 ? "1 row" : `${rowCount} rows`}</span>
-        <CopyCsvButton csv={csv} />
+        <CopyButton text={csv} label="Copy CSV" />
       </div>
       {/* A keyboard reaches a sideways-scrolling table only when it can take focus. */}
       <div tabIndex={0} role="region" aria-label="Table" className={cn("overflow-x-auto", focusRingInset)}>
