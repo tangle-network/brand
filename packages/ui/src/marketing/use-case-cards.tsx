@@ -25,11 +25,11 @@ const short = (text: string, max = 64) => (text.length > max ? `${text.slice(0, 
 /** The SDK calls made by recorded time `t`, each with the agent tool calls that finished inside it. */
 function steps(events: Ev[], t: number) {
   const tools = events.flatMap((event) => event.kind === 'stream' && event.data?.part?.type === 'tool' && event.data.part.state?.status !== 'running' ? [{ atMs: event.atMs, part: event.data.part }] : []);
-  return events.filter((event) => event.kind === 'call' && event.atMs <= t).map((event) => {
+  return events.filter((event) => event.kind === 'call' && event.atMs <= t).map((event, index) => {
     const done = event.atMs + (event.durationMs ?? 0) <= t;
     const inside = tools.filter((tool) => tool.atMs >= event.atMs && tool.atMs <= Math.min(t, event.atMs + (event.durationMs ?? 0)));
     const last = inside.at(-1)?.part, command = String(last?.state.input?.command ?? last?.state.input?.file_path ?? '').replace(/^\/bin\/bash -lc /, '');
-    return { key: event.id ?? event.atMs, label: event.label ?? event.name ?? '', done, value: done ? callValue(event) : '', time: done ? seconds(event.durationMs) : '',
+    return { key: `${event.atMs}-${index}`, label: event.label ?? event.name ?? '', done, value: done ? callValue(event) : '', time: done ? seconds(event.durationMs) : '',
       tools: inside.length, tool: last ? `${last.tool} ${short(command)}` : '', failed: !!event.error || (typeof event.result?.exitCode === 'number' && event.result.exitCode !== 0) };
   });
 }
