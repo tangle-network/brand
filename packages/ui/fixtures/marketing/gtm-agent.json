@@ -1,0 +1,63 @@
+{
+ "source": {
+  "path": "src/examples/products/gtm-agent.mts",
+  "sha256": "7120fd8b92379fcc10124cf5d38645fa18d59636bac8841b3242f98000632f2d"
+ },
+ "run": {
+  "id": "wfrun_1w92v-CuGMLVAQtW",
+  "recordedAt": "2026-10-31T03:10:08.136Z",
+  "exitCode": 0,
+  "costUsd": 0.038,
+  "sdk": {
+   "@tangle-network/sandbox": "1.0.134",
+   "@tangle-network/agent-eval": "1.0.9"
+  }
+ },
+ "events": [
+  {
+   "atMs": 168,
+   "kind": "call",
+   "id": 1,
+   "line": 12,
+   "name": "run",
+   "label": "client.run",
+   "assign": "run",
+   "durationMs": 29902,
+   "result": {
+    "id": "wfrun_1w92v-CuGMLVAQtW",
+    "status": "succeeded",
+    "placement": {
+     "chosen": "worker",
+     "policy": "agent-placement/2",
+     "reason": "http needs a fetch tool, which the worker holds without a sandbox",
+     "rejected": [
+      {
+       "placement": "inference",
+       "reason": "http needs a fetch tool"
+      },
+      {
+       "placement": "sandbox",
+       "reason": "costs more and no declared requirement needs it"
+      }
+     ]
+    },
+    "text": "## Three facts a seller should know about Tangle\n\n**1. They're an AI-agent infrastructure company, not an app company — their buying center is technical.**\nThe homepage describes the product as: *\"Run AI agents in isolated sandboxes, capture their work, compare changes, and review the evidence before deployment.\"* (tangle.tools homepage meta description). Their own positioning file adds: *\"Tangle is an infrastructure company for AI agents, with a product lab and a research lab. Its five infrastructure layers are sandbox, runtime, router, integrations, and observability (Intelligence).\"* (tangle.tools/llms.txt)\n\n**2. They're open-source-first with a developer-tool sales motion — GitHub, npm, docs, benchmarks.**\nThe site nav links to *docs.tangle.tools*, *github.com/tangle-network*, and a */benchmarks* page (tangle.tools homepage), and they publish installable SDKs: *\"npm install @tangle-network/tcloud / @tangle-network/sandbox / @tangle-network/agent-eval\"* (tangle.tools/llms.txt). Expect a technical evaluation before any purchase; self-serve trial beats cold demos.\n\n**3. Know their actual maturity — don't pitch them as enterprise-scale or on-prem.**\nTheir own guardrails state: *\"Hosted assistants are the first packaged use case, in preview. Do not present on-premises hosting as available today\"* and *\"Tangle offers hosted infrastructure; on-premises hosting is planned and is not available today\"* (tangle.tools/llms.txt). The company is Tangle Technologies, Inc., site author listed as Drew Stone (tangle.tools homepage metadata). Scale your offer to a pre-Series-scale, product-led team.\n\n## One opener\n\n> \"Drew — you've built Tangle's whole stack so agents can discover it themselves (llms.txt, well-known manifests, agent-setup.md), which tells me self-serve evaluation matters more to you than a demo. I work with dev-infra teams at your stage on [X — e.g., usage-based billing / GTM for agent buyers]. Worth a 15-min look at how [your product] fits into the sandbox-to-evaluation loop before you scale past preview?\"\n\nThe hook: they've explicitly optimized for *machine/AI buyers* discovering their product — leading with how you help sell to agents (not just humans) will land better than generic vendor talk.",
+    "model": "zai/glm-5.3",
+    "usage": {
+     "inputTokens": 22535,
+     "outputTokens": 1008
+    },
+    "costUsd": 0.037963330999999996,
+    "error": null,
+    "createdAt": "2026-10-31T03:10:11.360Z",
+    "startedAt": "2026-10-31T03:10:11.422Z",
+    "completedAt": "2026-10-31T03:10:37.344Z"
+   }
+  },
+  {
+   "atMs": 30071,
+   "kind": "stdout",
+   "text": "worker http needs a fetch tool, which the worker holds without a sandbox\n## Three facts a seller should know about Tangle\n\n**1. They're an AI-agent infrastructure company, not an app company — their buying center is technical.**\nThe homepage describes the product as: *\"Run AI agents in isolated sandboxes, capture their work, compare changes, and review the evidence before deployment.\"* (tangle.tools homepage meta description). Their own positioning file adds: *\"Tangle is an infrastructure company for AI agents, with a product lab and a research lab. Its five infrastructure layers are sandbox, runtime, router, integrations, and observability (Intelligence).\"* (tangle.tools/llms.txt)\n\n**2. They're open-source-first with a developer-tool sales motion — GitHub, npm, docs, benchmarks.**\nThe site nav links to *docs.tangle.tools*, *github.com/tangle-network*, and a */benchmarks* page (tangle.tools homepage), and they publish installable SDKs: *\"npm install @tangle-network/tcloud / @tangle-network/sandbox / @tangle-network/agent-eval\"* (tangle.tools/llms.txt). Expect a technical evaluation before any purchase; self-serve trial beats cold demos.\n\n**3. Know their actual maturity — don't pitch them as enterprise-scale or on-prem.**\nTheir own guardrails state: *\"Hosted assistants are the first packaged use case, in preview. Do not present on-premises hosting as available today\"* and *\"Tangle offers hosted infrastructure; on-premises hosting is planned and is not available today\"* (tangle.tools/llms.txt). The company is Tangle Technologies, Inc., site author listed as Drew Stone (tangle.tools homepage metadata). Scale your offer to a pre-Series-scale, product-led team.\n\n## One opener\n\n> \"Drew — you've built Tangle's whole stack so agents can discover it themselves (llms.txt, well-known manifests, agent-setup.md), which tells me self-serve evaluation matters more to you than a demo. I work with dev-infra teams at your stage on [X — e.g., usage-based billing / GTM for agent buyers]. Worth a 15-min look at how [your product] fits into the sandbox-to-evaluation loop before you scale past preview?\"\n\nThe hook: they've explicitly optimized for *machine/AI buyers* discovering their product — leading with how you help sell to agents (not just humans) will land better than generic vendor talk.\n$0.037963330999999996\n"
+  }
+ ]
+}
