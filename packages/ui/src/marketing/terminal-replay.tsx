@@ -56,6 +56,10 @@ function castInputs(events: Ev[], inputs: string[] = []): CastInput[] {
   return found.sort((a, b) => a.atMs - b.atMs);
 }
 
+// Optional peers this module reaches only through import(); scripts/validate-dist.mjs keeps the same list.
+const DEFERRED_PEERS = ['@xterm/xterm'];
+const loadXterm = () => import('@xterm/xterm').catch((error: unknown) => { console.error(`TerminalReplay needs ${DEFERRED_PEERS.join(', ')} installed`, error); throw error; });
+
 const IDLE: [number, number] = [2000, 600]; // a still screen over 2 s plays in 0.6 s while the clock sweeps its real length
 const marks = (events: Ev[]): Mark[] => events.map((event) => ({ atMs: event.atMs }));
 
@@ -70,6 +74,7 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   const markers = useMemo(() => castInputs(events ?? [], inputs), [events, inputs]);
   const screen = useRef<HTMLDivElement>(null), host = useRef<HTMLDivElement>(null);
   const [term, setTerm] = useState<Terminal | null>(null);
+  const [broken, setBroken] = useState(false);
   const [fit, setFit] = useState({ scale: 1, height: 0 });
   const written = useRef(0);
 
@@ -77,7 +82,7 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
     const cast = size.current, el = host.current;
     if (!events || !cast || !el) return;
     let live = true, made: Terminal | undefined;
-    Promise.all([import('@xterm/xterm'), document.fonts?.ready]).then(([{ Terminal }]) => {
+    Promise.all([loadXterm(), document.fonts?.ready]).then(([{ Terminal }]) => {
       if (!live) return;
       const style = getComputedStyle(el);
       made = new Terminal({
@@ -88,7 +93,7 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
       made.open(el);
       written.current = 0;
       setTerm(made);
-    }).catch(() => live && setTerm(null));
+    }).catch(() => { if (live) setBroken(true); });
     return () => { live = false; made?.dispose(); setTerm(null); };
   }, [events]);
 
@@ -117,7 +122,7 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   const at = (atMs: number) => (line ? (line.marks.find((mark) => mark.atMs >= atMs)?.r ?? line.total) / line.total : 0);
   return <section className="mk mk-term" ref={replay.root} aria-label={title} data-state={!line ? 'loading' : replay.playing ? 'playing' : 'paused'}>
     <div className="mk-term-screen" ref={screen} style={{ height: fit.height || undefined }}>
-      {replay.failed ? <p className="mk-term-note" role="status">The recording could not load.</p> : !term && <p className="mk-term-note" role="status">Loading the recording</p>}
+      {replay.failed || broken ? <p className="mk-term-note" role="status">The recording could not load.</p> : !term && <p className="mk-term-note" role="status">Loading the recording</p>}
       <div ref={host} className="mk-term-host" style={{ transform: `scale(${fit.scale})` }} aria-hidden="true" />
     </div>
     <div className="mk-term-bar">
