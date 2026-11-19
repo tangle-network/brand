@@ -1,0 +1,60 @@
+{
+  "engine": "chromium",
+  "width": 1440,
+  "stage": "candidate",
+  "revision": "ff4e34aa19c0b4e7ed685f086d9439b4a38a4e0d",
+  "before": {
+    "state": "idle",
+    "scrollY": 90,
+    "ratio": 0.11393778635157946,
+    "buttonTop": 848.125,
+    "buttonBottom": 892.125,
+    "viewport": 900,
+    "documentVisible": true
+  },
+  "oneClick": {
+    "state": "running",
+    "scrollY": 90,
+    "ratio": 0.11393778635157946,
+    "buttonTop": 848.125,
+    "buttonBottom": 892.125,
+    "viewport": 900,
+    "documentVisible": true
+  },
+  "offscreen": {
+    "state": "paused",
+    "scrollY": 1479,
+    "ratio": 0,
+    "buttonTop": -540.875,
+    "buttonBottom": -496.875,
+    "viewport": 900,
+    "documentVisible": true
+  },
+  "returned": {
+    "state": "running",
+    "scrollY": 90,
+    "ratio": 0.11393778635157946,
+    "buttonTop": 848.125,
+    "buttonBottom": 892.125,
+    "viewport": 900,
+    "documentVisible": true
+  },
+  "pause": {
+    "state": "paused",
+    "scrollY": 90,
+    "ratio": 0.11393778635157946,
+    "buttonTop": 848.125,
+    "buttonBottom": 892.125,
+    "viewport": 900,
+    "documentVisible": true
+  },
+  "reduced": {
+    "state": "ended",
+    "scrollY": 90,
+    "ratio": 0.11393778635157946,
+    "buttonTop": 848.125,
+    "buttonBottom": 892.125,
+    "viewport": 900,
+    "documentVisible": true
+  }
+}

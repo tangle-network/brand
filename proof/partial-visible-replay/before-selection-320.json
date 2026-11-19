@@ -1,0 +1,16 @@
+{
+  "phase": "before",
+  "width": 320,
+  "before": {
+    "state": "idle",
+    "ratio": 0.11043056952189415,
+    "y": 212,
+    "selection": "Fix a failing test"
+  },
+  "after": {
+    "state": "idle",
+    "ratio": 0.10795031425933097,
+    "y": 212,
+    "selection": "Fix a test, then commit"
+  }
+}

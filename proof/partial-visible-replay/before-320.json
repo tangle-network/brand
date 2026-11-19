@@ -1,0 +1,33 @@
+{
+  "engine": "chromium",
+  "width": 320,
+  "stage": "before",
+  "revision": "ff4e34aa19c0b4e7ed685f086d9439b4a38a4e0d",
+  "before": {
+    "state": "idle",
+    "scrollY": 215,
+    "ratio": 0.1162811957217296,
+    "buttonTop": 687.5625,
+    "buttonBottom": 731.5625,
+    "viewport": 740,
+    "documentVisible": true
+  },
+  "oneClick": {
+    "state": "paused",
+    "scrollY": 215,
+    "ratio": 0.1162811957217296,
+    "buttonTop": 687.5742797851562,
+    "buttonBottom": 731.5507202148438,
+    "viewport": 740,
+    "documentVisible": true
+  },
+  "centered": {
+    "state": "running",
+    "scrollY": 750,
+    "ratio": 1,
+    "buttonTop": 152.5625,
+    "buttonBottom": 196.5625,
+    "viewport": 740,
+    "documentVisible": true
+  }
+}

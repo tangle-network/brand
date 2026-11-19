@@ -1,0 +1,16 @@
+{
+  "phase": "candidate",
+  "width": 390,
+  "before": {
+    "state": "idle",
+    "ratio": 0.09765797613787008,
+    "y": 121,
+    "selection": "Fix a failing test"
+  },
+  "after": {
+    "state": "running",
+    "ratio": 0.09566581894919106,
+    "y": 121,
+    "selection": "Fix a test, then commit"
+  }
+}
