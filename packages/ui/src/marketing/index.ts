@@ -1,5 +1,5 @@
 // Marketing-site components shared by tangle.tools and sandbox.tangle.tools. Each takes its content as props.
-export { ExampleEditor, type Idea as ExampleIdea, type Subject as ExampleSubject } from "./example-editor";
+export { ExampleEditor, ExampleWorkbench, type ExampleWorkbenchProps, type Idea as ExampleIdea, type Subject as ExampleSubject } from "./example-editor";
 export type { RunMeta as ExampleRun } from "./run-replay";
 export { SiteNav, type SiteNavProps, type SiteLink } from './site-nav';
 export { SiteFooter, type SiteFooterProps } from './site-footer';
