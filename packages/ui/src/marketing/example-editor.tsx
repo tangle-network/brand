@@ -3,7 +3,7 @@ import { CodeBlock, CopyButton } from '../markdown/code-block';
 import { InlineThinkingItem } from '../run/inline-thinking-item';
 import { Button } from '../primitives/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '../primitives/dropdown-menu';
-import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown, Play, Pause } from 'lucide-react';
 import { ExampleReceipt, RecordedOutput } from './example-result';
 import { useReplay, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
@@ -149,7 +149,7 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
   return tops;
 }
 
-function Workspace({ idea, folder, showReceipt, playOnSelect, compact = false }: { idea: Idea; folder: string; showReceipt: boolean; playOnSelect: boolean; compact?: boolean }) {
+function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: Idea; folder: string; showReceipt: boolean; playOnSelect: boolean; picker?: ReactNode }) {
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null), followFeed = useRef(true);
@@ -198,7 +198,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, compact = false }:
   const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
     <div className="qs-actions">
-      <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
+      {picker ?? <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>}
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && (
         <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
@@ -285,6 +285,7 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
   const choose = (key: string) => {
     setActivation(count => count + 1);
     setPicked(key);
+    if (compact) setMenuOpen(false);
     onSelect?.(key);
     if (value !== undefined) return;
     const url = new URL(window.location.href);
@@ -300,21 +301,24 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
     event.preventDefault(); choose(next.key);
     requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]')?.focus());
   };
-  return <div className={compact ? 'qs-editor qs-workbench dark' : 'qs-editor'} data-theme={compact ? 'website' : undefined} ref={root}>
-    {compact && <div className="qs-picker"><DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+  const picker = compact && <div className="qs-picker"><DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild disabled={!ready}
         onPointerDownCapture={event => { if (event.button === 0 && !event.ctrlKey) event.stopPropagation(); }}
         onClick={() => setMenuOpen(open => !open)}>
         <Button variant="outline" aria-label={`Example, ${task.idea.title}`}>{task.idea.title}<ChevronDown aria-hidden="true" /></Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="qs-picker-menu" align="start" aria-label="Examples">
+      <DropdownMenuContent className="qs-picker-menu" align="start" aria-label="Examples" onCloseAutoFocus={event => {
+        event.preventDefault();
+        requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>('.qs-picker button')?.focus({ preventScroll: true }));
+      }}>
         <DropdownMenuRadioGroup value={task.key}>
           {tasks.map(entry => <DropdownMenuRadioItem key={entry.key} value={entry.key} onSelect={() => choose(entry.key)}>
             {entry.idea.title}
           </DropdownMenuRadioItem>)}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
-    </DropdownMenu></div>}
+    </DropdownMenu></div>;
+  return <div className={compact ? 'qs-editor qs-workbench dark' : 'qs-editor'} data-theme={compact ? 'website' : undefined} ref={root}>
     {!compact && tasks.length > 1 && featured?.length ? <div className="qs-tabs" role="tablist" aria-label="Recorded runs" onKeyDown={event => {
       const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
       if (!direction) return;
@@ -341,6 +345,6 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
         </Fragment>;
       })}
     </nav>}
-    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace compact={compact} key={task.key + activation} playOnSelect={playOnSelect || activation > 0} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
+    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace picker={picker} key={task.key + activation} playOnSelect={playOnSelect || activation > 0} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
   </div>;
 }
