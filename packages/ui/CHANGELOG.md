@@ -1,3 +1,9 @@
+## 11.51.40
+
+### Patch Changes
+
+- 0fab322: Show each recorded SDK example in the same interactive agent timeline. Playback starts on request, with source highlighting and recorded output attached to its step.
+
 ## 11.51.39
 
 ### Patch Changes
