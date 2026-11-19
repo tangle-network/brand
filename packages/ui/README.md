@@ -189,3 +189,15 @@ Create a `createThemeController({ storageKey, defaultTheme, storageValues, attri
 `VirtualCommand` composes that menu and Popover over the shared `VirtualList`. Supply `items`, a committed `value`, `onSelect`, accessible `label`/`listLabel` and a button `trigger`; items carry stable unique values, labels and optional keywords, groups, disabled state or display content. It searches the full collection with the public scorer while mounting the viewport and active option. Highlighting never commits. Load the same command stylesheet and scan UI sources as above.
 
 `VirtualList` measures rows in a supplied `scroller`; `target` settles a logical key and `keepMounted` retains one active row. Increment `targetRevision` to repeat a reveal request for an unchanged key. Optional semantic `groups` wrap only rendered rows without adding layout height: headings belong in measured items. `collectionTarget` moves through the full logical collection, independently of mounted DOM. Sandbox retains its established entry through an exact UI bridge.
+
+### Streaming Markdown
+
+Set `streaming` while the answer is arriving. Unfinished formatting stays out of the text, and a partial link stays plain text until its destination closes. Clear the flag when the reply finishes so the final message uses ordinary Markdown, including any literal markers.
+
+```tsx
+import { Markdown } from "@tangle-network/ui/markdown";
+
+export function Reply({ text, pending }: { text: string; pending: boolean }) {
+  return <Markdown streaming={pending}>{text}</Markdown>;
+}
+```

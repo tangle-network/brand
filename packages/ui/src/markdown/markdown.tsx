@@ -9,6 +9,7 @@ import {
 } from "react";
 import ReactMarkdown, { defaultUrlTransform, type ExtraProps, type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remend from "remend";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import GithubSlugger from "github-slugger";
@@ -241,6 +242,8 @@ function MarkdownImage({ node: _node, src, alt, className, ...props }: Component
 
 export interface MarkdownProps {
   children: string;
+  /** Set while an answer is arriving. Completed content uses normal CommonMark. */
+  streaming?: boolean;
   className?: string;
   /** Transform parsed link and image URLs while retaining protocol safety checks. */
   urlTransform?: UrlTransform;
@@ -259,13 +262,28 @@ export interface MarkdownProps {
 // the full parser. React escapes the text on both the server and the client.
 const literalParagraph = /^[\p{L}][\p{L}\p{M}\p{N} ,.!?'’()-]*$/u;
 
+const streamOptions = {
+  linkMode: "text-only", images: false, katex: false, strikethrough: false,
+  setextHeadings: false, singleTilde: false,
+} as const;
+
+function streamingSource(source: string) {
+  const marker = source.match(/(?:\*{1,3}|_{1,3}|`+)$/)?.[0];
+  // A bare opener has no content to format. Ask the same parser whether one
+  // more letter would make it a span, preserving escapes, closers and fences.
+  if (marker && remend(source + "a", streamOptions).endsWith("a" + marker)) {
+    source = source.slice(0, -marker.length);
+  }
+  return remend(source, streamOptions);
+}
+
 /**
  * Renders Markdown content with GFM support and XSS sanitisation: Shiki code
  * blocks that name their file, tables as cards with right-aligned figures and
  * a CSV copy, images that open full size or show a labelled placeholder, and
  * optional chips for links to known objects.
  */
-export const Markdown = memo(({ children, className, urlTransform, linkChip, headingPermalinks }: MarkdownProps) => {
+export const Markdown = memo(({ children, className, urlTransform, linkChip, headingPermalinks, streaming }: MarkdownProps) => {
   const proseClass = cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
   if (literalParagraph.test(children) && !/www\./i.test(children)) {
     return <div className={proseClass}><p>{children.trimEnd()}</p></div>;
@@ -292,7 +310,7 @@ export const Markdown = memo(({ children, className, urlTransform, linkChip, hea
             td: MarkdownTableCell,
           }}
         >
-          {children}
+          {streaming ? streamingSource(children) : children}
         </ReactMarkdown>
       </LinkChipContext.Provider>
     </div>
