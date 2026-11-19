@@ -191,7 +191,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
     return () => { observer.disconnect(); delete row.dataset.executing; };
   }, [activeLine, replay.playing, replay.still]);
   const holdSource = () => { follow.current = false; };
-  const { jump } = useFollowTail(feed, { identity: idea.id, content: run.items.length, thresholdPx: 3 });
+  const { jump } = useFollowTail(feed, { identity: idea.id, content: run.items.length, thresholdPx: 3, requireScrollInput: true });
   const label = replay.playing ? 'Pause' : ended ? 'Replay' : replay.started ? 'Resume' : 'Play';
   const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
