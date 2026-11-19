@@ -63,7 +63,13 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
     return () => { io.disconnect(); document.removeEventListener('visibilitychange', update); };
   }, []);
   const started = useRef(false);
-  useEffect(() => { if (autoplay && line && visible && !hidden && !still && !started.current) { started.current = true; setR(0); setEnabled(true); } }, [autoplay, line, visible, hidden, still]);
+  useEffect(() => {
+    if (!autoplay || !line || !visible || hidden || started.current) return;
+    started.current = true;
+    const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setR(animate ? 0 : line.total);
+    setEnabled(animate);
+  }, [autoplay, line, visible, hidden]);
   const position = r ?? (startAt === 'beginning' ? 0 : line?.total ?? 0);
   const playing = enabled && visible && !hidden && !!line && position < line.total;
   useEffect(() => {

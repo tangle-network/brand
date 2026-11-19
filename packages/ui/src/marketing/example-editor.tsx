@@ -2,11 +2,10 @@ import { AgentTimeline, type AgentTimelineItem } from '../chat/agent-timeline';
 import { CodeBlock, CopyButton } from '../markdown/code-block';
 import { InlineThinkingItem } from '../run/inline-thinking-item';
 import { Button } from '../primitives/button';
-import { Slider } from '../primitives/slider';
 import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { ExampleReceipt, RecordedOutput } from './example-result';
-import { useReplay, clock, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
+import { useReplay, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
 
 // The example editor from tangle.tools: a list of example files, each file's source, and the recorded production run
 // beside it. It takes its examples as props and imports no data; style it with @tangle-network/ui/styles/marketing.css.
@@ -140,12 +139,12 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
   return tops;
 }
 
-function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; showReceipt: boolean }) {
+function Workspace({ idea, folder, showReceipt, playOnSelect }: { idea: Idea; folder: string; showReceipt: boolean; playOnSelect: boolean }) {
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null), followFeed = useRef(true);
   const returnsId = useId();
-  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning' });
+  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay: playOnSelect });
   const { events, line, r } = replay;
   const t = replay.started ? replay.t : -1;
   const ended = replay.started && !!line && r >= line.total;
@@ -153,6 +152,11 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
   const rows = useMemo(() => returnRows(events ?? [], t, code, idea.run?.costUsd), [events, t, code, idea.run?.costUsd]);
   const tops = useReturns(source, rows, idea.code);
   const run = useMemo(() => activity(events ?? [], t, code, idea), [events, t, code, idea]);
+  const preview = useMemo(() => {
+    const first = events?.find(event => event.kind === 'call');
+    if (!first) return [];
+    return activity([first], first.atMs + (first.durationMs ?? 0), code, idea).items;
+  }, [events, code, idea]);
   const current = ended ? undefined : run.active;
   const activeLine = current?.line;
   useLayoutEffect(() => {
@@ -186,12 +190,9 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
     <div className="qs-actions">
       <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
       <CopyButton text={idea.code} label="Copy file" />
-      {idea.run && <>
+      {idea.run && (
         <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
-        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line?.total ? r / line.total : 0]} onValueChange={([part]) => { follow.current = followFeed.current = true; replay.seek(part); }}
-          onKeyDownCapture={event => {
-            if (event.key === 'Home') { event.preventDefault(); follow.current = followFeed.current = true; replay.seek(0); }
-          }} /></>}
+      )}
     </div>
     <div className="qs-panes">
       <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
@@ -204,8 +205,9 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
       <div className="qs-pane qs-machine"><div ref={feed} className="qs-feed" role="region" aria-label="Run" tabIndex={0}
         onWheel={holdFeed} onPointerDown={holdFeed} onKeyDown={holdFeed}>
         {current && <div className="qs-current-call" data-source-line={current.line}><span>Line {current.line}</span><code>{current.label ?? current.name}</code></div>}
-        <AgentTimeline className="qs-execution-timeline" items={run.items} isThinking={run.thinking}
-          emptyState={<p className="qs-wait">{!idea.run ? 'This example has source code only.' : replay.failed ? 'The recorded run could not load.' : !events ? 'Loading the recorded run…' : !replay.started ? 'Play the recorded run to follow each step.' : ended ? 'No steps were recorded.' : 'Waiting for the first recorded step…'}</p>} />
+        {!replay.started && preview.length > 0 && <p className="qs-preview-label">First recorded step</p>}
+        <AgentTimeline className="qs-execution-timeline" items={replay.started ? run.items : preview} isThinking={run.thinking}
+          emptyState={<p className="qs-wait">{!idea.run ? 'This example has source code only.' : replay.failed ? 'The recorded run could not load.' : !events ? 'Loading the recorded run…' : !events.length || ended ? 'No steps were recorded.' : 'Waiting for the first recorded step…'}</p>} />
         {ended && idea.output && !events?.some(e => e.kind === 'call' && e.label === idea.output!.call) &&
           <p className="qs-wait">This run has no recorded command output.</p>}
       </div></div>
@@ -223,12 +225,13 @@ function reveal(row: HTMLElement, item: HTMLElement, labels: HTMLElement[]) {
 }
 
 /** `initial` is the `subject/idea` key shown first; without it, the first idea. A `?example=` key in the URL wins. */
-export function ExampleEditor({ subjects, initial, featured, showReceipt = true }: { subjects: Subject[]; initial?: string; featured?: string[]; showReceipt?: boolean }) {
+export function ExampleEditor({ subjects, initial, featured, showReceipt = true, playOnSelect = false }: { subjects: Subject[]; initial?: string; featured?: string[]; showReceipt?: boolean; playOnSelect?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const tasks = useMemo(() => subjects.flatMap((subject) => subject.ideas.map((idea) => ({ key: `${subject.id}/${idea.id}`, subject, idea }))), [subjects]);
   const fallback = initial ?? tasks[0]?.key ?? '';
   const [picked, setPicked] = useState(fallback);
+  const [activation, setActivation] = useState(0);
   const [showAll, setShowAll] = useState(!featured?.length);
   useLayoutEffect(() => {
     const row = root.current?.querySelector<HTMLElement>('.qs-tabs');
@@ -240,12 +243,14 @@ export function ExampleEditor({ subjects, initial, featured, showReceipt = true 
   }, [picked]);
   useEffect(() => {
     const read = () => { const value = new URL(window.location.href).searchParams.get('example'); setPicked(tasks.some((task) => task.key === value) ? value! : fallback); };
-    read(); window.addEventListener('popstate', read);
-    return () => window.removeEventListener('popstate', read);
+    const restore = () => { setActivation(0); read(); };
+    read(); window.addEventListener('popstate', restore);
+    return () => window.removeEventListener('popstate', restore);
   }, [tasks, fallback]);
   const task = tasks.find((item) => item.key === picked) ?? tasks[0];
   if (!task) return null;
   const choose = (value: string) => {
+    setActivation(count => count + 1);
     setPicked(value);
     const url = new URL(window.location.href); url.searchParams.set('example', value);
     window.history.replaceState(window.history.state, '', url);
@@ -256,7 +261,6 @@ export function ExampleEditor({ subjects, initial, featured, showReceipt = true 
     event.preventDefault(); choose(next.key);
     requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]')?.focus());
   };
-  // One list, like a folder of files: a subject opens to its jobs, and each job shows how long its run took.
   return <div className="qs-editor" ref={root}>
     {tasks.length > 1 && featured?.length ? <div className="qs-tabs" role="tablist" aria-label="Recorded runs" onKeyDown={event => {
       const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
@@ -266,7 +270,7 @@ export function ExampleEditor({ subjects, initial, featured, showReceipt = true 
       choose(featured[(index + direction + featured.length) % featured.length]);
       requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus());
     }}>
-      {featured.flatMap(key => { const item = tasks.find(task => task.key === key); return item ? [<Button key={key} tabIndex={key === task.key ? 0 : -1} aria-controls={panelId} size="sm" variant="ghost" role="tab" aria-selected={key === task.key} onClick={() => choose(key)}>{item.idea.title}<span>{item.idea.run && clock(item.idea.run.ms)}</span></Button>] : []; })}
+      {featured.flatMap(key => { const item = tasks.find(task => task.key === key); return item ? [<Button key={key} tabIndex={key === task.key ? 0 : -1} aria-controls={panelId} size="sm" variant="ghost" role="tab" aria-selected={key === task.key} onClick={() => choose(key)}>{item.idea.title}</Button>] : []; })}
       <Button size="sm" variant="ghost" className="qs-all" aria-expanded={showAll} onClick={() => setShowAll(!showAll)}>All examples <span aria-hidden="true">▾</span></Button>
     </div> : null}
     {tasks.length > 1 && showAll && <nav className="qs-nav" aria-label="Examples" onKeyDown={step}>
@@ -277,13 +281,13 @@ export function ExampleEditor({ subjects, initial, featured, showReceipt = true 
           <div className="qs-rows" inert={!open}>
             <div className="qs-list">
               {subject.ideas.map((idea) => <Button key={idea.id} size="sm" variant="ghost" aria-pressed={idea === task.idea} onClick={() => choose(`${subject.id}/${idea.id}`)}>
-                {idea.title}{idea.run && <span aria-hidden="true">{clock(idea.run.ms)}</span>}
+                {idea.title}
               </Button>)}
             </div>
           </div>
         </Fragment>;
       })}
     </nav>}
-    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace key={task.key} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
+    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace key={task.key + activation} playOnSelect={playOnSelect || activation > 0} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
   </div>;
 }
