@@ -1,0 +1,42 @@
+{
+  "before": {
+    "scroll": 7215,
+    "height": 9366,
+    "locked": false,
+    "gap": 0,
+    "idleGap": 6,
+    "inset": 8.1875
+  },
+  "opened": {
+    "scroll": 7215,
+    "height": 9366,
+    "locked": false,
+    "gap": 0,
+    "idleGap": 6,
+    "inset": 8.1875
+  },
+  "followed": {
+    "scroll": 8013,
+    "height": 9377,
+    "locked": false,
+    "gap": 0,
+    "idleGap": 7,
+    "inset": 8.1875
+  },
+  "away": {
+    "scroll": 8013,
+    "height": 9377,
+    "locked": false,
+    "gap": 284,
+    "idleGap": -278,
+    "inset": 8.1875
+  },
+  "end": {
+    "scroll": 8013,
+    "height": 9377,
+    "locked": false,
+    "gap": 2104,
+    "idleGap": -2097,
+    "inset": 8.1875
+  }
+}
