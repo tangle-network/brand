@@ -23,7 +23,7 @@ Shapes to never copy, from the same market: "Your AI Agent Accelerator" (Runloop
 
 ## Headline patterns
 
-1. **What Tangle does, then why.** "Tangle gives each agent run its own machine." A statement with a subject, then one sentence of reason. Never a string of commands.
+1. **Start with what the reader can do.** "Give each agent its own machine." The next sentence can show what the agent does there.
 2. **Verb + what you get.** "Run any coding agent. On any cloud." One command at most; two or three in a row shout at the reader.
 3. **The reader's noun first.** "Every coding agent, installed." "Every agent gets a machine."
 4. **A fact with a number.** "Pay only for the seconds they run." Only with today's measurement and its benchmark link.
@@ -68,12 +68,12 @@ One line, under 90 characters, saying what the code cannot: a fact about the pla
 + // Daytona runs the command; the snapshot must have claude installed and logged in.
 ```
 
-## Before and after on tangle.tools
+## Homepage copy examples
 
 | Was | Now | Why |
 |---|---|---|
-| Every example ran on production. | Tangle gives each agent run its own machine. | The old line is about our proof; the new one says what Tangle does. |
-| Pick a job. Copy the file. Run it. | Tangle gives each agent run its own machine. Under it: Coding agents run commands and edit files. On Tangle they do it on a machine made for that run, and you get the changes back with a record of each step. | Three commands in a row shout at the reader. A statement tells them what we do, and the next sentence says why. |
+| Every example ran on production. | Give each agent its own machine. | The reader can picture where their code will run. |
+| Pick a job. Copy the file. Run it. | Give each agent its own machine. It can edit your repo and run the tests. You get a patch to review. | The subline names the work and what the developer gets back. |
 | Run any harness. On any cloud. | Run any coding agent. On any cloud. | "Harness" is our word. |
 | Installed in every sandbox, keys set. Click one to start it. (under "Every coding agent, installed.") | Click one to start it in a new sandbox. | The subline restated the heading. |
 | One SDK. | Run any coding agent. | A slogan any SDK could use. |
