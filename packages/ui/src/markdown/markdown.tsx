@@ -246,7 +246,11 @@ export interface MarkdownProps {
   urlTransform?: UrlTransform;
   /** Render links to known objects (a file, an asset) as chips that keep their href. */
   linkChip?: MarkdownLinkChipResolver;
-  /** Give each heading a shareable link and support explicit Markdown IDs such as {#install}. */
+  /**
+   * Only for trusted, authored documents. Add native named anchors after
+   * sanitization for short share URLs and support explicit IDs such as {#install}.
+   * Leave off for user- or agent-generated Markdown.
+   */
   headingPermalinks?: boolean;
 }
 

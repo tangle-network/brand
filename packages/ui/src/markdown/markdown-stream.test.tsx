@@ -37,16 +37,19 @@ it("renders native section links at every depth with stable, unique IDs and pres
   const source = [
     "# Getting started", "## Stable", "### [Guide](/guide) and `CLI` {#stable}",
     "#### Déjà vu", "##### Déjà vu", "###### 重複", "###### 重複",
+    "## User content {#user-content-stable}",
     "[Deep section](#stable) and [old outline](#user-content-stable)",
   ].join("\n\n");
   const view = render(<Markdown headingPermalinks>{source}</Markdown>);
   const headings = view.getAllByRole("heading");
-  const names = ["getting-started", "stable-1", "stable", "déjà-vu", "déjà-vu-1", "重複", "重複-1"];
+  const names = ["getting-started", "stable-1", "stable", "déjà-vu", "déjà-vu-1", "重複", "重複-1", "user-content-stable"];
   expect(headings.map((node) => node.id)).toEqual(names.map((name) => `user-content-${name}`));
   headings.forEach((node, index) => {
-    const link = node.querySelector("a[name]");
-    expect(link?.getAttribute("name")).toBe(names[index]);
-    expect(decodeURIComponent(link?.getAttribute("href") ?? "")).toBe(`#${node.id}`);
+    const link = node.querySelector(".md-heading-permalink")!;
+    const fragment = decodeURIComponent(link.getAttribute("href")!.slice(1));
+    const target = document.getElementById(fragment) ?? document.getElementsByName(fragment)[0];
+    expect(target?.closest("h1,h2,h3,h4,h5,h6")).toBe(node);
+    expect(fragment).toBe(index === names.length - 1 ? node.id : names[index]);
   });
   expect(view.getByRole("link", { name: "Guide" }).getAttribute("href")).toBe("/guide");
   expect(view.getByRole("link", { name: "Deep section" }).getAttribute("href")).toBe("#stable");

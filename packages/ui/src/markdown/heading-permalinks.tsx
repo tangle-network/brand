@@ -38,11 +38,14 @@ function heading(tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
     const title = `Link to ${label}`;
     // Keep the sanitizer's heading ID (also used by existing outlines). A named
     // anchor gives GitHub-style short fragments a native no-JavaScript target.
-    const name = id.slice(sanitizedPrefix.length);
+    const slug = id.slice(sanitizedPrefix.length);
+    // A short slug such as "user-content-install" may already identify a
+    // different heading. Its sanitized ID always identifies this heading.
+    const name = slug.startsWith(sanitizedPrefix) ? undefined : slug;
     return (
       <Tag {...props} id={id} aria-label={label} className="relative">
         {children}{" "}
-        <a {...{ name }} href={`#${encodeURIComponent(id)}`} className="md-heading-permalink inline-flex size-7 items-center justify-center align-middle text-muted-foreground hover:text-foreground focus-visible:outline-2" aria-label={title} title={title}>
+        <a {...{ name }} href={`#${encodeURIComponent(name || id)}`} className="md-heading-permalink inline-flex size-7 items-center justify-center align-middle text-muted-foreground hover:text-foreground focus-visible:outline-2" aria-label={title} title={title}>
           <Link2 aria-hidden="true" className="size-4" />
         </a>
       </Tag>
