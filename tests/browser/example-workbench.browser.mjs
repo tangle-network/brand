@@ -54,8 +54,16 @@ async function check(browserType, width) {
     const away = await feed.evaluate(metrics);
     await page.waitForFunction(h => document.querySelector(".qs-workbench .qs-feed").scrollHeight > h + 16, oldHeight);
     assert.ok(Math.abs((await feed.evaluate(metrics)).top - away.top) <= 2, "New content must not steal a reader's position");
-    const resumedHeight = await feed.evaluate(el => el.scrollHeight);
+    const resumedHeight = await feed.evaluate(el => {
+      // Sample after the scroller's handler, before native keyboard scrolling or the next streaming frame.
+      document.addEventListener('keydown', event => {
+        el.dataset.endKey = JSON.stringify({ handled: event.defaultPrevented, gap: el.scrollHeight - el.clientHeight - el.scrollTop });
+      }, { once: true });
+      return el.scrollHeight;
+    });
     await page.keyboard.press('End');
+    const endKey = JSON.parse(await feed.getAttribute('data-end-key'));
+    assert.ok(endKey.handled && Math.abs(endKey.gap) < 3, 'A focused End must reattach immediately at the current height');
     await page.waitForFunction(h => {
       const el = document.querySelector(".qs-workbench .qs-feed");
       return el.scrollHeight > h + 16 && el.scrollHeight - el.clientHeight - el.scrollTop < 3;

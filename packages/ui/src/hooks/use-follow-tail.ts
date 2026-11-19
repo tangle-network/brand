@@ -22,6 +22,12 @@ export function useFollowTail(scroller: RefObject<HTMLElement | null>, { identit
     let touchY = 0
     const wheel = (event: WheelEvent) => { if (event.deltaY < 0) following.current = false }
     const key = (event: KeyboardEvent) => {
+      if (event.key === 'End' && event.target === node && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey && latest.current.follow) {
+        // Native End may animate to a height that is already stale when the next text chunk arrives.
+        event.preventDefault()
+        jump('instant')
+        return
+      }
       if (['Home', 'PageUp', 'ArrowUp'].includes(event.key) || (event.shiftKey && [' ', 'Tab'].includes(event.key))) following.current = false
     }
     const start = (event: TouchEvent) => { touchY = event.touches[0].clientY }
@@ -46,7 +52,7 @@ export function useFollowTail(scroller: RefObject<HTMLElement | null>, { identit
     if (input) {
       const options = { passive: true, signal: input.signal }
       node.addEventListener('wheel', wheel, options)
-      node.addEventListener('keydown', key, options)
+      node.addEventListener('keydown', key, { signal: input.signal })
       node.addEventListener('touchstart', start, options)
       node.addEventListener('touchmove', move, options)
       node.addEventListener('pointerdown', drag, options)
@@ -57,6 +63,6 @@ export function useFollowTail(scroller: RefObject<HTMLElement | null>, { identit
     observer.observe(node)
     for (const child of node.children) observer.observe(child)
     return () => { input?.abort(); observer.disconnect(); node.removeEventListener('scroll', track) }
-  }, [content, follow, identity, requireScrollInput])
+  }, [content, follow, identity, requireScrollInput, jump])
   return { following, unseen, jump, atBottom }
 }
