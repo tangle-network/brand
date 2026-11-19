@@ -19,6 +19,8 @@ export interface TerminalReplayProps {
   positionMs?: number;
   /** Keep terminal text near its native size on narrow screens and allow horizontal scrolling. */
   readable?: boolean;
+  /** In a cropped preview, bring the recorded row containing this text into view. */
+  revealText?: string;
 }
 
 interface Cast { width: number; height: number; events: Ev[] }
@@ -70,7 +72,7 @@ const loadXterm = () => import('@xterm/xterm').catch((error: unknown) => { conso
 const IDLE: [number, number] = [2000, 600]; // a still screen over 2 s plays in 0.6 s while the clock sweeps its real length
 const marks = (events: Ev[]): Mark[] => events.map((event) => ({ atMs: event.atMs }));
 
-export function TerminalReplay({ src, title = 'Recorded terminal session', inputs, autoplay = true, positionMs, readable = false }: TerminalReplayProps) {
+export function TerminalReplay({ src, title = 'Recorded terminal session', inputs, autoplay = true, positionMs, readable = false, revealText }: TerminalReplayProps) {
   const size = useRef<Cast | null>(null);
   const replay = useReplay(src, marks, IDLE, [0, Infinity], undefined, {
     autoplay: positionMs === undefined && autoplay,
@@ -126,9 +128,23 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
     while (due < output.length && output[due].atMs <= t) due++;
     while (due > 0 && output[due - 1].atMs > t) due--;
     if (due < written.current) { term.reset(); written.current = 0; }
-    if (due > written.current) term.write(output.slice(written.current, due).map((event) => event.text).join(''));
+    const box = screen.current;
+    let live = true;
+    const reveal = () => {
+      if (!live || !box || !readable || positionMs === undefined || box.scrollHeight <= box.clientHeight) return;
+      const buffer = term.buffer.active;
+      let row = buffer.cursorY;
+      if (revealText) {
+        for (let index = 0; index < term.rows; index++) {
+          if (buffer.getLine(buffer.viewportY + index)?.translateToString(true).includes(revealText)) { row = index; break; }
+        }
+      }
+      box.scrollTop = (row + 1) * box.scrollHeight / term.rows - box.clientHeight * .7;
+    };
+    if (due > written.current) term.write(output.slice(written.current, due).map((event) => event.text).join(''), reveal);
     written.current = due;
-  }, [term, output, t]);
+    return () => { live = false; };
+  }, [term, output, t, readable, revealText, positionMs]);
 
   const end = output.at(-1)?.atMs ?? 0;
   const at = (atMs: number) => (line ? (line.marks.find((mark) => mark.atMs >= atMs)?.r ?? line.total) / line.total : 0);
