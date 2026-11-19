@@ -18,7 +18,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `python3 -m http.server ${storybookPort} --bind 127.0.0.1 --directory storybook-static`,
+    command: `pnpm exec vite preview --outDir storybook-static --host 127.0.0.1 --port ${storybookPort} --strictPort`,
     url: `http://127.0.0.1:${storybookPort}/index.json`,
     reuseExistingServer: false,
     stderr: "ignore",
