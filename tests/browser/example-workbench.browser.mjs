@@ -32,6 +32,22 @@ async function check(browserType, width) {
     if (width < 500) await trigger.tap(); else await trigger.click();
     await page.getByRole("menu").waitFor();
     assert.equal(await page.evaluate(() => document.body.hasAttribute("data-scroll-locked")), false);
+    const options = await page.getByRole("menuitemradio").allTextContents();
+    const phrase = options.find(title => title.trim().split(/\s+/).length >= 3)?.trim();
+    if (phrase) {
+      await page.evaluate(() => {
+        function captureSpace(event) {
+          if (event.key !== ' ') return;
+          document.body.dataset.typeaheadSpace = String(event.defaultPrevented);
+          document.removeEventListener('keydown', captureSpace);
+        }
+        document.addEventListener('keydown', captureSpace);
+      });
+      await page.keyboard.type(phrase, { delay: 40 });
+      await page.waitForFunction(title => document.activeElement?.textContent?.trim() === title, phrase);
+      assert.equal(await page.locator('body').getAttribute('data-typeahead-space'), 'true');
+      assert.equal((await feed.evaluate(metrics)).page, before.page, 'Multiword search stays in the picker');
+    }
     await page.keyboard.press("End");
     await page.keyboard.press("Escape");
     await page.waitForFunction(() => document.activeElement?.matches(".qs-picker button"));
