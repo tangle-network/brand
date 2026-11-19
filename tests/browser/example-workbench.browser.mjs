@@ -1,4 +1,4 @@
-/** Run against a rendered workbench with a recorded example long enough to scroll. */
+/** Run against a rendered workbench with a long streaming example, e.g. sandboxes/fix-and-commit. */
 import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
 
@@ -47,16 +47,23 @@ async function check(browserType, width) {
       const el = document.querySelector(".qs-workbench .qs-feed");
       return el.scrollHeight > el.clientHeight + 130 && el.scrollHeight - el.clientHeight - el.scrollTop < 3;
     });
-    const oldHeight = await feed.evaluate(el => { el.scrollBy({ top: -120, behavior: "instant" }); return el.scrollHeight; });
+    await feed.evaluate(el => el.focus({ preventScroll: true }));
+    await page.keyboard.press('Home');
+    await page.waitForFunction(() => document.querySelector('.qs-workbench .qs-feed').scrollTop < 2);
+    const oldHeight = await feed.evaluate(el => el.scrollHeight);
     const away = await feed.evaluate(metrics);
     await page.waitForFunction(h => document.querySelector(".qs-workbench .qs-feed").scrollHeight > h + 16, oldHeight);
     assert.ok(Math.abs((await feed.evaluate(metrics)).top - away.top) <= 2, "New content must not steal a reader's position");
-    const resumedHeight = await feed.evaluate(el => { el.scrollTo({ top: el.scrollHeight, behavior: "instant" }); return el.scrollHeight; });
+    const resumedHeight = await feed.evaluate(el => el.scrollHeight);
+    await page.keyboard.press('End');
     await page.waitForFunction(h => {
       const el = document.querySelector(".qs-workbench .qs-feed");
       return el.scrollHeight > h + 16 && el.scrollHeight - el.clientHeight - el.scrollTop < 3;
     }, resumedHeight);
-    assert.equal((await feed.evaluate(metrics)).page, watching.page);
+    await root.locator('.qs-main[data-state="ended"]').waitFor({ timeout: 35000 });
+    const finished = await feed.evaluate(metrics);
+    assert.ok(finished.gap < 3, "Following survives repeated streamed growth through the final output");
+    assert.equal(finished.page, watching.page);
     console.log(JSON.stringify({ width, idleBottomInset: Math.round(end), documentScrollOnMenu: closed.page - before.page,
       unpinnedGap: Math.round(away.gap), resumedGap: Math.round((await feed.evaluate(metrics)).gap) }));
   } finally {

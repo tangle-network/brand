@@ -649,7 +649,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .qs-workbench .qs-code pre > code { display: block; width: max-content; min-width: 100%; }
 .qs-workbench .qs-code pre > code > span { overflow: visible; }
 .qs-workbench .qs-band { background: color-mix(in srgb, var(--brand-cool) 52%, var(--md3-surface-container-low)); }
-.qs-workbench .qs-feed { display: flex; flex-direction: column; overscroll-behavior: contain; }
+.qs-workbench .qs-feed { display: flex; flex-direction: column; overflow-anchor: none; overscroll-behavior: contain; }
 .qs-workbench .qs-execution-timeline { flex: none; margin-block-start: auto; padding: .4rem .7rem; }
 .qs-workbench .qs-execution-timeline [data-timeline-step=tool] { margin: 0; }
 .qs-workbench [data-timeline-step=tool] [data-run-row] > button {
