@@ -1,0 +1,101 @@
+{
+  "before": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 6
+  },
+  "open": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": 0,
+    "focus": "menu",
+    "pane": 0,
+    "tail": 6
+  },
+  "escape": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 6
+  },
+  "keyOpen": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": 0,
+    "focus": "menuitemradio",
+    "pane": 0,
+    "tail": 6
+  },
+  "end": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": 6,
+    "focus": "menuitemradio",
+    "pane": 0,
+    "tail": 6
+  },
+  "close": {
+    "page": 393,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 6
+  },
+  "start": {
+    "page": 1155,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": null
+  },
+  "streaming": {
+    "page": 1155,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 153,
+    "tail": 6
+  },
+  "away": {
+    "page": 1155,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 33,
+    "tail": -114
+  },
+  "growing": {
+    "page": 1155,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 33,
+    "tail": -225
+  },
+  "resumed": {
+    "page": 1155,
+    "height": 5824,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 372,
+    "tail": 6
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "before": {
+    "page": 389,
+    "height": 5816,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 171
+  },
+  "open": {
+    "page": 325,
+    "height": 5752,
+    "locked": true,
+    "menu": 0,
+    "focus": "menu",
+    "pane": 0,
+    "tail": 171
+  },
+  "escape": {
+    "page": 389,
+    "height": 5816,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 171
+  },
+  "keyOpen": {
+    "page": 325,
+    "height": 5752,
+    "locked": true,
+    "menu": 0,
+    "focus": "menuitemradio",
+    "pane": 0,
+    "tail": 171
+  },
+  "end": {
+    "page": 325,
+    "height": 5752,
+    "locked": true,
+    "menu": 6,
+    "focus": "menuitemradio",
+    "pane": 0,
+    "tail": 171
+  },
+  "close": {
+    "page": 389,
+    "height": 5816,
+    "locked": false,
+    "menu": null,
+    "focus": null,
+    "pane": 0,
+    "tail": 171
+  }
+}
