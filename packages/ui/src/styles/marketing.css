@@ -57,13 +57,15 @@
 .qs-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .qs-source { border-right: calc(var(--qs-u) / 16) solid var(--qs-line); }
 .qs-code { position: relative; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--qs-line) transparent; }
-.qs-code > div:not(.qs-exec) { flex: none; border: 0; border-radius: 0; background: transparent; }
+.qs-code > div:not(.qs-exec) { position: relative; z-index: 1; flex: none; border: 0; border-radius: 0; background: transparent; }
 .qs-code :is(pre, code) { font-size: var(--qs-code-size) !important; line-height: 1.74 !important; white-space: pre !important; font-variant-ligatures: none; }
 .qs-code pre { padding: var(--font-size-sm) 0 !important; overflow: hidden !important; background: transparent !important; }
 .qs-code pre > code > span { display: block; overflow: hidden; text-overflow: ellipsis; padding-right: var(--font-size-sm); min-height: var(--qs-code-line); }
 .qs-code [data-line-number] { width: var(--qs-code-gutter); padding-right: var(--font-size-lg); }
-.qs-exec { position: absolute; inset: 0; pointer-events: none; }
-.qs-band { position: absolute; inset: 0 0 auto; height: var(--qs-code-line); border-left: 3px solid var(--accent-text); background: color-mix(in srgb, var(--brand-cool) 19%, transparent); transition: transform var(--motion-control); }
+.qs-exec { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.qs-band { position: absolute; inset: 0 0 auto; height: var(--qs-code-line); pointer-events: none; border-left: 4px solid var(--accent-text); background: color-mix(in srgb, var(--brand-cool) 48%, var(--md3-surface-container-lowest)); transition: transform var(--motion-control); }
+.qs-code [data-executing] [data-line-number] { color: var(--text-primary); }
+.qs-band::after { content: ''; position: absolute; top: 50%; left: calc(var(--qs-code-gutter) - .9rem); width: .55rem; height: .7rem; transform: translateY(-50%); clip-path: polygon(0 0, 100% 50%, 0 100%); background: var(--accent-text); }
 .qs-current-call { position: sticky; top: 0; z-index: 1; display: flex; align-items: baseline; gap: var(--font-size-xs); padding: .5rem var(--qs-u); background: var(--md3-surface-container-high); border-left: 3px solid var(--accent-text); }
 .qs-current-call span { color: var(--accent-text); font: 600 var(--font-size-sm)/1.4 var(--font-sans); }
 .qs-current-call code { color: var(--text-primary); font: var(--qs-code-size)/1.4 var(--font-mono); }

@@ -127,6 +127,7 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
     const pane = source.current, marker = band.current;
     const row = pane?.querySelector<HTMLElement>(`pre > code > span:nth-child(${activeLine})`);
     if (!pane || !row || !marker) return;
+    row.dataset.executing = 'true';
     const place = () => {
       const bounds = pane.getBoundingClientRect(), line = row.getBoundingClientRect();
       const top = line.top - bounds.top + pane.scrollTop - pane.clientTop;
@@ -138,7 +139,7 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
     place();
     const observer = new ResizeObserver(place);
     observer.observe(row.closest('pre')!);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); delete row.dataset.executing; };
   }, [activeLine, replay.playing, replay.still]);
   const holdSource = () => { follow.current = false; };
   const label = replay.playing ? 'Pause' : 'Replay';
@@ -154,8 +155,9 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
       <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
         onWheel={holdSource} onPointerDown={holdSource} onKeyDown={holdSource} aria-label={`${idea.id}.mts source`}>
         <style>{[...rows.keys()].map(n => `[data-returns="${returnsId}"] pre > code > span:nth-child(${n + 1}) { padding-bottom: var(--qs-return-line); }`).join('\n')}</style>
+        {activeLine && <i aria-hidden="true" ref={band} className="qs-band" />}
         <CodeBlock code={idea.code.trimEnd()} language="ts" label="" showLineNumbers className="rounded-none border-0" />
-        <div className="qs-exec">{activeLine && <i aria-hidden="true" ref={band} className="qs-band" />}{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
+        <div className="qs-exec">{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
       </section>
       {idea.run && <div className="qs-pane qs-machine"><div className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
         {current && <div className="qs-current-call" data-source-line={current.line}><span>Line {current.line}</span><code>{current.label ?? current.name}</code></div>}
