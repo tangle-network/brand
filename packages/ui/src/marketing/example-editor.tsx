@@ -54,7 +54,7 @@ function activity(events: Ev[], t: number, source: string[]) {
   const lines = new Map<number, { atMs: number; label: string; done: number; total: number; turn: boolean; state?: string; last?: Ev }>();
   const items = new Map<string, Item>();
   const streamed = events.some((event) => event.data?.part?.type === 'text'); // a newer record carries the agent's own words
-  let busy = false;
+  let active: Ev | undefined, busy = false;
   for (const event of events) {
     if (event.atMs > t) break;
     const part = event.type === 'message.part.updated' ? event.data?.part : undefined;
@@ -63,7 +63,7 @@ function activity(events: Ev[], t: number, source: string[]) {
       let line = lines.get(event.line);
       if (!line) lines.set(event.line, line = { atMs: event.atMs, label: event.label ?? '', done: 0, total: 0, turn: typeof event.result?.response === 'string' });
       line.total++;
-      if (done) { line.done++; line.last = event; }
+      if (done) { line.done++; line.last = event; } else active = event;
       if (done && line.turn && !streamed) items.set(`a${event.atMs}`, { id: `a${event.atMs}`, atMs: event.atMs + (event.durationMs ?? 0), kind: 'message', role: 'assistant', content: event.result.response });
     } else if (part?.type === 'tool') {
       const status = part.state?.status === 'completed' ? 'success' : part.state?.status === 'error' ? 'error' : 'running';
@@ -88,7 +88,7 @@ function activity(events: Ev[], t: number, source: string[]) {
   }
   const list = [...items.values()].sort((a, b) => a.atMs - b.atMs);
   const quiet = !list.some((item) => (item.kind === 'tool' && item.call.status === 'running') || (item.kind === 'message' && item.isStreaming));
-  return { items: list, thinking: busy && quiet };
+  return { items: list, active, thinking: busy && quiet };
 }
 
 /** Return rows reserve space below the highlighted statement instead of covering source. */
@@ -109,8 +109,9 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
   return tops;
 }
 
-function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
+function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; showReceipt: boolean }) {
   const source = useRef<HTMLElement>(null);
+  const band = useRef<HTMLElement>(null), follow = useRef(true);
   const returnsId = useId();
   const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events);
   const { events, t, line, r } = replay;
@@ -119,22 +120,47 @@ function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
   const rows = useMemo(() => returnRows(events ?? [], t, code, idea.run?.costUsd), [events, t, code, idea.run?.costUsd]);
   const tops = useReturns(source, rows, idea.code);
   const run = useMemo(() => activity(events ?? [], t, code), [events, t, code]);
+  const current = ended ? undefined : run.active;
+  const activeLine = current?.line;
+  useLayoutEffect(() => {
+    if (!activeLine) return;
+    const pane = source.current, marker = band.current;
+    const row = pane?.querySelector<HTMLElement>(`pre > code > span:nth-child(${activeLine})`);
+    if (!pane || !row || !marker) return;
+    row.dataset.executing = 'true';
+    const place = () => {
+      const bounds = pane.getBoundingClientRect(), line = row.getBoundingClientRect();
+      const top = line.top - bounds.top + pane.scrollTop - pane.clientTop;
+      marker.style.transform = `translateY(${top}px)`;
+      if (follow.current && replay.playing && (line.top < bounds.top || line.top + marker.offsetHeight > bounds.bottom)) {
+        pane.scrollTo({ top: top - pane.clientHeight * .35, behavior: replay.still ? 'instant' : 'smooth' });
+      }
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(row.closest('pre')!);
+    return () => { observer.disconnect(); delete row.dataset.executing; };
+  }, [activeLine, replay.playing, replay.still]);
+  const holdSource = () => { follow.current = false; };
   const label = replay.playing ? 'Pause' : 'Replay';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={!idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : 'idle'}>
     <div className="qs-actions">
       <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && <><span className="qs-run-id">{idea.run.runId}</span><span className="qs-stamp">recorded {idea.run.recordedAt.slice(0, 10)} {idea.run.recordedAt.slice(11, 16)} UTC</span><span className="qs-clock">{clock(line ? t : idea.run.ms)}</span>
-        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={replay.toggle} aria-label={replay.playing ? 'Pause the recorded run' : 'Replay the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
-        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line ? r / line.total : 1]} onValueChange={([part]) => replay.seek(part)} /></>}
+        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended) follow.current = true; replay.toggle(); }} aria-label={replay.playing ? 'Pause the recorded run' : 'Replay the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
+        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line ? r / line.total : 1]} onValueChange={([part]) => { follow.current = true; replay.seek(part); }} /></>}
     </div>
     <div className="qs-panes">
-      <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} aria-label={`${idea.id}.mts source`}>
+      <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
+        onWheel={holdSource} onPointerDown={holdSource} onKeyDown={holdSource} aria-label={`${idea.id}.mts source`}>
         <style>{[...rows.keys()].map(n => `[data-returns="${returnsId}"] pre > code > span:nth-child(${n + 1}) { padding-bottom: var(--qs-return-line); }`).join('\n')}</style>
+        {activeLine && <i aria-hidden="true" ref={band} className="qs-band" />}
         <CodeBlock code={idea.code.trimEnd()} language="ts" label="" showLineNumbers className="rounded-none border-0" />
         <div className="qs-exec">{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
       </section>
       {idea.run && <div className="qs-pane qs-machine"><div className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
+        {current && <div className="qs-current-call" data-source-line={current.line}><span>Line {current.line}</span><code>{current.label ?? current.name}</code></div>}
         {!events ? <p className="qs-wait" role="status">{replay.failed ? 'The run could not load.' : ''}</p> : <>
           {!idea.view && !idea.output && <AgentTimeline items={run.items} isThinking={run.thinking} />}
           <ExampleResult idea={idea} events={events} t={t} />
@@ -142,7 +168,7 @@ function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
         </>}
       </div></div>}
     </div>
-    {idea.run && events && <ExampleReceipt idea={idea} events={events} t={t} ended={ended} />}
+    {showReceipt && idea.run && events && <ExampleReceipt idea={idea} events={events} t={t} ended={ended} />}
   </div>;
 }
 
@@ -155,7 +181,7 @@ function reveal(row: HTMLElement, item: HTMLElement, labels: HTMLElement[]) {
 }
 
 /** `initial` is the `subject/idea` key shown first; without it, the first idea. A `?example=` key in the URL wins. */
-export function ExampleEditor({ subjects, initial, featured }: { subjects: Subject[]; initial?: string; featured?: string[] }) {
+export function ExampleEditor({ subjects, initial, featured, showReceipt = true }: { subjects: Subject[]; initial?: string; featured?: string[]; showReceipt?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const tasks = useMemo(() => subjects.flatMap((subject) => subject.ideas.map((idea) => ({ key: `${subject.id}/${idea.id}`, subject, idea }))), [subjects]);
@@ -216,6 +242,6 @@ export function ExampleEditor({ subjects, initial, featured }: { subjects: Subje
         </Fragment>;
       })}
     </nav>}
-    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace key={task.key} idea={task.idea} folder={task.subject.id} /></div>
+    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace key={task.key} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
   </div>;
 }
