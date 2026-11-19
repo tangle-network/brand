@@ -15,6 +15,12 @@ export interface TerminalReplayProps {
   /** Text typed into the session; each becomes a scrub-bar marker where it first appears on screen. */
   inputs?: string[];
   autoplay?: boolean;
+  /** Render this recorded timestamp in milliseconds; the caller supplies the transport. */
+  positionMs?: number;
+  /** Keep terminal text near its native size on narrow screens and allow horizontal scrolling. */
+  readable?: boolean;
+  /** In a cropped preview, bring the recorded row containing this text into view. */
+  revealText?: string;
 }
 
 interface Cast { width: number; height: number; events: Ev[] }
@@ -66,13 +72,14 @@ const loadXterm = () => import('@xterm/xterm').catch((error: unknown) => { conso
 const IDLE: [number, number] = [2000, 600]; // a still screen over 2 s plays in 0.6 s while the clock sweeps its real length
 const marks = (events: Ev[]): Mark[] => events.map((event) => ({ atMs: event.atMs }));
 
-export function TerminalReplay({ src, title = 'Recorded terminal session', inputs, autoplay = true }: TerminalReplayProps) {
+export function TerminalReplay({ src, title = 'Recorded terminal session', inputs, autoplay = true, positionMs, readable = false, revealText }: TerminalReplayProps) {
   const size = useRef<Cast | null>(null);
   const replay = useReplay(src, marks, IDLE, [0, Infinity], undefined, {
-    autoplay,
+    autoplay: positionMs === undefined && autoplay,
     read: async (res) => { const cast = parseCast(await res.text()); size.current = cast; return cast.events; },
   });
-  const { events, line, t, r } = replay;
+  const { events, line, r } = replay;
+  const t = positionMs ?? replay.t;
   const output = useMemo(() => (events ?? []).filter((event) => event.kind === 'o'), [events]);
   const markers = useMemo(() => castInputs(events ?? [], inputs), [events, inputs]);
   const screen = useRef<HTMLDivElement>(null), host = useRef<HTMLDivElement>(null);
@@ -104,11 +111,15 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   useLayoutEffect(() => {
     const box = screen.current, drawn = host.current?.querySelector<HTMLElement>('.xterm-screen');
     if (!term || !box || !drawn) return;
-    const measure = () => { const scale = drawn.offsetWidth ? Math.min(1, box.clientWidth / drawn.offsetWidth) : 1; setFit({ scale, height: drawn.offsetHeight * scale }); };
+    const measure = () => {
+      const fitWidth = drawn.offsetWidth ? Math.min(1, box.clientWidth / drawn.offsetWidth) : 1;
+      const scale = Math.max(readable ? 0.9 : 0, fitWidth);
+      setFit({ scale, height: drawn.offsetHeight * scale });
+    };
     measure();
     const observer = new ResizeObserver(measure); observer.observe(box); observer.observe(drawn);
     return () => observer.disconnect();
-  }, [term]);
+  }, [term, readable]);
 
   // Playing writes the frames due since the last tick; seeking back redraws from the first frame to the target time.
   useEffect(() => {
@@ -117,18 +128,33 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
     while (due < output.length && output[due].atMs <= t) due++;
     while (due > 0 && output[due - 1].atMs > t) due--;
     if (due < written.current) { term.reset(); written.current = 0; }
-    if (due > written.current) term.write(output.slice(written.current, due).map((event) => event.text).join(''));
+    const box = screen.current;
+    let live = true;
+    const reveal = () => {
+      if (!live || !box || !readable || positionMs === undefined || box.scrollHeight <= box.clientHeight) return;
+      const buffer = term.buffer.active;
+      let row = buffer.cursorY;
+      if (revealText) {
+        for (let index = 0; index < term.rows; index++) {
+          if (buffer.getLine(buffer.viewportY + index)?.translateToString(true).includes(revealText)) { row = index; break; }
+        }
+      }
+      box.scrollTop = (row + 1) * box.scrollHeight / term.rows - box.clientHeight * .7;
+    };
+    if (due > written.current) term.write(output.slice(written.current, due).map((event) => event.text).join(''), reveal);
     written.current = due;
-  }, [term, output, t]);
+    return () => { live = false; };
+  }, [term, output, t, readable, revealText, positionMs]);
 
   const end = output.at(-1)?.atMs ?? 0;
   const at = (atMs: number) => (line ? (line.marks.find((mark) => mark.atMs >= atMs)?.r ?? line.total) / line.total : 0);
-  return <section className="mk mk-term" ref={replay.root} aria-label={title} data-state={!line ? 'loading' : replay.playing ? 'playing' : 'paused'}>
+  const state = !line || !term ? 'loading' : positionMs !== undefined ? 'controlled' : replay.playing ? 'playing' : 'paused';
+  return <section className="mk mk-term" ref={replay.root} aria-label={title} data-state={state} data-readable={readable || undefined}>
     <div className="mk-term-screen" ref={screen} style={{ height: fit.height || undefined }}>
       {replay.failed || broken ? <p className="mk-term-note" role="status">The recording could not load.</p> : !term && <p className="mk-term-note" role="status">Loading the recording</p>}
       <div ref={host} className="mk-term-host" style={{ transform: `scale(${fit.scale})` }} aria-hidden="true" />
     </div>
-    <div className="mk-term-bar">
+    {positionMs === undefined && <div className="mk-term-bar">
       <Button size="icon-sm" variant="ghost" disabled={!line} onClick={replay.toggle} aria-label={replay.playing ? 'Pause the recording' : 'Play the recording'}>
         {replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}
       </Button>
@@ -138,6 +164,6 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
           title={marker.label} aria-label={`Jump to input: ${marker.label}`} onClick={() => replay.seek(at(marker.atMs))} />)}
       </div>
       <span className="mk-term-clock">{clock(line ? Math.min(t, end) : 0)} / {clock(end)}</span>
-    </div>
+    </div>}
   </section>;
 }

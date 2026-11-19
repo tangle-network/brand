@@ -520,6 +520,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 /* ---------- TerminalReplay ---------- */
 .mk-term { display: flex; flex-direction: column; min-width: 0; border: calc(var(--font-size-base) / 16) solid var(--qs-line); border-radius: var(--radius-panel); overflow: hidden; background: var(--depth-1); }
 .mk-term-screen { position: relative; min-height: calc(var(--font-size-base) * 6); overflow: hidden; padding: 0; }
+.mk-term[data-readable] .mk-term-screen { overflow-x: auto; }
 .mk-term-host { width: max-content; transform-origin: 0 0; font-family: var(--font-mono); color: var(--text-primary); }
 .mk-term-note { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--qs-muted); font-size: var(--font-size-sm); }
 .mk-term-bar { display: flex; align-items: center; gap: var(--font-size-sm); min-height: calc(var(--font-size-base) * 2.75); padding: 0 var(--font-size-sm) 0 calc(var(--font-size-base) * .375); border-top: calc(var(--font-size-base) / 16) solid var(--qs-line); }
