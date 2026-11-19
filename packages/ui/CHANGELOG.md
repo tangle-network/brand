@@ -1,3 +1,9 @@
+## 11.51.41
+
+### Patch Changes
+
+- 1cd1015: Start a recorded example when selected and show its first recorded step before playback.
+
 ## 11.51.40
 
 ### Patch Changes
