@@ -299,7 +299,11 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
     event.preventDefault(); choose(next.key);
     requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]')?.focus());
   };
-  const picker = compact && <div className="qs-picker"><DropdownMenu modal={false} open={menuOpen} onOpenChange={setMenuOpen}>
+  const picker = compact && <div className="qs-picker" onKeyDown={event => {
+    // Radix has already handled selection or added the space to its typeahead buffer.
+    if (event.key === ' ' && !event.altKey && !event.ctrlKey && !event.metaKey &&
+        event.target instanceof Element && event.target.closest('[role="menuitemradio"]')) event.preventDefault();
+  }}><DropdownMenu modal={false} open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild disabled={!ready}
         onPointerDownCapture={event => { if (event.button === 0 && !event.ctrlKey) event.stopPropagation(); }}
         onClick={() => setMenuOpen(open => !open)}>
