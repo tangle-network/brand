@@ -188,7 +188,10 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && <>
         <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
-        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line?.total ? r / line.total : 0]} onValueChange={([part]) => { follow.current = followFeed.current = true; replay.seek(part); }} /></>}
+        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line?.total ? r / line.total : 0]} onValueChange={([part]) => { follow.current = followFeed.current = true; replay.seek(part); }}
+          onKeyDownCapture={event => {
+            if (event.key === 'Home') { event.preventDefault(); follow.current = followFeed.current = true; replay.seek(0); }
+          }} /></>}
     </div>
     <div className="qs-panes">
       <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
