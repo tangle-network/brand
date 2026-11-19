@@ -156,7 +156,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null);
   const returnsId = useId();
-  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay: playOnSelect });
+  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay: playOnSelect ? 'selection' : false });
   const { events, line, r } = replay;
   const t = replay.started ? replay.t : -1;
   const ended = replay.started && !!line && r >= line.total;

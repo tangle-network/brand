@@ -29,15 +29,17 @@ const recordAt = (anchors: [number, number][], r: number) => {
 };
 
 /** The replay's clock. Visibility pauses work; reduced motion opens the finished record. */
-/** `read` turns the fetched file into events (a run record by default); `autoplay` starts from the beginning once the replay is on screen. */
-export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean; startAt?: 'beginning' | 'end' }
+/** `read` turns the fetched file into events (a run record by default); Passive autoplay waits for a quarter of the panel. A user selection starts when any of the panel is visible. */
+export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean | 'selection'; startAt?: 'beginning' | 'end' }
 const readRecord = async (res: Response) => (await res.json()).events as Ev[];
 
 export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[], { read = readRecord, autoplay = false, startAt = 'end' }: ReplayOptions = {}) {
   const root = useRef<HTMLDivElement>(null);
   const [events, setEvents] = useState<Ev[] | null>(initialEvents ?? null), [failed, setFailed] = useState(false);
-  const [r, setR] = useState<number | null>(null), [enabled, setEnabled] = useState(false);
-  const [visible, setVisible] = useState(false), [hidden, setHidden] = useState(false), [still, setStill] = useState(false);
+  const [r, setR] = useState<number | null>(null), [playback, setPlayback] = useState<'manual' | 'auto' | null>(null);
+  const [view, setView] = useState<'offscreen' | 'partial' | 'visible'>('offscreen');
+  const [hidden, setHidden] = useState(false), [still, setStill] = useState(false);
+  const visible = view === 'visible';
   useEffect(() => {
     if (!url || initialEvents) return; // a file with no record has nothing to replay
     const controller = new AbortController();
@@ -50,28 +52,32 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => { setStill(media.matches); if (media.matches && line) {
-      setR(position => position == null && startAt === 'beginning' ? null : line.total); setEnabled(false);
+      setR(position => position == null && startAt === 'beginning' ? null : line.total); setPlayback(null);
     } };
     update(); media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
   }, [line, startAt]);
   useEffect(() => {
-    const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting && entry.intersectionRatio >= 0.25), { threshold: 0.25 });
+    const io = new IntersectionObserver(([entry]) => {
+      setView(!entry.isIntersecting ? 'offscreen' : entry.intersectionRatio >= 0.25 ? 'visible' : 'partial');
+    }, { threshold: [0, 0.25] });
     if (root.current) io.observe(root.current);
     const update = () => setHidden(document.hidden);
     update(); document.addEventListener('visibilitychange', update);
     return () => { io.disconnect(); document.removeEventListener('visibilitychange', update); };
   }, []);
+  const startVisible = autoplay === 'selection' ? view !== 'offscreen' : visible;
   const started = useRef(false);
   useEffect(() => {
-    if (!autoplay || !line || !visible || hidden || started.current) return;
+    if (!autoplay || !line || !startVisible || hidden || started.current) return;
     started.current = true;
     const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
     setR(animate ? 0 : line.total);
-    setEnabled(animate);
-  }, [autoplay, line, visible, hidden]);
+    setPlayback(animate ? (autoplay === 'selection' ? 'manual' : 'auto') : null);
+  }, [autoplay, line, startVisible, hidden]);
   const position = r ?? (startAt === 'beginning' ? 0 : line?.total ?? 0);
-  const playing = enabled && visible && !hidden && !!line && position < line.total;
+  const inView = playback === 'manual' ? view !== 'offscreen' : visible;
+  const playing = playback !== null && inView && !hidden && !!line && position < line.total;
   useEffect(() => {
     if (!playing || !line) return;
     let last = performance.now(), raf = requestAnimationFrame(function tick(now: number) {
@@ -84,12 +90,14 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   }, [playing, line]);
   const toggle = () => {
     if (!line) return;
-    if (still && startAt === 'beginning') { setR(line.total); setEnabled(false); return; }
-    if (r == null || position >= line.total) { setR(0); setEnabled(true); } else setEnabled(!enabled);
+    if (still && startAt === 'beginning') { setR(line.total); setPlayback(null); return; }
+    started.current = true;
+    if (r == null || position >= line.total) setR(0);
+    setPlayback(playing ? null : 'manual');
   };
   const seek = (part: number) => {
     if (!line) return;
-    if (startAt === 'beginning' && part === 0) { setEnabled(false); setR(null); }
+    if (startAt === 'beginning' && part === 0) { setPlayback(null); setR(null); }
     else setR(part * line.total);
   };
   return { root, url, events, failed, line, r: position, t: line ? recordAt(line.anchors, position) : 0,
