@@ -150,6 +150,7 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
 }
 
 function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: Idea; folder: string; showReceipt: boolean; playOnSelect: boolean; picker?: ReactNode }) {
+  const compact = Boolean(picker);
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null), followFeed = useRef(true);
@@ -198,7 +199,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
   const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
     <div className="qs-actions">
-      {picker ?? <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>}
+      {picker || <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>}
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && (
         <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
