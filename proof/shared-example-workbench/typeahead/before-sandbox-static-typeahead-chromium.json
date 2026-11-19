@@ -1,0 +1,121 @@
+{
+  "engine": "chromium",
+  "width": 1440,
+  "positions": {
+    "open": {
+      "y": 5963,
+      "selected": "Run a command"
+    },
+    "typed": {
+      "y": 6471,
+      "selected": "Fix a failing test"
+    },
+    "selected": {
+      "y": 6471,
+      "selected": "Fix a failing test"
+    },
+    "space": {
+      "y": 6471,
+      "selected": "Run a command"
+    }
+  },
+  "samples": [
+    {
+      "y": 5963,
+      "selected": "Find every TODO",
+      "char": "F"
+    },
+    {
+      "y": 5963,
+      "selected": "Find every TODO",
+      "char": "i"
+    },
+    {
+      "y": 5963,
+      "selected": "Fix a failing test",
+      "char": "x"
+    },
+    {
+      "y": 5963,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 5963,
+      "selected": "Fix a failing test",
+      "char": "a"
+    },
+    {
+      "y": 5963,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 6450,
+      "selected": "Fix a failing test",
+      "char": "f"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "a"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "i"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "l"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "i"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "n"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "g"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "t"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "e"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "s"
+    },
+    {
+      "y": 6471,
+      "selected": "Fix a failing test",
+      "char": "t"
+    }
+  ],
+  "title": "Example, Fix a failing test",
+  "lone": {
+    "y": 6471,
+    "selected": "Run a command"
+  },
+  "title2": "Example, Run a command",
+  "maxDelta": 508
+}

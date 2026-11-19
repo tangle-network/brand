@@ -1,0 +1,121 @@
+{
+  "engine": "webkit",
+  "width": 390,
+  "positions": {
+    "open": {
+      "y": 7610,
+      "selected": "Run a command"
+    },
+    "typed": {
+      "y": 7610,
+      "selected": "Fix a failing test"
+    },
+    "selected": {
+      "y": 7610,
+      "selected": "Fix a failing test"
+    },
+    "space": {
+      "y": 7610,
+      "selected": "Crunch a CSV in Python"
+    }
+  },
+  "samples": [
+    {
+      "y": 7610,
+      "selected": "Find every TODO",
+      "char": "F"
+    },
+    {
+      "y": 7610,
+      "selected": "Find every TODO",
+      "char": "i"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "x"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "a"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "f"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "a"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "i"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "l"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "i"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "n"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "g"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": " "
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "t"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "e"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "s"
+    },
+    {
+      "y": 7610,
+      "selected": "Fix a failing test",
+      "char": "t"
+    }
+  ],
+  "title": "Example, Fix a failing test",
+  "lone": {
+    "y": 7610,
+    "selected": "Crunch a CSV in Python"
+  },
+  "title2": "Example, Crunch a CSV in Python",
+  "maxDelta": 0
+}
