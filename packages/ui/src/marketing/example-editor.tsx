@@ -6,7 +6,7 @@ import { Slider } from '../primitives/slider';
 import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { ExampleReceipt, RecordedOutput } from './example-result';
-import { useReplay, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
+import { useReplay, clock, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
 
 // The example editor from tangle.tools: a list of example files, each file's source, and the recorded production run
 // beside it. It takes its examples as props and imports no data; style it with @tangle-network/ui/styles/marketing.css.
@@ -60,6 +60,9 @@ function callOutput(event: Ev, idea: Idea) {
   if (stderr && !stdout) return textResult(String(stderr), failed(event) ? 'Recorded error' : 'Standard error');
   if (typeof stdout === 'string' && stdout.trim()) {
     const passes = stdout.match(/^# pass (\d+)/m)?.[1], failures = stdout.match(/^# fail (\d+)/m)?.[1];
+    if (!stdout.trim().includes('\n') && stdout.trim().length <= 150) {
+      return <pre className="qs-inline-output" aria-label="Standard output">{stdout.trimEnd()}</pre>;
+    }
     return textResult(stdout, passes ? `${passes} tests passed${failures && failures !== '0' ? `, ${failures} failed` : ''}` : stdout.startsWith('diff --git ') ? 'View recorded patch' : 'Standard output');
   }
   if (event.name === 'fetch' && typeof event.result?.body === 'string') return textResult(event.result.body, `Response body · HTTP ${event.result.status}`);
@@ -73,6 +76,7 @@ function activity(events: Ev[], t: number, source: string[], idea: Idea) {
   const items = new Map<string, Item>();
   const externalFiles = idea.timelineNoteAt != null && idea.code.includes('.download(');
   const streamed = events.some(event => event.data?.part?.type === 'text');
+  const printed = new Set<string>();
   let active: Ev | undefined, latest: Ev | undefined, busy = false;
   for (const [index, event] of events.entries()) {
     if (event.atMs > t) break;
@@ -81,9 +85,12 @@ function activity(events: Ev[], t: number, source: string[], idea: Idea) {
     if (event.kind === 'call') {
       const doneAt = atMs + (event.durationMs ?? 0), done = doneAt <= t;
       if (event.line) { latest = event; if (!done) active = event; }
-      const label = event.label || event.name || 'SDK call';
+      const line = source[(event.line ?? 0) - 1] ?? '';
+      const command = event.name === 'exec' && line.match(/\.exec\(\s*(["'`])(.+?)\1/)?.[2];
+      const label = command || event.label || event.name || 'SDK call';
+      if (done && typeof event.result?.stdout === 'string') printed.add(event.result.stdout.trim());
       const result = done ? callValue(event, source) || brief(event.result) : '';
-      items.set(id, { id, atMs, kind: 'tool', call: { id, type: 'unknown', label, status: !done ? 'running' : failed(event) ? 'error' : 'success',
+      items.set(id, { id, atMs, kind: 'tool', call: { id, type: command ? 'bash' : 'unknown', label, status: !done ? 'running' : failed(event) ? 'error' : 'success',
         detail: [event.line ? `Line ${event.line}` : '', typeof result === 'string' ? result : '', done && event.durationMs ? seconds(event.durationMs) : ''].filter(Boolean).join(' · ') } });
       if (event.name === 'prompt') {
         busy ||= !done;
@@ -105,7 +112,7 @@ function activity(events: Ev[], t: number, source: string[], idea: Idea) {
       const text = live ? part.text.slice(0, Math.ceil(part.text.length * (t - atMs) / (end - atMs))) : part.text;
       items.set(part.id, part.type === 'text' ? { id: part.id, atMs, kind: 'message', role: 'assistant', content: text, isStreaming: live }
         : { id: part.id, atMs, kind: 'custom', content: <InlineThinkingItem part={{ type: 'reasoning', text, time: { start: atMs, end: live ? undefined : end } }} /> });
-    } else if ((event.kind === 'stdout' || event.kind === 'stderr') && !externalFiles && !idea.output && event.text?.trim() && !/\b(?:inputTokens|cacheReadTokens)\b/.test(event.text)) {
+    } else if ((event.kind === 'stdout' || event.kind === 'stderr') && !externalFiles && !idea.output && event.text?.trim() && !printed.has(event.text.trim()) && !/\b(?:inputTokens|cacheReadTokens)\b/.test(event.text)) {
       items.set(id, { id, atMs, kind: 'custom', content: textResult(event.text, event.kind === 'stderr' ? 'Standard error' : 'Console output') });
     } else if (event.type === 'agent.started') items.set(event.data.agentId, { id: event.data.agentId, atMs, kind: 'tool', call: { id: event.data.agentId, type: 'unknown', label: event.data.agentId, detail: event.data.harness, status: 'running' } });
     else if (event.type === 'agent.finished') { const item = items.get(event.data.result?.agentId); if (item?.kind === 'tool') item.call = { ...item.call, status: event.data.result.status === 'completed' ? 'success' : 'error' }; }
