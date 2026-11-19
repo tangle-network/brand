@@ -625,7 +625,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
   --syntax-comment: var(--text-secondary); --syntax-foreground: var(--text-primary); --syntax-variable: var(--text-primary);
 }
 .qs-workbench .qs-picker { flex: 1; min-width: 0; }
-.qs-picker > button { max-width: 100%; min-height: var(--control-height-lg); height: auto; white-space: normal; text-align: start; }
+.qs-picker > button { max-width: 100%; min-height: var(--control-height-lg); height: auto; padding-inline: .65rem; white-space: normal; text-align: start; font: 500 var(--font-size-sm)/1.35 var(--font-sans); }
 .qs-picker-menu { max-width: calc(100vw - 2rem); max-height: min(26rem,var(--radix-dropdown-menu-content-available-height)); overflow-y: auto; }
 .qs-picker-menu [role=menuitemradio] { min-height: var(--control-height-md); }
 .qs-workbench .qs-panes { grid-template-columns: minmax(0,2fr) minmax(0,1fr); height: clamp(25rem,51svh,31rem); }
@@ -674,4 +674,8 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
   .qs-workbench .qs-machine { order: 1; height: clamp(14rem,29svh,19rem); }
   .qs-workbench [data-state=source] .qs-source { height: clamp(20rem,55svh,29rem); }
   .qs-workbench .qs-event-output pre { max-height: 18svh; }
+}
+@container (max-width: 21rem) {
+  .qs-workbench .qs-run { min-width: var(--control-height-lg); padding-inline: .6rem; }
+  .qs-workbench .qs-run-label { display: none; }
 }
