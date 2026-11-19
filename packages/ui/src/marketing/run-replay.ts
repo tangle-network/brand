@@ -30,10 +30,10 @@ const recordAt = (anchors: [number, number][], r: number) => {
 
 /** The replay's clock. Visibility pauses work; reduced motion opens the finished record. */
 /** `read` turns the fetched file into events (a run record by default); `autoplay` starts from the beginning once the replay is on screen. */
-export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean }
+export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean; startAt?: 'beginning' | 'end' }
 const readRecord = async (res: Response) => (await res.json()).events as Ev[];
 
-export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[], { read = readRecord, autoplay = false }: ReplayOptions = {}) {
+export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[], { read = readRecord, autoplay = false, startAt = 'end' }: ReplayOptions = {}) {
   const root = useRef<HTMLDivElement>(null);
   const [events, setEvents] = useState<Ev[] | null>(initialEvents ?? null), [failed, setFailed] = useState(false);
   const [r, setR] = useState<number | null>(null), [enabled, setEnabled] = useState(false);
@@ -49,10 +49,12 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   const line = useMemo(() => (events ? pace(marks(events), idle) : null), [events]);
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => { setStill(media.matches); if (media.matches && line) { setR(line.total); setEnabled(false); } };
+    const update = () => { setStill(media.matches); if (media.matches && line) {
+      setR(position => position == null && startAt === 'beginning' ? null : line.total); setEnabled(false);
+    } };
     update(); media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
-  }, [line]);
+  }, [line, startAt]);
   useEffect(() => {
     const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting && entry.intersectionRatio >= 0.25), { threshold: 0.25 });
     if (root.current) io.observe(root.current);
@@ -62,7 +64,8 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   }, []);
   const started = useRef(false);
   useEffect(() => { if (autoplay && line && visible && !hidden && !still && !started.current) { started.current = true; setR(0); setEnabled(true); } }, [autoplay, line, visible, hidden, still]);
-  const playing = enabled && visible && !hidden && !!line && (r ?? line.total) < line.total;
+  const position = r ?? (startAt === 'beginning' ? 0 : line?.total ?? 0);
+  const playing = enabled && visible && !hidden && !!line && position < line.total;
   useEffect(() => {
     if (!playing || !line) return;
     let last = performance.now(), raf = requestAnimationFrame(function tick(now: number) {
@@ -73,9 +76,19 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
     });
     return () => cancelAnimationFrame(raf);
   }, [playing, line]);
-  const toggle = () => { if (line && (r ?? line.total) >= line.total) { setR(0); setEnabled(true); } else setEnabled(!enabled); };
-  const seek = (part: number) => line && setR(part * line.total); // the reader drags the run to any moment
-  return { root, url, events, failed, line, r: r ?? line?.total ?? 0, t: line ? recordAt(line.anchors, r ?? line.total) : 0, playing, toggle, seek, still, visible: visible && !hidden };
+  const toggle = () => {
+    if (!line) return;
+    if (still && startAt === 'beginning') { setR(line.total); setEnabled(false); return; }
+    if (r == null || position >= line.total) { setR(0); setEnabled(true); } else setEnabled(!enabled);
+  };
+  const seek = (part: number) => {
+    if (!line) return;
+    if (startAt === 'beginning' && part === 0) { setEnabled(false); setR(null); }
+    else setR(part * line.total);
+  };
+  return { root, url, events, failed, line, r: position, t: line ? recordAt(line.anchors, position) : 0,
+    started: r !== null, playing, toggle, seek, still, visible: visible && !hidden };
+
 }
 
 /** Display clocks always floor the recorded duration to a whole second. */
