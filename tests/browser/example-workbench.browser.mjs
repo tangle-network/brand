@@ -55,7 +55,18 @@ async function check(browserType, width) {
     assert.equal(closed.page, before.page);
     assert.equal(closed.pageHeight, before.pageHeight);
 
-    await run.click();
+    // A reader can reach the transport before a quarter of the workbench has entered the viewport.
+    await run.evaluate(button => window.scrollTo({ top: scrollY + button.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
+    const partial = await root.locator('.qs-main').evaluate(el => ({
+      ratio: (innerHeight - el.getBoundingClientRect().top) / el.clientHeight,
+      page: Math.round(scrollY),
+    }));
+    assert.ok(partial.ratio > 0 && partial.ratio < .25);
+    if (width < 500) await run.tap(); else await run.click();
+    await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
+    assert.equal(Math.round(await page.evaluate(() => scrollY)), partial.page, 'Play preserves the reader’s page position');
+    await root.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom + 8, behavior: 'instant' }));
+    await root.locator('.qs-main[data-state="paused"]').waitFor({ timeout: 3000 });
     // Move the feed into view before measuring. Follow always belongs to the feed.
     await feed.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().top - 72, behavior: "instant" }));
     const watching = await feed.evaluate(metrics);
