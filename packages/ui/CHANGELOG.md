@@ -1,3 +1,9 @@
+## 11.51.46
+
+### Patch Changes
+
+- d141302: Keep the page still when searching the example menu with a multiword title.
+
 ## 11.51.45
 
 ### Patch Changes
