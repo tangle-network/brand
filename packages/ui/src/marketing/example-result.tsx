@@ -196,15 +196,21 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
 function tableRows(stdout: string, width: number): (string | number)[][] | undefined {
   try {
     const rows: unknown = JSON.parse(stdout);
-    if (Array.isArray(rows) && rows.length && rows.every(row => Array.isArray(row) && row.length === width && row.every(cell => typeof cell === 'string' || typeof cell === 'number'))) return rows;
+    if (!Array.isArray(rows) || !rows.length) return;
+    const matches = rows.every(row => Array.isArray(row) && row.length === width &&
+      row.every(cell => typeof cell === 'string' || typeof cell === 'number'));
+    if (matches) return rows;
   } catch { /* A command can print any text. */ }
 }
 
-function RecordedOutput({ output, calls }: { output: NonNullable<Idea['output']>; calls: Ev[] }) {
+function RecordedOutput({ output, calls, hasRecordedCall }: { output: NonNullable<Idea['output']>; calls: Ev[]; hasRecordedCall: boolean }) {
   const event = calls.findLast(call => call.label === output.call);
-  if (!event) return <p className="qs-wait" role="status">Waiting for output…</p>;
+  if (!event) return <p className="qs-wait" role="status">
+    {hasRecordedCall ? 'Waiting for output…' : 'This run has no recorded command output.'}
+  </p>;
   const stdout = typeof event.result?.stdout === 'string' ? event.result.stdout.trimEnd() : '';
-  const error = event.error?.message ?? event.result?.stderr;
+  const stderr = event.error?.message ?? event.result?.stderr;
+  const failed = Boolean(event.error) || (typeof event.result?.exitCode === 'number' && event.result.exitCode !== 0);
   const columns = output.columns;
   const rows = columns?.length && tableRows(stdout, columns.length);
   return <section className="qs-command-result" aria-label={output.title}>
@@ -212,14 +218,15 @@ function RecordedOutput({ output, calls }: { output: NonNullable<Idea['output']>
       <thead><tr>{columns.map((column, index) => <th scope="col" key={index}>{column}</th>)}</tr></thead>
       <tbody>{rows.map((row, index) => <tr key={index}>{row.map((cell, i) => <td key={i} data-numeric={typeof cell === 'number' || undefined}>{cell}</td>)}</tr>)}</tbody>
     </table> : <><h4>{output.title}</h4>{stdout && <pre>{stdout}</pre>}</>}
-    {error && <pre className="qs-error">{String(error)}</pre>}
-    {!stdout && !error && <p>No standard output.</p>}
+    {stderr && <pre className={failed ? "qs-error" : undefined}>{String(stderr)}</pre>}
+    {!stdout && !stderr && <p>No standard output.</p>}
   </section>;
 }
 
 export default function ExampleResult({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) {
   const calls = completed(events, t), out = printed(events, t);
-  if (idea.output) return <RecordedOutput output={idea.output} calls={calls} />;
+  if (idea.output) return <RecordedOutput output={idea.output} calls={calls}
+    hasRecordedCall={events.some(event => event.kind === 'call' && event.label === idea.output?.call)} />;
   if (idea.view === 'spend') return <div className="qs-result qs-spend" dangerouslySetInnerHTML={{ __html: idea.figure ?? '' }} />;
   if (idea.view === 'timeline') return <div className="qs-result qs-timeline"><Timeline idea={idea} events={events} t={t} /></div>;
   if (idea.view === 'page') {
