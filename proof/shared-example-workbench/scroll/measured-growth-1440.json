@@ -1,0 +1,95 @@
+{
+  "sameRowGrowth": [
+    {
+      "rowCount": 7,
+      "was": 459,
+      "now": 467,
+      "gap": 8
+    },
+    {
+      "rowCount": 7,
+      "was": 467,
+      "now": 501,
+      "gap": 34
+    },
+    {
+      "rowCount": 8,
+      "was": 565,
+      "now": 590,
+      "gap": 25
+    },
+    {
+      "rowCount": 8,
+      "was": 590,
+      "now": 616,
+      "gap": 26
+    },
+    {
+      "rowCount": 9,
+      "was": 707,
+      "now": 733,
+      "gap": 26
+    },
+    {
+      "rowCount": 9,
+      "was": 733,
+      "now": 759,
+      "gap": 26
+    },
+    {
+      "rowCount": 10,
+      "was": 1072,
+      "now": 1105,
+      "gap": 33
+    },
+    {
+      "rowCount": 10,
+      "was": 1097,
+      "now": 1123,
+      "gap": 26
+    },
+    {
+      "rowCount": 11,
+      "was": 1410,
+      "now": 1436,
+      "gap": 26
+    },
+    {
+      "rowCount": 11,
+      "was": 1436,
+      "now": 1552,
+      "gap": 0
+    },
+    {
+      "rowCount": 11,
+      "was": 1552,
+      "now": 1572,
+      "gap": 20
+    },
+    {
+      "rowCount": 12,
+      "was": 1606,
+      "now": 1625,
+      "gap": 19
+    },
+    {
+      "rowCount": 12,
+      "was": 1606,
+      "now": 1631,
+      "gap": 25
+    },
+    {
+      "rowCount": 12,
+      "was": 1631,
+      "now": 1657,
+      "gap": 26
+    },
+    {
+      "rowCount": 12,
+      "was": 1657,
+      "now": 1682,
+      "gap": 25
+    }
+  ],
+  "finalGap": 0
+}

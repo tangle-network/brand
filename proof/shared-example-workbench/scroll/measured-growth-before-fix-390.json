@@ -1,0 +1,137 @@
+{
+  "sameRowGrowth": [
+    {
+      "rowCount": 5,
+      "was": 266,
+      "now": 292,
+      "gap": 26
+    },
+    {
+      "rowCount": 6,
+      "was": 364,
+      "now": 389,
+      "gap": 25
+    },
+    {
+      "rowCount": 7,
+      "was": 500,
+      "now": 526,
+      "gap": 26
+    },
+    {
+      "rowCount": 7,
+      "was": 526,
+      "now": 559,
+      "gap": 33
+    },
+    {
+      "rowCount": 8,
+      "was": 643,
+      "now": 669,
+      "gap": 26
+    },
+    {
+      "rowCount": 8,
+      "was": 669,
+      "now": 694,
+      "gap": 51
+    },
+    {
+      "rowCount": 8,
+      "was": 694,
+      "now": 720,
+      "gap": 77
+    },
+    {
+      "rowCount": 9,
+      "was": 831,
+      "now": 857,
+      "gap": 214
+    },
+    {
+      "rowCount": 9,
+      "was": 857,
+      "now": 882,
+      "gap": 137
+    },
+    {
+      "rowCount": 9,
+      "was": 882,
+      "now": 908,
+      "gap": 137
+    },
+    {
+      "rowCount": 10,
+      "was": 1254,
+      "now": 1288,
+      "gap": 483
+    },
+    {
+      "rowCount": 10,
+      "was": 1280,
+      "now": 1305,
+      "gap": 483
+    },
+    {
+      "rowCount": 11,
+      "was": 1651,
+      "now": 1677,
+      "gap": 829
+    },
+    {
+      "rowCount": 11,
+      "was": 1677,
+      "now": 1703,
+      "gap": 830
+    },
+    {
+      "rowCount": 11,
+      "was": 1703,
+      "now": 1774,
+      "gap": 830
+    },
+    {
+      "rowCount": 11,
+      "was": 1774,
+      "now": 1831,
+      "gap": 830
+    },
+    {
+      "rowCount": 11,
+      "was": 1831,
+      "now": 1850,
+      "gap": 829
+    },
+    {
+      "rowCount": 12,
+      "was": 1903,
+      "now": 1922,
+      "gap": 882
+    },
+    {
+      "rowCount": 12,
+      "was": 1903,
+      "now": 1928,
+      "gap": 881
+    },
+    {
+      "rowCount": 12,
+      "was": 1928,
+      "now": 1954,
+      "gap": 882
+    },
+    {
+      "rowCount": 12,
+      "was": 1954,
+      "now": 1979,
+      "gap": 881
+    },
+    {
+      "rowCount": 12,
+      "was": 1979,
+      "now": 2005,
+      "gap": 882
+    }
+  ],
+  "finalGap": 1414
+}
