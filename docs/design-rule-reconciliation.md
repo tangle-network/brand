@@ -66,7 +66,7 @@ The first consumer implementation estimate remains uncommitted until authenticat
 
 ## October 15 publication handoff
 
-Drew authorized publishing and consolidating these two repositories. This is source delivery, not designer approval, authenticated journey proof or a package release.
+This is source delivery, not designer approval, authenticated journey proof or a package release.
 
 | Source at Brand `c2c6a15` | Destination | Decision |
 |---|---|---|

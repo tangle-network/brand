@@ -1,7 +1,7 @@
 # OpenUI schema browser proof
 
 Source: Brand PR #147, `OpenUI/ArtifactRenderer` Storybook states.
-Target: local Storybook iframe at `127.0.0.1:6009`, Chromium via Playwright on GTR.
+Target: local Storybook iframe at `127.0.0.1:6009`, Chromium via Playwright.
 
 The invalid state uses a card with an unsupported nested `section`.
 Both dark desktop and light mobile render an explicit `role=alert` with `$.children[0]`.

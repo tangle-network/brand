@@ -70,9 +70,18 @@ See the [design bible](design-bible.md#theme-roles).
 
 See the [design bible](design-bible.md#product-hierarchy).
 
-### Copy standard
+### Product language
 
-See the [design bible](design-bible.md#copy-standard).
+Name the action and its object. “Save draft” and “Approve and send” describe different effects. A task is the intended work, a run is one execution, and an artifact is the output a reader can open. An approval records a decision. Show a pending state until the operation confirms its result.
+
+| State | What to show |
+| --- | --- |
+| Empty | Name what is missing. Offer a first action when the reader can take it, such as “Create snapshot”. |
+| Loading or disabled | Say what is pending or which input is required. Keep the control’s name stable. |
+| Error | Name the failed action and offer a retry when it is safe. Keep a draft or uploaded file available if it can be recovered. |
+| Confirmation | Say which object changes and what the confirming button does. Use the same verb as the trigger. |
+
+Brand owns tokens and generic UI behavior. Sandbox UI composes those controls for workspaces, files and sessions. Agent App owns its application flows and the names of its domain objects. Products own their positioning, supported actions and confirmation text. The [copy guide](copy-bible.md) covers headlines and examples.
 
 ### Graphic standard
 

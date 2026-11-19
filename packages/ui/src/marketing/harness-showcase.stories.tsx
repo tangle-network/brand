@@ -6,7 +6,7 @@ import { CliPlayground, HarnessStrip, Section, UseCaseCards, type ExampleRun, ty
 import codexCast from "../../fixtures/marketing/codex.cast?url"
 import opencodeCast from "../../fixtures/marketing/opencode.cast?url"
 import piCast from "../../fixtures/marketing/pi.cast?url"
-import gtmRecord from "../../fixtures/marketing/gtm-agent.json"
+import commandRecord from "../../fixtures/marketing/run-code.json"
 import fixRecord from "../../fixtures/marketing/fix-and-commit.json"
 import claudeLogo from "../../fixtures/marketing/logos/claude-code.svg?url"
 import codexLogo from "../../fixtures/marketing/logos/codex.png?url"
@@ -47,10 +47,10 @@ const run = (record: RunRecord): ExampleRun => ({
   ms: Math.max(0, ...record.events.map((event) => event.atMs + (event.durationMs ?? 0))),
 })
 const cases: UseCase[] = [
-  { slug: "gtm-agent", title: "Ask the GTM agent about a company", run: run(gtmRecord as RunRecord), lead: "Workflow run succeeded",
-    templateHref: "https://tangle.tools/examples?example=products/gtm-agent", links: [{ label: "Run record", href: "https://tangle.tools/runs/products/gtm-agent.json" }] },
+  { slug: "run-code", title: "Run a command in a sandbox", run: run(commandRecord as RunRecord), lead: "Command exited with code 0",
+    templateHref: "https://tangle.tools/?example=sandboxes/run-code#quickstart", links: [{ label: "Run record", href: "https://github.com/tangle-network/brand/blob/main/packages/ui/fixtures/marketing/run-code.json" }] },
   { slug: "fix-and-commit", title: "Fix a failing test and commit", run: run(fixRecord as RunRecord), lead: "Fix committed",
-    templateHref: "https://tangle.tools/examples?example=sandboxes/fix-and-commit", links: [{ label: "Run record", href: "https://tangle.tools/runs/sandboxes/fix-and-commit.json" }] },
+    templateHref: "https://tangle.tools/?example=sandboxes/fix-and-commit#quickstart", links: [{ label: "Run record", href: "https://github.com/tangle-network/brand/blob/main/packages/ui/fixtures/marketing/fix-and-commit.json" }] },
 ]
 
 export const Showcase: Story = {

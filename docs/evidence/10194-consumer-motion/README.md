@@ -4,7 +4,7 @@ GTM and Sandbox rejected the published Motion cohort under their existing depend
 
 ## Checked source and scope
 
-`f822fb5cfd35dd2851db4ee19853b97abe7c48fe`, gate `beelink1-a715b4ddec44ef73bd47936dbb1eb92b`, exit0. Frozen install, typecheck, Brand/UI builds and72 affected tests across6files pass. The lock changes only18added/18removed lines for the four exact Motion dependencies. The actual packed UI declares the compatible pin; source and dependencies will be checked again against its immutable published artifact.
+`f822fb5cfd35dd2851db4ee19853b97abe7c48fe` passed. Frozen install, typecheck, Brand/UI builds and72 affected tests across6files pass. The lock changes only18added/18removed lines for the four exact Motion dependencies. The actual packed UI declares the compatible pin; source and dependencies will be checked again against its immutable published artifact.
 
 Six reversal cases passed at2026-10-15T23:59:05Z: Dialog/Sheet/Popover ×390/1440px. The served role drives a16x slowed fixture with120ms temporal resolution; the same unchanged position/opacity boundary checks, carried velocity in both directions, retained node, settle/focus and live reduced-motion dismissal apply. Two normal/reduced cases passed23:58:37Z, including all three surfaces, Tooltip, bare-control timing, live preference change and focus return.
 

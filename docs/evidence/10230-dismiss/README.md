@@ -11,7 +11,7 @@ GTM's [exact-source fixture diagnostic](https://github.com/tangle-network/gtm-ag
 | Close/reopen continuity, three surfaces ×390/1440 |retained prior evidence|6/6|[trajectory](dismiss-retarget/receipt.json)|
 | Normal/reduced/live preference and focus |retained prior evidence|2/2|[preference](dismiss-preference/receipt.json)|
 
-Red at2026-10-16T01:56:07Z, gate `beelink2-1c18ddae83fe4e694115a91168d80541` exit1. Green at01:58:14Z, trajectory01:58:43Z, preferences01:58:51Z; gate `beelink2-08014ef3d28cf51b6356a00dc5164f0c` exit0,122seconds. Frozen install, typecheck, Brand/UI builds and distribution validation also passed. Full postmerge suite and immutable publication remain separate checks.
+Red at2026-10-16T01:56:07Z (exit 1). Green at01:58:14Z, trajectory01:58:43Z, preferences01:58:51Z (exit 0, 122 seconds). Frozen install, typecheck, Brand/UI builds and distribution validation also passed. Full postmerge suite and immutable publication remain separate checks.
 
 `SurfaceMotion` retires its DOM at the computed scoped dismissal deadline even if CSS lifecycle events never arrive. Null-ref cleanup lets Radix release presence and focus. Reopening cancels retirement and preserves the same node and retained motion values. No new timing constant, root wrapper or consumer fork. Reduced/missing motion settles synchronously.
 

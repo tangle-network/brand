@@ -6,7 +6,7 @@ Canonical highlighting, exact-copy feedback, accessible code tabs, request/respo
 
 Browser receipt: `951a1bb26c52680356d855986caeb95645904dc0`, 2026-10-15T23:24:44Z. Sixteen cases cover React/Hono ×390/1440px ×light/dark ×normal/reduced motion. Five exact-copy formats per case give80 byte checks: TypeScript, SSE, binary response, error and long JSON. Every case checks permission failure/focus, one pending write, visible delayed indicator, long-work status, scoped seconds/calc timing and contained overflow. The controlled long write exceeds the observed mutation budget; no timing compliance is claimed for it.
 
-The released-main merge at `c61984e9e0371c37edea508fcb2f4e56195c391a` preserves the tested UI/Brand source and clipboard fixture/probe bytes. Gate `beelink1-2f80913dd0708ed0e25dd7ebb351f77b` passed frozen install, typecheck, both builds,33 affected tests and actual packed export proof at23:33Z. Subsequent commits add evidence only.
+The released-main merge at `c61984e9e0371c37edea508fcb2f4e56195c391a` preserves the tested UI/Brand source and clipboard fixture/probe bytes. Verification passed frozen install, typecheck, both builds,33 affected tests and actual packed export proof at23:33Z. Subsequent commits add evidence only.
 
 ## Inspected media
 

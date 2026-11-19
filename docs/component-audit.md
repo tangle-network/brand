@@ -61,10 +61,10 @@ This document tracks what in `@tangle-network/ui` is canonical, adapter-only, or
 
 Before deleting a public export:
 
-1. Search active repos for imports:
+1. From the directory containing the consumer checkouts, search for imports:
 
    ```sh
-   rg -n "ToolCallStep|ToolCallFeed|InlineToolItem|RunGroup" ~/webb -g '!**/node_modules/**' -g '!**/dist/**'
+   rg -n "ToolCallStep|ToolCallFeed|InlineToolItem|RunGroup" . -g '!**/node_modules/**' -g '!**/dist/**'
    ```
 
 2. Migrate active first-party consumers to `RunGroup` or `InlineToolItem`.

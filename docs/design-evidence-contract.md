@@ -25,7 +25,7 @@ Use the sorted nearest-rank percentile, rank ceil(p × n). Report both batches, 
 
 Use browser traces, marked frame captures and calibrated recording timestamps to identify visible feedback. Record timestamp quantization and capture frame interval. If uncertainty spans a budget boundary, mark the measurement UNCHECKED and improve the instrument. A loaded host's callback gap does not prove a dropped display frame. Validate the instrument against a deliberately delayed fixture before claiming accuracy. Store this measurement in the existing live instrument during implementation; the capture script is only a reference.
 
-References: [Event Timing](https://www.w3.org/TR/event-timing/) and the existing [UI evidence procedure](https://github.com/drewstone/dotfiles/blob/1eefcc1e30bbd91c5a5c29ed57d6e7abc2bf8261/docs/anti-patterns/ui-evidence.md).
+References: [Event Timing](https://www.w3.org/TR/event-timing/).
 
 ## Persistence, effects and cancellation
 
@@ -77,6 +77,6 @@ Use observed ownership and capacity gaps to choose staffing. Test the 100x ambit
 
 Record installed Brand revision, registered surface, scanned commit, baseline revision, roots, exclusions, gated metrics, unrecorded metrics and per-file findings. Aggregate counts can hide a new violation behind a removed one. Review changed files and imports as well as counts. An absent metric or registry entry is UNCHECKED, not a pass. Router adoption includes its entry and baseline in the existing registry. Runtime behavior remains a separate browser check. See the [registry](https://github.com/tangle-network/brand/blob/c2c6a15a436282b8c3d09af5767594503f2624b1/packages/brand/bin/tangle-drift.mjs#L30) and [comparison](https://github.com/tangle-network/brand/blob/c2c6a15a436282b8c3d09af5767594503f2624b1/packages/brand/bin/tangle-drift.mjs#L320).
 
-Drew approves design direction. Record review decisions in the existing PR.
+The product owner approves design direction. Record review decisions in the existing PR.
 
-Use existing fast merge checks, full post-merge suites and release checks. [UI evidence](https://github.com/drewstone/dotfiles/blob/1eefcc1e30bbd91c5a5c29ed57d6e7abc2bf8261/docs/anti-patterns/ui-evidence.md) owns the capture procedure. Static or copy-only changes need matched screenshots. Changed interactions need video. A claim that a flow works in production needs an uncut production recording and served revision, with backend/provider receipts for effects. Reuse evidence until its relevant inputs change.
+Use existing fast merge checks, full post-merge suites and release checks. Static or copy-only changes need matched screenshots. Changed interactions need video. A claim that a flow works in production needs an uncut production recording and served revision, with backend/provider receipts for effects. Reuse evidence until its relevant inputs change.

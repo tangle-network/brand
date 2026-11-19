@@ -223,8 +223,7 @@ describe("shared surface context and interaction tokens (tokens.css)", () => {
 });
 
 describe("Canonical surface ladder (the spine: :root, .dark, .light, dark, light, tangle-dark)", () => {
-  // Drew, 2026-10-26, on a Discovery run page built from the spine: "no color
-  // depth ladder". Raised levels painted the card and every well was one value,
+  // Raised levels painted the card and every well was one value,
   // so a card in a card, and a field in it, read as the plane they sat on.
   const css = rules(tokens);
   const ladderRule = (selector: string) => {
