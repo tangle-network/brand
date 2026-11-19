@@ -1,3 +1,9 @@
+## 11.51.42
+
+### Patch Changes
+
+- a49bdd0: Add a shared recorded example workbench with a flat example chooser, compact command trace and readable output.
+
 ## 11.51.41
 
 ### Patch Changes
