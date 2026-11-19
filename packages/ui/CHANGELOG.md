@@ -1,3 +1,9 @@
+## 11.51.47
+
+### Patch Changes
+
+- a637aec: Start a recording when a reader presses Play or chooses an example with its controls in view. Automatic playback keeps its existing visibility threshold.
+
 ## 11.51.46
 
 ### Patch Changes
