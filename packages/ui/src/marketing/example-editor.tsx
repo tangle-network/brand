@@ -5,8 +5,8 @@ import { Button } from '../primitives/button';
 import { Slider } from '../primitives/slider';
 import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
-import ExampleResult, { ExampleReceipt } from './example-result';
-import { useReplay, clock, seconds, usd, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
+import { ExampleReceipt, RecordedOutput } from './example-result';
+import { useReplay, seconds, usd, callValue, returnRows, type Ev, type Mark, type RunMeta } from './run-replay';
 
 // The example editor from tangle.tools: a list of example files, each file's source, and the recorded production run
 // beside it. It takes its examples as props and imports no data; style it with @tangle-network/ui/styles/marketing.css.
@@ -49,46 +49,70 @@ const failed = (event: Ev) => !!event.error || (typeof event.result?.exitCode ==
 type Item = AgentTimelineItem & { atMs: number };
 const tidy = (input: Record<string, unknown> = {}) => Object.fromEntries(Object.entries(input).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/\/home\/agent\//g, '') : v]));
 
-/** The run so far, as the product's own transcript: what each source line did on the machine, and the agent's words, reasoning and tool calls as they happen. */
-function activity(events: Ev[], t: number, source: string[]) {
-  const lines = new Map<number, { atMs: number; label: string; done: number; total: number; turn: boolean; state?: string; last?: Ev }>();
+function textResult(text: string, label: string) {
+  return <details className="qs-event-output"><summary>{label}</summary><pre>{text.trimEnd()}</pre></details>;
+}
+
+/** Only a completed SDK call owns a result. Attach it to the same recorded clock as its source line. */
+function callOutput(event: Ev, idea: Idea) {
+  if (idea.output?.call === event.label && idea.output) return <RecordedOutput output={idea.output} calls={[event]} hasRecordedCall />;
+  const stdout = event.result?.stdout, stderr = event.error?.message ?? event.result?.stderr;
+  if (stderr && !stdout) return textResult(String(stderr), failed(event) ? 'Recorded error' : 'Standard error');
+  if (typeof stdout === 'string' && stdout.trim()) {
+    const passes = stdout.match(/^# pass (\d+)/m)?.[1], failures = stdout.match(/^# fail (\d+)/m)?.[1];
+    return textResult(stdout, passes ? `${passes} tests passed${failures && failures !== '0' ? `, ${failures} failed` : ''}` : stdout.startsWith('diff --git ') ? 'View recorded patch' : 'Standard output');
+  }
+  if (event.name === 'fetch' && typeof event.result?.body === 'string') return textResult(event.result.body, `Response body · HTTP ${event.result.status}`);
+  if (event.result?.aggregates?.byScenario) return <dl className="qs-event-scores" aria-label="Recorded scenario scores">
+    {Object.entries(event.result.aggregates.byScenario).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{String((value as {meanComposite: number}).meanComposite)}</dd></div>)}
+  </dl>;
+}
+
+/** One chronological transcript for every run. A streamed tool keeps its row while its state changes. */
+function activity(events: Ev[], t: number, source: string[], idea: Idea) {
   const items = new Map<string, Item>();
-  const streamed = events.some((event) => event.data?.part?.type === 'text'); // a newer record carries the agent's own words
-  let active: Ev | undefined, busy = false;
-  for (const event of events) {
+  const externalFiles = idea.timelineNoteAt != null && idea.code.includes('.download(');
+  const streamed = events.some(event => event.data?.part?.type === 'text');
+  let active: Ev | undefined, latest: Ev | undefined, busy = false;
+  for (const [index, event] of events.entries()) {
     if (event.atMs > t) break;
+    const id = 'event-' + index, atMs = event.atMs;
     const part = event.type === 'message.part.updated' ? event.data?.part : undefined;
-    if (event.kind === 'call' && event.line) {
-      const done = event.atMs + (event.durationMs ?? 0) <= t;
-      let line = lines.get(event.line);
-      if (!line) lines.set(event.line, line = { atMs: event.atMs, label: event.label ?? '', done: 0, total: 0, turn: typeof event.result?.response === 'string' });
-      line.total++;
-      if (done) { line.done++; line.last = event; } else active = event;
-      if (done && line.turn && !streamed) items.set(`a${event.atMs}`, { id: `a${event.atMs}`, atMs: event.atMs + (event.durationMs ?? 0), kind: 'message', role: 'assistant', content: event.result.response });
+    if (event.kind === 'call') {
+      const doneAt = atMs + (event.durationMs ?? 0), done = doneAt <= t;
+      if (event.line) { latest = event; if (!done) active = event; }
+      const label = event.label || event.name || 'SDK call';
+      const result = done ? callValue(event, source) || brief(event.result) : '';
+      items.set(id, { id, atMs, kind: 'tool', call: { id, type: 'unknown', label, status: !done ? 'running' : failed(event) ? 'error' : 'success',
+        detail: [event.line ? `Line ${event.line}` : '', typeof result === 'string' ? result : '', done && event.durationMs ? seconds(event.durationMs) : ''].filter(Boolean).join(' · ') } });
+      if (event.name === 'prompt') {
+        busy ||= !done;
+        const prompt = source[(event.line ?? 0)-1]?.match(/\.prompt\(\s*(["'`])(.+)\1/)?.[2];
+        if (prompt) items.set(id+'-prompt', { id: id+'-prompt', atMs, kind: 'message', role: 'user', content: prompt, collapsedLines: 3 });
+        if (done && !streamed && !externalFiles && typeof event.result?.response === 'string') items.set(id+'-reply', { id: id+'-reply', atMs: doneAt, kind: 'message', role: 'assistant', content: event.result.response });
+      }
+      const output = done && callOutput(event, idea);
+      if (output) items.set(id+'-result', { id: id+'-result', atMs: doneAt, kind: 'custom', content: output });
     } else if (part?.type === 'tool') {
       const status = part.state?.status === 'completed' ? 'success' : part.state?.status === 'error' ? 'error' : 'running';
-      items.set(part.id, { id: part.id, atMs: items.get(part.id)?.atMs ?? event.atMs, kind: 'tool', call: { id: part.id, type: 'unknown', label: part.tool, status },
-        part: { ...part, state: { ...part.state, input: tidy(part.state?.input) } } });
+      // External page data is never transcript copy. Report recorded tool status and the network refusal.
+      const refusal = externalFiles && String(part.state?.output ?? '').match(/"code":"(EGRESS_DOMAIN_NOT_ALLOWED)"/)?.[1];
+      items.set(part.id, { id: part.id, atMs: items.get(part.id)?.atMs ?? atMs, kind: 'tool', call: { id: part.id, type: 'unknown', label: refusal || part.tool, status },
+        part: externalFiles ? undefined : { ...part, state: { ...part.state, input: tidy(part.state?.input) } } });
     } else if (part?.type === 'text' || part?.type === 'reasoning') {
-      const end = (event as { endMs?: number }).endMs ?? event.atMs, live = t < end;
-      const text = live ? part.text.slice(0, Math.ceil(part.text.length * (t - event.atMs) / (end - event.atMs))) : part.text; // the words arrive over the time they took
-      items.set(part.id, part.type === 'text' ? { id: part.id, atMs: event.atMs, kind: 'message', role: 'assistant', content: text, isStreaming: live }
-        : { id: part.id, atMs: event.atMs, kind: 'custom', content: <InlineThinkingItem part={{ type: 'reasoning', text, time: { start: event.atMs, end: live ? undefined : end } }} /> });
-    } else if (event.type === 'agent.started') items.set(event.data.agentId, { id: event.data.agentId, atMs: event.atMs, kind: 'tool', call: { id: event.data.agentId, type: 'unknown', label: event.data.agentId, detail: event.data.harness, status: 'running' } });
+      if (externalFiles && atMs !== idea.timelineNoteAt) continue;
+      const end = (event as { endMs?: number }).endMs ?? atMs, live = t < end;
+      const text = live ? part.text.slice(0, Math.ceil(part.text.length * (t - atMs) / (end - atMs))) : part.text;
+      items.set(part.id, part.type === 'text' ? { id: part.id, atMs, kind: 'message', role: 'assistant', content: text, isStreaming: live }
+        : { id: part.id, atMs, kind: 'custom', content: <InlineThinkingItem part={{ type: 'reasoning', text, time: { start: atMs, end: live ? undefined : end } }} /> });
+    } else if ((event.kind === 'stdout' || event.kind === 'stderr') && !externalFiles && !idea.output && event.text?.trim() && !/\b(?:inputTokens|cacheReadTokens)\b/.test(event.text)) {
+      items.set(id, { id, atMs, kind: 'custom', content: textResult(event.text, event.kind === 'stderr' ? 'Standard error' : 'Console output') });
+    } else if (event.type === 'agent.started') items.set(event.data.agentId, { id: event.data.agentId, atMs, kind: 'tool', call: { id: event.data.agentId, type: 'unknown', label: event.data.agentId, detail: event.data.harness, status: 'running' } });
     else if (event.type === 'agent.finished') { const item = items.get(event.data.result?.agentId); if (item?.kind === 'tool') item.call = { ...item.call, status: event.data.result.status === 'completed' ? 'success' : 'error' }; }
   }
-  for (const [n, line] of lines) {
-    const { done, total, last } = line, running = done < total;
-    line.state = running ? 'running' : last && failed(last) ? 'failed' : 'completed';
-    const said = source[n - 1]?.match(new RegExp(`\\b${line.label.split('.').pop()}\\(\\s*(["'\`])((?:\\\\.|(?!\\1).)+)\\1`))?.[2]; // the string the call passes: a prompt or a command
-    if (line.turn) { busy ||= running; if (said) items.set(`l${n}`, { id: `l${n}`, atMs: line.atMs, kind: 'message', role: 'user', content: said }); continue; }
-    const exec = /\.exec$/.test(line.label) && said;
-    items.set(`l${n}`, { id: `l${n}`, atMs: line.atMs, kind: 'tool', call: { id: `l${n}`, type: exec ? 'bash' : 'unknown', label: exec ? said : line.label, status: running ? 'running' : line.state === 'failed' ? 'error' : 'success',
-      detail: [total > 1 ? `${done}/${total}` : '', last ? brief(last.result) : '', last && total === 1 ? seconds(last.durationMs) : ''].filter(Boolean).join(' · ') } });
-  }
-  const list = [...items.values()].sort((a, b) => a.atMs - b.atMs);
-  const quiet = !list.some((item) => (item.kind === 'tool' && item.call.status === 'running') || (item.kind === 'message' && item.isStreaming));
-  return { items: list, active, thinking: busy && quiet };
+  const list = [...items.values()].sort((a,b) => a.atMs-b.atMs);
+  const quiet = !list.some(item => item.kind === 'tool' && item.call.status === 'running' || item.kind === 'message' && item.isStreaming);
+  return { items: list, active: active ?? latest, thinking: busy && quiet };
 }
 
 /** Return rows reserve space below the highlighted statement instead of covering source. */
@@ -112,14 +136,16 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
 function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; showReceipt: boolean }) {
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
+  const feed = useRef<HTMLDivElement>(null), followFeed = useRef(true);
   const returnsId = useId();
-  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events);
-  const { events, t, line, r } = replay;
-  const ended = !!line && r >= line.total;
+  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning' });
+  const { events, line, r } = replay;
+  const t = replay.started ? replay.t : -1;
+  const ended = replay.started && !!line && r >= line.total;
   const code = useMemo(() => idea.code.trimEnd().split('\n'), [idea.code]);
   const rows = useMemo(() => returnRows(events ?? [], t, code, idea.run?.costUsd), [events, t, code, idea.run?.costUsd]);
   const tops = useReturns(source, rows, idea.code);
-  const run = useMemo(() => activity(events ?? [], t, code), [events, t, code]);
+  const run = useMemo(() => activity(events ?? [], t, code, idea), [events, t, code, idea]);
   const current = ended ? undefined : run.active;
   const activeLine = current?.line;
   useLayoutEffect(() => {
@@ -142,14 +168,20 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
     return () => { observer.disconnect(); delete row.dataset.executing; };
   }, [activeLine, replay.playing, replay.still]);
   const holdSource = () => { follow.current = false; };
-  const label = replay.playing ? 'Pause' : 'Replay';
-  return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={!idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : 'idle'}>
+  const holdFeed = () => { followFeed.current = false; };
+  useLayoutEffect(() => {
+    const el = feed.current;
+    if (el && followFeed.current && replay.started) el.scrollTop = el.scrollHeight;
+  }, [run.items.length, ended, replay.started]);
+  const label = replay.playing ? 'Pause' : ended ? 'Replay' : replay.started ? 'Resume' : 'Play';
+  const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
+  return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
     <div className="qs-actions">
       <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>
       <CopyButton text={idea.code} label="Copy file" />
-      {idea.run && <><span className="qs-run-id">{idea.run.runId}</span><span className="qs-stamp">recorded {idea.run.recordedAt.slice(0, 10)} {idea.run.recordedAt.slice(11, 16)} UTC</span><span className="qs-clock">{clock(line ? t : idea.run.ms)}</span>
-        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended) follow.current = true; replay.toggle(); }} aria-label={replay.playing ? 'Pause the recorded run' : 'Replay the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
-        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line ? r / line.total : 1]} onValueChange={([part]) => { follow.current = true; replay.seek(part); }} /></>}
+      {idea.run && <>
+        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
+        <Slider className="qs-progress" aria-label="Run position" max={1} step={0.001} disabled={!line} value={[line?.total ? r / line.total : 0]} onValueChange={([part]) => { follow.current = followFeed.current = true; replay.seek(part); }} /></>}
     </div>
     <div className="qs-panes">
       <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
@@ -159,16 +191,16 @@ function Workspace({ idea, folder, showReceipt }: { idea: Idea; folder: string; 
         <CodeBlock code={idea.code.trimEnd()} language="ts" label="" showLineNumbers className="rounded-none border-0" />
         <div className="qs-exec">{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
       </section>
-      {idea.run && <div className="qs-pane qs-machine"><div className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
+      <div className="qs-pane qs-machine"><div ref={feed} className="qs-feed" role="region" aria-label="Run" tabIndex={0}
+        onWheel={holdFeed} onPointerDown={holdFeed} onKeyDown={holdFeed}>
         {current && <div className="qs-current-call" data-source-line={current.line}><span>Line {current.line}</span><code>{current.label ?? current.name}</code></div>}
-        {!events ? <p className="qs-wait" role="status">{replay.failed ? 'The run could not load.' : ''}</p> : <>
-          {!idea.view && !idea.output && <AgentTimeline items={run.items} isThinking={run.thinking} />}
-          <ExampleResult idea={idea} events={events} t={t} />
-          {idea.output && run.items.length > 0 && <details className="qs-run-steps"><summary>Run details</summary><AgentTimeline items={run.items} isThinking={run.thinking} /></details>}
-        </>}
-      </div></div>}
+        <AgentTimeline className="qs-execution-timeline" items={run.items} isThinking={run.thinking}
+          emptyState={<p className="qs-wait">{!idea.run ? 'This example has source code only.' : replay.failed ? 'The recorded run could not load.' : !events ? 'Loading the recorded run…' : !replay.started ? 'Play the recorded run to follow each step.' : ended ? 'No steps were recorded.' : 'Waiting for the first recorded step…'}</p>} />
+        {ended && idea.output && !events?.some(e => e.kind === 'call' && e.label === idea.output!.call) &&
+          <p className="qs-wait">This run has no recorded command output.</p>}
+      </div></div>
     </div>
-    {showReceipt && idea.run && events && <ExampleReceipt idea={idea} events={events} t={t} ended={ended} />}
+    {showReceipt && idea.run && events && replay.started && <ExampleReceipt idea={idea} events={events} t={t} ended={ended} />}
   </div>;
 }
 

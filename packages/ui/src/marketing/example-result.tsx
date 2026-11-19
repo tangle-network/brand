@@ -203,7 +203,7 @@ function tableRows(stdout: string, width: number): (string | number)[][] | undef
   } catch { /* A command can print any text. */ }
 }
 
-function RecordedOutput({ output, calls, hasRecordedCall }: { output: NonNullable<Idea['output']>; calls: Ev[]; hasRecordedCall: boolean }) {
+export function RecordedOutput({ output, calls, hasRecordedCall }: { output: NonNullable<Idea['output']>; calls: Ev[]; hasRecordedCall: boolean }) {
   const event = calls.findLast(call => call.label === output.call);
   if (!event) return <p className="qs-wait" role="status">
     {hasRecordedCall ? 'Waiting for output…' : 'This run has no recorded command output.'}
