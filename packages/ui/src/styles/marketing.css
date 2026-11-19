@@ -192,7 +192,9 @@
   .qs-source { order: 2; height: calc(var(--qs-u) * 23.75); border-right: 0; border-top: calc(var(--qs-u) / 16) solid var(--qs-line); }
   .qs-machine { order: 1; height: calc(var(--qs-u) * 32.5); }
   .qs-actions { padding: 0 calc(var(--qs-u) * .375) 0 var(--font-size-xs); gap: calc(var(--qs-u) * .625); }
-  .qs-actions > button[title], .qs-run { min-width: 2.75rem; min-height: 2.75rem; }
+  .qs-actions > button[title], .qs-run { display: inline-flex; min-width: 2.75rem; min-height: 2.75rem; }
+  .qs-run { width: auto; }
+  .qs-run-label { display: inline; }
   .qs-clock { font-size: var(--qs-chrome-size); }
   .qs-receipt { padding: var(--font-size-xs); }
   .qs-receipt .qs-receipt-lead { font-size: var(--font-size-base); white-space: normal; }
