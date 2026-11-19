@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.13
+
+### Patch Changes
+
+- 2a31ab4: Add installation and first-use examples to the published package guides.
+
 ## 1.31.12
 
 ### Patch Changes
