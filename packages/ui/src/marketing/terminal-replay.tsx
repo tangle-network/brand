@@ -109,7 +109,11 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   useLayoutEffect(() => {
     const box = screen.current, drawn = host.current?.querySelector<HTMLElement>('.xterm-screen');
     if (!term || !box || !drawn) return;
-    const measure = () => { const scale = drawn.offsetWidth ? Math.max(readable ? 0.9 : 0, Math.min(1, box.clientWidth / drawn.offsetWidth)) : 1; setFit({ scale, height: drawn.offsetHeight * scale }); };
+    const measure = () => {
+      const fitWidth = drawn.offsetWidth ? Math.min(1, box.clientWidth / drawn.offsetWidth) : 1;
+      const scale = Math.max(readable ? 0.9 : 0, fitWidth);
+      setFit({ scale, height: drawn.offsetHeight * scale });
+    };
     measure();
     const observer = new ResizeObserver(measure); observer.observe(box); observer.observe(drawn);
     return () => observer.disconnect();
@@ -128,7 +132,8 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
 
   const end = output.at(-1)?.atMs ?? 0;
   const at = (atMs: number) => (line ? (line.marks.find((mark) => mark.atMs >= atMs)?.r ?? line.total) / line.total : 0);
-  return <section className="mk mk-term" ref={replay.root} aria-label={title} data-state={!line || !term ? 'loading' : positionMs !== undefined ? 'controlled' : replay.playing ? 'playing' : 'paused'} data-readable={readable || undefined}>
+  const state = !line || !term ? 'loading' : positionMs !== undefined ? 'controlled' : replay.playing ? 'playing' : 'paused';
+  return <section className="mk mk-term" ref={replay.root} aria-label={title} data-state={state} data-readable={readable || undefined}>
     <div className="mk-term-screen" ref={screen} style={{ height: fit.height || undefined }}>
       {replay.failed || broken ? <p className="mk-term-note" role="status">The recording could not load.</p> : !term && <p className="mk-term-note" role="status">Loading the recording</p>}
       <div ref={host} className="mk-term-host" style={{ transform: `scale(${fit.scale})` }} aria-hidden="true" />
