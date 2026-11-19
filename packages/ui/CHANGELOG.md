@@ -1,3 +1,9 @@
+## 11.51.44
+
+### Patch Changes
+
+- 148579c: Allow terminal recordings to follow a shared external clock and keep their text readable on narrow screens.
+
 ## 11.51.43
 
 ### Patch Changes
