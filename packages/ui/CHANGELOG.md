@@ -1,3 +1,9 @@
+## 11.51.39
+
+### Patch Changes
+
+- 13d18c2: Add optional native heading permalinks and explicit section IDs to Markdown documents.
+
 ## 11.51.38
 
 ### Patch Changes
