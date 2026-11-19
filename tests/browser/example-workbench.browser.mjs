@@ -99,6 +99,13 @@ async function check(browserType, width) {
     const finished = await feed.evaluate(metrics);
     assert.ok(finished.gap < 3, "Following survives repeated streamed growth through the final output");
     assert.equal(finished.page, watching.page);
+    await trigger.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
+    const selectionPage = Math.round(await page.evaluate(() => scrollY));
+    if (width < 500) await trigger.tap(); else await trigger.click();
+    const current = page.getByRole('menuitemradio', { checked: true });
+    if (width < 500) await current.tap(); else await current.click();
+    await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
+    assert.equal(Math.round(await page.evaluate(() => scrollY)), selectionPage, 'Choosing a recording starts it in place');
     console.log(JSON.stringify({ width, idleBottomInset: Math.round(end), documentScrollOnMenu: closed.page - before.page,
       unpinnedGap: Math.round(away.gap), resumedGap: Math.round((await feed.evaluate(metrics)).gap) }));
   } finally {

@@ -29,8 +29,8 @@ const recordAt = (anchors: [number, number][], r: number) => {
 };
 
 /** The replay's clock. Visibility pauses work; reduced motion opens the finished record. */
-/** `read` turns the fetched file into events (a run record by default); `autoplay` starts from the beginning once the replay is on screen. */
-export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean; startAt?: 'beginning' | 'end' }
+/** `read` turns the fetched file into events (a run record by default); Passive autoplay waits for a quarter of the panel. A user selection starts when any of the panel is visible. */
+export interface ReplayOptions { read?: (res: Response) => Promise<Ev[]>; autoplay?: boolean | 'selection'; startAt?: 'beginning' | 'end' }
 const readRecord = async (res: Response) => (await res.json()).events as Ev[];
 
 export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Idle = [10_000, 800], [minMs, maxMs]: [number, number] = [0, Infinity], initialEvents?: Ev[], { read = readRecord, autoplay = false, startAt = 'end' }: ReplayOptions = {}) {
@@ -66,14 +66,15 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
     update(); document.addEventListener('visibilitychange', update);
     return () => { io.disconnect(); document.removeEventListener('visibilitychange', update); };
   }, []);
+  const startVisible = autoplay === 'selection' ? view !== 'offscreen' : visible;
   const started = useRef(false);
   useEffect(() => {
-    if (!autoplay || !line || !visible || hidden || started.current) return;
+    if (!autoplay || !line || !startVisible || hidden || started.current) return;
     started.current = true;
     const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
     setR(animate ? 0 : line.total);
-    setPlayback(animate ? 'auto' : null);
-  }, [autoplay, line, visible, hidden]);
+    setPlayback(animate ? (autoplay === 'selection' ? 'manual' : 'auto') : null);
+  }, [autoplay, line, startVisible, hidden]);
   const position = r ?? (startAt === 'beginning' ? 0 : line?.total ?? 0);
   const inView = playback === 'manual' ? view !== 'offscreen' : visible;
   const playing = playback !== null && inView && !hidden && !!line && position < line.total;
