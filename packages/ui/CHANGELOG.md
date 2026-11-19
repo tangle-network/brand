@@ -1,3 +1,10 @@
+## 11.51.43
+
+### Patch Changes
+
+- 27c46b5: Keep the page in place when choosing an example. Align short traces to the bottom and follow growing output until the reader scrolls back.
+- b155f10: Keep a streaming example pinned when the browser adjusts the scroll position during text reflow. Reader navigation still pauses following.
+
 ## 11.51.42
 
 ### Patch Changes
