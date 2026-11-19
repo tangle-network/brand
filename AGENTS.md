@@ -1,6 +1,7 @@
 # Brand, UI, and Charts
 
 Keep shared design tokens, components, and chart behavior in their owning packages.
+Write public instructions for a fresh clone. Use repository-relative paths and fictional accounts in examples, screenshots, and recordings. Keep operator runbooks in private storage.
 Choose checks for the changed package and surface; instruction-only changes need diff and link checks.
 Reuse passing checks while their inputs remain unchanged.
 Honor explicit hosted-CI waivers while preserving hooks and enforced branch protections.
