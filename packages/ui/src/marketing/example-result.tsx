@@ -114,6 +114,8 @@ export function ExampleReceipt({ idea, events, t, ended }: { idea: Idea; events:
     lead ??= download && read ? `${file} and ${readPath} written` : undefined;
     facts = download && idea.run?.exitCode != null ? [`exit ${idea.run.exitCode}`] : [];
   } else if (idea.view === 'tree' || idea.view === 'states') facts = [`exit ${calls.filter(e => e.name === 'exec').at(-1)?.result.exitCode}`];
+  const outputExit = idea.output && calls.findLast(e => e.label === idea.output?.call)?.result?.exitCode;
+  if (typeof outputExit === 'number') lead ??= `Exit ${outputExit}`;
   const lastCall = calls.at(-1);
   lead ??= lastCall ? callValue(lastCall, idea.code.trimEnd().split('\n')) : '';
   if (!lead && idea.run?.exitCode != null) lead = `exit ${idea.run.exitCode}`;
@@ -190,8 +192,41 @@ function Timeline({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) 
   return <><AgentTimeline items={items} className="qs-record-timeline" />{patch && <><div className="qs-files">{diffStats(patch).map(f => <div key={f.name}><span>{f.name}</span><span><b>+{f.add}</b> <s>−{f.del}</s></span></div>)}</div><pre className="qs-diff">{patch.split('\n').slice(4, 18).map((line, i) => <span key={i} data-line={line.startsWith('@@') ? 'hunk' : line.startsWith('+') ? 'add' : line.startsWith('-') ? 'del' : undefined}>{line}{'\n'}</span>)}</pre></>}</>;
 }
 
+/** Keep malformed or unexpected recorded data readable as the original stdout. */
+function tableRows(stdout: string, width: number): (string | number)[][] | undefined {
+  try {
+    const rows: unknown = JSON.parse(stdout);
+    if (!Array.isArray(rows) || !rows.length) return;
+    const matches = rows.every(row => Array.isArray(row) && row.length === width &&
+      row.every(cell => typeof cell === 'string' || typeof cell === 'number'));
+    if (matches) return rows;
+  } catch { /* A command can print any text. */ }
+}
+
+function RecordedOutput({ output, calls, hasRecordedCall }: { output: NonNullable<Idea['output']>; calls: Ev[]; hasRecordedCall: boolean }) {
+  const event = calls.findLast(call => call.label === output.call);
+  if (!event) return <p className="qs-wait" role="status">
+    {hasRecordedCall ? 'Waiting for output…' : 'This run has no recorded command output.'}
+  </p>;
+  const stdout = typeof event.result?.stdout === 'string' ? event.result.stdout.trimEnd() : '';
+  const stderr = event.error?.message ?? event.result?.stderr;
+  const failed = Boolean(event.error) || (typeof event.result?.exitCode === 'number' && event.result.exitCode !== 0);
+  const columns = output.columns;
+  const rows = columns?.length && tableRows(stdout, columns.length);
+  return <section className="qs-command-result" aria-label={output.title}>
+    {rows && columns ? <table><caption>{output.title}</caption>
+      <thead><tr>{columns.map((column, index) => <th scope="col" key={index}>{column}</th>)}</tr></thead>
+      <tbody>{rows.map((row, index) => <tr key={index}>{row.map((cell, i) => <td key={i} data-numeric={typeof cell === 'number' || undefined}>{cell}</td>)}</tr>)}</tbody>
+    </table> : <><h4>{output.title}</h4>{stdout && <pre>{stdout}</pre>}</>}
+    {stderr && <pre className={failed ? "qs-error" : undefined}>{String(stderr)}</pre>}
+    {!stdout && !stderr && <p>No standard output.</p>}
+  </section>;
+}
+
 export default function ExampleResult({ idea, events, t }: { idea: Idea; events: Ev[]; t: number }) {
   const calls = completed(events, t), out = printed(events, t);
+  if (idea.output) return <RecordedOutput output={idea.output} calls={calls}
+    hasRecordedCall={events.some(event => event.kind === 'call' && event.label === idea.output?.call)} />;
   if (idea.view === 'spend') return <div className="qs-result qs-spend" dangerouslySetInnerHTML={{ __html: idea.figure ?? '' }} />;
   if (idea.view === 'timeline') return <div className="qs-result qs-timeline"><Timeline idea={idea} events={events} t={t} /></div>;
   if (idea.view === 'page') {

@@ -17,6 +17,8 @@ export interface Idea {
   run?: RunMeta;
   install?: string;
   view?: "timeline" | "page" | "scoreboard" | "states" | "tree" | "spend" | "egress";
+  /** Present stdout from this recorded call first. Column labels describe a JSON array of rows. */
+  output?: { call: string; title: string; columns?: string[] };
   figure?: string;
   lead?: string;
   stopped?: string;
@@ -134,8 +136,9 @@ function Workspace({ idea, folder }: { idea: Idea; folder: string }) {
       </section>
       {idea.run && <div className="qs-pane qs-machine"><div className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
         {!events ? <p className="qs-wait" role="status">{replay.failed ? 'The run could not load.' : ''}</p> : <>
-          {!idea.view && <AgentTimeline items={run.items} isThinking={run.thinking} />}
+          {!idea.view && !idea.output && <AgentTimeline items={run.items} isThinking={run.thinking} />}
           <ExampleResult idea={idea} events={events} t={t} />
+          {idea.output && run.items.length > 0 && <details className="qs-run-steps"><summary>Run details</summary><AgentTimeline items={run.items} isThinking={run.thinking} /></details>}
         </>}
       </div></div>}
     </div>

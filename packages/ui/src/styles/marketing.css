@@ -57,7 +57,7 @@
 .qs-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .qs-source { border-right: calc(var(--qs-u) / 16) solid var(--qs-line); }
 .qs-code { position: relative; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--qs-line) transparent; }
-.qs-code > div:not(.qs-exec) { border: 0; border-radius: 0; background: transparent; }
+.qs-code > div:not(.qs-exec) { flex: none; border: 0; border-radius: 0; background: transparent; }
 .qs-code :is(pre, code) { font-size: var(--qs-code-size) !important; line-height: 1.74 !important; white-space: pre !important; font-variant-ligatures: none; }
 .qs-code pre { padding: var(--font-size-sm) 0 !important; overflow: hidden !important; background: transparent !important; }
 .qs-code pre > code > span { display: block; overflow: hidden; text-overflow: ellipsis; padding-right: var(--font-size-sm); min-height: var(--qs-code-line); }
@@ -69,6 +69,16 @@
 .qs-feed { position: relative; flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--qs-line) transparent; }
 .qs-wait { padding: var(--qs-u); color: var(--qs-muted); }
 .qs-result { min-height: 100%; }
+.qs-command-result { padding: var(--qs-u); color: var(--text-primary); }
+.qs-command-result table { width: 100%; border-collapse: collapse; }
+.qs-command-result :is(caption,h4) { margin: 0 0 var(--qs-u); text-align: left; font: 600 var(--font-size-lg)/1.3 var(--font-sans); }
+.qs-command-result :is(th,td) { border-bottom: 1px solid var(--qs-line); padding: var(--font-size-xs) 0; text-align: left; overflow-wrap: anywhere; }
+.qs-command-result th { color: var(--qs-muted); font: 500 var(--font-size-xs)/1.4 var(--font-sans); }
+.qs-command-result td { font: 400 var(--font-size-sm)/1.5 var(--font-mono); }
+.qs-command-result td[data-numeric], .qs-command-result th:last-child:not(:first-child) { text-align: end; }
+.qs-command-result pre { white-space: pre-wrap; overflow-wrap: anywhere; font: var(--font-size-sm)/1.6 var(--font-mono); }
+.qs-run-steps { margin: 0 var(--qs-u) var(--qs-u); border-top: 1px solid var(--qs-line); }
+.qs-run-steps summary { cursor: pointer; padding-block: var(--font-size-xs); color: var(--text-secondary); font-size: var(--font-size-sm); }
 .qs-output, .qs-timeline { padding: var(--qs-u); font-size: var(--font-size-sm); line-height: 1.5; }
 .qs-output :is(pre, code) { white-space: pre-wrap !important; overflow-wrap: anywhere; }
 .qs-output pre { background: transparent; }
