@@ -63,6 +63,11 @@
 .qs-code pre > code > span { display: block; overflow: hidden; text-overflow: ellipsis; padding-right: var(--font-size-sm); min-height: var(--qs-code-line); }
 .qs-code [data-line-number] { width: var(--qs-code-gutter); padding-right: var(--font-size-lg); }
 .qs-exec { position: absolute; inset: 0; pointer-events: none; }
+.qs-band { position: absolute; inset: 0 0 auto; height: var(--qs-code-line); border-left: 3px solid var(--accent-text); background: color-mix(in srgb, var(--brand-cool) 19%, transparent); transition: transform var(--motion-control); }
+.qs-current-call { position: sticky; top: 0; z-index: 1; display: flex; align-items: baseline; gap: var(--font-size-xs); padding: .5rem var(--qs-u); background: var(--md3-surface-container-high); border-left: 3px solid var(--accent-text); }
+.qs-current-call span { color: var(--accent-text); font: 600 var(--font-size-sm)/1.4 var(--font-sans); }
+.qs-current-call code { color: var(--text-primary); font: var(--qs-code-size)/1.4 var(--font-mono); }
+@media (prefers-reduced-motion: reduce) { .qs-band { transition: none; } }
 .qs-ret { position: absolute; left: 0; right: 0; height: var(--qs-return-line); padding-right: var(--font-size-sm); padding-left: var(--qs-code-gutter); background: color-mix(in srgb, var(--brand-cool) 6%, transparent); color: var(--accent-text); font: var(--font-size-xs)/var(--qs-return-line) var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .qs-ret b { font-weight: 500; }
 .qs-ret i { font-style: normal; margin-left: calc(var(--qs-u) * .625); color: var(--qs-dim); }
