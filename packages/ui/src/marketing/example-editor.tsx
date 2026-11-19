@@ -74,7 +74,7 @@ function callOutput(event: Ev, idea: Idea) {
 /** One chronological transcript for every run. A streamed tool keeps its row while its state changes. */
 function activity(events: Ev[], t: number, source: string[], idea: Idea) {
   const items = new Map<string, Item>();
-  const externalFiles = idea.timelineNoteAt != null && idea.code.includes('.download(');
+  const externalFiles = idea.code.includes('.download(');
   const streamed = events.some(event => event.data?.part?.type === 'text');
   const printed = new Set<string>();
   let active: Ev | undefined, latest: Ev | undefined, busy = false;
