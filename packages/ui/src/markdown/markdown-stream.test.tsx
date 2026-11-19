@@ -32,3 +32,26 @@ it("keeps completed code selectable across chunks and matches a fresh render aft
   expect(chat.container.querySelector("pre code")!.textContent).toBe(replacement);
   expect(chat.container.contains(firstToken)).toBe(false);
 });
+
+it("renders native section links at every depth with stable, unique IDs and preserved inline links", () => {
+  const source = [
+    "# Getting started", "## Stable", "### [Guide](/guide) and `CLI` {#stable}",
+    "#### Déjà vu", "##### Déjà vu", "###### 重複", "###### 重複",
+    "[Deep section](#stable) and [old outline](#user-content-stable)",
+  ].join("\n\n");
+  const view = render(<Markdown headingPermalinks>{source}</Markdown>);
+  const headings = view.getAllByRole("heading");
+  const names = ["getting-started", "stable-1", "stable", "déjà-vu", "déjà-vu-1", "重複", "重複-1"];
+  expect(headings.map((node) => node.id)).toEqual(names.map((name) => `user-content-${name}`));
+  headings.forEach((node, index) => {
+    const link = node.querySelector("a[name]");
+    expect(link?.getAttribute("name")).toBe(names[index]);
+    expect(decodeURIComponent(link?.getAttribute("href") ?? "")).toBe(`#${node.id}`);
+  });
+  expect(view.getByRole("link", { name: "Guide" }).getAttribute("href")).toBe("/guide");
+  expect(view.getByRole("link", { name: "Deep section" }).getAttribute("href")).toBe("#stable");
+  expect(view.getByRole("link", { name: "old outline" }).getAttribute("href")).toBe("#user-content-stable");
+  expect(view.container.querySelector("a a")).toBeNull();
+  view.rerender(<Markdown>{source}</Markdown>);
+  expect(view.container.querySelector("a[name]")).toBeNull();
+});
