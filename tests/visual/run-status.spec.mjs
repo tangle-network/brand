@@ -1,8 +1,8 @@
 import { expect, test } from "playwright/test"
 
 // The run module draws every state through statusMeta, on Brand's roles: a
-// running glyph breathes on the page's one loop period, also under reduced
-// motion, and nothing spins; Failed and Done take their status inks; every
+// running glyph breathes only when motion is enabled, and nothing spins;
+// Failed and Done take their status inks; every
 // shadow is the mode's one shadow colour, so dark mode has no light halo.
 
 const VIEWPORTS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } }
@@ -61,12 +61,14 @@ for (const theme of ["dark", "light"]) {
         for (const glyph of facts.glyphs) {
           seen.add(glyph.status)
           if (glyph.status in facts.inks) expect(glyph.color, `${id}: ${glyph.status} ink`).toBe(facts.inks[glyph.status])
-          if (glyph.status === "running") {
-            expect(glyph.animation, `${id}: running breathes`).toBe("tangle-breathe")
-            expect(glyph.duration, `${id}: one loop period, kept under reduced motion`).toBe("2s")
-          } else {
-            expect(glyph.animation, `${id}: a settled glyph is still`).toBe("none")
-          }
+          expect(glyph.animation, `${id}: status glyphs stay still under reduced motion`).toBe("none")
+        }
+        const running = page.locator('[data-run-status="running"]').first()
+        if (await running.count()) {
+          await page.emulateMedia({ reducedMotion: "no-preference" })
+          await expect(running).toHaveCSS("animation-name", "tangle-breathe")
+          await expect(running).toHaveCSS("animation-duration", "2s")
+          await page.emulateMedia({ reducedMotion: "reduce" })
         }
         // One shadow colour: black in dark, rgb(12 18 29) (220 40% 8%) in light; never the light ink.
         const colour = theme === "dark" ? /rgba\(0, 0, 0, / : /rgba\(12, 18, 29, /
