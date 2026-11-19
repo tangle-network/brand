@@ -293,3 +293,14 @@ export const StreamingBlockquote: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => <StreamingBlockquoteFixture />,
 }
+
+
+export const StreamingInlineMarkers: Story = {
+  render: () => {
+    const [index, advance] = useState(0);
+    const parts = ["Income (**MAGI**) between **$79,000** and ", "**", "$", "89,000", "**", ". See ", "[", "details", "](/guide)", "."];
+    return <div><button type="button" onClick={() => advance((index + 1) % parts.length)}>
+      {index === parts.length - 1 ? "Start over" : "Receive next chunk"}
+    </button><Markdown streaming={index < parts.length - 1}>{parts.slice(0, index + 1).join("")}</Markdown></div>;
+  },
+};

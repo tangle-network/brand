@@ -58,3 +58,23 @@ it("renders native section links at every depth with stable, unique IDs and pres
   view.rerender(<Markdown>{source}</Markdown>);
   expect(view.container.querySelector("a[name]")).toBeNull();
 });
+
+it("keeps pending inline markers out of a streamed answer and preserves settled CommonMark", () => {
+  const base = "Income (**MAGI**) between **$79,000** and ";
+  const chat = render(<Markdown streaming>{base}</Markdown>);
+  for (const mark of ["**", "*", "__", "_", "`", "``", "["]) {
+    for (const suffix of [mark, mark + "more"]) {
+      chat.rerender(<Markdown streaming>{base + suffix}</Markdown>);
+      expect(chat.container.textContent?.trimEnd()).toBe("Income (MAGI) between $79,000 and" + (suffix === mark ? "" : " more"));
+      expect(chat.container.querySelector("a")).toBeNull();
+    }
+    chat.rerender(<Markdown>{base + mark}</Markdown>);
+    expect(chat.container.textContent).toContain(mark);
+  }
+  for (const text of ["**done**", "_done_", "file_name", "\\*literal", "`**`", "[link](/guide)"]) {
+    chat.rerender(<Markdown streaming>{text}</Markdown>);
+    const expected = render(<Markdown>{text}</Markdown>);
+    expect(chat.container.innerHTML).toBe(expected.container.innerHTML);
+    expected.unmount();
+  }
+});
