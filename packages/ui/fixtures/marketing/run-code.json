@@ -1,0 +1,65 @@
+{
+ "source": {
+  "path": "src/examples/sandboxes/run-code.mts",
+  "sha256": "c1bdae7c7ca9ecafdeaaa0392ef4a6d6016f761d08e2636d73b16dcffd472a0d"
+ },
+ "run": {
+  "id": "sandbox-9183dd6fcc5a",
+  "recordedAt": "2026-11-12T22:26:02.596Z",
+  "exitCode": 0,
+  "costUsd": null,
+  "sdk": {
+   "@tangle-network/sandbox": "1.0.168"
+  }
+ },
+ "events": [
+  {
+   "atMs": 522,
+   "kind": "call",
+   "id": 1,
+   "line": 9,
+   "name": "create",
+   "label": "client.create",
+   "assign": "box",
+   "durationMs": 1617,
+   "result": {
+    "id": "sandbox-9183dd6fcc5a",
+    "status": "running",
+    "name": "sandbox-9183dd6fcc5a"
+   }
+  },
+  {
+   "atMs": 2140,
+   "kind": "call",
+   "id": 2,
+   "line": 11,
+   "name": "exec",
+   "label": "box.exec",
+   "assign": "{ exitCode, stdout }",
+   "durationMs": 649,
+   "result": {
+    "exitCode": 0,
+    "stdout": "Linux-6.8.0-146-generic-x86_64-with-glibc2.42\n",
+    "stderr": ""
+   }
+  },
+  {
+   "atMs": 2790,
+   "kind": "stdout",
+   "text": "0 Linux-6.8.0-146-generic-x86_64-with-glibc2.42\n\n"
+  },
+  {
+   "atMs": 2790,
+   "kind": "call",
+   "id": 3,
+   "line": 16,
+   "name": "delete",
+   "label": "box.delete",
+   "durationMs": 1259,
+   "result": {
+    "outcome": "destroyed",
+    "removal": "pending"
+   }
+  }
+ ]
+}

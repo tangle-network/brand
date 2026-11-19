@@ -2,7 +2,7 @@
 
 Source checked: `215e2c12cf6c52c6da725326699388908d71b90b`. Baseline: `4919c826c0b594b36eedd66fba455557b5963ecc`. The baseline Hono view records the prior export boundary; it is not a consumer implementation. These are local package fixtures, not production adoption evidence.
 
-Beelink: frozen install and typecheck passed; 18 affected tests passed; packed `brand/knot` imports with React unavailable. Changed browser proof passed 8/8 at 2026-10-15T20:27:50Z. All 16 before/after captures inspected. Each changed pair shares computed typography, CTA roles and knot paths, with no page overflow or page errors; reduced motion produces no active animations.
+The frozen install and typecheck passed; 18 affected tests passed; packed `brand/knot` imports with React unavailable. Changed browser proof passed 8/8 at 2026-10-15T20:27:50Z. All 16 before/after captures inspected. Each changed pair shares computed typography, CTA roles and knot paths, with no page overflow or page errors; reduced motion produces no active animations.
 
 | Renderer / viewport / theme | Before | After |
 |---|---|---|

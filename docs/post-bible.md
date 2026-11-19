@@ -4,7 +4,7 @@ How Tangle writes for X, and what it shows. Every rule comes from 6,611 public p
 
 Each post is judged against its own account: **lift** is its views over that account's median. **Saves** are bookmarks per 1,000 views: a developer saving a post to try later. Counts were read on 2026-11-15 and move after that.
 
-The [copy bible](copy-bible.md) owns voice and the running list of rejected copy. This page owns posts.
+The [copy bible](copy-bible.md) owns product language and edited examples. This page owns posts.
 
 ## What to show
 
@@ -75,7 +75,7 @@ Over 280 characters: 3.0x; 100 or fewer: 0.7x (higher in 21 of 33 accounts). Thr
 ```
 
 ### 11. Say the items, not how many there are.
-Drew's rule (2026-11-02, 2026-11-15). The corpus does not penalize counts: the 7 posts that announce a count ran 6.4x, and Railway's "Zero sign-up. One command." ran 27x. Those posts then show every item. Ours counted instead of showing.
+The corpus does not penalize counts: the 7 posts that announce a count ran 6.4x, and Railway's "Zero sign-up. One command." ran 27x. Those posts then show every item. Ours counted instead of showing.
 ```diff
 - Three commands: create the sandbox, prompt the agent, start a preview.
 + (the command itself, in the post; the others in the reply)
@@ -94,15 +94,3 @@ A founder's own account reaches more people per follower than the company's: med
 ## How it was checked
 
 20 % of posts were set aside by a hash before any analysis; 60 of them, drawn at random, were coded without their counts. Scored one point per rule, the rules called 38 of 60 right against the account's median (63 %), and 23 of 30 (77 %) on the five kinds above. A second scorer, its weights learned from the analysis set and frozen before 60 fresh held-out posts were read, called 30 of 60 (50 %). The rules tell the best posts from the worst; they do not predict whether an ordinary post lands just above or below its account's median.
-
-## The running list: copy Drew rejected
-
-Added here and in the [copy bible's list](copy-bible.md#the-running-list-copy-drew-rejected-in-his-words).
-
-| Date | Drew | Rule |
-|---|---|---|
-| 2026-11-15 | Rejected every draft; asked for rules measured on real posts | This page. |
-| 2026-11-15 | Counting the commands ("Three commands: create the sandbox, prompt the agent, start a preview.") | 11 |
-| 2026-11-15 | "Just tell the commands"; "have the video show a time duration" instead of saying it is sped up | 3, 7 |
-| 2026-11-15 | "We want examples! We want to visualize!" | 1, 2 |
-| 2026-11-13 | Demos the way real people want to see them, not labelled and captioned; "visual like a movie! motion!" | 1, 4 |

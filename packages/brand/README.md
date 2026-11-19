@@ -1,12 +1,29 @@
 # @tangle-network/brand
 
-The authoring owner of shared Tangle color, typography, radius, motion, shadow and status decisions. Generic components live in `@tangle-network/ui`; product composition stays in its product repository. Read the [design bible](../../docs/design-bible.md) for shared policy and the [brand guidelines](../../docs/brand-guidelines.md) for implementation contracts.
+Use the Tangle knot, color tokens, typography, and light and dark themes in a website. The CSS, SVG knot and social metadata also work in applications that do not use React.
 
 ## Install
 
 ```sh
-pnpm add @tangle-network/brand
+npm install @tangle-network/brand
 ```
+
+For a Tailwind v4 site, add these imports to its main stylesheet.
+
+```css
+@import "tailwindcss";
+@import "@tangle-network/brand/styles";
+```
+
+For a framework-independent SVG, use the knot entry directly.
+
+```js
+import { knotSvg } from "@tangle-network/brand/knot";
+
+const mark = knotSvg({ id: "site-knot", label: "Tangle" });
+```
+
+The [React UI package](https://github.com/tangle-network/brand/blob/main/packages/ui/README.md) includes controls styled with these tokens.
 
 ## Use
 

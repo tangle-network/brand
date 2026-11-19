@@ -79,7 +79,7 @@ node packages/brand/bin/tangle-drift.mjs check --all --remote --update-baseline
 ```
 
 `--remote` shallow-fetches each repository's default branch (resolved from the remote) into `~/.cache/tangle-drift` as a partial clone that leaves blobs over 256 KiB on the server.
-The first run of all fifteen surfaces (now sixteen, with insurance) took about seven minutes on GTR; a warm run takes under a minute.
+The first run of all fifteen surfaces (now sixteen, with insurance) took about seven minutes; a warm run takes under a minute.
 `--update-baseline` writes the shipped baseline only with `--remote` (a local checkout may be a feature branch, and writing into an installed package would relax that consumer's gate); `--baseline <file>` writes another file.
 `--update-baseline` refuses any row with a rise and exits 1, but still records any metric that row had not recorded; `--allow-rise` accepts the rise, and belongs only in a reviewed brand change that explains it.
 Lowering takes effect for a consumer when it installs the brand release carrying the new baseline.

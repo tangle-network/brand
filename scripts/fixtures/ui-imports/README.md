@@ -95,7 +95,7 @@ check. Nothing here introduces another seam or claims Platform was exercised.
 
 ## Verification on the supported toolchain
 
-On GTR, Node 24.20.0, pnpm 12.6.0, tsdown 0.23.0, esbuild 0.28.2, and Vite 8.3.1 were exercised.
+Node 24.20.0, pnpm 12.6.0, tsdown 0.23.0, esbuild 0.28.2, and Vite 8.3.1 were exercised.
 The layout comparison used identical source, packed manifests, and npm dependency locks.
 Vite root JavaScript measured 70,385 gzip bytes before and 30,526 after.
 Esbuild root remained heavy at 441,162 reachable gzip bytes after; its diagnostic is intentionally retained.

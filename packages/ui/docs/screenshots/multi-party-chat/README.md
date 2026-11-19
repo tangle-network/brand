@@ -2,7 +2,7 @@
 
 The `Chat/Multi-party transcript` stories render the actual `AgentTimeline`, `ChatMessage` and `MessageAuthor` components with one intake thread: a client (Maria Lopez), an attorney (Jane Doe) and the agent.
 
-Captured with Playwright 1.63 Chromium from a static Storybook build on beelink1-wsl, at 1280px (1x) and 360px (2x), full page, in the `dark` and `light` Storybook themes.
+Captured with Playwright 1.63 Chromium from a static Storybook build, at 1280px (1x) and 360px (2x), full page, in the `dark` and `light` Storybook themes.
 The after images are from commit 468c927; no capture had horizontal overflow.
 The before images are the same story built against the unchanged components at 3095584, which ignore `author` and `viewerId`: the attorney's messages render as the client's own.
 

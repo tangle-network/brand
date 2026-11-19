@@ -1,32 +1,41 @@
 # @tangle-network/ui
 
-Minimal graph and server hosts can import the existing clock from `@tangle-network/ui/hooks/use-live-time` and status metadata/glyphs from `@tangle-network/ui/run/status-meta`. These module entries share the root bindings without loading optional session stores.
-
-Generic React UI components for Tangle products. Imports tokens from `@tangle-network/brand` (peer dep). Tailwind v4-native.
-
-Component visual precedent is governed by the repo-level [design bible](../../docs/design-bible.md) and [component audit](../../docs/component-audit.md). Storybook examples are test surfaces; they are not automatically approved brand patterns.
+React buttons, dialogs, forms, Markdown, file views and recorded examples. Import the part of the library your app uses. Its styles use the tokens in [@tangle-network/brand](https://github.com/tangle-network/brand/blob/main/packages/brand/README.md).
 
 ## Install
 
+In a React project that builds Tailwind CSS v4, install the packages and load the styles below.
+
 ```sh
-pnpm add @tangle-network/ui @tangle-network/brand react react-dom
+npm install @tangle-network/ui @tangle-network/brand react react-dom
 ```
 
-## Use
+```css
+/* src/styles.css */
+@import "tailwindcss";
+@import "@tangle-network/brand/styles";
+@source "../node_modules/@tangle-network/ui/src";
+```
 
 ```tsx
 import { Button } from "@tangle-network/ui/primitives";
-import { Logo } from "@tangle-network/brand";
 
-export function App() {
-  return (
-    <>
-      <Logo size="md" />
-      <Button>Click</Button>
-    </>
-  );
+export function PrintPage() {
+  return <Button onClick={() => window.print()}>Print page</Button>;
 }
 ```
+
+## Choose an entry point
+
+| Import | Use it for |
+| --- | --- |
+| `@tangle-network/ui/primitives` | Buttons, dialogs, tabs and form fields |
+| `@tangle-network/ui/markdown` | Formatted text, code blocks, tables and links |
+| `@tangle-network/ui/files` | File lists, previews and optional PDF support |
+| `@tangle-network/ui/marketing` | Recorded example editors and terminal replays |
+| `@tangle-network/ui/utils/format` | Pure formatters for time, bytes and currency |
+
+See [package exports](https://github.com/tangle-network/brand/blob/main/packages/ui/package.json) for the full list. Each entry lists its types and runtime module.
 
 `partitionBySpeaker` and the speaker types in `/chat` re-export the canonical
 `@tangle-network/agent-interface/speaker` contract. Server consumers import that
@@ -34,7 +43,7 @@ entry directly; `SpeakerHeader` remains the UI renderer.
 
 ## Styling
 
-This package ships no CSS. Its components are Tailwind v4 class names in source, and the build emits JavaScript only, so two pieces of consumer setup carry real weight.
+Most controls use Tailwind utilities from the package source. Components with additional styles, such as the example editor and command menu, also export their own stylesheets.
 
 ### Scan this package
 
@@ -69,11 +78,11 @@ One consequence worth knowing. This is a scan, not a manifest, so a consumer emi
 `@tangle-network/brand` is a peer dependency. It holds the tokens every colour here resolves through, and a few real classes that some components reference by name instead of composing out of utilities. `Badge` with `dot` is the one to know about: it emits `status-dot status-dot-running` and its siblings, which are defined in `@tangle-network/brand/styles/globals.css` and nowhere else. Without that import the dots have no size and no colour.
 
 ```css
-@import "@tangle-network/brand/styles";
 @import "tailwindcss";
+@import "@tangle-network/brand/styles";
 ```
 
-See [`@tangle-network/brand`'s README](../brand/README.md) for the token-level breakdown, the finer-grained imports, and the fonts, which brand deliberately does not bundle.
+See [`@tangle-network/brand`'s README](https://github.com/tangle-network/brand/blob/main/packages/brand/README.md) for the token-level breakdown, the finer-grained imports, and the fonts, which brand deliberately does not bundle.
 
 ### Focus treatment
 

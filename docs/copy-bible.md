@@ -2,7 +2,7 @@
 
 The reader is a developer who has never heard of Tangle, deciding in five seconds whether this does their job. Every heading, subline, button, meta description and example comment on tangle.tools, in the docs and in launches passes one test: **would that developer care?** If the line is about us (our process, our proof, our effort, our architecture) and not about what they get, it fails.
 
-[Copywriting anti-patterns](https://github.com/drewstone/dotfiles/blob/main/docs/anti-patterns/copywriting.md) owns the editing procedure (slop patterns, banned words, CTA rules). This page owns Tangle's voice, the headline patterns we copy from, and the running list of copy Drew rejected. The [post bible](post-bible.md) owns posts: what to show and what to write, measured on real developer posts.
+Use this guide for product language, headline examples and chart labels. The [post guide](post-bible.md) covers examples for developer audiences.
 
 ## How the best pages in our market write
 
@@ -78,37 +78,3 @@ One line, under 90 characters, saying what the code cannot: a fact about the pla
 | Installed in every sandbox, keys set. Click one to start it. (under "Every coding agent, installed.") | Click one to start it in a new sandbox. | The subline restated the heading. |
 | One SDK. | Run any coding agent. | A slogan any SDK could use. |
 | Run agents on the harnesses you already use, on any cloud: Claude Code, Codex, OpenCode and more, each in its own sandbox on Tangle. | Claude Code, Codex, OpenCode and more, each in its own sandbox, on any cloud. | Shorter, reader's nouns. |
-
-## The running list: copy Drew rejected, in his words
-
-Add to this list every time Drew rejects a line. Date, quote, rule. Never remove an entry.
-
-| Date | Drew | Rule |
-|---|---|---|
-| 2026-11-15 | Rejected every draft; asked for rules measured on real posts | The [post bible](post-bible.md), every rule measured on real posts. |
-| 2026-11-15 | Counting the commands ("Three commands: create the sandbox, prompt the agent, start a preview.") | Say the items, not how many there are. |
-| 2026-11-15 | "Just tell the commands"; "have the video show a time duration" instead of saying it is sped up | Put the command in the post. A clock in the frame keeps the time; the text says nothing about speed. |
-| 2026-11-15 | "We want examples! We want to visualize!" | Show it running, and show the result. |
-| 2026-11-13 | Demos the way real people want to see them, not labelled and captioned; "visual like a movie! motion!" | A clip of the real screen with no caption text over the product. |
-| 2026-11-12 | "fix the copy its so gimmicky, Copy the file, run it, like wtf, we're like yelling at the reader, why not just tell them what our compnay does? and why?" on "Pick a job. Copy the file. Run it." | Say what Tangle does and why, as statements. Never a string of commands. |
-| 2026-11-02 | "these charts in ai applied benchmarks are bad … we had somthign 100x better months ago, when it was all sorts of verticals or tax or legal and stuff with clear bar charts tooltips, agentprofile/(model + harness) combinations as x axis and score on y" | A score board is columns of model and harness, with score on y. |
-| 2026-11-02 | "get rid of all the competitors or at least hide them from this chart for now until we're really competitive" | No competitors on a benchmark page until we are competitive. |
-| 2026-11-02 | "These ones just look like bar charts and the tooltips are kind of shit. I wish you could get that data in those tooltips somehow into the charts themselves or we have multiple charts (P50, P95, or whatever)" | Confidence is drawn on the mark, and p50, p95 and n print on the row. |
-| 2026-11-02 | "there's so much space taken up by this website. You could probably fit more, make more charts, and make the data much more compelling" | A one-line head and a dense grid. Show every measure. |
-| 2026-11-02 | "delet this from brand kit too … and add it to anti pattners" on "Using the logo": "Use the supplied logo files without stretching, recoloring, or adding effects." | A brand kit is the files and the colors. No rules telling a reader what anyone already knows. |
-| 2026-11-02 | "we need benchmark charts there if we don't alreaydhave them! and we need unified design and branding and an actual brand/copy bible, elimiante all this dumb extra text and labels its AI SLOP!" | A chart is a title, marks and numbers, drawn by `@tangle-network/charts`. |
-| 2026-11-02 | "theres no hover no tooltip in those benchmarks I think the page is a bit unclear like don't you think there's BETTER charts visualizations or ways to represnt the data clearly? places to put the numbers or w/e?" | Each number on its mark; every other fact on hover. |
-| 2026-11-02 | "what is "The same journey on the desktop shape"? consolidate!" | Plain words, and one table. Never a hidden second one. |
-| 2026-11-02 | "why do yo uhave 2 vesrions showing tangle not fulfilling all things?" | One row per entrant, and it prints what the run really reached. |
-| 2026-11-02 | "i don't like this run table around the billing area, stop with this nonsense! delete that, just one key one bill, for compute, inference, and observability, clean it up!" | A billing section states the offer in the reader's nouns; no receipts, ledgers or run tables as proof. |
-| 2026-11-02 | "the benchmarks page is bad, i don't like this waterfall blog style thing, it should look like artificial analysis and vals ai! … I mean seriously up to par competing on design vision!" | A benchmark page is a leaderboard, never a waterfall of prose sections. See [Charts and benchmark pages](#charts-and-benchmark-pages). |
-| 2026-11-02 | "this copy is SO BAD 'Every example ran on production.' … NO HUMAN USER CARES OR THINKS THIS IS GOOD" | A heading says what the reader gets or does, never what we did. |
-| 2026-11-02 | "if theres small text labels subtext and nonsense that restates things with AI slop sounding bullshit CUT IT! JUST GET THE WHAT IN!" | No subline that restates. No labels above headings. |
-| 2026-11-02 | "you don't need to COUNT examples per tab, you need to PUT GOOD AND COMPLETE EXAMPLES IN PLACE! … creative things! good use cases!" | Counts are not content. Show the thing. |
-| 2026-11-02 | "SHORT AND SWEET is better than this terrible shit like '// The Daytona adapter runs this command in the sandbox and nothing else …' 'And nothing else?' … dont put all these stupid comments!" | One-line comments that state a fact. Never what something does not do. |
-| 2026-11-02 | "no card shit that says nothing about what we do" | No cards whose text could describe any product. |
-| 2026-11-02 | "tile" | Plain words; never a word we invented for the UI. |
-| 2026-11-02 | tabs on one row, "it must fit" | Write a headline to the width it renders in. |
-| 2026-11-01 | "One SDK." rejected | No slogans. |
-| 2026-10-24 | "sleek, like an apple product" | Fewer words, bigger type, one idea per section. |
-| 2026-10-22 | "talk to me in clear simple technical english terms and decisions … what kinda of mannered prose crap is this" | No mannered or clipped prose anywhere, including reports. |

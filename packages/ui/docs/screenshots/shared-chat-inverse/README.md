@@ -2,7 +2,7 @@
 
 The before images show `main` at `6c2127b`.
 The after images show the change in this branch.
-All images came from the real Storybook iframe in Chromium on drew-gtr-pro on 2026-10-01.
+All images came from the real Storybook iframe in Chromium on 2026-10-01.
 The stories use synthetic conversation content and the Brand light and dark theme globals.
 
 | Surface | Theme and viewport | Before | After |
