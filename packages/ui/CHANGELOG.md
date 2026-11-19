@@ -1,3 +1,9 @@
+## 11.51.38
+
+### Patch Changes
+
+- b205701: Restore the moving source line and corresponding SDK call during recorded example playback. Allow sites to omit the run receipt.
+
 ## 11.51.37
 
 ### Patch Changes
