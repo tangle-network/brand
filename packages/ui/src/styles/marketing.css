@@ -621,17 +621,25 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 
 /* A shared two-pane embed. Only the selector and workbench use these proportions. */
 .qs-workbench {
+  overflow-anchor: none;
   --qs-code-size: var(--font-size-sm); --qs-muted: var(--text-secondary); --qs-dim: var(--text-secondary);
   --syntax-comment: var(--text-secondary); --syntax-foreground: var(--text-primary); --syntax-variable: var(--text-primary);
 }
 .qs-workbench .qs-picker { flex: 1; min-width: 0; }
-.qs-picker > button { max-width: 100%; min-height: var(--control-height-lg); height: auto; padding-inline: .65rem; white-space: normal; text-align: start; font: 500 var(--font-size-sm)/1.35 var(--font-sans); }
+.qs-picker > button {
+  max-width: 100%; min-height: var(--control-height-lg); height: auto; gap: .65rem; padding-inline: .75rem;
+  border: 1px solid var(--border-default); border-radius: var(--radius-md);
+  background: var(--md3-surface-container); color: var(--text-primary);
+  white-space: normal; text-align: start; font: 500 var(--font-size-sm)/1.35 var(--font-sans);
+}
+.qs-picker > button:is(:hover,[aria-expanded=true]) { background: var(--md3-surface-container-high); border-color: var(--border-accent); }
+.qs-picker > button svg { flex: none; width: .9rem; color: var(--text-secondary); }
 .qs-picker-menu { max-width: calc(100vw - 2rem); max-height: min(26rem,var(--radix-dropdown-menu-content-available-height)); overflow-y: auto; }
 .qs-picker-menu [role=menuitemradio] { min-height: var(--control-height-md); }
 .qs-workbench .qs-panes { grid-template-columns: minmax(0,2fr) minmax(0,1fr); height: clamp(25rem,51svh,31rem); }
 .qs-workbench .qs-source { isolation: isolate; background: var(--md3-surface-container-low); }
 .qs-workbench .qs-machine { background: var(--md3-surface-container-high); }
-.qs-workbench .qs-actions { height: auto; min-height: 3rem; padding-block: .2rem; gap: .4rem; background: var(--md3-surface-container-low); }
+.qs-workbench .qs-actions { height: auto; min-height: 3rem; padding: .45rem .75rem; gap: .5rem; background: var(--md3-surface-container-low); }
 .qs-workbench .qs-actions > button { min-height: var(--control-height-lg); margin-left: 0; }
 .qs-workbench .qs-actions > button[title] { min-width: var(--control-height-lg); }
 .qs-workbench .qs-current-call, .qs-workbench [data-state=source] .qs-machine { display: none; }
@@ -640,8 +648,8 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .qs-workbench .qs-code pre > code { display: block; width: max-content; min-width: 100%; }
 .qs-workbench .qs-code pre > code > span { overflow: visible; }
 .qs-workbench .qs-band { background: color-mix(in srgb, var(--brand-cool) 52%, var(--md3-surface-container-low)); }
-.qs-workbench .qs-preview-label { margin: .65rem .85rem .15rem; }
-.qs-workbench .qs-execution-timeline { padding: .4rem .7rem; }
+.qs-workbench .qs-feed { display: flex; flex-direction: column; overscroll-behavior: contain; }
+.qs-workbench .qs-execution-timeline { flex: none; margin-block-start: auto; padding: .4rem .7rem; }
 .qs-workbench .qs-execution-timeline [data-timeline-step=tool] { margin: 0; }
 .qs-workbench [data-timeline-step=tool] [data-run-row] > button {
   display: flex; align-items: baseline; gap: .4rem; min-height: 2rem; padding: .35rem .15rem;

@@ -1,4 +1,5 @@
 import { AgentTimeline, type AgentTimelineItem } from '../chat/agent-timeline';
+import { useFollowTail } from '../hooks/use-follow-tail';
 import { CodeBlock, CopyButton } from '../markdown/code-block';
 import { InlineThinkingItem } from '../run/inline-thinking-item';
 import { Button } from '../primitives/button';
@@ -153,7 +154,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
   const compact = Boolean(picker);
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
-  const feed = useRef<HTMLDivElement>(null), followFeed = useRef(true);
+  const feed = useRef<HTMLDivElement>(null);
   const returnsId = useId();
   const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay: playOnSelect });
   const { events, line, r } = replay;
@@ -190,11 +191,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
     return () => { observer.disconnect(); delete row.dataset.executing; };
   }, [activeLine, replay.playing, replay.still]);
   const holdSource = () => { follow.current = false; };
-  const holdFeed = () => { followFeed.current = false; };
-  useLayoutEffect(() => {
-    const el = feed.current;
-    if (el && followFeed.current && replay.started) el.scrollTop = el.scrollHeight;
-  }, [run.items.length, ended, replay.started]);
+  const { jump } = useFollowTail(feed, { identity: idea.id, content: run.items.length, thresholdPx: 3 });
   const label = replay.playing ? 'Pause' : ended ? 'Replay' : replay.started ? 'Resume' : 'Play';
   const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
@@ -202,7 +199,7 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
       {picker || <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>}
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && (
-        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) follow.current = followFeed.current = true; replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
+        <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) { follow.current = true; jump(); } replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
       )}
     </div>
     <div className="qs-panes">
@@ -213,10 +210,9 @@ function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: 
         <CodeBlock code={idea.code.trimEnd()} language="ts" label="" showLineNumbers className="rounded-none border-0" />
         <div className="qs-exec">{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
       </section>
-      <div className="qs-pane qs-machine"><div ref={feed} className="qs-feed" role="region" aria-label="Run" tabIndex={0}
-        onWheel={holdFeed} onPointerDown={holdFeed} onKeyDown={holdFeed}>
+      <div className="qs-pane qs-machine"><div ref={feed} className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
         {current && <div className="qs-current-call" data-source-line={current.line}><span>Line {current.line}</span><code>{current.label ?? current.name}</code></div>}
-        {!replay.started && preview.length > 0 && <p className="qs-preview-label">First recorded step</p>}
+        {!compact && !replay.started && preview.length > 0 && <p className="qs-preview-label">First recorded step</p>}
         <AgentTimeline className="qs-execution-timeline" items={replay.started ? run.items : preview} isThinking={run.thinking}
           emptyState={<p className="qs-wait">{!idea.run ? 'This example has source code only.' : replay.failed ? 'The recorded run could not load.' : !events ? 'Loading the recorded run…' : !events.length || ended ? 'No steps were recorded.' : 'Waiting for the first recorded step…'}</p>} />
         {ended && idea.output && !events?.some(e => e.kind === 'call' && e.label === idea.output!.call) &&
@@ -262,6 +258,7 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
   const fallback = initial ?? tasks[0]?.key ?? '';
   const [picked, setPicked] = useState(fallback);
   const [menuOpen, setMenuOpen] = useState(false);
+  const outsideDismiss = useRef(false);
   const [ready, setReady] = useState(false);
   const [activation, setActivation] = useState(0);
   const [showAll, setShowAll] = useState(!featured?.length);
@@ -302,16 +299,19 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
     event.preventDefault(); choose(next.key);
     requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]')?.focus());
   };
-  const picker = compact && <div className="qs-picker"><DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+  const picker = compact && <div className="qs-picker"><DropdownMenu modal={false} open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild disabled={!ready}
         onPointerDownCapture={event => { if (event.button === 0 && !event.ctrlKey) event.stopPropagation(); }}
         onClick={() => setMenuOpen(open => !open)}>
         <Button variant="outline" aria-label={`Example, ${task.idea.title}`}>{task.idea.title}<ChevronDown aria-hidden="true" /></Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="qs-picker-menu" align="start" aria-label="Examples" onCloseAutoFocus={event => {
-        event.preventDefault();
-        requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>('.qs-picker button')?.focus({ preventScroll: true }));
-      }}>
+      <DropdownMenuContent className="qs-picker-menu" align="start" aria-label="Examples"
+        onInteractOutside={() => { outsideDismiss.current = true; }}
+        onCloseAutoFocus={event => {
+          if (outsideDismiss.current) { outsideDismiss.current = false; return; }
+          event.preventDefault();
+          requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>('.qs-picker button')?.focus({ preventScroll: true }));
+        }}>
         <DropdownMenuRadioGroup value={task.key}>
           {tasks.map(entry => <DropdownMenuRadioItem key={entry.key} value={entry.key} onSelect={() => choose(entry.key)}>
             {entry.idea.title}
