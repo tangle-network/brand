@@ -14,6 +14,7 @@ import rehypeSlug from "rehype-slug";
 import GithubSlugger from "github-slugger";
 import { FileImage, FileText, Folder, ImageOff, Package, type LucideIcon } from "lucide-react";
 import { CodeBlock, CopyButton } from "./code-block";
+import { permalinkHeadings, rehypePermalinkIds } from "./heading-permalinks";
 import { fenceInfo, remarkCodeMeta } from "./code-meta";
 import {
   MarkdownTable,
@@ -49,11 +50,12 @@ function transformMarkdownUrl(
   key: string,
   node: Parameters<UrlTransform>[2],
   urlTransform?: UrlTransform,
+  headingPermalinks?: boolean,
 ) {
   const transformed = urlTransform ? urlTransform(url, key, node) : url;
   if (transformed == null) return undefined;
 
-  if (key === "href" && transformed === url && url.startsWith("#")) {
+  if (!headingPermalinks && key === "href" && transformed === url && url.startsWith("#")) {
     return safeUrl("#" + getSanitizedMarkdownHeadingIdFromRawFragment(url.slice(1)));
   }
 
@@ -244,6 +246,12 @@ export interface MarkdownProps {
   urlTransform?: UrlTransform;
   /** Render links to known objects (a file, an asset) as chips that keep their href. */
   linkChip?: MarkdownLinkChipResolver;
+  /**
+   * Only for trusted, authored documents. Add native named anchors after
+   * sanitization for short share URLs and support explicit IDs such as {#install}.
+   * Leave off for user- or agent-generated Markdown.
+   */
+  headingPermalinks?: boolean;
 }
 
 // This subset has exactly one CommonMark interpretation, a literal paragraph.
@@ -257,7 +265,7 @@ const literalParagraph = /^[\p{L}][\p{L}\p{M}\p{N} ,.!?'’()-]*$/u;
  * a CSV copy, images that open full size or show a labelled placeholder, and
  * optional chips for links to known objects.
  */
-export const Markdown = memo(({ children, className, urlTransform, linkChip }: MarkdownProps) => {
+export const Markdown = memo(({ children, className, urlTransform, linkChip, headingPermalinks }: MarkdownProps) => {
   const proseClass = cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
   if (literalParagraph.test(children) && !/www\./i.test(children)) {
     return <div className={proseClass}><p>{children.trimEnd()}</p></div>;
@@ -267,9 +275,10 @@ export const Markdown = memo(({ children, className, urlTransform, linkChip }: M
       <LinkChipContext.Provider value={linkChip}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkCodeMeta]}
-          rehypePlugins={[rehypeSlug, [rehypeSanitize, sanitizeSchema]]}
-          urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform)}
+          rehypePlugins={[headingPermalinks ? rehypePermalinkIds : rehypeSlug, [rehypeSanitize, sanitizeSchema]]}
+          urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform, headingPermalinks)}
           components={{
+            ...(headingPermalinks && permalinkHeadings),
             a: MarkdownLink,
             img: MarkdownImage,
             pre: MarkdownPre,
