@@ -70,6 +70,8 @@ See the [design bible](design-bible.md#theme-roles).
 
 See the [design bible](design-bible.md#product-hierarchy).
 
+<a name="copy-standard"></a>
+
 ### Product language
 
 Name the action and its object. “Save draft” and “Approve and send” describe different effects. A task is the intended work, a run is one execution, and an artifact is the output a reader can open. An approval records a decision. Show a pending state until the operation confirms its result.

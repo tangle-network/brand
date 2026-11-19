@@ -2,7 +2,7 @@
 
 Publication record, October 15, 2026. The migration manifest retains the supplied inventory; its future actions do not claim completed adoption. The section handoff below records the clauses consolidated in this delivery. Other manifest entries retain their owners.
 
-Rules not explicitly replaced below stay in their current owner. A merge action transfers only reconciled clauses, not an entire file by implication. Keep existing text and incoming links until the destination, live readers, approved examples and authority are verified. Count consumers before retaining compatibility or removing an export. Do not delete historical audits. Retire neither branded-designer recipe until its incoming readers have migrated. Source snapshots are fixed evidence; fetch the default branch and reconcile changes before authoring an adoption PR.
+Rules not explicitly replaced below stay in their current owner. A merge action transfers only reconciled clauses, not an entire file by implication. Keep existing text and incoming links until the destination, live readers, approved examples and authority are verified. Count consumers before retaining compatibility or removing an export. Do not delete historical audits. Source snapshots are fixed evidence; fetch the default branch and reconcile changes before authoring an adoption PR.
 
 ## Policy and implementation boundaries
 
@@ -22,7 +22,7 @@ The bible owns shared policy. Brand guidelines now retains its implementation co
 | Category labels/icons, generated tone families and product status adapters | Retain exact implementation in Brand surfaces/state and package docs. |
 | Scrim/on-media tokens and named co-brand themes | Retain exact implementation owner; do not replace with local literal colors. |
 | Product, open-source tool and example-agent hierarchy | Retain Brand's hierarchy section until a deliberate product-strategy revision; bible explicitly references it. |
-| Direct copy, buyer/builder consequence, proof and breathing room | Retain in Visual grammar; preserve scoped rejected examples in dotfiles. |
+| Direct copy, buyer/builder consequence, proof and breathing room | Retain in the visual grammar and copy guide. |
 | No obvious mechanics, internal taxonomy, premature CTA or automatic card grid | Retain source copy restrictions through Brand guidance and the linked procedure. |
 | Every major marketing/brand page needs a visual idea | Retain literally in Visual grammar. Do not weaken to an aspiration. |
 | Faithful screenshots, actual data-flow diagrams, brand atmospheres and explanatory research figures | Retain graphic standard. Concepts need explicit labels and cannot masquerade as product proof. |
@@ -39,20 +39,15 @@ The bible owns shared policy. Brand guidelines now retains its implementation co
 | Historical audits, old controls and calibration evidence | Preserve dated evidence. Superseded values are historical, never current instructions. |
 | Static screenshots versus changed-flow video | Preserve UI-evidence procedure's distinction. Production-flow claims always require production video. |
 
-## Eight inventory conflicts
+## Design decisions
 
 | Conflict | Explicit decision |
 |---|---|
-| Legacy branded-designer pure black, Satoshi and copied values | Current Brand identity, font roles and executable values win for Tangle. Retire both recipes only after reader migration; retain a pointer and history. |
-| Generic frontend-design palette/type invention | Tangle's explicit Brand brief wins. Keep third-party skill upstream; bind precedence in product-design invocation. |
 | Old agent-app motion table and branch-era links | Remove the copied table during adoption. Link executable Brand roles and the current generated projection contract. |
 | Generic exit easing and independent motion recipes | Brand dismissal role wins. Retain generic techniques, with Tangle recipes implemented in shared components and tested by consumers. |
 | Zero-duration Brand versus one-millisecond agent-app adapter | Preserve the deliberate adapter as an implementation detail. Semantic completion/focus/cancellation cannot depend on an animation-end event. Test both paths. |
 | Categorical marketing no-wrap rule | Replace that clause with responsive text fit, accessible full-value access and reflow acceptance. Preserve all unrelated source rules. |
 | Universal ban on technical nouns | Scope vocabulary to the audience. Runtime identity belongs in Sandbox; unexplained internal language does not belong in general-professional tasks. |
-| Adjacent artifact-builder font/purple bans and optional testing | Tangle identity and required rendered evidence win at invocation. Keep upstream intact. Do not treat this skill as the unresolved `artifact-design`. |
-
-Resolve the separate `artifact-design` incoming instruction by establishing its installed owner or proving the instruction dead across default branches and catalogs. The supplied search establishes an unresolved owner, not global absence.
 
 ## Adoption administration
 
@@ -79,4 +74,4 @@ This is source delivery, not designer approval, authenticated journey proof or a
 | drift-ratchet.md | Existing file | Preserve migration procedure; state aggregate-count limits and evidence fields. |
 | component-audit.md and shared-form-metric-presentation.md | Existing files | Preserve historical evidence and superseded warnings. |
 
-Reader check at publication: Brand's README and both package READMEs link brand-guidelines.md. Those readers now link the bible as policy owner. Legacy section anchors remain in the implementation index for external readers; their policy text has moved. No entire file or public API is deleted. Other repositories in the manifest are out of scope for this source delivery; their retained entries do not claim migration. The separate dotfiles PR reconciles skill procedures.
+Reader check at publication: Brand's README and both package READMEs link brand-guidelines.md. Those readers now link the bible as policy owner. Legacy section anchors remain in the implementation index for external readers; their policy text has moved. No entire file or public API is deleted. Other repositories in the manifest are out of scope for this source delivery; their retained entries do not claim migration.
