@@ -90,6 +90,14 @@ async function check(browserType, width) {
     assert.ok(finished.gap < 3, "Following survives repeated streamed growth through the final output");
     assert.equal(finished.page, watching.page);
     // A reader can reach the transport before a quarter of the workbench has entered the viewport.
+    // Locator.tap() can scroll a visible trigger before delivering the touch on WebKit.
+    async function pressVisible(control) {
+      const rect = await control.boundingBox();
+      assert.ok(rect && rect.width && rect.height);
+      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+      assert.ok(x >= 0 && x < width && y >= 0 && y < page.viewportSize().height);
+      if (width < 500) await page.touchscreen.tap(x, y); else await page.mouse.click(x, y);
+    }
     const replay = root.locator('.qs-run');
     await replay.evaluate(button => window.scrollTo({ top: scrollY + button.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
     const partial = await root.locator('.qs-main').evaluate(el => ({
@@ -97,16 +105,16 @@ async function check(browserType, width) {
       page: Math.round(scrollY),
     }));
     assert.ok(partial.ratio > 0 && partial.ratio < .25);
-    if (width < 500) await replay.tap(); else await replay.click();
+    await pressVisible(replay);
     await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
     assert.equal(Math.round(await page.evaluate(() => scrollY)), partial.page, 'Play preserves the reader’s page position');
     await root.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom + 8, behavior: 'instant' }));
     await root.locator('.qs-main[data-state="paused"]').waitFor({ timeout: 3000 });
     await trigger.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
     const selectionPage = Math.round(await page.evaluate(() => scrollY));
-    if (width < 500) await trigger.tap(); else await trigger.click();
+    await pressVisible(trigger);
     const current = page.getByRole('menuitemradio', { checked: true });
-    if (width < 500) await current.tap(); else await current.click();
+    await pressVisible(current);
     await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
     assert.equal(Math.round(await page.evaluate(() => scrollY)), selectionPage, 'Choosing a recording starts it in place');
     console.log(JSON.stringify({ width, idleBottomInset: Math.round(end), documentScrollOnMenu: closed.page - before.page,
