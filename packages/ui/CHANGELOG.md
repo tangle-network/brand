@@ -1,3 +1,10 @@
+## 11.51.48
+
+### Patch Changes
+
+- c299a6e: Add an optional streaming mode to Markdown that keeps incomplete inline formatting out of an incoming answer.
+- 2a31ab4: Add installation and first-use examples to the published package guides.
+
 ## 11.51.47
 
 ### Patch Changes
