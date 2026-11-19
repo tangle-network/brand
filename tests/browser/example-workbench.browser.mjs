@@ -15,13 +15,14 @@ async function check(browserType, width) {
   const browser = await browserType.launch();
   try {
     const page = await browser.newPage({ viewport: { width, height: width < 500 ? 844 : 900 }, hasTouch: width < 500, isMobile: width < 500 });
-    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.goto(url, { waitUntil: "load" });
     const root = page.locator(".qs-workbench");
     const trigger = root.locator(".qs-picker button");
     const feed = root.getByRole("region", { name: "Run" });
     const run = root.getByRole("button", { name: "Play the recorded run" });
     await trigger.waitFor();
     await run.waitFor();
+    await page.evaluate(() => document.fonts.ready);
     await trigger.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().top - innerHeight * .6, behavior: "instant" }));
     const before = await feed.evaluate(metrics);
     const idle = feed.locator("[data-timeline-step]").last();
@@ -55,18 +56,7 @@ async function check(browserType, width) {
     assert.equal(closed.page, before.page);
     assert.equal(closed.pageHeight, before.pageHeight);
 
-    // A reader can reach the transport before a quarter of the workbench has entered the viewport.
-    await run.evaluate(button => window.scrollTo({ top: scrollY + button.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
-    const partial = await root.locator('.qs-main').evaluate(el => ({
-      ratio: (innerHeight - el.getBoundingClientRect().top) / el.clientHeight,
-      page: Math.round(scrollY),
-    }));
-    assert.ok(partial.ratio > 0 && partial.ratio < .25);
-    if (width < 500) await run.tap(); else await run.click();
-    await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
-    assert.equal(Math.round(await page.evaluate(() => scrollY)), partial.page, 'Play preserves the reader’s page position');
-    await root.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom + 8, behavior: 'instant' }));
-    await root.locator('.qs-main[data-state="paused"]').waitFor({ timeout: 3000 });
+    await run.click();
     // Move the feed into view before measuring. Follow always belongs to the feed.
     await feed.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().top - 72, behavior: "instant" }));
     const watching = await feed.evaluate(metrics);
@@ -99,6 +89,19 @@ async function check(browserType, width) {
     const finished = await feed.evaluate(metrics);
     assert.ok(finished.gap < 3, "Following survives repeated streamed growth through the final output");
     assert.equal(finished.page, watching.page);
+    // A reader can reach the transport before a quarter of the workbench has entered the viewport.
+    const replay = root.locator('.qs-run');
+    await replay.evaluate(button => window.scrollTo({ top: scrollY + button.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
+    const partial = await root.locator('.qs-main').evaluate(el => ({
+      ratio: (innerHeight - el.getBoundingClientRect().top) / el.clientHeight,
+      page: Math.round(scrollY),
+    }));
+    assert.ok(partial.ratio > 0 && partial.ratio < .25);
+    if (width < 500) await replay.tap(); else await replay.click();
+    await root.locator('.qs-main[data-state="running"]').waitFor({ timeout: 3000 });
+    assert.equal(Math.round(await page.evaluate(() => scrollY)), partial.page, 'Play preserves the reader’s page position');
+    await root.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom + 8, behavior: 'instant' }));
+    await root.locator('.qs-main[data-state="paused"]').waitFor({ timeout: 3000 });
     await trigger.evaluate(el => window.scrollTo({ top: scrollY + el.getBoundingClientRect().bottom - innerHeight + 8, behavior: 'instant' }));
     const selectionPage = Math.round(await page.evaluate(() => scrollY));
     if (width < 500) await trigger.tap(); else await trigger.click();
