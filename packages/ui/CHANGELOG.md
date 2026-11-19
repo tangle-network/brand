@@ -1,3 +1,9 @@
+## 11.51.45
+
+### Patch Changes
+
+- 39acd6e: Pressing End in a focused recording reattaches immediately to the growing output.
+
 ## 11.51.44
 
 ### Patch Changes
