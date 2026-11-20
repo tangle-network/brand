@@ -3,6 +3,7 @@ import { useFollowTail } from '../hooks/use-follow-tail';
 import { CodeBlock, CopyButton } from '../markdown/code-block';
 import { InlineThinkingItem } from '../run/inline-thinking-item';
 import { Button } from '../primitives/button';
+import { SegmentedControl } from '../primitives/segmented-control';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '../primitives/dropdown-menu';
 import { Fragment, useId, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown, Play, Pause } from 'lucide-react';
@@ -15,6 +16,9 @@ export interface Idea {
   id: string;
   title: string;
   code: string;
+  filename?: string;
+  /** Groups alternate implementations of the same task by provider. */
+  provider?: { name: string; logo: string };
   run?: RunMeta;
   install?: string;
   view?: "timeline" | "page" | "scoreboard" | "states" | "tree" | "spend" | "egress";
@@ -28,7 +32,7 @@ export interface Idea {
   timelineNoteAt?: number;
 }
 export interface Subject { id: string; label: string; install: string; ideas: Idea[] }
-const PLAY_MS: [number, number] = [5000, 20_000]; // every replay lasts this long: a short record plays slower, a long one faster
+const PLAY_MS: [number, number] = [0, 20_000]; // Preserve short calls at their recorded speed.
 const IDLE: [number, number] = [2500, 1200]; // a wait over 2.5 s plays in 1.2 s, long enough to see the agent think
 const marks = (events: Ev[]): Mark[] => events.flatMap((event) => [{ atMs: event.atMs }, { atMs: event.atMs + (event.durationMs ?? 0) }]);
 const short = (text: string, max = 24) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
@@ -123,7 +127,13 @@ function activity(events: Ev[], t: number, source: string[], idea: Idea, compact
       items.set(part.id, part.type === 'text' ? { id: part.id, atMs, kind: 'message', role: 'assistant', content: text, isStreaming: live }
         : { id: part.id, atMs, kind: 'custom', content: <InlineThinkingItem part={{ type: 'reasoning', text, time: { start: atMs, end: live ? undefined : end } }} /> });
     } else if ((event.kind === 'stdout' || event.kind === 'stderr') && !externalFiles && !idea.output && event.text?.trim() && !printed.has(event.text.trim()) && !/\b(?:inputTokens|cacheReadTokens)\b/.test(event.text)) {
-      items.set(id, { id, atMs, kind: 'custom', content: textResult(event.text, event.kind === 'stderr' ? 'Standard error' : 'Console output', compact) });
+      const label = event.kind === 'stderr' ? 'Standard error' : 'Console output';
+      // Short console results can be read immediately; lengthy logs remain expandable.
+      const text = event.text.trimEnd();
+      const content = compact && text.length <= 512 && text.split('\n').length <= 16
+        ? <pre className="qs-inline-output" aria-label={label}>{text}</pre>
+        : textResult(text, label, compact);
+      items.set(id, { id, atMs, kind: 'custom', content });
     } else if (event.type === 'agent.started') items.set(event.data.agentId, { id: event.data.agentId, atMs, kind: 'tool', call: { id: event.data.agentId, type: 'unknown', label: event.data.agentId, detail: event.data.harness, status: 'running' } });
     else if (event.type === 'agent.finished') { const item = items.get(event.data.result?.agentId); if (item?.kind === 'tool') item.call = { ...item.call, status: event.data.result.status === 'completed' ? 'success' : 'error' }; }
   }
@@ -152,6 +162,7 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
 
 function Workspace({ idea, folder, showReceipt, autoplay, picker }: { idea: Idea; folder: string; showReceipt: boolean; autoplay: boolean | 'selection'; picker?: ReactNode }) {
   const compact = Boolean(picker);
+  const filename = idea.filename ?? idea.id + '.mts';
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null);
@@ -196,7 +207,7 @@ function Workspace({ idea, folder, showReceipt, autoplay, picker }: { idea: Idea
   const state = !idea.run ? 'source' : ended ? 'ended' : replay.playing ? 'running' : replay.started ? 'paused' : 'idle';
   return <div className="qs-main" ref={replay.root} data-example-view={idea.view} data-state={state}>
     <div className="qs-actions">
-      {picker || <span className="qs-file"><i>{folder}/</i>{idea.id}.mts</span>}
+      {picker || <span className="qs-file"><i>{folder}/</i>{filename}</span>}
       <CopyButton text={idea.code} label="Copy file" />
       {idea.run && (
         <Button size="sm" variant="outline" className="qs-run" disabled={!line} onClick={() => { if (ended || !replay.started) { follow.current = true; jump(); } replay.toggle(); }} aria-label={label+' the recorded run'}>{replay.playing ? <Pause aria-hidden="true" fill="currentColor" strokeWidth={0} /> : <Play aria-hidden="true" fill="currentColor" strokeWidth={0} />}<span className="qs-run-label">{label}</span></Button>
@@ -204,10 +215,10 @@ function Workspace({ idea, folder, showReceipt, autoplay, picker }: { idea: Idea
     </div>
     <div className="qs-panes">
       <section className="qs-pane qs-source qs-code" ref={source} data-returns={returnsId} data-active-line={activeLine} tabIndex={0}
-        onWheel={holdSource} onPointerDown={holdSource} onKeyDown={holdSource} aria-label={`${idea.id}.mts source`}>
+        onWheel={holdSource} onPointerDown={holdSource} onKeyDown={holdSource} aria-label={`${filename} source`}>
         <style>{[...rows.keys()].map(n => `[data-returns="${returnsId}"] pre > code > span:nth-child(${n + 1}) { padding-bottom: var(--qs-return-line); }`).join('\n')}</style>
         {activeLine && <i aria-hidden="true" ref={band} className="qs-band" />}
-        <CodeBlock code={idea.code.trimEnd()} language="ts" label="" showLineNumbers className="rounded-none border-0" />
+        <CodeBlock code={idea.code.trimEnd()} language={filename.endsWith('.tsx') ? 'tsx' : 'ts'} label="" showLineNumbers className="rounded-none border-0" />
         <div className="qs-exec">{[...rows].map(([n, row], i) => <span key={n} className="qs-ret" style={{ top: tops.get(n) ?? `calc(var(--font-size-sm) + ${n + 1} * var(--qs-code-line) + ${i} * var(--qs-return-line))`, paddingLeft: `calc(var(--qs-code-gutter) + ${(code[n]?.match(/^ */)?.[0].length ?? 0)}ch)` }}>→ <b>{row.value}</b><i>{row.time}</i></span>)}</div>
       </section>
       <div className="qs-pane qs-machine"><div ref={feed} className="qs-feed" role="region" aria-label="Run" tabIndex={0}>
@@ -257,6 +268,11 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const tasks = useMemo(() => subjects.flatMap((subject) => subject.ideas.map((idea) => ({ key: `${subject.id}/${idea.id}`, subject, idea }))), [subjects]);
+  // Only group a fully annotated subject. Mixed and older catalogs retain every file in the picker.
+  const providers = useMemo(() => {
+    if (!compact || !tasks.length || !tasks.every(({ idea }) => idea.provider)) return [];
+    return [...new Map(tasks.map(({ idea }) => [idea.provider!.name, idea.provider!])).values()];
+  }, [compact, tasks]);
   const fallback = initial ?? tasks[0]?.key ?? '';
   const [picked, setPicked] = useState(fallback);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -301,7 +317,9 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
     event.preventDefault(); choose(next.key);
     requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('.qs-list [aria-pressed="true"]')?.focus());
   };
-  const picker = compact && <div className="qs-picker" onKeyDown={event => {
+  const provider = providers.length ? task.idea.provider : undefined;
+  const files = provider ? tasks.filter(({ idea }) => idea.provider?.name === provider.name) : tasks;
+  const fileMenu = <div className="qs-picker" onKeyDown={event => {
     // Radix has already handled selection or added the space to its typeahead buffer.
     if (event.key === ' ' && !event.altKey && !event.ctrlKey && !event.metaKey &&
         event.target instanceof Element && event.target.closest('[role="menuitemradio"]')) event.preventDefault();
@@ -319,13 +337,23 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
           requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>('.qs-picker button')?.focus({ preventScroll: true }));
         }}>
         <DropdownMenuRadioGroup value={task.key}>
-          {tasks.map(entry => <DropdownMenuRadioItem key={entry.key} value={entry.key} onSelect={() => choose(entry.key)}>
+          {files.map(entry => <DropdownMenuRadioItem key={entry.key} value={entry.key} onSelect={() => choose(entry.key)}>
             {entry.idea.title}
           </DropdownMenuRadioItem>)}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu></div>;
+  const picker = compact && (provider && files.length === 1
+    ? <span className="qs-single-title">{task.idea.title}</span> : fileMenu);
   return <div className={compact ? 'qs-editor qs-workbench dark' : 'qs-editor'} data-theme={compact ? 'website' : undefined} ref={root}>
+    {provider && <SegmentedControl className="qs-providers" variant="tabs" aria-label="Sandbox provider"
+      value={provider.name} onValueChange={name => {
+        const first = tasks.find(({ idea }) => idea.provider?.name === name);
+        if (first) choose(first.key);
+      }}
+      options={providers.map(({ name, logo }) => ({
+        value: name, label: <span className="qs-provider-label"><img src={logo} alt="" width={20} height={20} />{name}</span>,
+      }))} />}
     {!compact && tasks.length > 1 && featured?.length ? <div className="qs-tabs" role="tablist" aria-label="Recorded runs" onKeyDown={event => {
       const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
       if (!direction) return;
