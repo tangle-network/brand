@@ -1,3 +1,9 @@
+## 11.51.49
+
+### Patch Changes
+
+- f9165e3: ExampleWorkbench supports starting a recording once as the reader scrolls it into view. Manual pause takes precedence, and reduced motion opens on a still preview.
+
 ## 11.51.48
 
 ### Patch Changes
