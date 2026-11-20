@@ -70,11 +70,12 @@ export function useReplay(url: string, marks: (events: Ev[]) => Mark[], idle: Id
   const started = useRef(false);
   useEffect(() => {
     if (!autoplay || !line || !startVisible || hidden || started.current) return;
-    started.current = true;
     const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!animate && autoplay === true && startAt === 'beginning') return;
+    started.current = true;
     setR(animate ? 0 : line.total);
     setPlayback(animate ? (autoplay === 'selection' ? 'manual' : 'auto') : null);
-  }, [autoplay, line, startVisible, hidden]);
+  }, [autoplay, line, startVisible, hidden, startAt, still]);
   const position = r ?? (startAt === 'beginning' ? 0 : line?.total ?? 0);
   const inView = playback === 'manual' ? view !== 'offscreen' : visible;
   const playing = playback !== null && inView && !hidden && !!line && position < line.total;
