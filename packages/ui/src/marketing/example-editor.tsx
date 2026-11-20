@@ -150,13 +150,13 @@ function useReturns(pane: React.RefObject<HTMLElement | null>, rows: ReturnType<
   return tops;
 }
 
-function Workspace({ idea, folder, showReceipt, playOnSelect, picker }: { idea: Idea; folder: string; showReceipt: boolean; playOnSelect: boolean; picker?: ReactNode }) {
+function Workspace({ idea, folder, showReceipt, autoplay, picker }: { idea: Idea; folder: string; showReceipt: boolean; autoplay: boolean | 'selection'; picker?: ReactNode }) {
   const compact = Boolean(picker);
   const source = useRef<HTMLElement>(null);
   const band = useRef<HTMLElement>(null), follow = useRef(true);
   const feed = useRef<HTMLDivElement>(null);
   const returnsId = useId();
-  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay: playOnSelect ? 'selection' : false });
+  const replay = useReplay(idea.run?.url ?? '', marks, IDLE, PLAY_MS, idea.run?.events, { startAt: 'beginning', autoplay });
   const { events, line, r } = replay;
   const t = replay.started ? replay.t : -1;
   const ended = replay.started && !!line && r >= line.total;
@@ -239,6 +239,8 @@ export interface ExampleWorkbenchProps {
   onSelect?: (key: string) => void;
   showReceipt?: boolean;
   playOnSelect?: boolean;
+  /** Start once when a quarter of the example is in view, respecting reduced motion. */
+  playOnView?: boolean;
 }
 
 export function ExampleWorkbench(props: ExampleWorkbenchProps) {
@@ -250,7 +252,7 @@ export function ExampleEditor(props: { subjects: Subject[]; initial?: string; fe
   return <Editor {...props} />;
 }
 
-function Editor({ subjects, initial, featured, value, onSelect, compact = false, showReceipt = true, playOnSelect = false }:
+function Editor({ subjects, initial, featured, value, onSelect, compact = false, showReceipt = true, playOnSelect = false, playOnView = false }:
   ExampleWorkbenchProps & { featured?: string[]; compact?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
@@ -350,6 +352,6 @@ function Editor({ subjects, initial, featured, value, onSelect, compact = false,
         </Fragment>;
       })}
     </nav>}
-    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace picker={picker} key={task.key + activation} playOnSelect={playOnSelect || activation > 0} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
+    <div id={panelId} role={featured?.length ? "tabpanel" : undefined} aria-label={task.idea.title}><Workspace picker={picker} key={task.key + activation} autoplay={playOnSelect || activation > 0 ? 'selection' : playOnView} idea={task.idea} folder={task.subject.id} showReceipt={showReceipt} /></div>
   </div>;
 }
