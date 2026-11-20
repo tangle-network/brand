@@ -1,0 +1,26 @@
+{
+  "before": {
+    "state": "idle",
+    "top": 7712,
+    "scroll": 0,
+    "rowCount": 1
+  },
+  "entry": {
+    "state": "idle",
+    "top": 77,
+    "scroll": 7635,
+    "rowCount": 1
+  },
+  "stopped": {
+    "state": "ended",
+    "top": 77,
+    "scroll": 7635,
+    "rowCount": 4
+  },
+  "last": {
+    "state": "ended",
+    "top": 77,
+    "scroll": 7635,
+    "rowCount": 4
+  }
+}
