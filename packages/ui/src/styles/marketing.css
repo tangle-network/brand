@@ -626,6 +626,17 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
   --qs-code-size: var(--font-size-sm); --qs-muted: var(--text-secondary); --qs-dim: var(--text-secondary);
   --syntax-comment: var(--text-secondary); --syntax-foreground: var(--text-primary); --syntax-variable: var(--text-primary);
 }
+.qs-providers { display: flex; align-items: stretch; gap: .2rem; padding: .15rem .55rem 0; background: var(--md3-surface-container); border-bottom: 1px solid var(--qs-line); }
+.qs-providers [role=radio] { min-height: var(--control-height-lg); padding: .45rem .8rem; color: var(--text-secondary); font: 500 var(--font-size-sm)/1.3 var(--font-sans); }
+.qs-providers [aria-checked=true] { color: var(--text-primary); box-shadow: inset 0 -2px var(--brand-cool); }
+.qs-provider-label { display: inline-flex; align-items: center; gap: .45rem; }
+.qs-provider-label img { width: 1.25rem; height: 1.25rem; object-fit: contain; border-radius: var(--radius-sm); background: var(--longform-paper); }
+.qs-single-title { flex: 1; min-width: 0; padding-inline-start: .25rem; font: 500 var(--font-size-sm)/1.35 var(--font-sans); color: var(--text-primary); }
+@container (max-width: 32rem) {
+  .qs-providers { padding-inline: .25rem; gap: 0; }
+  .qs-providers [role=radio] { flex: 1 0 auto; padding-inline: .4rem; }
+  .qs-provider-label { flex-direction: column; gap: .25rem; }
+}
 .qs-workbench .qs-picker { flex: 1; min-width: 0; }
 .qs-picker > button {
   max-width: 100%; min-height: var(--control-height-lg); height: auto; gap: .65rem; padding-inline: .75rem;
@@ -651,7 +662,7 @@ table.mk-billing tr:last-child td { border-bottom: 0; }
 .qs-workbench .qs-band { background: color-mix(in srgb, var(--brand-cool) 52%, var(--md3-surface-container-low)); }
 .qs-workbench .qs-feed { display: flex; flex-direction: column; overflow-anchor: none; overscroll-behavior: contain; }
 .qs-workbench .qs-execution-timeline { flex: none; margin-block-start: auto; padding: .4rem .7rem; }
-.qs-workbench .qs-execution-timeline [data-timeline-step=tool] { margin: 0; }
+.qs-workbench .qs-execution-timeline [data-timeline-step=tool] { margin-inline: 0; }
 .qs-workbench [data-timeline-step=tool] [data-run-row] > button {
   display: flex; align-items: baseline; gap: .4rem; min-height: 2rem; padding: .35rem .15rem;
 }
