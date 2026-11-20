@@ -1,3 +1,9 @@
+## 11.51.50
+
+### Patch Changes
+
+- fb0e0aa: Show provider implementations together in the example editor, preserve timeline spacing and short request timings, and support TSX sources.
+
 ## 11.51.49
 
 ### Patch Changes
