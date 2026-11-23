@@ -70,6 +70,10 @@ export const WidePlot: Story = {
   args: { src: "/fixtures/wide-plot.pdf", filename: "Plot calibration.pdf", size: 8_569 },
 };
 
+export const CitedPlotPage: Story = {
+  args: { ...WidePlot.args, initialPage: 5 },
+};
+
 export const ZeroConfiguration: Story = {
   name: "Zero configuration (main-thread worker)",
   parameters: { pdfAssets: "none" satisfies PdfAssets },
