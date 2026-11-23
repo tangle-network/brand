@@ -66,6 +66,10 @@ export const ScannedLetter: Story = {
   },
 };
 
+export const WidePlot: Story = {
+  args: { src: "/fixtures/wide-plot.pdf", filename: "Plot calibration.pdf", size: 8_569 },
+};
+
 export const ZeroConfiguration: Story = {
   name: "Zero configuration (main-thread worker)",
   parameters: { pdfAssets: "none" satisfies PdfAssets },
