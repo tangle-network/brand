@@ -180,8 +180,8 @@ export { TerminalDisplay, TerminalLine, TerminalInput, TerminalCursor } from "./
 export { DropZone } from "./drop-zone";
 export type { DropZoneProps } from "./drop-zone";
 
-export { UploadProgress } from "./upload-progress";
-export type { UploadProgressProps, UploadFile } from "./upload-progress";
+export { UploadProgress, UploadProgressDialog } from "./upload-progress";
+export type { UploadProgressProps, UploadProgressDialogProps, UploadFile } from "./upload-progress";
 
 export { SidebarDropZone } from "./sidebar-drop-zone";
 export type { SidebarDropZoneProps } from "./sidebar-drop-zone";

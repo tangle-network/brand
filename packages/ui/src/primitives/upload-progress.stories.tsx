@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { Button } from './button'
-import { UploadProgress, type UploadFile } from './upload-progress'
+import { UploadProgress, UploadProgressDialog, type UploadFile } from './upload-progress'
 
 const meta: Meta<typeof UploadProgress> = {
   title: 'Primitives/UploadProgress',
@@ -153,3 +153,25 @@ function RecoveryExample() {
 }
 
 export const Recovery: Story = { render: () => <RecoveryExample /> }
+
+function DialogExample() {
+  const [open, setOpen] = useState(false)
+  const [available, setAvailable] = useState(false)
+  const [files, setFiles] = useState<UploadFile[]>([uploading45, error, complete])
+  const [step, setStep] = useState('Transferring selected files')
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Show upload progress</Button>
+      {available && <p>Available file: config.json</p>}
+      <UploadProgressDialog open={open} onOpenChange={setOpen} title="File uploads" step={step} files={files}
+        onRetry={(id) => {
+          setFiles(current => current.map(file => file.id === id ? {...file, status: 'uploading', error: undefined} : file))
+          setStep('Retrying upload')
+        }}
+        action={{label: 'View available files', onClick: () => { setAvailable(true); setOpen(false) }}}
+      />
+    </>
+  )
+}
+
+export const Dialog: Story = { render: () => <DialogExample /> }
