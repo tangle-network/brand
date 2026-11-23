@@ -21,7 +21,7 @@ export interface TerminalReplayProps {
    * timeline (idle time compressed as in its own transport), rests `loopHoldMs` on its last frame and starts again.
    * There is no transport bar; the caller pauses it by stopping the clock. */
   elapsedMs?: number;
-  /** How long a looping replay rests on its last frame. */
+  /** How long a looping replay rests on the last frame that prints text, before it starts again. */
   loopHoldMs?: number;
   /** Keep terminal text near its native size on narrow screens and allow horizontal scrolling. */
   readable?: boolean;
@@ -86,8 +86,14 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
     read: async (res) => { const cast = parseCast(await res.text()); size.current = cast; return cast.events; },
   });
   const { events, line, r } = replay;
-  const t = positionMs ?? (elapsedMs !== undefined ? (line ? loopedAt(line, elapsedMs, loopHoldMs) : 0) : replay.t);
   const output = useMemo(() => (events ?? []).filter((event) => event.kind === 'o'), [events]);
+  // A loop rests from the last output that prints text: a trailing control code, such as showing the cursor, changes
+  // nothing on screen and would only lengthen the rest.
+  const lastPrintR = useMemo(() => {
+    const last = output.findLast((event) => plain(event.text ?? ''));
+    return (last && line?.marks.findLast((mark) => mark.atMs <= last.atMs)?.r) ?? line?.total ?? 0;
+  }, [output, line]);
+  const t = positionMs ?? (elapsedMs !== undefined ? (line ? loopedAt(line.anchors, lastPrintR, elapsedMs, loopHoldMs) : 0) : replay.t);
   const markers = useMemo(() => castInputs(events ?? [], inputs), [events, inputs]);
   const screen = useRef<HTMLDivElement>(null), host = useRef<HTMLDivElement>(null);
   const [term, setTerm] = useState<Terminal | null>(null);

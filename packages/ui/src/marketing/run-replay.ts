@@ -27,10 +27,10 @@ const recordAt = (anchors: [number, number][], r: number) => {
   const i = anchors.findLastIndex(([x]) => x <= r), [r0, t0] = anchors[i], next = anchors[i + 1];
   return !next || next[0] === r0 ? t0 : t0 + ((r - r0) / (next[0] - r0)) * (next[1] - t0);
 };
-/** The recorded time a looping replay shows `elapsedMs` into its loop: each pass plays the paced timeline, then rests
- * `holdMs` on its last frame. One shared clock can drive many replays this way, each at its own pace. */
-export const loopedAt = (line: { anchors: [number, number][]; total: number }, elapsedMs: number, holdMs: number) =>
-  recordAt(line.anchors, Math.min(Math.max(0, elapsedMs) % (line.total + holdMs || 1), line.total));
+/** The recorded time a looping replay shows `elapsedMs` into its loop: each pass plays the paced timeline up to `endR`,
+ * then rests `holdMs` there. One shared clock can drive many replays this way, each at its own pace. */
+export const loopedAt = (anchors: [number, number][], endR: number, elapsedMs: number, holdMs: number) =>
+  recordAt(anchors, Math.min(Math.max(0, elapsedMs) % (endR + holdMs || 1), endR));
 
 /** The replay's clock. Visibility pauses work; reduced motion opens the finished record. */
 /** `read` turns the fetched file into events (a run record by default); Passive autoplay waits for a quarter of the panel. A user selection starts when any of the panel is visible. */
