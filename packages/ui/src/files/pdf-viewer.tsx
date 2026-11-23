@@ -46,6 +46,8 @@ export interface PdfViewerProps {
    * falls back to the browser's viewer.
    */
   src: string;
+  /** One-based physical page to open in the page reader. Defaults to the first page. */
+  initialPage?: number;
   /** Names the document for assistive technology and the fallback card. */
   filename?: string;
   /** Size in bytes, shown on the fallback card. */
@@ -126,6 +128,7 @@ function fallbackFor(error: unknown): { notice: string; retry: boolean } {
 
 export function PdfViewer({
   src,
+  initialPage,
   filename = "Document",
   size,
   onDownload,
@@ -181,7 +184,7 @@ export function PdfViewer({
       )}
     >
       {state.status === "ready" ? (
-        <PdfDocument doc={state.doc} filename={filename} onDownload={onDownload} />
+        <PdfDocument doc={state.doc} filename={filename} initialPage={initialPage} onDownload={onDownload} />
       ) : state.status === "loading" ? (
         <div
           role="status"
@@ -231,10 +234,12 @@ export function PdfViewer({
 function PdfDocument({
   doc,
   filename,
+  initialPage,
   onDownload,
 }: {
   doc: PDFDocumentProxy;
   filename: string;
+  initialPage?: number;
   onDownload?: () => void;
 }) {
   const pageCount = doc.numPages;
@@ -248,7 +253,7 @@ function PdfDocument({
   const [currentPage, setCurrentPage] = useState(1);
   // The reading position as a page and a fraction of its height, so a zoom
   // or a resize keeps the same text in view. Null until the reader scrolls.
-  const anchor = useRef<{ index: number; fraction: number } | null>(null);
+  const anchor = useRef<{ index: number; fraction: number; selected?: boolean } | null>(null);
   const registerPage = useCallback((pageNumber: number, element: HTMLDivElement | null) => {
     pageElements.current[pageNumber - 1] = element;
   }, []);
@@ -291,6 +296,10 @@ function PdfDocument({
     if (!scroller) return;
     const top = scroller.scrollTop;
     const bottom = top + scroller.clientHeight;
+    // A resize can clamp scrollTop before ResizeObserver runs. While the
+    // chosen sheet is visible, keep it through those layout-driven scrolls.
+    const selected = anchor.current?.selected && pageElements.current[anchor.current.index];
+    if (selected && selected.offsetTop < bottom && selected.offsetTop + selected.offsetHeight > top) return;
     // The page with the most height on screen is the current one, except at
     // either end, where the first or last page cannot scroll to the top.
     let best = 0;
@@ -313,13 +322,45 @@ function PdfDocument({
     setCurrentPage(best + 1);
   }, [scroller, pageCount]);
 
+  const goToPage = useCallback((pageNumber: number) => {
+    const target = clamp(Number.isFinite(pageNumber) ? Math.trunc(pageNumber) : 1, 1, pageCount);
+    const element = pageElements.current[target - 1];
+    if (!scroller || !element) return;
+    scroller.scrollTop = element.offsetTop - COLUMN_PADDING;
+    anchor.current = {
+      index: target - 1,
+      fraction: element.offsetHeight ? (scroller.scrollTop - element.offsetTop) / element.offsetHeight : 0,
+      selected: true,
+    };
+    setCurrentPage(target);
+  }, [scroller, pageCount]);
+
+  const ready = Boolean(firstPage && availableWidth);
+  useLayoutEffect(() => {
+    if (ready && initialPage !== undefined) goToPage(initialPage);
+  }, [ready, initialPage, goToPage]);
+
+  // Individual sheets replace placeholders as they load. Keep an explicit
+  // destination in view if that changes the column or the viewport dimensions.
+  useLayoutEffect(() => {
+    const column = pageElements.current[0]?.parentElement;
+    if (!ready || !scroller || !column || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      if (anchor.current?.selected) goToPage(anchor.current.index + 1);
+    });
+    observer.observe(column);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [ready, scroller, goToPage]);
+
   // Restore the reading position after the page sizes change.
   useLayoutEffect(() => {
     const element = anchor.current && pageElements.current[anchor.current.index];
     if (!scroller || !anchor.current || !element) return;
-    scroller.scrollTop = element.offsetTop + anchor.current.fraction * element.offsetHeight;
+    if (anchor.current.selected) goToPage(anchor.current.index + 1);
+    else scroller.scrollTop = element.offsetTop + anchor.current.fraction * element.offsetHeight;
     scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
-  }, [scroller, zoom]);
+  }, [scroller, zoom, goToPage]);
 
   const frame = useRef(0);
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
@@ -331,17 +372,10 @@ function PdfDocument({
     });
   };
 
-  const goToPage = (pageNumber: number) => {
-    const target = clamp(pageNumber, 1, pageCount);
-    const element = pageElements.current[target - 1];
-    if (scroller && element) {
-      scroller.scrollTop = element.offsetTop - COLUMN_PADDING;
-      anchor.current = {
-        index: target - 1,
-        fraction: element.offsetHeight ? -COLUMN_PADDING / element.offsetHeight : 0,
-      };
-    }
-    setCurrentPage(target);
+  const resumeScrolling = () => {
+    if (!anchor.current?.selected) return;
+    anchor.current.selected = false;
+    onScroll();
   };
 
   const zoomBy = (direction: 1 | -1) => {
@@ -454,6 +488,12 @@ function PdfDocument({
         role="region"
         aria-label={filename}
         onScroll={onScroll}
+        onWheel={(event) => { if (event.deltaY) resumeScrolling(); }}
+        onTouchMove={resumeScrolling}
+        onPointerDown={(event) => { if (event.target === event.currentTarget) resumeScrolling(); }}
+        onKeyDown={(event) => {
+          if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "End", "Home", " "].includes(event.key)) resumeScrolling();
+        }}
         // A stable gutter keeps fit-to-width from oscillating as the
         // scrollbar appears and narrows the column it was fitted to.
         className={cn(
