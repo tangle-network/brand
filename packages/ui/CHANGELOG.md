@@ -1,3 +1,9 @@
+## 11.51.52
+
+### Patch Changes
+
+- 6e7b398: Fit wide PDF sheets inside narrow readers and return to fit when zooming out from the smallest manual zoom step.
+
 ## 11.51.51
 
 ### Patch Changes
