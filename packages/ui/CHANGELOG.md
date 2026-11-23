@@ -1,3 +1,9 @@
+## 11.51.51
+
+### Patch Changes
+
+- 494be96: Add a controlled upload progress dialog with per-file status, measured or indeterminate progress, and optional recovery actions.
+
 ## 11.51.50
 
 ### Patch Changes
