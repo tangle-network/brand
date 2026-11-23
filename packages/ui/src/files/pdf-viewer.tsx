@@ -282,8 +282,9 @@ function PdfDocument({
 
   const fitZoom =
     firstPage && availableWidth > COLUMN_PADDING * 2
-      ? clamp((availableWidth - COLUMN_PADDING * 2) / firstPage.width, MIN_ZOOM, MAX_ZOOM)
+      ? Math.min((availableWidth - COLUMN_PADDING * 2) / firstPage.width, MAX_ZOOM)
       : 1;
+  const minimumZoom = Math.min(fitZoom, MIN_ZOOM);
   const zoom = zoomSetting.mode === "fit" ? fitZoom : zoomSetting.value;
 
   const readPosition = useCallback(() => {
@@ -348,8 +349,8 @@ function PdfDocument({
     const next =
       direction > 0
         ? ZOOM_STEPS.find((step) => step > zoom + 0.001) ?? MAX_ZOOM
-        : [...ZOOM_STEPS].reverse().find((step) => step < zoom - 0.001) ?? MIN_ZOOM;
-    setZoomSetting({ mode: "manual", value: next });
+        : [...ZOOM_STEPS].reverse().find((step) => step < zoom - 0.001) ?? minimumZoom;
+    setZoomSetting(next < MIN_ZOOM ? { mode: "fit" } : { mode: "manual", value: next });
   };
 
   const percent = Math.round(zoom * 100);
@@ -394,7 +395,7 @@ function PdfDocument({
             size="icon"
             aria-label="Zoom out"
             title="Zoom out"
-            disabled={zoom <= MIN_ZOOM + 0.001}
+            disabled={zoom <= minimumZoom + 0.001}
             onClick={() => zoomBy(-1)}
           >
             <ZoomOut />
