@@ -1,3 +1,9 @@
+## 11.51.56
+
+### Patch Changes
+
+- 17907f1: Render inline and display TeX in Markdown using native MathML. Existing Markdown consumers need no extra stylesheet or fonts.
+
 ## 11.51.55
 
 ### Patch Changes
