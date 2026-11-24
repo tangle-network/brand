@@ -1,3 +1,4 @@
+import type {} from "remark-parse";
 import type { Root } from "mdast";
 import { mathFromMarkdown } from "mdast-util-math";
 import { math } from "micromark-extension-math-extended";

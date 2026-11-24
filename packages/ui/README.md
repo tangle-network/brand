@@ -201,6 +201,8 @@ Create a `createThemeController({ storageKey, defaultTheme, storageValues, attri
 
 ### Streaming Markdown
 
+The renderer typesets inline TeX such as `$x^2$` or `\(x^2\)` and display equations between `$$` or `\[` and `\]` on their own lines. It outputs native MathML using browser fonts. Code spans and ordinary prices stay literal.
+
 Set `streaming` while the answer is arriving. Unfinished formatting stays out of the text, and a partial link stays plain text until its destination closes. Clear the flag when the reply finishes so the final message uses ordinary Markdown, including any literal markers.
 
 ```tsx
