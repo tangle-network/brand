@@ -78,3 +78,30 @@ it("keeps pending inline markers out of a streamed answer and preserves settled 
     expected.unmount();
   }
 });
+
+it("typesets research notation while preserving prices, code and link policy", () => {
+  const source = [
+    String.raw`The roots of $x^2=4$ are \(\pm 2\). $5–$10 and $20 to $35 are prices. A literal \$5 follows.`,
+    String.raw`$$\frac{1}{2}$$`,
+    String.raw`\[` + "\n" + String.raw`\sum_{n=1}^{3} n = 6` + "\n" + String.raw`\]`,
+    ["```tex", String.raw`$x$ and \(y\)`, "```"].join("\n"),
+    "Inline `$z$`. [Paper](https://example.org/paper) [unsafe](javascript:alert).",
+    String.raw`$\href{javascript:alert(1)}{unsafe}$`,
+  ].join("\n\n");
+  const chat = render(<Markdown>{source}</Markdown>);
+  for (const streaming of [false, true]) {
+    chat.rerender(<Markdown streaming={streaming}>{source}</Markdown>);
+    const math = [...chat.container.querySelectorAll("math")];
+    expect(math.slice(0, 4).map((el) => el.querySelector("annotation")?.textContent)).toEqual([
+      "x^2=4", String.raw`\pm 2`, String.raw`\frac{1}{2}`, String.raw`\sum_{n=1}^{3} n = 6`,
+    ]);
+    expect(math.filter((el) => el.getAttribute("display") === "block")).toHaveLength(2);
+    expect(chat.container.querySelector("msup")).toBeTruthy();
+    expect(chat.container.querySelector("mfrac")).toBeTruthy();
+    expect(chat.container.textContent).toContain("$5–$10 and $20 to $35 are prices. A literal $5 follows.");
+    expect(chat.container.querySelector("pre code")?.textContent).toContain(String.raw`$x$ and \(y\)`);
+    expect(chat.container.querySelector("p code")?.textContent).toBe("$z$");
+    expect(chat.getByRole("link", { name: "Paper" }).getAttribute("href")).toBe("https://example.org/paper");
+    expect(chat.container.querySelector('[href^="javascript:"]')).toBeNull();
+  }
+});

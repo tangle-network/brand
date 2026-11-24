@@ -9,6 +9,8 @@ import {
 } from "react";
 import ReactMarkdown, { defaultUrlTransform, type ExtraProps, type UrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import { remarkMath } from "./math";
 import remend from "remend";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
@@ -172,6 +174,7 @@ const sanitizeSchema = {
   attributes: {
     ...defaultSchema.attributes,
     code: [...(defaultSchema.attributes?.code ?? []), "dataMeta"],
+    span: [...(defaultSchema.attributes?.span ?? []), ["className", "math-display"]],
   },
 };
 
@@ -284,7 +287,7 @@ function streamingSource(source: string) {
  * optional chips for links to known objects.
  */
 export const Markdown = memo(({ children, className, urlTransform, linkChip, headingPermalinks, streaming }: MarkdownProps) => {
-  const proseClass = cn("tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
+  const proseClass = cn("tangle-prose max-w-none text-sm [&_.katex-display]:block [&_.katex-display]:overflow-x-auto [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
   if (literalParagraph.test(children) && !/www\./i.test(children)) {
     return <div className={proseClass}><p>{children.trimEnd()}</p></div>;
   }
@@ -292,8 +295,10 @@ export const Markdown = memo(({ children, className, urlTransform, linkChip, hea
     <div className={proseClass}>
       <LinkChipContext.Provider value={linkChip}>
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkCodeMeta]}
-          rehypePlugins={[headingPermalinks ? rehypePermalinkIds : rehypeSlug, [rehypeSanitize, sanitizeSchema]]}
+          remarkPlugins={[remarkGfm, remarkCodeMeta, remarkMath]}
+          rehypePlugins={[headingPermalinks ? rehypePermalinkIds : rehypeSlug, [rehypeSanitize, sanitizeSchema],
+            [rehypeKatex, { output: "mathml", trust: false, maxSize: 20 }],
+          ]}
           urlTransform={(url, key, node) => transformMarkdownUrl(url, key, node, urlTransform, headingPermalinks)}
           components={{
             ...(headingPermalinks && permalinkHeadings),
