@@ -238,6 +238,7 @@
     "@tiptap/extension-collaboration-caret": ">=3.7.0 <4.0.0",
     "@tiptap/react": ">=3.20.4 <4.0.0",
     "@tiptap/starter-kit": ">=3.20.4 <4.0.0",
+    "@xterm/addon-serialize": ">=0.13.0 <1.0.0",
     "@xterm/xterm": ">=5.5.0 <7.0.0",
     "nanostores": ">=0.11.3 <2.0.0",
     "pdfjs-dist": ">=6.0.0 <7.0.0",
@@ -280,6 +281,9 @@
     "pdfjs-dist": {
       "optional": true
     },
+    "@xterm/addon-serialize": {
+      "optional": true
+    },
     "@xterm/xterm": {
       "optional": true
     }
@@ -297,6 +301,7 @@
     "@types/hast": "^3.0.5",
     "@types/react": "^19.3.0",
     "@types/turndown": "^5.0.6",
+    "@xterm/addon-serialize": "^0.14.0",
     "@xterm/xterm": "^6.0.0",
     "ajv": "8.20.0",
     "nanostores": "^1.5.5",
