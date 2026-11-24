@@ -287,7 +287,10 @@ function streamingSource(source: string) {
  * optional chips for links to known objects.
  */
 export const Markdown = memo(({ children, className, urlTransform, linkChip, headingPermalinks, streaming }: MarkdownProps) => {
-  const proseClass = cn("tangle-prose max-w-none text-sm [&_.katex-display]:block [&_.katex-display]:overflow-x-auto [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none", className);
+  const proseClass = cn(
+    "tangle-prose max-w-none text-sm [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none",
+    "[&_.katex-display]:block [&_.katex-display]:overflow-x-auto", className,
+  );
   if (literalParagraph.test(children) && !/www\./i.test(children)) {
     return <div className={proseClass}><p>{children.trimEnd()}</p></div>;
   }

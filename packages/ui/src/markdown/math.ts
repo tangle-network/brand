@@ -15,7 +15,9 @@ const singleDollar: Construct = {
     let escaped = false;
     const start: State = (code) => {
       effects.enter("mathText");
+      effects.enter("mathTextSequence");
       effects.consume(code);
+      effects.exit("mathTextSequence");
       return first;
     };
     const first: State = (code) => {
@@ -28,7 +30,9 @@ const singleDollar: Construct = {
       if (code === 36 && !escaped) {
         if (previousWasSpace) return nok(code);
         effects.exit("mathTextData");
+        effects.enter("mathTextSequence");
         effects.consume(code);
+        effects.exit("mathTextSequence");
         effects.exit("mathText");
         return end;
       }
