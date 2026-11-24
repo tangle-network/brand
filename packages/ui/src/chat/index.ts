@@ -4,6 +4,11 @@ export { UserMessage, type UserMessageProps } from "./user-message";
 export { ChatMessage, type ChatMessageProps, type MessageRole } from "./chat-message";
 export { MessageAuthor, isViewerMessage, type MessageAuthorProps } from "./message-author";
 export {
+  mapPlainChatMessages,
+  type PlainChatMessage,
+  type PlainChatTranscript,
+} from "./plain-messages";
+export {
   SpeakerHeader,
   partitionBySpeaker,
   type Speaker,

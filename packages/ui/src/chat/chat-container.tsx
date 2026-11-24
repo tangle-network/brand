@@ -36,7 +36,11 @@ import {
  */
 export interface ChatContainerProps {
   messages: SessionMessage[];
-  partMap: Record<string, SessionPart[]>;
+  /**
+   * Parts keyed by message id. Optional for plain-text transcripts that only
+   * need the message list until parts arrive (defaults to an empty map).
+   */
+  partMap?: Record<string, SessionPart[]>;
   isStreaming: boolean;
   branding?: AgentBranding;
   className?: string;
@@ -394,7 +398,7 @@ function buildTimelineItems(
 export const ChatContainer = memo(
   ({
     messages,
-    partMap,
+    partMap: partMapProp,
     isStreaming,
     branding,
     className,
@@ -409,6 +413,7 @@ export const ChatContainer = memo(
     collapseTimelineAfter,
   }: ChatContainerProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const partMap = partMapProp ?? {};
 
     // Group messages into runs
     const groups = useRunGroups({ messages, partMap, isStreaming });
