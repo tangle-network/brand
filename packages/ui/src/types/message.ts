@@ -3,6 +3,8 @@ export interface SessionMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   sessionID?: string;
+  /** Model id for the turn when the product surfaces one per message. */
+  model?: string;
   time?: {
     created?: number;
     updated?: number;
