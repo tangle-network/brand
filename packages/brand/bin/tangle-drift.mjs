@@ -183,8 +183,7 @@ const LINE_METRICS = Object.keys(PATTERNS);
 export const GATED = [LINE_METRICS[0], "hex", ...LINE_METRICS.slice(1), ...Object.keys(RULE_PATTERNS).filter((m) => m !== "hex"),
   ...Object.keys(PAGE_PATTERNS)];
 
-function extensions(surface, metric) {
-  const extra = SURFACES[surface]?.extraExt ?? [];
+function extensions(metric, extra = []) {
   switch (metric) {
     case "raw_palette": return ["*.tsx", "*.jsx", "*.astro", "*.ts", ...extra];
     case "hex": return ["*.tsx", "*.jsx", "*.astro", "*.css", ...extra];
@@ -395,8 +394,8 @@ function pkgVersions(source, roots) {
 }
 
 /** Measure one surface from `source`. `matches` holds the raw gated matches for reporting. */
-export function measure(surface, source) {
-  const { roots, extraExt, exclude = [] } = SURFACES[surface];
+export function measure(surface, source, config = SURFACES[surface]) {
+  const { roots, extraExt, exclude = [] } = config;
   source = { ...source, exclude };
   const files = listFiles(source, roots);
   const srcRe = extraExt ? /\.(tsx|jsx|astro|vue|svelte|js|html)$/ : /\.(tsx|jsx|astro|vue|svelte)$/;
@@ -404,16 +403,16 @@ export function measure(surface, source) {
   const cssFiles = files.filter((f) => f.endsWith(".css") && !f.includes("node_modules") && !f.includes("dist/")).length;
 
   const matches = {};
-  const row = { repo: SURFACES[surface].repo, roots, exclude, branch: source.branch ?? null, head: source.head ?? null,
+  const row = { repo: config.repo, roots, exclude, branch: source.branch ?? null, head: source.head ?? null,
     tsx_files: tsxFiles, css_files: cssFiles, versions: pkgVersions(source, roots), importing_files: {} };
   for (const pkg of SHARED) {
     const escaped = pkg.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
-    const hits = grepMatches(source, roots, String.raw`from ['"]${escaped}[/'"]`, extensions(surface, "imports"));
+    const hits = grepMatches(source, roots, String.raw`from ['"]${escaped}[/'"]`, extensions("imports", extraExt));
     row.importing_files[pkg.split("/")[1]] = new Set(hits.map((h) => h.path)).size;
   }
   row.by_file = {};
   for (const metric of GATED) {
-    const exts = extensions(surface, metric);
+    const exts = extensions(metric, extraExt);
     const hits = RULE_PATTERNS[metric] ? ruleMatches(source, roots, metric, exts)
       : PAGE_PATTERNS[metric] ? pageMatches(source, roots, metric, exts)
         : grepMatches(source, roots, PATTERNS[metric], exts);
@@ -545,7 +544,7 @@ export function localSource(repoDir, rev = "HEAD") {
 function parseArgs(argv) {
   if (argv.includes("-h") || argv.includes("--help")) usage();
   const opts = { command: argv[0], surfaces: [], all: false, remote: false, repoDir: null, rev: "HEAD",
-    worktree: false, baseline: DEFAULT_BASELINE, update: false, allowRise: false, json: false, top: 20 };
+    worktree: false, against: null, roots: [], baseline: DEFAULT_BASELINE, update: false, allowRise: false, json: false, top: 20 };
   for (let i = 1; i < argv.length; i++) {
     const flag = argv[i];
     const take = () => {
@@ -558,6 +557,8 @@ function parseArgs(argv) {
       case "--all": opts.all = true; break;
       case "--remote": opts.remote = true; break;
       case "--repo-dir": opts.repoDir = take(); break;
+      case "--root": opts.roots.push(take()); break;
+      case "--against": opts.against = take(); break;
       case "--rev": opts.rev = take(); break;
       case "--worktree": opts.worktree = true; break;
       case "--baseline": opts.baseline = take(); break;
@@ -569,9 +570,25 @@ function parseArgs(argv) {
     }
   }
   if (!["check", "scan"].includes(opts.command)) usage(opts.command ? `unknown command: ${opts.command}` : "name a command: check or scan");
-  if (opts.all || (!opts.surfaces.length && opts.remote)) opts.surfaces = Object.keys(SURFACES);
-  for (const s of opts.surfaces) if (!SURFACES[s]) usage(`unknown surface: ${s} (known: ${Object.keys(SURFACES).join(", ")})`);
-  if (!opts.surfaces.length) usage("name a --surface, or pass --all");
+  if (opts.against !== null || opts.roots.length) {
+    if (opts.command !== "check" || !opts.repoDir || opts.all || opts.remote || opts.surfaces.length ||
+        opts.update || opts.allowRise || opts.baseline !== DEFAULT_BASELINE) {
+      usage("use --against and --root with a standalone local check --repo-dir");
+    }
+    if (!/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(opts.against ?? "")) usage("--against requires a full commit SHA");
+    if (!opts.roots.length) usage("--against requires at least one --root <source directory>");
+    for (const root of opts.roots) {
+      if (root !== "." && !root.split("/").every(part => part && part !== "." && part !== ".." && !/[:*?\[\]\\\x00-\x1f]/.test(part))) {
+        usage("--root must be a literal repository-relative directory (use . for the repository)");
+      }
+    }
+    opts.roots = [...new Set(opts.roots.map(root => root === "." ? "" : root))];
+    opts.surfaces = ["checkout"];
+  } else {
+    if (opts.all || (!opts.surfaces.length && opts.remote)) opts.surfaces = Object.keys(SURFACES);
+    for (const s of opts.surfaces) if (!SURFACES[s]) usage(`unknown surface: ${s} (known: ${Object.keys(SURFACES).join(", ")})`);
+    if (!opts.surfaces.length) usage("name a --surface, or pass --all");
+  }
   if (!!opts.repoDir === opts.remote) usage("pass exactly one of --repo-dir <path> or --remote");
   if (opts.repoDir && opts.surfaces.length > 1 && new Set(opts.surfaces.map((s) => SURFACES[s].repo)).size > 1) {
     usage("--repo-dir reads one repository; name surfaces from that repository only");
@@ -592,6 +609,7 @@ export class UsageError extends Error {}
 function usage(error) {
   const text = `Usage:
   tangle-drift check --surface <name> --repo-dir <path> [--rev <tree-ish> | --worktree]
+  tangle-drift check --repo-dir <path> --root <src>... --against <full-commit-sha> [--rev <revision> | --worktree]
   tangle-drift check --all --remote [--update-baseline [--allow-rise]]
   tangle-drift scan  (--surface <name>... | --all) (--repo-dir <path> | --remote) [--json]
 
@@ -619,12 +637,28 @@ function describe(surface, row) {
 
 export function main(argv = process.argv.slice(2), log = (s) => process.stdout.write(`${s}\n`)) {
   const opts = parseArgs(argv);
-  const baseline = readBaseline(opts.baseline);
+  const baseline = opts.against ? {} : readBaseline(opts.baseline);
   const rows = {};
   const measured = {};
   for (const surface of opts.surfaces) {
     const source = sourceFor(surface, opts);
-    measured[surface] = { ...measure(surface, source), source };
+    let config = SURFACES[surface];
+    if (opts.against) {
+      const before = localSource(opts.repoDir, opts.against);
+      if (git(source.dir, ["merge-base", opts.against, source.rev ?? "HEAD"]).trim() !== opts.against) {
+        throw new Error("--against must be an ancestor commit of the revision being checked");
+      }
+      for (const tree of [before, source]) {
+        for (const root of opts.roots) {
+          if (!listFiles(tree, [root]).some(path => /\.(?:tsx?|jsx|css|astro|vue|svelte)$/.test(path) && (tree.rev || existsSync(join(tree.dir, path))))) {
+            throw new Error(`No UI source under ${root || "."} in ${tree.rev ?? "the worktree"}`);
+          }
+        }
+      }
+      config = { repo: null, roots: opts.roots };
+      baseline[surface] = measure(surface, before, config).row;
+    }
+    measured[surface] = { ...measure(surface, source, config), source };
     rows[surface] = measured[surface].row;
   }
   if (opts.command === "scan") {
@@ -664,8 +698,11 @@ export function main(argv = process.argv.slice(2), log = (s) => process.stdout.w
     if (rises.length) failed = true;
     else if (falls.length) {
       log(`  ok, lower than baseline: ${falls.map((f) => `${f.metric} ${f.base} -> ${f.now}`).join(", ")}`);
-      log("  once this reaches the default branch, lower the baseline in tangle-network/brand:");
-      log(`    node packages/brand/bin/tangle-drift.mjs check --surface ${surface} --remote --update-baseline`);
+      if (opts.against) log("  after merging, pin --against to the improved default-branch commit");
+      else {
+        log("  once this reaches the default branch, lower the baseline in tangle-network/brand:");
+        log(`    node packages/brand/bin/tangle-drift.mjs check --surface ${surface} --remote --update-baseline`);
+      }
     } else log("  ok, equal to baseline");
   }
 
