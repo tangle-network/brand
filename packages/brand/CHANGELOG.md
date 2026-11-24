@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.31.14
+
+### Patch Changes
+
+- 79dfbb0: Check design drift in a local product against a pinned Git commit with the same UI roots and rules on both revisions.
+
 ## 1.31.13
 
 ### Patch Changes
