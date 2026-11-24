@@ -64,7 +64,7 @@ const deferredPeersBySource = {
     "yjs",
   ],
   "src/files/pdf-loader.ts": ["pdfjs-dist"],
-  "src/marketing/terminal-replay.tsx": ["@xterm/xterm"],
+  "src/marketing/terminal-replay.tsx": ["@xterm/xterm", "@xterm/addon-serialize"],
 };
 const deferredOptionalPeers = Object.values(deferredPeersBySource).flat();
 

@@ -1,12 +1,14 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import type { Terminal } from '@xterm/xterm';
+import type { SerializeAddon } from '@xterm/addon-serialize';
 import { Button } from '../primitives/button';
 import { Slider } from '../primitives/slider';
 import { clock, loopedAt, useReplay, type Ev, type Mark } from './run-replay';
 
 // Replays an asciinema v2 recording of a real terminal in xterm.js, loaded only when a replay mounts.
-// @xterm/xterm is an optional peer: install it where this component renders.
+// @xterm/xterm is an optional peer: install it where this component renders. With @xterm/addon-serialize also installed, a
+// readable replay narrower than its recording wraps long lines instead of cutting them.
 export interface TerminalReplayProps {
   /** URL of an asciinema v2 `.cast` file. */
   src: string;
@@ -23,7 +25,8 @@ export interface TerminalReplayProps {
   elapsedMs?: number;
   /** How long a looping replay rests on the last frame that prints text, before it starts again. */
   loopHoldMs?: number;
-  /** Keep terminal text near its native size on narrow screens and allow horizontal scrolling. */
+  /** Keep terminal text near its native size on narrow screens. The recording still plays at its own columns, and its screen
+   * is shown wrapped to the box's columns (or scrolls sideways when @xterm/addon-serialize is not installed). */
   readable?: boolean;
   /** In a cropped preview, bring the recorded row containing this text into view. */
   revealText?: string;
@@ -72,8 +75,23 @@ function castInputs(events: Ev[], inputs: string[] = []): CastInput[] {
 }
 
 // Optional peers this module reaches only through import(); scripts/validate-dist.mjs keeps the same list.
-const DEFERRED_PEERS = ['@xterm/xterm'];
+const DEFERRED_PEERS = ['@xterm/xterm', '@xterm/addon-serialize'];
 const loadXterm = () => import('@xterm/xterm').catch((error: unknown) => { console.error(`TerminalReplay needs ${DEFERRED_PEERS.join(', ')} installed`, error); throw error; });
+const loadSerialize = () => import('@xterm/addon-serialize').catch(() => null); // without it, a narrow readable replay scrolls sideways
+
+/** The row of a wrapped view that shows the model's cursor: each of the model's lines starts a line in the view. */
+function cursorRow(view: Terminal, model: Terminal) {
+  const m = model.buffer.active, v = view.buffer.active;
+  let line = -1, start = m.cursorY;
+  for (let y = 0; y <= m.cursorY; y++) if (!m.getLine(m.viewportY + y)?.isWrapped) line++;
+  while (start > 0 && m.getLine(m.viewportY + start)?.isWrapped) start--;
+  const offset = (m.cursorY - start) * model.cols + m.cursorX;
+  for (let row = 0, seen = -1; row < view.rows; row++) {
+    if (!v.getLine(v.viewportY + row)?.isWrapped) seen++;
+    if (seen === line) return row + Math.floor(offset / view.cols);
+  }
+  return v.cursorY;
+}
 
 const IDLE: [number, number] = [2000, 600]; // a still screen over 2 s plays in 0.6 s while the clock sweeps its real length
 const marks = (events: Ev[]): Mark[] => events.map((event) => ({ atMs: event.atMs }));
@@ -97,6 +115,13 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   const markers = useMemo(() => castInputs(events ?? [], inputs), [events, inputs]);
   const screen = useRef<HTMLDivElement>(null), host = useRef<HTMLDivElement>(null);
   const [term, setTerm] = useState<Terminal | null>(null);
+  // A readable replay plays into `model`, a terminal at the recording's own size that never renders. After each write its
+  // screen is serialized into `term`, which has the box's columns, so a TUI laid out for wide columns keeps its layout and
+  // the view wraps its long lines. Resizing the terminal itself would garble a TUI's cursor moves.
+  const mirror = useRef<{ model: Terminal; serialize: SerializeAddon } | null>(null);
+  // Copies the model's screen into the view in one write: a full reset, then the serialized screen, parsed together so no
+  // frame shows an empty terminal. Set by the write effect, which knows what to bring into view afterwards.
+  const show = useRef<() => void>(() => {});
   const [broken, setBroken] = useState(false);
   const [fit, setFit] = useState({ scale: 1, height: 0 });
   const written = useRef(0);
@@ -104,8 +129,8 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   useEffect(() => {
     const cast = size.current, el = host.current;
     if (!events || !cast || !el) return;
-    let live = true, made: Terminal | undefined;
-    Promise.all([loadXterm(), document.fonts?.ready]).then(([{ Terminal }]) => {
+    let live = true, made: Terminal | undefined, model: Terminal | undefined;
+    Promise.all([loadXterm(), readable ? loadSerialize() : null, document.fonts?.ready]).then(([{ Terminal }, addon]) => {
       if (!live) return;
       const style = getComputedStyle(el);
       made = new Terminal({
@@ -114,17 +139,33 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
         theme: { background: 'rgba(0, 0, 0, 0)', foreground: style.color, cursor: style.color },
       });
       made.open(el);
+      if (addon) {
+        model = new Terminal({ cols: cast.width, rows: cast.height, scrollback: 0, allowProposedApi: true });
+        const serialize = new addon.SerializeAddon();
+        model.loadAddon(serialize);
+        mirror.current = { model, serialize };
+      }
       written.current = 0;
       setTerm(made);
     }).catch(() => { if (live) setBroken(true); });
-    return () => { live = false; made?.dispose(); setTerm(null); };
-  }, [events]);
+    return () => { live = false; mirror.current = null; model?.dispose(); made?.dispose(); setTerm(null); };
+  }, [events, readable]);
 
-  // The recording keeps its own columns; a narrow screen shows it smaller instead of reflowing it.
+  // The recording keeps its own columns. A narrow screen shows it smaller, and a readable replay that cannot shrink far
+  // enough shows the recorded screen wrapped to the columns that fit at 90 percent.
   useLayoutEffect(() => {
-    const box = screen.current, drawn = host.current?.querySelector<HTMLElement>('.xterm-screen');
-    if (!term || !box || !drawn) return;
+    const box = screen.current, drawn = host.current?.querySelector<HTMLElement>('.xterm-screen'), cast = size.current;
+    if (!term || !box || !drawn || !cast) return;
     const measure = () => {
+      if (mirror.current && drawn.offsetWidth && box.clientWidth) {
+        const cell = drawn.offsetWidth / term.cols;
+        const cols = Math.min(cast.width, Math.max(20, Math.floor(box.clientWidth / (cell * 0.9))));
+        if (cols !== term.cols) {
+          term.resize(cols, cols < cast.width ? cast.height * Math.ceil(cast.width / cols) : cast.height);
+          show.current();
+          return; // the resize changes the drawn width, and the observer measures again
+        }
+      }
       const fitWidth = drawn.offsetWidth ? Math.min(1, box.clientWidth / drawn.offsetWidth) : 1;
       const scale = Math.max(readable ? 0.9 : 0, fitWidth);
       setFit({ scale, height: drawn.offsetHeight * scale });
@@ -137,16 +178,18 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   // Playing writes the frames due since the last tick; seeking back redraws from the first frame to the target time.
   useEffect(() => {
     if (!term) return;
+    const target = mirror.current?.model ?? term;
     let due = written.current;
     while (due < output.length && output[due].atMs <= t) due++;
     while (due > 0 && output[due - 1].atMs > t) due--;
-    if (due < written.current) { term.reset(); written.current = 0; }
+    const restart = due < written.current;
+    if (restart) { target.reset(); written.current = 0; }
     const box = screen.current;
     let live = true;
     const reveal = () => {
       if (!live || !box || !readable || !controlled || box.scrollHeight <= box.clientHeight) return;
       const buffer = term.buffer.active;
-      let row = buffer.cursorY;
+      let row = mirror.current ? cursorRow(term, mirror.current.model) : buffer.cursorY;
       if (revealText) {
         for (let index = 0; index < term.rows; index++) {
           if (buffer.getLine(buffer.viewportY + index)?.translateToString(true).includes(revealText)) { row = index; break; }
@@ -154,7 +197,9 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
       }
       box.scrollTop = (row + 1) * box.scrollHeight / term.rows - box.clientHeight * .7;
     };
-    if (due > written.current) term.write(output.slice(written.current, due).map((event) => event.text).join(''), reveal);
+    show.current = () => { if (mirror.current) term.write(`\x1bc${mirror.current.serialize.serialize({ scrollback: 0 })}`, reveal); };
+    if (due > written.current) target.write(output.slice(written.current, due).map((event) => event.text).join(''), mirror.current ? () => { if (live) show.current(); } : reveal);
+    else if (restart) show.current();
     written.current = due;
     return () => { live = false; };
   }, [term, output, t, readable, revealText, controlled]);
