@@ -7,6 +7,16 @@ Both ship in `@tangle-network/brand`, so the baseline a consumer checks against 
 It ports the company scanner `wiki/evidence/ui-unification-2026-10-05/drift.py` with the same patterns and pathspecs.
 Counts are regex matches on source read from a git tree with `git grep`, not rendered output.
 
+## Gate a local product
+
+Pin the full SHA of a reviewed default-branch commit in the product's release script and name its UI source directories. Every check measures that commit and the candidate with the installed scanner. The checkout needs both commits and their ancestry.
+
+```sh
+pnpm exec tangle-drift check --repo-dir . --root src --against "$BASELINE_COMMIT"
+```
+
+Repeat `--root` for additional directories. Use `--worktree` while editing, or `--rev` for a committed candidate. Keep the roots and baseline under review in the product repository. When improvements reach the default branch, pin that commit to keep their lower counts.
+
 ## What is gated
 
 | Metric | Pattern | Files |

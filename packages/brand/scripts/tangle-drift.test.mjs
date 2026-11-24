@@ -373,6 +373,32 @@ test("contradictory or unsafe arguments are refused", () => {
   assert.ok(DEFAULT_BASELINE.endsWith("drift-baseline.json"));
 });
 
+test("a local product ratchets the same source roots against its pinned ancestor", () => {
+  const product = join(tmp, "checkout-only");
+  mkdirSync(product);
+  git(product, "init", "-q");
+  write(product, { "ui/App.tsx": "export const Page = () => <main/>;\n", "other/Skip.tsx": "export const Skip = () => <button/>;\n" });
+  commit(product, "base");
+  const base = git(product, "rev-parse", "HEAD").trim();
+  const check = ["check", "--repo-dir", product, "--root", "ui", "--against", base];
+  const output = [];
+  const log = line => output.push(line);
+  assert.equal(main(check, log), 0);
+  write(product, { "ui/Form.tsx": "export const Form = () => <input/>;\n" });
+  assert.equal(main([...check, "--worktree"], log), 1);
+  assert.ok(output.some(line => line.includes("FAIL native_control: 1 > baseline 0")));
+  commit(product, "regression");
+  assert.equal(main(check, log), 1);
+  assert.equal(main([...check, "--rev", base], log), 0);
+  assert.throws(() => main(["check", "--repo-dir", product, "--root", "ui", "--against", "HEAD"], log), /full commit SHA/);
+  assert.throws(() => main(["check", "--repo-dir", product, "--against", base], log), /at least one --root/);
+  assert.throws(() => main([...check, "--root", "missing"], log), /No UI source/);
+  assert.throws(() => main([...check, "--root", "../outside"], log), /repository-relative directory/);
+  assert.throws(() => main([...check, "--baseline", join(tmp, "other.json")], log), /standalone local/);
+  const later = git(product, "rev-parse", "HEAD").trim();
+  assert.throws(() => main(["check", "--repo-dir", product, "--root", "ui", "--against", later, "--rev", base], log), /ancestor/);
+});
+
 test("the shipped baseline has a row with every gated count for each surface", () => {
   const baseline = readBaseline(DEFAULT_BASELINE);
   assert.deepEqual(Object.keys(baseline), ["website", "sandbox", "platform", "intelligence", "gtm", "tax", "legal", "insurance", "creative", "physim", "hospitality", "audits", "browser", "builder", "blueprint", "super", "disco"]);
