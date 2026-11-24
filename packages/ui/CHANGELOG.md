@@ -1,3 +1,9 @@
+## 11.51.57
+
+### Patch Changes
+
+- d5abd73: Export `mapPlainChatMessages` so a product that stores plain `{ role, content, model }` turns can render them through the shared chat container. `ChatContainer`'s `partMap` is optional (defaults to an empty map) for transcripts that do not carry agent parts yet. Session messages may carry an optional `model` id.
+
 ## 11.51.56
 
 ### Patch Changes
