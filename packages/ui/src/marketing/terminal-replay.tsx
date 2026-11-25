@@ -152,13 +152,19 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
   }, [events, readable]);
 
   // The recording keeps its own columns. A narrow screen shows it smaller, and a readable replay that cannot shrink far
-  // enough shows the recorded screen wrapped to the columns that fit at 90 percent.
+  // enough shows the recorded screen wrapped to the columns that fit at 90 percent. A row can draw wider than its columns:
+  // box-drawing and block glyphs the mono font lacks come from a fallback font with a wider advance. `stretch` is the widest
+  // that overshoot seen, as a ratio of the drawn width, so columns and scale leave room for the widest row ever drawn.
+  const stretch = useRef(1);
   useLayoutEffect(() => {
+    stretch.current = 1;
     const box = screen.current, drawn = host.current?.querySelector<HTMLElement>('.xterm-screen'), cast = size.current;
     if (!term || !box || !drawn || !cast) return;
+    const rows = drawn.querySelector<HTMLElement>('.xterm-rows');
     const measure = () => {
+      const wide = drawn.offsetWidth * stretch.current;
       if (mirror.current && drawn.offsetWidth && box.clientWidth) {
-        const cell = drawn.offsetWidth / term.cols;
+        const cell = wide / term.cols;
         const cols = Math.min(cast.width, Math.max(20, Math.floor(box.clientWidth / (cell * 0.9))));
         if (cols !== term.cols) {
           term.resize(cols, cols < cast.width ? cast.height * Math.ceil(cast.width / cols) : cast.height);
@@ -166,13 +172,20 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
           return; // the resize changes the drawn width, and the observer measures again
         }
       }
-      const fitWidth = drawn.offsetWidth ? Math.min(1, box.clientWidth / drawn.offsetWidth) : 1;
+      const fitWidth = wide ? Math.min(1, box.clientWidth / wide) : 1;
       const scale = Math.max(readable ? 0.9 : 0, fitWidth);
       setFit({ scale, height: drawn.offsetHeight * scale });
     };
+    // After each render, a row that drew wider than the terminal widens `stretch` and the fit is measured again.
+    const learn = () => {
+      if (!rows || !drawn.offsetWidth) return;
+      const ratio = rows.scrollWidth / drawn.offsetWidth;
+      if (ratio > stretch.current + 0.002) { stretch.current = ratio; measure(); }
+    };
     measure();
+    const rendered = term.onRender(learn);
     const observer = new ResizeObserver(measure); observer.observe(box); observer.observe(drawn);
-    return () => observer.disconnect();
+    return () => { rendered.dispose(); observer.disconnect(); };
   }, [term, readable]);
 
   // Playing writes the frames due since the last tick; seeking back redraws from the first frame to the target time.
