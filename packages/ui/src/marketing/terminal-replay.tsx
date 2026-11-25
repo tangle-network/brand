@@ -179,7 +179,10 @@ export function TerminalReplay({ src, title = 'Recorded terminal session', input
     // After each render, a row that drew wider than the terminal widens `stretch` and the fit is measured again.
     const learn = () => {
       if (!rows || !drawn.offsetWidth) return;
-      const ratio = rows.scrollWidth / drawn.offsetWidth;
+      // Each row clips its own overflow, so the container's scroll width does not see a row that draws too wide.
+      let widest = 0;
+      for (const row of rows.children) widest = Math.max(widest, row.scrollWidth);
+      const ratio = widest / drawn.offsetWidth;
       if (ratio > stretch.current + 0.002) { stretch.current = ratio; measure(); }
     };
     measure();
