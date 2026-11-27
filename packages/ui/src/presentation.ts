@@ -96,7 +96,7 @@ export const tablePresentation = {
  * The data table's named parts (`styles/presentation.css` owns their values). A Hono page writes these classes and the
  * `data-*` attributes below; React uses `DataTable`. On the root: `data-density="compact"`, `data-surface="none"` inside
  * a card, `data-layout="stack"` (default for column tables) or `"scroll"`. On a cell: `data-align="end"` for numbers,
- * `data-primary` for the row's title, `data-label` for its column's name when the row stacks. On a status:
+ * `data-primary` for the row's title, `data-label` for its column's name when the row stacks. On a row: `aria-current` or `data-state="selected"` for the open one, `data-href` or `data-clickable` when it opens or selects something. On a status:
  * `data-run-status` from `statusMeta`. On a bar: `--tangle-dt-bar` as its fill width and `data-tone`.
  */
 export const dataTablePresentation = {
