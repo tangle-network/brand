@@ -45,7 +45,8 @@ function Runs() {
     { key: "wall", header: "Wall time", width: "12rem", sort: { direction, onSort: () => setDirection(direction === "desc" ? "asc" : direction === "asc" ? undefined : "desc") },
       cell: (run) => <DataTableBar value={run.wall} max={MAX_WALL}>{run.wall == null ? "—" : `${run.wall.toFixed(1)} h`}</DataTableBar> },
     { key: "tries", header: "Tries", align: "end", cell: (run) => run.tries ?? <span className="tangle-data-table-faint">—</span> },
-    { key: "best", header: "Best check", cell: (run) => run.best },
+    // A value of several nodes, as a product writes a rival or a check: a name, a figure, a date and a link.
+    { key: "best", header: "Best check", cell: (run) => run.best.startsWith("passed") ? <>passed <b>contract</b> v2 <code>rc1</code> with a long qualifying note that has to wrap</> : run.best },
     { key: "usd", header: "API-equiv.", align: "end", cell: (run) => <DataTableMoney value={run.usd} qualifier={run.qualifier} unknown="API-equivalent not priced" /> },
   ];
   return <DataTable label="Runs" title="Runs" meta="$14.59 · $14.59 per step passed" columns={columns} rows={rows} rowKey={(run) => run.id}
