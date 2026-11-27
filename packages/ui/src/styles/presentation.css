@@ -120,9 +120,10 @@
 .tangle-data-table-mono { font-family: var(--font-mono); font-size: 0.8125rem; }
 
 /* A run or job state: a glyph whose outline differs per state, in the state's ink, beside its word in the body colour. */
-.tangle-data-status { display: inline-flex; align-items: center; gap: 0.375rem; min-width: 0; white-space: nowrap; color: hsl(var(--foreground)); }
-.tangle-data-status > svg { flex: none; width: 1rem; height: 1rem; color: var(--tangle-dt-status, var(--surface-neutral-text)); }
-.tangle-data-status > :not(svg) { overflow: hidden; text-overflow: ellipsis; }
+/* A long word ("Stopped by Lab (stall) 03:27Z") wraps beside its glyph rather than leaving its cell; a nowrap column keeps it on one line. */
+.tangle-data-status { display: inline-flex; align-items: flex-start; gap: 0.375rem; min-width: 0; max-width: 100%; color: hsl(var(--foreground)); text-align: start; vertical-align: middle; }
+.tangle-data-status > svg { flex: none; width: 1rem; height: 1rem; margin-block: 0.125rem; color: var(--tangle-dt-status, var(--surface-neutral-text)); }
+.tangle-data-status > :not(svg) { min-width: 0; overflow-wrap: break-word; }
 .tangle-data-status[data-run-status="running"] { --tangle-dt-status: var(--surface-info-text); }
 .tangle-data-status[data-run-status="done"] { --tangle-dt-status: var(--surface-success-text); }
 .tangle-data-status[data-run-status="failed"] { --tangle-dt-status: var(--surface-danger-text); }
