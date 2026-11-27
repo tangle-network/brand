@@ -97,6 +97,10 @@
 .tangle-data-table-table tbody > tr + tr > :is(td, th) { border-top: 1px solid hsl(var(--border)); }
 /* An ARIA table (a virtual list) rules each body row, which carries data-row, above itself; its header cells draw no rule. */
 .tangle-data-table-table [role="columnheader"] { border-bottom: 0; }
+/* An ARIA header cell is a block with a fixed height, so it centres its label itself; numbers keep their end edge. */
+.tangle-data-table-table div[role="columnheader"], .tangle-data-table-table span[role="columnheader"] { display: flex; align-items: center; }
+.tangle-data-table-table :is(div, span)[role="columnheader"][data-align="end"] { justify-content: flex-end; }
+.tangle-data-table-table :is(div, span)[role="columnheader"][data-align="center"] { justify-content: center; }
 .tangle-data-table-table [data-row] { border-top: 1px solid hsl(var(--border)); }
 .tangle-data-table-table tfoot :is(td, th) { border-top: 1px solid hsl(var(--border)); font-weight: 500; }
 .tangle-data-table-table :is(td, th, [role="cell"]) { transition: background-color 120ms ease; }

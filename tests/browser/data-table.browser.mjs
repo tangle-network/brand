@@ -91,6 +91,8 @@ try {
         const ledger = page.getByRole("table", { name: "Ledger" });
         assert.equal(await ledger.evaluate((table) => table.tabIndex), 0, "a virtual list's ARIA table is its own focusable scroller");
         assert.equal(await ledger.locator("[data-row]").first().evaluate((row) => getComputedStyle(row).borderTopWidth), "1px");
+        const centred = await ledger.getByRole("columnheader").evaluateAll((cells) => cells.map((cell) => { const box = cell.getBoundingClientRect(), range = document.createRange(); range.selectNodeContents(cell); const text = range.getBoundingClientRect(); return Math.abs((text.top + text.bottom) / 2 - (box.top + box.bottom) / 2); }));
+        assert.ok(centred.every((offset) => offset <= 1.5), `an ARIA header centres its label in its height: ${centred}`);
         const ledgerOpen = await ledger.locator('[data-row][data-state="selected"]').evaluate((row) => ({ row: getComputedStyle(row).backgroundColor, cell: getComputedStyle(row.firstElementChild).backgroundColor }));
         assert.equal(ledgerOpen.row, facts.selected, "an ARIA row, a grid with gaps, takes the selected tint as one block");
         assert.equal(ledgerOpen.cell, "rgba(0, 0, 0, 0)");
