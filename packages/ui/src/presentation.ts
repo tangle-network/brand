@@ -98,6 +98,8 @@ export const tablePresentation = {
  * a card, `data-layout="stack"` (default for column tables) or `"scroll"`. On a cell: `data-align="end"` for numbers,
  * `data-primary` for the row's title, `data-label` for its column's name when the row stacks. On a row: `aria-current` or `data-state="selected"` for the open one, `data-href` or `data-clickable` when it opens or selects something. On a status:
  * `data-run-status` from `statusMeta`. On a bar: `--tangle-dt-bar` as its fill width and `data-tone`.
+ * `--tangle-dt-font` and `--tangle-dt-font-small` on the root set the body and the small text (header, meta, stacked
+ * labels), for a product with its own type floor.
  */
 export const dataTablePresentation = {
   root: "tangle-data-table",

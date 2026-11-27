@@ -86,6 +86,7 @@ try {
         assert.equal(await empty.getByText("No runs yet").isVisible(), true);
 
         const boards = page.getByRole("region", { name: "Boards" });
+        assert.equal(await boards.locator("thead th").first().evaluate((th) => getComputedStyle(th).fontSize), "13px", "a product with a 13px floor sets the small text once");
         const ledger = page.getByRole("table", { name: "Ledger" });
         assert.equal(await ledger.evaluate((table) => table.tabIndex), 0, "a virtual list's ARIA table is its own focusable scroller");
         assert.equal(await ledger.locator("[data-row]").first().evaluate((row) => getComputedStyle(row).borderTopWidth), "1px");

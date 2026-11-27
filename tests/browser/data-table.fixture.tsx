@@ -59,7 +59,7 @@ createRoot(document.getElementById("root")!).render(
     <Runs />
     <DataTable label="Empty runs" title="Runs" meta="none yet" columns={[{ key: "run", header: "Run", primary: true, cell: () => null }, { key: "usd", header: "API-equiv.", align: "end", cell: () => null }]}
       rows={[]} rowKey={() => "none"} empty="No runs yet" />
-    <DataTableFrame label="Boards" title="Boards" meta="85 boards" density="compact">
+    <DataTableFrame label="Boards" title="Boards" meta="85 boards" density="compact" style={{ ["--tangle-dt-font-small" as string]: "13px" }}>
       <thead><tr>{BOARD_COLUMNS.map((name) => <th key={name} scope="col" data-align={name === "Plain solver" || name === "Disco best" || name === "Gap" ? "end" : undefined}>{name}</th>)}</tr></thead>
       <tbody>{["Circle Packing in a Square", "Barnard-Steinerberger autocorrelation constant C_1c (lower bound)", "Covering design C(17,7,3)"].map((board) => (
         <tr key={board}>{BOARD_COLUMNS.map((name, i) => <td key={name} data-primary={i === 0 || undefined} data-align={i >= 4 && i <= 6 ? "end" : undefined}>{i === 0 ? board : i === 1 ? "live" : i >= 4 && i <= 6 ? "2.635983085" : "AlphaEvolve, 2026-03-24"}</td>)}</tr>
