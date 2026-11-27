@@ -35,7 +35,8 @@ try {
         page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
         await page.goto(`${url}?theme=${theme}`);
         const runs = page.getByRole("region", { name: "Runs", exact: true });
-        await runs.getByRole("row").nth(5).waitFor();
+        // The first page load waits on Vite's dependency optimizer, which a busy gate host can hold past 30 s.
+        await runs.getByRole("row").nth(5).waitFor({ timeout: 120_000 });
 
         const facts = await page.evaluate(() => {
           const probe = (property, value) => { const el = document.createElement("i"); el.style[property] = value; document.body.append(el); const read = getComputedStyle(el)[property]; el.remove(); return read; };
