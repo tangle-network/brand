@@ -138,6 +138,7 @@ export type {
   DataTableFrameProps,
   DataTableDensity,
   DataTableLayout,
+  DataTableElementProps,
   DataTableStatusProps,
   DataTableBarProps,
   DataTableMoneyProps,

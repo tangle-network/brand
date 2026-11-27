@@ -12,6 +12,8 @@ import { runStatus, statusMeta, type RunStatus } from "../run/status-meta";
  */
 
 export type DataTableDensity = "default" | "compact";
+/** Attributes for the table element, `data-*` included. */
+export type DataTableElementProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & { [key: `data-${string}`]: string | number | boolean | undefined };
 export type DataTableLayout = "stack" | "scroll";
 
 export interface DataTableColumn<Row> {
@@ -58,7 +60,7 @@ export interface DataTableFrameProps
   /** `<thead>`, `<tbody>` and `<tfoot>` of the table, or an ARIA table's row groups when `as="grid"`. */
   children: React.ReactNode;
   /** Attributes for the `<table>` (or the ARIA table element). */
-  tableProps?: Omit<React.HTMLAttributes<HTMLElement>, "children">;
+  tableProps?: DataTableElementProps;
   /** A div with `role="table"` instead of a native table, for a virtual list of rows that carry `data-row`. */
   as?: "table" | "grid";
   /** The scrolling element, for a virtual list that measures it. */
@@ -124,12 +126,12 @@ DataTableFrame.displayName = "DataTableFrame";
 
 export interface DataTableProps<Row> extends FrameOptions, Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "children"> {
   /** Attributes for the `<table>`. */
-  tableProps?: Omit<React.HTMLAttributes<HTMLElement>, "children">;
+  tableProps?: DataTableElementProps;
   columns: ReadonlyArray<DataTableColumn<Row> | false | null | undefined>;
   rows: ReadonlyArray<Row>;
   rowKey: (row: Row, index: number) => React.Key;
   /** Attributes for a row: `aria-current` for the open one, `data-href` with `onClick` for a row that opens a page. */
-  rowProps?: (row: Row, index: number) => React.HTMLAttributes<HTMLTableRowElement> & Record<`data-${string}`, string | number | boolean | undefined>;
+  rowProps?: (row: Row, index: number) => React.HTMLAttributes<HTMLTableRowElement> & { [key: `data-${string}`]: string | number | boolean | undefined };
   /** Shown in place of rows when there are none. A string becomes the empty state's title. */
   empty?: React.ReactNode;
   /** A `<tfoot>` row, such as totals; one node per column or one spanning node. */
