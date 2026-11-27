@@ -86,8 +86,8 @@ try {
         assert.equal(await empty.getByText("No runs yet").isVisible(), true);
 
         const boards = page.getByRole("region", { name: "Boards" });
-        const ledger = page.getByRole("region", { name: "Ledger" });
-        assert.equal(await ledger.getByRole("table").count(), 1, "a virtual list keeps an ARIA table");
+        const ledger = page.getByRole("table", { name: "Ledger" });
+        assert.equal(await ledger.evaluate((table) => table.tabIndex), 0, "a virtual list's ARIA table is its own focusable scroller");
         assert.equal(await ledger.locator("[data-row]").first().evaluate((row) => getComputedStyle(row).borderTopWidth), "1px");
 
         if (width === 390) {

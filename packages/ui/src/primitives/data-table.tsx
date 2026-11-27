@@ -82,7 +82,27 @@ const DataTableFrame = React.forwardRef<HTMLDivElement, DataTableFrameProps>(
     ref,
   ) => {
     const { className: tableClassName, ...tableAttributes } = tableProps ?? {};
-    const Table = as === "grid" ? "div" : "table";
+    // A native table scrolls inside a named region. An ARIA table (a virtual list) is its own focusable scroller, so the
+    // element a reader reaches as the table is the one the keyboard scrolls.
+    const body =
+      as === "grid" ? (
+        <div
+          ref={scrollRef}
+          role="table"
+          aria-label={label}
+          tabIndex={0}
+          className={cn(part.scroll, part.table, tableClassName)}
+          {...(tableAttributes as React.HTMLAttributes<HTMLDivElement>)}
+        >
+          {children}
+        </div>
+      ) : (
+        <div ref={scrollRef} className={part.scroll} role="region" aria-label={label} tabIndex={0}>
+          <table aria-label={label} className={cn(part.table, tableClassName)} {...(tableAttributes as React.TableHTMLAttributes<HTMLTableElement>)}>
+            {children}
+          </table>
+        </div>
+      );
     return (
       <div
         ref={ref}
@@ -94,16 +114,7 @@ const DataTableFrame = React.forwardRef<HTMLDivElement, DataTableFrameProps>(
         {...props}
       >
         <FrameHead title={title} meta={meta} actions={actions} titleAs={titleAs} />
-        <div ref={scrollRef} className={part.scroll} role="region" aria-label={label} tabIndex={0}>
-          <Table
-            {...(as === "grid" ? { role: "table" } : {})}
-            aria-label={label}
-            className={cn(part.table, tableClassName)}
-            {...(tableAttributes as React.HTMLAttributes<HTMLElement>)}
-          >
-            {children}
-          </Table>
-        </div>
+        {body}
       </div>
     );
   },
