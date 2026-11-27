@@ -78,7 +78,7 @@ try {
         assert.ok(facts.bars.some((bar) => bar.empty), "an unmeasured run draws an empty track");
         assert.deepEqual(facts.money.map((money) => money.text), ["$0.42", "≥$1.79", "—API-equivalent not priced", "$4.53"]);
         assert.equal(facts.money[2].unknown, true, "an unpriced run is unknown, not zero");
-        assert.equal(facts.current, facts.selected, "the open row takes the selected wash");
+        if (width > 390) assert.equal(facts.current, facts.selected, "the open row takes the selected wash");
         assert.equal(facts.pageFits, true, "no horizontal page scroll");
 
         const empty = page.getByRole("region", { name: "Empty runs" });
@@ -100,8 +100,12 @@ try {
           assert.deepEqual(stacked.labels, ["none", '"Ending"', '"Wall time"', '"Tries"', '"Best check"', '"API-equiv."']);
           assert.ok(stacked.primary >= stacked.rowWidth - 40, "the run name is the row's full-width title");
           assert.equal(stacked.scrolls, false, "a stacked table never scrolls sideways");
+          const open = await runs.locator('tbody tr[aria-current="true"]').evaluate((row) => ({ row: getComputedStyle(row).backgroundColor, cell: getComputedStyle(row.children[1]).backgroundColor }));
+          assert.equal(open.row, facts.selected, "a stacked open row takes the selected tint as one block");
+          assert.equal(open.cell, "rgba(0, 0, 0, 0)");
           assert.equal(await page.getByRole("row").filter({ hasText: "procedure-census-matrix" }).first().isVisible(), true);
-          const wide = await boards.evaluate((region) => ({ scrolls: region.scrollWidth > region.clientWidth, tab: region.tabIndex }));
+          const wide = await boards.evaluate((region) => ({ scrolls: region.scrollWidth > region.clientWidth, tab: region.tabIndex, title: region.querySelector("tbody td").getBoundingClientRect().width }));
+          assert.ok(wide.title >= 80, `a scrolling table keeps whole words in a cell (${wide.title}px), not one letter a line`);
           assert.equal(wide.scrolls, true, "a wide scroll table scrolls inside its region");
           assert.equal(wide.tab, 0, "its region takes keyboard focus to scroll");
         } else {

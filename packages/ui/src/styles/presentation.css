@@ -91,7 +91,8 @@
 .tangle-data-table-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
 .tangle-data-table-scroll:focus-visible { outline: 1px solid var(--focus-border); outline-offset: -1px; box-shadow: inset 0 0 0 3px var(--focus-halo); }
 .tangle-data-table-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--font-size-sm); line-height: 1.25rem; font-variant-numeric: tabular-nums; }
-.tangle-data-table-table :is(th, td, [role="columnheader"], [role="cell"]) { padding: var(--tangle-dt-pad-y) var(--tangle-dt-pad-x); text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
+/* break-word, not anywhere: a cell never shrinks below its longest word, so a wide table scrolls instead of stacking letters. */
+.tangle-data-table-table :is(th, td, [role="columnheader"], [role="cell"]) { padding: var(--tangle-dt-pad-y) var(--tangle-dt-pad-x); text-align: start; vertical-align: middle; overflow-wrap: break-word; }
 .tangle-data-table-table :is(thead th, [role="columnheader"]) { height: var(--tangle-dt-head); padding-block: 0; font-size: var(--font-size-xs); font-weight: 500; letter-spacing: 0; line-height: 1rem; color: hsl(var(--muted-foreground)); white-space: nowrap; overflow-wrap: normal; background: color-mix(in oklab, hsl(var(--card)), hsl(var(--foreground)) 3%); border-bottom: 1px solid hsl(var(--border)); }
 .tangle-data-table-table tbody > tr + tr > :is(td, th) { border-top: 1px solid hsl(var(--border)); }
 /* An ARIA table (a virtual list) rules each body row, which carries data-row, above itself; its header cells draw no rule. */
@@ -160,7 +161,11 @@
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.375rem; padding: 0.75rem var(--tangle-dt-pad-x); }
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr + tr { border-top: 1px solid hsl(var(--border)); }
-  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th) { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; min-width: 0; padding: 0; border: 0; text-align: end; white-space: normal; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th) { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; min-width: 0; padding: 0; border: 0; text-align: end; white-space: normal; overflow-wrap: anywhere; }
+  /* A stacked row is one block: it, not each cell, takes the hover wash and the selected tint. */
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th, [role="cell"]):nth-child(n) { background: none; box-shadow: none; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr:hover { background: var(--ix-hover-bg); }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) { background: var(--ix-sel-bg); box-shadow: inset 2px 0 0 var(--ix-sel-ring); }
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th)::before { content: attr(data-label); flex: none; max-width: 45%; color: hsl(var(--muted-foreground)); font-size: var(--font-size-xs); font-weight: 400; text-align: start; }
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th):is([data-primary], :not([data-label]))::before { content: none; }
   .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > [data-primary] { justify-content: flex-start; text-align: start; font-size: var(--font-size-base); }
