@@ -77,3 +77,96 @@
 .tangle-page-description { margin-top: 0.25rem; max-width: 65ch; color: hsl(var(--muted-foreground)); font-size: var(--font-size-label); overflow-wrap: anywhere; }
 .tangle-code-tabs { overflow-x: auto; max-width: 100%; }
 .tangle-code-tabs [role="tab"] { flex: none; min-height: var(--control-height-lg); }
+
+/* Data table. A card on Brand's ladder that holds one native table (or an ARIA table of rows for a virtual list), so a
+   table never sits flat on the page. Status, bar, money and empty cells share it; a narrow container stacks each row into
+   label and value pairs (data-layout="stack") or scrolls inside its own named region (data-layout="scroll"). */
+.tangle-data-table { --tangle-dt-pad-x: 1rem; --tangle-dt-pad-y: 0.75rem; --tangle-dt-head: 2.5rem; container: tangle-data-table / inline-size; position: relative; min-width: 0; max-width: 100%; color: hsl(var(--card-foreground)); background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius-card); box-shadow: var(--edge-highlight), var(--shadow-card); overflow: hidden; }
+.tangle-data-table[data-density="compact"] { --tangle-dt-pad-x: 0.75rem; --tangle-dt-pad-y: 0.5rem; --tangle-dt-head: 2.25rem; }
+.tangle-data-table[data-surface="none"] { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.tangle-data-table-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; padding: 0.875rem var(--tangle-dt-pad-x) 0.75rem; border-bottom: 1px solid hsl(var(--border)); }
+.tangle-data-table-title { margin: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: 1.25rem; color: hsl(var(--foreground)); }
+.tangle-data-table-meta { margin: 0; font-size: var(--font-size-xs); line-height: 1rem; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tangle-data-table-actions { margin-inline-start: auto; display: flex; align-items: center; gap: 0.5rem; }
+.tangle-data-table-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.tangle-data-table-scroll:focus-visible { outline: 1px solid var(--focus-border); outline-offset: -1px; box-shadow: inset 0 0 0 3px var(--focus-halo); }
+.tangle-data-table-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--font-size-sm); line-height: 1.25rem; font-variant-numeric: tabular-nums; }
+.tangle-data-table-table :is(th, td, [role="columnheader"], [role="cell"]) { padding: var(--tangle-dt-pad-y) var(--tangle-dt-pad-x); text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
+.tangle-data-table-table :is(thead th, [role="columnheader"]) { height: var(--tangle-dt-head); padding-block: 0; font-size: var(--font-size-xs); font-weight: 500; letter-spacing: 0; line-height: 1rem; color: hsl(var(--muted-foreground)); white-space: nowrap; overflow-wrap: normal; background: color-mix(in oklab, hsl(var(--card)), hsl(var(--foreground)) 3%); border-bottom: 1px solid hsl(var(--border)); }
+.tangle-data-table-table tbody > tr + tr > :is(td, th) { border-top: 1px solid hsl(var(--border)); }
+/* An ARIA table (a virtual list) rules each body row, which carries data-row, above itself; its header cells draw no rule. */
+.tangle-data-table-table [role="columnheader"] { border-bottom: 0; }
+.tangle-data-table-table [data-row] { border-top: 1px solid hsl(var(--border)); }
+.tangle-data-table-table tfoot :is(td, th) { border-top: 1px solid hsl(var(--border)); font-weight: 500; }
+.tangle-data-table-table :is(td, th, [role="cell"]) { transition: background-color 120ms ease; }
+.tangle-data-table-table :is(tbody > tr, [data-row]):hover > :is(td, th, [role="cell"]) { background: var(--ix-hover-bg); }
+.tangle-data-table-table :is(tr, [data-row]):is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :is(td, th, [role="cell"]) { background: var(--ix-sel-bg); }
+.tangle-data-table-table :is(tr, [data-row]):is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :first-child { box-shadow: inset 2px 0 0 var(--ix-sel-ring); }
+.tangle-data-table-table :is(tr, [data-row])[data-href] { cursor: pointer; }
+.tangle-data-table-table :is(tr, [data-row]):focus-visible { outline: 1px solid var(--focus-border); outline-offset: -1px; }
+.tangle-data-table-table [data-align="end"] { text-align: end; white-space: nowrap; overflow-wrap: normal; font-variant-numeric: tabular-nums; }
+.tangle-data-table-table [data-align="center"] { text-align: center; }
+.tangle-data-table-table [data-primary] { font-weight: 500; color: hsl(var(--foreground)); }
+.tangle-data-table-table [data-nowrap] { white-space: nowrap; overflow-wrap: normal; }
+.tangle-data-table-table :is(td, [role="cell"]) a:not([class]) { color: var(--accent-text); text-decoration: none; text-underline-offset: 2px; }
+.tangle-data-table-table :is(td, [role="cell"]) a:not([class]):hover { text-decoration: underline; }
+.tangle-data-table-table :is(th, [role="columnheader"]) > button { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 1.5rem; padding: 0; color: inherit; font: inherit; background: none; border: 0; border-radius: var(--radius-sm, 4px); cursor: pointer; }
+.tangle-data-table-table :is(th, [role="columnheader"]) > button:hover { color: hsl(var(--foreground)); }
+.tangle-data-table-table :is(th, [role="columnheader"]) > button:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.tangle-data-table-table :is(th, [role="columnheader"])[aria-sort]:not([aria-sort="none"]) { color: hsl(var(--foreground)); }
+.tangle-data-table-faint { color: var(--text-dim); }
+.tangle-data-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tangle-data-table-mono { font-family: var(--font-mono); font-size: 0.8125rem; }
+
+/* A run or job state: a glyph whose outline differs per state, in the state's ink, beside its word in the body colour. */
+.tangle-data-status { display: inline-flex; align-items: center; gap: 0.375rem; min-width: 0; white-space: nowrap; color: hsl(var(--foreground)); }
+.tangle-data-status > svg { flex: none; width: 1rem; height: 1rem; color: var(--tangle-dt-status, var(--surface-neutral-text)); }
+.tangle-data-status > :not(svg) { overflow: hidden; text-overflow: ellipsis; }
+.tangle-data-status[data-run-status="running"] { --tangle-dt-status: var(--surface-info-text); }
+.tangle-data-status[data-run-status="done"] { --tangle-dt-status: var(--surface-success-text); }
+.tangle-data-status[data-run-status="failed"] { --tangle-dt-status: var(--surface-danger-text); }
+.tangle-data-status[data-run-status="needs-you"] { --tangle-dt-status: var(--surface-warning-text); }
+.tangle-data-status[data-run-status="running"] > svg { animation: tangle-breathe var(--motion-ambient, 2s) infinite; }
+@media (prefers-reduced-motion: reduce) { .tangle-data-status > svg { animation: none !important; } }
+
+/* A quantity against the column's largest: a track, its fill, and the value it draws. */
+.tangle-data-bar { display: grid; grid-template-columns: minmax(3rem, 1fr) auto; align-items: center; gap: 0.5rem; min-width: 7.5rem; }
+.tangle-data-bar-track { position: relative; height: 0.375rem; overflow: hidden; border-radius: 999px; background: color-mix(in oklab, hsl(var(--card)), hsl(var(--foreground)) 10%); }
+.tangle-data-bar-fill { position: absolute; inset-block: 0; inset-inline-start: 0; width: var(--tangle-dt-bar, 0%); min-width: 2px; border-radius: inherit; background: var(--tangle-dt-bar-color, var(--chart-series-1)); }
+.tangle-data-bar-fill[data-empty] { display: none; }
+.tangle-data-bar[data-tone="success"] { --tangle-dt-bar-color: var(--surface-success-text); }
+.tangle-data-bar[data-tone="danger"] { --tangle-dt-bar-color: var(--surface-danger-text); }
+.tangle-data-bar[data-tone="warning"] { --tangle-dt-bar-color: var(--surface-warning-text); }
+.tangle-data-bar[data-tone="neutral"] { --tangle-dt-bar-color: var(--text-dim); }
+.tangle-data-bar-value { min-width: 3.5ch; text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; color: hsl(var(--foreground)); }
+
+/* Money: tabular digits; a lower bound or an estimate says so before the number; an unpriced value is a dash, not a zero. */
+.tangle-data-money { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tangle-data-money-mark { margin-inline-end: 0.125rem; color: hsl(var(--muted-foreground)); }
+.tangle-data-money[data-unknown] { color: var(--text-dim); }
+
+/* No rows: one full-width cell that says what would be here and what to do. */
+.tangle-data-table-table .tangle-data-empty > :is(td, [role="cell"]) { padding: 2.5rem var(--tangle-dt-pad-x); text-align: center; white-space: normal; }
+.tangle-data-table-table .tangle-data-empty:hover > :is(td, [role="cell"]) { background: none; }
+.tangle-data-empty-title { margin: 0; font-size: var(--font-size-sm); font-weight: 600; color: hsl(var(--foreground)); }
+.tangle-data-empty-description { margin: 0.25rem auto 0; max-width: 40ch; font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); }
+.tangle-data-empty-action { margin-top: 1rem; }
+
+/* Narrow container: a stack table turns each row into its own block, the primary cell as its title and every other cell as
+   its column's label beside its value. Table semantics stay on the explicit roles the React table writes. */
+@container tangle-data-table (max-width: 40rem) {
+  .tangle-data-table { --tangle-dt-pad-x: 0.875rem; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table, .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody { display: block; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.375rem; padding: 0.75rem var(--tangle-dt-pad-x); }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr + tr { border-top: 1px solid hsl(var(--border)); }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th) { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; min-width: 0; padding: 0; border: 0; text-align: end; white-space: normal; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th)::before { content: attr(data-label); flex: none; max-width: 45%; color: hsl(var(--muted-foreground)); font-size: var(--font-size-xs); font-weight: 400; text-align: start; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th):is([data-primary], :not([data-label]))::before { content: none; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > [data-primary] { justify-content: flex-start; text-align: start; font-size: var(--font-size-base); }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th):empty { display: none; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > tr > :is(td, th) > .tangle-data-bar { flex: 1 1 auto; max-width: 60%; min-width: 0; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > .tangle-data-empty { display: block; padding: 0; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tbody > .tangle-data-empty > td { display: block; padding: 2rem var(--tangle-dt-pad-x); text-align: center; }
+  .tangle-data-table[data-layout="stack"] .tangle-data-table-table > tfoot { display: block; }
+}

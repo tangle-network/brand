@@ -92,6 +92,37 @@ export const tablePresentation = {
   caption: "mt-4 text-muted-foreground text-sm",
 } as const;
 
+/**
+ * The data table's named parts (`styles/presentation.css` owns their values). A Hono page writes these classes and the
+ * `data-*` attributes below; React uses `DataTable`. On the root: `data-density="compact"`, `data-surface="none"` inside
+ * a card, `data-layout="stack"` (default for column tables) or `"scroll"`. On a cell: `data-align="end"` for numbers,
+ * `data-primary` for the row's title, `data-label` for its column's name when the row stacks. On a status:
+ * `data-run-status` from `statusMeta`. On a bar: `--tangle-dt-bar` as its fill width and `data-tone`.
+ */
+export const dataTablePresentation = {
+  root: "tangle-data-table",
+  head: "tangle-data-table-head",
+  title: "tangle-data-table-title",
+  meta: "tangle-data-table-meta",
+  actions: "tangle-data-table-actions",
+  scroll: "tangle-data-table-scroll",
+  table: "tangle-data-table-table",
+  faint: "tangle-data-table-faint",
+  mono: "tangle-data-table-mono",
+  status: "tangle-data-status",
+  bar: "tangle-data-bar",
+  barTrack: "tangle-data-bar-track",
+  barFill: "tangle-data-bar-fill",
+  barValue: "tangle-data-bar-value",
+  money: "tangle-data-money",
+  moneyMark: "tangle-data-money-mark",
+  empty: "tangle-data-empty",
+  emptyTitle: "tangle-data-empty-title",
+  emptyDescription: "tangle-data-empty-description",
+  emptyAction: "tangle-data-empty-action",
+  srOnly: "tangle-data-sr",
+} as const;
+
 export const emptyStatePresentation = {
   root: "flex flex-col items-center justify-center px-4 py-16 text-center",
   icon: "mb-4 rounded-full bg-muted p-4 text-muted-foreground",
