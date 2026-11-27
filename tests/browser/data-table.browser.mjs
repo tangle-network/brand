@@ -30,13 +30,19 @@ try {
     for (const width of [390, 1440]) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme, reducedMotion: "reduce", ...(out ? { recordVideo: { dir: resolve(out, "video"), size: { width, height: 900 } } } : {}) });
       try {
-        const page = await context.newPage(), errors = [];
+        const page = await context.newPage(), errors = [], heard = [];
         page.on("pageerror", (error) => errors.push(error.message));
-        page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
+        page.on("console", (message) => { heard.push(`${message.type()}: ${message.text()}`); if (message.type() === "error") errors.push(message.text()); });
+        page.on("response", (response) => response.status() >= 400 && heard.push(`${response.status()} ${response.url()}`));
         await page.goto(`${url}?theme=${theme}`);
         const runs = page.getByRole("region", { name: "Runs", exact: true });
         // The first page load waits on Vite's dependency optimizer, which a busy gate host can hold past 30 s.
-        await runs.getByRole("row").nth(5).waitFor({ timeout: 120_000 });
+        try {
+          await runs.getByRole("row").nth(5).waitFor({ timeout: 120_000 });
+        } catch (error) {
+          const body = await page.evaluate(() => document.body.innerHTML.slice(0, 3000)).catch((reason) => String(reason));
+          throw new Error(`the runs table never drew: ${error.message}\nerrors: ${JSON.stringify(errors)}\nconsole: ${JSON.stringify(heard.slice(-40))}\nbody: ${body}`);
+        }
 
         const facts = await page.evaluate(() => {
           const probe = (property, value) => { const el = document.createElement("i"); el.style[property] = value; document.body.append(el); const read = getComputedStyle(el)[property]; el.remove(); return read; };
