@@ -113,6 +113,14 @@ try {
           assert.deepEqual(stacked.labels, ["none", '"Ending"', '"Wall time"', '"Tries"', '"Best check"', '"API-equiv."']);
           assert.ok(stacked.primary >= stacked.rowWidth - 40, "the run name is the row's full-width title");
           assert.equal(stacked.scrolls, false, "a stacked table never scrolls sideways");
+          const flow = await runs.locator('td[data-column="best"]:has(b)').first().evaluate((cell) => {
+            const lead = document.createRange(); lead.selectNodeContents(cell.firstChild);
+            const b = cell.querySelector("b"), code = cell.querySelector("code");
+            return { space: b.getBoundingClientRect().left - lead.getBoundingClientRect().right, words: b.getClientRects().length, line: Math.abs(b.getBoundingClientRect().top - code.getBoundingClientRect().top) };
+          });
+          assert.ok(flow.space > -1 && flow.space < 8, `a stacked value of several nodes keeps its words a space apart, not in columns (${flow.space}px)`);
+          assert.equal(flow.words, 1, "no word in a stacked value breaks across lines");
+          assert.ok(flow.line < 4, "the nodes of a short stacked value share a line");
           const open = await runs.locator('tbody tr[aria-current="true"]').evaluate((row) => ({ row: getComputedStyle(row).backgroundColor, cell: getComputedStyle(row.children[1]).backgroundColor }));
           assert.equal(open.row, facts.selected, "a stacked open row takes the selected tint as one block");
           assert.equal(open.cell, "rgba(0, 0, 0, 0)");
