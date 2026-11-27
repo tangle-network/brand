@@ -1,6 +1,7 @@
 import * as React from "react";
 import { dataTablePresentation as part } from "../presentation";
 import { cn } from "../lib/utils";
+import { formatCost } from "../utils/format";
 import { runStatus, statusMeta, type RunStatus } from "../run/status-meta";
 
 /**
@@ -263,45 +264,38 @@ const DataTableBar = React.forwardRef<HTMLSpanElement, DataTableBarProps>(({ val
 DataTableBar.displayName = "DataTableBar";
 
 export interface DataTableMoneyProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
-  /** The amount; null or undefined is unknown and prints a dash, never a zero. */
+  /** US dollars; null or undefined is unknown and prints a dash, never a zero. */
   value: number | null | undefined;
-  currency?: string;
   /** `at-least` prints ≥ (a lower bound), `estimated` prints ≈. */
   qualifier?: "at-least" | "estimated";
-  /** Why the value is unknown, as the dash's title. */
+  /** Why the value is unknown, as the dash's title and its accessible text. */
   unknown?: string;
-  /** Fraction digits; two by default, none from 1,000 up. */
-  digits?: number;
-  locale?: string;
 }
 
-/** Money on tabular digits, with its bound or estimate marked and an unknown kept distinct from zero. */
-const DataTableMoney = React.forwardRef<HTMLSpanElement, DataTableMoneyProps>(
-  ({ value, currency = "USD", qualifier, unknown = "Not priced", digits, locale = "en-US", className, title, ...props }, ref) => {
-    if (value == null || !Number.isFinite(value)) {
-      return (
-        <span ref={ref} className={cn(part.money, className)} data-unknown="" title={title ?? unknown} {...props}>
-          <span aria-hidden="true">—</span>
-          <span className={part.srOnly}>{unknown}</span>
-        </span>
-      );
-    }
-    const fraction = digits ?? (Math.abs(value) >= 1000 ? 0 : 2);
-    const text = new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: fraction, maximumFractionDigits: fraction }).format(value);
-    const mark = qualifier === "at-least" ? "≥" : qualifier === "estimated" ? "≈" : null;
+/** Dollars as `formatCost` writes them, on tabular digits, with a bound or estimate marked and unknown kept apart from zero. */
+const DataTableMoney = React.forwardRef<HTMLSpanElement, DataTableMoneyProps>(({ value, qualifier, unknown = "Not priced", className, title, ...props }, ref) => {
+  if (value == null || !Number.isFinite(value) || value < 0) {
     return (
-      <span
-        ref={ref}
-        className={cn(part.money, className)}
-        title={title ?? (qualifier === "at-least" ? `at least ${text}` : qualifier === "estimated" ? `about ${text}` : undefined)}
-        {...props}
-      >
-        {mark && <span className={part.moneyMark} aria-hidden="true">{mark}</span>}
-        {text}
+      <span ref={ref} className={cn(part.money, className)} data-unknown="" title={title ?? unknown} {...props}>
+        <span aria-hidden="true">—</span>
+        <span className={part.srOnly}>{unknown}</span>
       </span>
     );
-  },
-);
+  }
+  const text = formatCost(value);
+  const mark = qualifier === "at-least" ? "≥" : qualifier === "estimated" ? "≈" : null;
+  return (
+    <span
+      ref={ref}
+      className={cn(part.money, className)}
+      title={title ?? (qualifier === "at-least" ? `at least ${text}` : qualifier === "estimated" ? `about ${text}` : undefined)}
+      {...props}
+    >
+      {mark && <span className={part.moneyMark} aria-hidden="true">{mark}</span>}
+      {text}
+    </span>
+  );
+});
 DataTableMoney.displayName = "DataTableMoney";
 
 export interface DataTableEmptyProps extends Omit<React.HTMLAttributes<HTMLTableRowElement>, "title"> {
