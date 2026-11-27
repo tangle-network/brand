@@ -67,7 +67,7 @@ createRoot(document.getElementById("root")!).render(
     </DataTableFrame>
     <DataTableFrame label="Ledger" title="Ledger" as="grid">
       <div role="rowgroup"><div role="row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}><div role="columnheader">Run</div><div role="columnheader" data-align="end">Hours</div></div></div>
-      <div role="rowgroup">{["27b", "27a", "26a"].map((id) => <div key={id} role="row" data-row="" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}><div role="cell">{id}</div><div role="cell" data-align="end">1.8</div></div>)}</div>
+      <div role="rowgroup">{["27b", "27a", "26a"].map((id) => <div key={id} role="row" data-row="" data-state={id === "27a" ? "selected" : undefined} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 12 }}><div role="cell">{id}</div><div role="cell" data-align="end">1.8</div></div>)}</div>
     </DataTableFrame>
   </main>,
 );

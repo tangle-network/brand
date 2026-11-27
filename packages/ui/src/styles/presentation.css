@@ -100,9 +100,12 @@
 .tangle-data-table-table [data-row] { border-top: 1px solid hsl(var(--border)); }
 .tangle-data-table-table tfoot :is(td, th) { border-top: 1px solid hsl(var(--border)); font-weight: 500; }
 .tangle-data-table-table :is(td, th, [role="cell"]) { transition: background-color 120ms ease; }
-.tangle-data-table-table :is(tbody > tr, [data-row]):hover > :is(td, th, [role="cell"]) { background: var(--ix-hover-bg); }
-.tangle-data-table-table :is(tr, [data-row]):is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :is(td, th, [role="cell"]) { background: var(--ix-sel-bg); }
-.tangle-data-table-table :is(tr, [data-row]):is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :first-child { box-shadow: inset 2px 0 0 var(--ix-sel-ring); }
+.tangle-data-table-table tbody > tr:hover > :is(td, th) { background: var(--ix-hover-bg); }
+.tangle-data-table-table tr:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :is(td, th) { background: var(--ix-sel-bg); }
+.tangle-data-table-table tr:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [data-state="selected"]) > :first-child { box-shadow: inset 2px 0 0 var(--ix-sel-ring); }
+/* An ARIA row is usually a grid with gaps between its cells, so the row, not each cell, takes the wash and the tint. */
+.tangle-data-table-table [data-row]:hover { background: var(--ix-hover-bg); }
+.tangle-data-table-table [data-row]:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"], [data-state="selected"]) { background: var(--ix-sel-bg); box-shadow: inset 2px 0 0 var(--ix-sel-ring); }
 .tangle-data-table-table :is(tr, [data-row]):is([data-href], [data-clickable]) { cursor: pointer; }
 .tangle-data-table-table :is(tr, [data-row]):focus-visible { outline: 1px solid var(--focus-border); outline-offset: -1px; }
 .tangle-data-table-table [data-align="end"] { text-align: end; white-space: nowrap; overflow-wrap: normal; font-variant-numeric: tabular-nums; }
