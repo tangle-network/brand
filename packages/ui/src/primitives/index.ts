@@ -124,6 +124,27 @@ export {
 } from "./table";
 export type { TableProps } from "./table";
 
+export {
+  DataTable,
+  DataTableFrame,
+  DataTableStatus,
+  DataTableBar,
+  DataTableMoney,
+  DataTableEmpty,
+} from "./data-table";
+export type {
+  DataTableProps,
+  DataTableColumn,
+  DataTableFrameProps,
+  DataTableDensity,
+  DataTableLayout,
+  DataTableElementProps,
+  DataTableStatusProps,
+  DataTableBarProps,
+  DataTableMoneyProps,
+  DataTableEmptyProps,
+} from "./data-table";
+
 export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 
 export { SegmentedControl } from "./segmented-control";

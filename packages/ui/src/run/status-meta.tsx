@@ -42,11 +42,11 @@ const META: Record<RunStatus, StatusMeta> = {
 
 // The vocabularies ui and its products already speak, so each maps here once.
 const ALIASES: Record<string, RunStatus> = {
-  active: "running", working: "running", in_progress: "running", "in-progress": "running", streaming: "running",
+  active: "running", live: "running", working: "running", in_progress: "running", "in-progress": "running", streaming: "running",
   pending: "waiting", queued: "waiting", blocked: "waiting",
   "attention-needed": "needs-you", needs_you: "needs-you", needs_input: "needs-you", awaiting_input: "needs-you",
-  winner: "done", completed: "done", complete: "done", success: "done", succeeded: "done", shipped: "done",
-  error: "failed", errored: "failed", "driver-failed": "failed", down: "failed",
+  winner: "done", passed: "done", pass: "done", solved: "done", completed: "done", complete: "done", success: "done", succeeded: "done", shipped: "done",
+  error: "failed", errored: "failed", fail: "failed", "driver-failed": "failed", down: "failed",
   "no-winner": "stopped", cancelled: "stopped", canceled: "stopped", aborted: "stopped",
 };
 

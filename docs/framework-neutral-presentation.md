@@ -16,6 +16,7 @@ on the server: DOM APIs are used only when its event binding is called in a brow
 | Reading frame | `PageShell navigation article outline` slots | `tangle-reading-shell`, `tangle-reading-nav`, `tangle-reading-article`, `tangle-reading-outline` | Local docs grid/width styles |
 | Field and native select | `Input`, `Textarea`, `SelectTrigger` | `inputVariants`, `labelVariants`, `helpPresentation`, `fieldPresentation`, `fieldSizes`, `fieldTouchText`; native select uses field classes | Local field fills/sizes/focus |
 | Table | `Table` family | `tablePresentation` named parts | Generic table styling; retain table data |
+| Data table on a card | `DataTable` (columns and rows), `DataTableFrame` (native markup); `DataTableStatus`, `DataTableBar`, `DataTableMoney`, `DataTableEmpty` | `dataTablePresentation` named parts and `data-*` attributes; values in `styles/presentation.css` | Local table surfaces, status pills, bar and money cells, empty rows |
 | Dialog | `Dialog`/`Sheet` (Radix) | `dialogPresentation` parts; `tangle-native-dialog`, `bindDialog` for native dialog | Local modal styles and handwritten focus traps |
 | Metrics | `MetricStrip`, `Metric` | `metricPresentation`, `metricLayouts` | Local metric grids/typography; retain data source |
 | Empty state | `EmptyState` | `emptyStatePresentation` named parts | Local generic empty-state definitions |
